@@ -55,6 +55,10 @@ cell based models
 
 ### Cell based models
 
+For a more detailed version of this discussion, see
+[this notebook](notebooks/core_architecture/Simulation structures and
+specification.ipynb).
+
 #### Common elements
 
 The graphic below details the various objects modeled here. Each of
