@@ -114,8 +114,10 @@ based on the formalism described in [Tlili2013]
 
 TODO
 
+## Licence
 
-
+This project is distributed as a GPL licence v3 or above. Some parts of it, of
+potential general interest, will be distributed under a LGPL licence.
 
 
 ## Bibliography
