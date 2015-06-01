@@ -7,14 +7,20 @@ bio-mechanical models of living tissues, with a focus on **epithelium** modeling
 > An epithelium is a collection of connective cells forming a
 > single cell thick sheet.
 
-Here is an example of epithelium simulation:
 
-![An example of epithelium simulation](illus/tissue_3d.png)
+### What kind of Models does it implement?
 
-It is a vertex model of the apical surface of the epithelium, from Monier et al. [monier2015apico]
+The first model that will be implemented is the one described in
+Monier et al. [monier2015apico]. It is an example of a vertex model,
+where the interactions are only evaluated on the apical surface sheet
+of the epithelium. The second class of models are still at an
+stage. They implement a description of the tissue's rheology, within a
+dissipation function formalism.
+
+![The two models considered](illus/two_models.png)
 
 
-## Authors
+### Authors
 
 * Cyprien Gay @cypriengay
 * Guillaume Gay (maintainer) - @glyg
@@ -63,7 +69,7 @@ graph of interacting cells, with two cells neighbouring cells sharing
 a junction.
 
 All the physical objects are represented by
-[CGAL Linear Cell Complexes](http://doc.cgal.org/latest/Linear_cell_complex/index.html),
+[CGAL Linear Cell Complexes - in short LCC](http://doc.cgal.org/latest/Linear_cell_complex/index.html),
 that are specialized versions of
 [CGAL Combinatorial Maps](http://doc.cgal.org/latest/Combinatorial_map/index.html). Vertices
 are 0-cells (associated to a Point object in the LCC), edges 1-cells,
@@ -75,7 +81,7 @@ and common events such as cell division (using
 `lcc.insert_point_in_cell`). For a given model, only subsets of these
 objects might be needed, but we'll try to keep the various definitions
 as generic as possible, for example by defining cell division
-irrespective of the detailed geometry of the cell.
+irrespective of the detailed geometry of the cell, through template meta-programming
 
 ![The objects defined in this library](illus/class_diagram.png)
 
@@ -89,18 +95,26 @@ If the core computation and objects are defined in C++ through CGAL,
 we use `boost::python` to expose these objects in Python. The
 objective is to have an easy and reactive way to define and run
 different simulation scenarios. An essential aspect of this C++/Python
-framework will be to expose CGAL CombinatorialMap CellAttribute as
+framework will be to expose `CGAL::CellAttribute` instances as
 Numpy `ndarray`, to ease data exploration, visualization and analysis,
 as is done for graph-tool `PropertyMap` objects.
 
-#### Models to be implemented
+The general idea here is to implement in C++ all the core components
+of each model class (which can also be seen as physical engines), and
+develop simulation specific definitions in python.
 
-The first model that will be implemented is the one described in Monier et al. [monier2015apico].
 
 ## Continuous Models
 
 Here the base object is derived from CGAL `Polyhedron_3` and is a
-segmentation of the whole tissue.
+segmentation of the whole tissue. The (yet to be) implemented model is
+based on the formalism described in [Tlili2013]
+
+## Similar softwares
+
+TODO
+
+
 
 
 
@@ -117,6 +131,8 @@ segmentation of the whole tissue.
   apoptotic cells drive epithelium folding. Nature 518, 245–248 (2015).
 
 [Tamulonis2013]: Tamulonis, C. Cell-based models. (Universiteit ven Amsterdam, 2013). doi:10.1177/1745691612459060.
+
+[Tlili2013]: Tlili,S. et al. Mechanical formalism for tissue dynamics. 6, 23 (2013).
 
 [1]: The fact that the LCC model uses the term `cell` as it's core
   concept is unfortunate. This will be hidden in the python API of the project.
