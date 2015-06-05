@@ -17,7 +17,7 @@ of the epithelium. The second class of models are still at an
 stage. They implement a description of the tissue's rheology, within a
 dissipation function formalism.
 
-![The two models considered](illus/two_models.png)
+![The two models considered](doc/illus/two_models.png)
 
 
 ### Authors
@@ -42,6 +42,12 @@ dissipation function formalism.
 ### C++
 - Boost >= 1.54
 - CGAL >= 3.5
+
+
+## Install
+
+```bash
+
 
 ## Object Architecture
 
@@ -87,7 +93,7 @@ objects might be needed, but we'll try to keep the various definitions
 as generic as possible, for example by defining cell division
 irrespective of the detailed geometry of the cell, through template meta-programming
 
-![The objects defined in this library](illus/class_diagram.png)
+![The objects defined in this library](doc/illus/class_diagram.png)
 
 Note that we might need to further sub-class CGAL's LinearCellComplex
 to take into account the possibility of curved edges and faces in the
