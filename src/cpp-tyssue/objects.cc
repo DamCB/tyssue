@@ -1,4 +1,5 @@
 #include <CGAL/Linear_cell_complex.h>
+#include "objects.hh"
 
 struct World
 {
@@ -17,9 +18,9 @@ struct World
 #include <boost/python.hpp>
 using namespace boost::python;
 
-void export_python()
+void export_world()
 {
-  class_<World>("World", no_init)
+  class_<World>("World")
     .def("greet", &World::greet)
     .def("set", &World::set);
 }

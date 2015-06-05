@@ -1,6 +1,7 @@
 
 from ..dl_import import dl_import
-libcore = None
+
+libcore = None ## Avoids code check complains od libcore being undefined
 
 dl_import("from .. import libtyssue_core as libcore")
 
@@ -8,7 +9,7 @@ dl_import("from .. import libtyssue_core as libcore")
 def test_import():
     planet = libcore.World()
     planet.set('howdy')
-    planet.greet()
+    print(planet.greet())
 
 
 class LinearCellComplex:
@@ -28,12 +29,12 @@ class LinearCellComplex:
         '''
         self.i = dim # as in i-cell in the doc.
 
-class JunctionVertex(LinearCellComplex):
+class Vertex(LinearCellComplex):
 
     def __init__(self):
         LinearCellComplex.__init__(self, 0)
 
-class JunctionEdge(LinearCellComplex):
+class Edge(LinearCellComplex):
 
     def __init__(self):
         LinearCellComplex.__init__(self, 1)
