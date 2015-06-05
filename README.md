@@ -30,6 +30,9 @@ dissipation function formalism.
 
 ## Dependencies
 
+As all the dependencies are allready completely supported in python 3.x, we won't be maintaining a
+python 2.x version, because it's time to move on...
+
 ### Python
 
 - Python >= 3.4
@@ -46,9 +49,13 @@ dissipation function formalism.
 
 ## Install
 
+Here is the procedure for a debian/ubuntu machine. Building this software should be possible
+on Mac (follow the instructions from the graph-tool website), but is untested (as the maintainer lacks a Mac to do so)
+
 ```bash
 
 
+```
 ## Object Architecture
 
 We distinguish **cell-based** and **continuous** epithelium

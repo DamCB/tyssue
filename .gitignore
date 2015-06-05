@@ -41,7 +41,7 @@ stamp-h1
 Makefile.in
 depcomp
 .libs
-
+lt*.m4
 
 # Installer logs
 pip-log.txt
