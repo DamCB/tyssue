@@ -1,5 +1,7 @@
 
 from ..dl_import import dl_import
+libcore = None
+
 dl_import("from .. import libtyssue_core as libcore")
 
 
@@ -30,8 +32,6 @@ class JunctionVertex(LinearCellComplex):
 
     def __init__(self):
         LinearCellComplex.__init__(self, 0)
-
-
 
 class JunctionEdge(LinearCellComplex):
 

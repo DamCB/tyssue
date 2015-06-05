@@ -17,10 +17,9 @@ struct World
 #include <boost/python.hpp>
 using namespace boost::python;
 
-void export_python_interface()
+void export_python()
 {
-  using namespace boost::python;
-  class_<World>("World")
+  class_<World>("World", no_init)
     .def("greet", &World::greet)
     .def("set", &World::set);
 }

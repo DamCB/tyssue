@@ -2,6 +2,8 @@
 
 # C extensions
 *.so
+*.lo
+*.la
 
 # Packages
 *.egg
@@ -30,8 +32,16 @@ install-sh
 ltmain.sh
 missing
 py-compile
+Makefile
+libtool
+config.h
+config.status
+.deps
+stamp-h1
 Makefile.in
 depcomp
+.libs
+
 
 # Installer logs
 pip-log.txt
