@@ -49,13 +49,8 @@ python 2.x version, because it's time to move on...
 
 ## Install
 
-Here is the procedure for a debian/ubuntu machine. Building this software should be possible
-on Mac (follow the instructions from the graph-tool website), but is untested (as the maintainer lacks a Mac to do so)
+See [INSTALL.md](INSTALL.md)
 
-```bash
-
-
-```
 ## Object Architecture
 
 We distinguish **cell-based** and **continuous** epithelium

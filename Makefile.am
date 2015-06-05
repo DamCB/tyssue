@@ -4,7 +4,9 @@ SUBDIRS = src
 
 tyssuedocdir = ${PACKAGE_DOC_DIR}
 nobase_dist_tyssuedoc_DATA = \
-	README.md\
+	INSTALL.md \
+	LICENCE.md \
+	README.md \
 	doc/bibliography/tyssue.bib
 
 EXTRA_DIST = $(tyssuedoc_DATA) autogen.sh
