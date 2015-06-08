@@ -1,1 +1,1 @@
-from .objects import Vertex, Edge, Face, Volume, Cell, test_import
+from .objects import Epithelium, Vertex, Edge, Face, Volume, Cell, test_import

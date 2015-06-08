@@ -12,6 +12,16 @@ def test_import():
     print(planet.greet())
 
 
+
+class Epithelium(libcore.Epithelium):
+
+    def __init__(self, eptm=None):
+        if eptm is None:
+            self.__eptm = libcore.Epithelium()
+        else:
+            self.__eptm = eptm.__eptm
+
+
 class LinearCellComplex:
     '''
     Just a stand up for the actual CGAL class

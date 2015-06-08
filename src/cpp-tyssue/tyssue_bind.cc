@@ -59,6 +59,7 @@ void* do_import_array()
 
 void export_world();
 
+void export_epithelium();
 
 
 BOOST_PYTHON_MODULE(libtyssue_core)
@@ -68,7 +69,7 @@ BOOST_PYTHON_MODULE(libtyssue_core)
     // numpy
     do_import_array();
     export_world();
-
+    export_epithelium();
     // class_<LibInfo>("mod_info")
     //     .add_property("name", &LibInfo::GetName)
     //     .add_property("author", &LibInfo::GetAuthor)

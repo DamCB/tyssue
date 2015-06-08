@@ -34,6 +34,7 @@ missing
 py-compile
 Makefile
 libtool
+libtool.m4
 config.h
 config.status
 .deps
@@ -42,6 +43,8 @@ Makefile.in
 depcomp
 .libs
 lt*.m4
+
+
 
 # Installer logs
 pip-log.txt
