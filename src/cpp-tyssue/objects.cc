@@ -1,9 +1,10 @@
+#include <math.h>
 #include <CGAL/Linear_cell_complex.h>
 #include <CGAL/Simple_cartesian.h>
 
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Polyhedron_items_with_id_3.h>
-
+#include <CGAL/Polyhedron_incremental_builder_3.h>
 #include "objects.hh"
 
 
@@ -35,32 +36,39 @@ void export_world()
     .def("set", &World::set);
 }
 
+template <class HDS>
+class Build_hexagon : public CGAL::Modifier_base<HDS> {
+public:
+  Build_hexagon() {};
+  void operator()( HDS& hds ){
+    CGAL::Polyhedron_incremental_builder_3<HDS> B( hds, true);
+    B.begin_surface(6, 1, 6);
+    typedef typename HDS::Vertex   Vertex;
+    typedef typename Vertex::Point Point;
+    B.add_vertex( Point( 0, 1, 0) );
+    B.add_vertex( Point( 0.5, sqrt(3)/2, 0) );
+    B.add_vertex( Point( 0.5, -sqrt(3)/2, 0) );
+    B.add_vertex( Point( 0, -1, 0) );
+    B.add_vertex( Point( -0.5, -sqrt(3)/2, 0) );
+    B.add_vertex( Point( 0.5, -sqrt(3)/2, 0) );
+    B.begin_facet();
+    B.add_vertex_to_facet( 0);
+    B.add_vertex_to_facet( 1);
+    B.add_vertex_to_facet( 2);
+    B.add_vertex_to_facet( 3);
+    B.add_vertex_to_facet( 4);
+    B.add_vertex_to_facet( 5);
+    B.end_facet();
+    B.end_surface();
+  };
+};
 
 
+void make_hexagon(Epithelium &eptm){
+  Build_hexagon<HalfedgeDS> hexagon;
+  eptm.delegate( hexagon);
+};
 
-
-// template <Epithelium>
-Halfedge_handle add_triangle(Epithelium eptm)
-{
-  Halfedge_handle h;
-  h = eptm.make_triangle();
-  return h;
-}
-
-
-
-std::size_t get_num_vert(Epithelium &eptm)
-{
-  size_t Nv = eptm.size_of_vertices();
-  return Nv;
-}
-// int main() {
-//     Polyhedron P;
-//     Halfedge_handle h = P.make_tetrahedron();
-
-//     h->facet()->color = CGAL::RED;
-//     return 0;
-// }
 
 
 void export_epithelium()

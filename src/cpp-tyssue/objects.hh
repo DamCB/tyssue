@@ -63,5 +63,6 @@ typedef CGAL::Simple_cartesian<double>               Kernel;
 typedef CGAL::Polyhedron_3<Kernel, Epithelium_items> Epithelium;
 typedef Epithelium::Halfedge_handle                  Halfedge_handle;
 typedef Kernel::Point_3                              Point_3;
+typedef Epithelium::HalfedgeDS                       HalfedgeDS;
 
-//struct Epithelium : public Poly {};
+//void make_hexagon(Epithelium &eptm){};
