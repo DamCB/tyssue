@@ -5,6 +5,7 @@ libcore = None ## Avoids code check complains od libcore being undefined
 
 dl_import("from .. import libtyssue_core as libcore")
 
+dl_import("from ..libtyssue_core import Epithelium")
 
 def test_import():
     planet = libcore.World()
@@ -13,13 +14,13 @@ def test_import():
 
 
 
-class Epithelium(libcore.Epithelium):
+# class Epithelium(libcore.Epithelium):
 
-    def __init__(self, eptm=None):
-        if eptm is None:
-            self.__eptm = libcore.Epithelium()
-        else:
-            self.__eptm = eptm.__eptm
+#     def __init__(self, eptm=None):
+#         if eptm is None:
+#             self.__eptm = libcore.Epithelium()
+#         else:
+#             self.__eptm = eptm.__eptm
 
 
 class LinearCellComplex:

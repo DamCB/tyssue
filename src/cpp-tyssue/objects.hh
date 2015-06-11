@@ -5,13 +5,23 @@
 
 
 
-template <class Refs>
-struct Juction_vertex : public CGAL::HalfedgeDS_vertex_base<Refs> {
+template <class Refs, class Point>
+struct Junction_vertex : public CGAL::HalfedgeDS_vertex_base<Refs, CGAL::Tag_true, Point> {
+public:
+  bool get_active_state() const;
+  void set_active_state(bool value);
+private:
   bool is_active;
 };
 
 template <class Refs>
 struct Junction_edge : public CGAL::HalfedgeDS_halfedge_base<Refs> {
+public:
+  double get_line_tension() const;
+  void set_line_tension(double value);
+  double get_radial_tension() const;
+  void set_radial_tension(double value);
+private:
   double line_tension;
   double radial_tension;
 };
@@ -34,19 +44,24 @@ struct Cell_face : public CGAL::HalfedgeDS_face_base<Refs> {
 };
 
 
-
-
 struct Epithelium_items : public CGAL::Polyhedron_items_with_id_3 {
-    template <class Refs, class Traits>
-    struct Face_wrapper {
-        typedef Cell_face<Refs> Face;
-    };
-    // template <class Refs, class Traits>
-    // struct Edge_wrapper {
-    //     typedef Junction_edge<Refs> Edge;
-    // };
-    // template <class Refs, class Traits>
-    // struct Vertex_wrapper {
-    //     typedef Junction_vertex<Refs> Vertex;
-    // };
+  template <class Refs, class Traits>
+  struct Face_wrapper {
+    typedef Cell_face<Refs> Face;
+  };
+  template <class Refs, class Traits>
+  struct Halfedge_wrapper {
+    typedef Junction_edge<Refs> Halfedge;
+  };
+  template <class Refs, class Point>
+  struct Vertex_wrapper {
+    typedef Junction_vertex<Refs, Point> Vertex;
+  };
 };
+
+typedef CGAL::Simple_cartesian<double>               Kernel;
+typedef CGAL::Polyhedron_3<Kernel, Epithelium_items> Epithelium;
+typedef Epithelium::Halfedge_handle                  Halfedge_handle;
+typedef Kernel::Point_3                              Point_3;
+
+//struct Epithelium : public Poly {};
