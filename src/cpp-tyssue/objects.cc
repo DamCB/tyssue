@@ -1,5 +1,5 @@
 #include <math.h>
-#include <CGAL/Linear_cell_complex.h>
+// #include <CGAL/Linear_cell_complex.h>
 #include <CGAL/Simple_cartesian.h>
 
 #include <CGAL/Polyhedron_3.h>
@@ -36,16 +36,29 @@ void export_world()
     .def("set", &World::set);
 }
 
+typedef Epithelium::HalfedgeDS                       HalfedgeDS;
+typedef Kernel::Point_3                              Point_3;
+
+
 template <class HDS>
 class Build_hexagon : public CGAL::Modifier_base<HDS> {
 public:
-  Build_hexagon() {};
+  Build_hexagon() {}
   void operator()( HDS& hds ){
     CGAL::Polyhedron_incremental_builder_3<HDS> B( hds, true);
-    B.begin_surface(6, 1, 6);
-    typedef typename HDS::Vertex   Vertex;
+    typedef typename HDS::Vertex Vertex;
     typedef typename Vertex::Point Point;
-    B.add_vertex( Point( 0, 1, 0) );
+
+    // Point p1, p2, p3, p4, p5, p6;
+    // p1 = Point( 0, 1, 0);
+    // p2 = Point( 0.5, sqrt(3)/2, 0);
+    // p3 = Point( 0.5, -sqrt(3)/2, 0);
+    // p4 = Point( 0, -1, 0);
+    // p5 = Point( -0.5, -sqrt(3)/2, 0);
+    // p6 = Point( 0.5, -sqrt(3)/2, 0);
+    B.begin_surface(6, 1, 6);
+
+    B.add_vertex( Point( 0, 1, 0));
     B.add_vertex( Point( 0.5, sqrt(3)/2, 0) );
     B.add_vertex( Point( 0.5, -sqrt(3)/2, 0) );
     B.add_vertex( Point( 0, -1, 0) );
@@ -60,20 +73,29 @@ public:
     B.add_vertex_to_facet( 5);
     B.end_facet();
     B.end_surface();
-  };
+  }
 };
 
 
-void make_hexagon(Epithelium &eptm){
-  Build_hexagon<HalfedgeDS> hexagon;
-  eptm.delegate( hexagon);
-};
+typedef Epithelium::HalfedgeDS             HalfedgeDS;
+
+int make_hexagon(Epithelium &eptm) {
+    Build_hexagon<HalfedgeDS> hexagon;
+    eptm.delegate( hexagon);
+    //CGAL_assertion( P.is_triangle( P.halfedges_begin()));
+    return 0;
+}
+
+// void (Epithelium &eptm){
+//   Build_hexagon<HalfedgeDS> hexagon;
+//   eptm.delegate( hexagon);
+// };
 
 
 
 void export_epithelium()
 {
-
+  def("make_hexagon", make_hexagon);
   //class_<Epithelium, bases<Poly> >("Epithelium")
   class_<Epithelium>("Epithelium")
     //.def("add_triangle", &Epithelium::make_triangle);

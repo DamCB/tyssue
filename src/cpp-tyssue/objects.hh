@@ -53,16 +53,14 @@ struct Epithelium_items : public CGAL::Polyhedron_items_with_id_3 {
   struct Halfedge_wrapper {
     typedef Junction_edge<Refs> Halfedge;
   };
-  template <class Refs, class Point>
-  struct Vertex_wrapper {
-    typedef Junction_vertex<Refs, Point> Vertex;
-  };
+  // template <class Refs, class Point>
+  // struct Vertex_wrapper {
+  //   typedef Junction_vertex<Refs, Point> Vertex;
+  // };
 };
 
 typedef CGAL::Simple_cartesian<double>               Kernel;
 typedef CGAL::Polyhedron_3<Kernel, Epithelium_items> Epithelium;
 typedef Epithelium::Halfedge_handle                  Halfedge_handle;
-typedef Kernel::Point_3                              Point_3;
-typedef Epithelium::HalfedgeDS                       HalfedgeDS;
 
 //void make_hexagon(Epithelium &eptm){};
