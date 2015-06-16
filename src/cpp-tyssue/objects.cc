@@ -82,8 +82,8 @@ typedef Epithelium::HalfedgeDS             HalfedgeDS;
 int make_hexagon(Epithelium &eptm) {
     Build_hexagon<HalfedgeDS> hexagon;
     eptm.delegate( hexagon);
-    //CGAL_assertion( P.is_triangle( P.halfedges_begin()));
     return 0;
+    //CGAL_assertion( P.is_triangle( P.halfedges_begin()));
 }
 
 // void (Epithelium &eptm){
