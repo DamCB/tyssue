@@ -1,67 +1,129 @@
-
+#include <CGAL/Linear_cell_complex.h>
+#include <CGAL/Linear_cell_complex_operations.h>
+#include <CGAL/Linear_cell_complex_constructors.h>
 #include <CGAL/Simple_cartesian.h>
-#include <CGAL/Polyhedron_3.h>
-#include <CGAL/Polyhedron_items_with_id_3.h>
 
+typedef CGAL::Simple_cartesian<double>               Kernel;
 
-
-template <class Refs, class Point>
-struct Junction_vertex : public CGAL::HalfedgeDS_vertex_base<Refs, CGAL::Tag_true, Point> {
-public:
-  bool get_active_state() const;
-  void set_active_state(bool value);
-private:
-  bool is_active;
-};
-
-template <class Refs>
-struct Junction_edge : public CGAL::HalfedgeDS_halfedge_base<Refs> {
-public:
-  double get_line_tension() const;
-  void set_line_tension(double value);
-  double get_radial_tension() const;
-  void set_radial_tension(double value);
-private:
+struct Junction_data {
+  typedef Kernel::Vector_3 Vector;
+  Vector gradient;
+  double length;
   double line_tension;
-  double radial_tension;
 };
 
-// An items type using my face.
-// A face type with a color member variable.
-template <class Refs>
-struct Cell_face : public CGAL::HalfedgeDS_face_base<Refs> {
-  // Cell's life
-  bool is_alive;
-  int age;
-  // Geometry
+struct Cell_data {
   double perimeter;
   double area;
   double volume;
-  int num_sides;
-  // Dynamical properties
+  double prefered_volume;
   double contractility;
   double vol_elasticity;
 };
 
-
-struct Epithelium_items : public CGAL::Polyhedron_items_with_id_3 {
-  template <class Refs, class Traits>
-  struct Face_wrapper {
-    typedef Cell_face<Refs> Face;
-  };
-  template <class Refs, class Traits>
-  struct Halfedge_wrapper {
-    typedef Junction_edge<Refs> Halfedge;
-  };
-  // template <class Refs, class Traits>
-  // struct Vertex_wrapper {
-  //   typedef typename Traits::Point_3 Point;
-  //   typedef CGAL::HalfedgeDS_vertex_base<Refs, Point> Vertex;
-  // };
+struct Average_functor
+{
+  template<class CellAttribute>
+  void operator()(CellAttribute& ca1, CellAttribute& ca2)
+  { ca1.info()=(ca1.info()+ ca2.info())/2; }
 };
 
-typedef CGAL::Simple_cartesian<double>               Kernel;
-typedef CGAL::Polyhedron_3<Kernel, Epithelium_items> Epithelium;
-typedef Epithelium::Halfedge_handle                  Halfedge_handle;
+struct Vertex_functor
+{
+  template<class CellAttribute>
+  void operator()(CellAttribute& ca1, CellAttribute& ca2)
+  { ca1.info()= (ca1.info() || ca2.info()); }
+};
 
-//void make_hexagon(Epithelium &eptm){};
+struct Junction_merge_functor
+{
+  template<class CellAttribute>
+  void operator()(CellAttribute& ca1, CellAttribute& ca2)
+  {
+    ca1.info().gradient=(ca1.info().gradient + ca2.info().gradient)/2;
+    ca1.info().length=(ca1.info().length + ca2.info().length)/2;
+    ca1.info().line_tension=(ca1.info().line_tension + ca2.info().line_tension)/2;
+ }
+};
+
+struct Junction_split_functor
+{
+  template<class CellAttribute>
+  void operator()(CellAttribute& ca1, CellAttribute& ca2)
+  {
+    ca1.info().gradient= ca1.info().gradient/2.;
+    ca2.info().gradient= ca2.info().gradient/2.;
+    ca1.info().length= ca1.info().length/2;
+    ca2.info().length= ca1.info().length/2;
+    ca1.info().line_tension= ca1.info().line_tension;
+    ca2.info().line_tension= ca1.info().line_tension;
+ }
+};
+
+
+struct Cell_merge_functor
+{
+  template<class CellAttribute>
+  void operator()(CellAttribute& ca1, CellAttribute& ca2)
+  {
+    ca1.info().perimeter=(ca1.info().perimeter + ca2.info().perimeter);
+    ca1.info().area=(ca1.info().area + ca2.info().area);
+    ca1.info().volume=(ca1.info().volume + ca2.info().volume);
+    ca1.info().prefered_volume=(ca1.info().prefered_volume
+				+ ca2.info().prefered_volume)/2;
+    ca1.info().contractility=(ca1.info().contractility + ca2.info().contractility)/2;
+    ca1.info().vol_elasticity=(ca1.info().vol_elasticity + ca2.info().vol_elasticity)/2;
+ }
+};
+
+struct Cell_split_functor
+{
+  template<class CellAttribute>
+  void operator()(CellAttribute& ca1, CellAttribute& ca2)
+  {
+    ca1.info().perimeter = ca1.info().perimeter/2;
+    ca2.info().perimeter = ca1.info().perimeter/2;
+    ca1.info().area = ca1.info().area/2;
+    ca2.info().area = ca1.info().area/2;
+    ca1.info().volume = ca1.info().volume/2;
+    ca2.info().volume = ca1.info().volume/2;
+    ca1.info().contractility = ca1.info().contractility;
+    ca2.info().contractility = ca1.info().contractility;
+    ca1.info().vol_eslasticity = ca1.info().vol_eslasticity;
+    ca2.info().vol_eslasticity = ca1.info().vol_eslasticity;
+ }
+};
+
+
+
+
+struct Epithelium_Items
+{
+  template<class Refs>
+  struct Dart_wrapper
+  {
+    typedef CGAL::Dart<2, Refs > Dart;
+    // Vertex attribute's info switch between active/inactive
+    typedef CGAL::Cell_attribute_with_point< Refs, bool, CGAL::Tag_true,
+                                             Vertex_functor >
+    Vertex_attribute;
+    typedef CGAL::Cell_attribute< Refs, Junction_data, CGAL::Tag_true,
+				  Junction_merge_functor,
+				  Junction_split_functor >
+    Edge_attribute;
+
+    typedef CGAL::Cell_attribute< Refs, Cell_data, CGAL::Tag_true,
+				  Cell_merge_functor,
+				  Cell_split_functor >
+    Celldart_attribute;
+
+    typedef CGAL::cpp11::tuple<Vertex_attribute, Edge_attribute, Celldart_attribute>
+    Attributes;
+  };
+};
+
+typedef CGAL::Linear_cell_complex_traits<3, Kernel>                Traits;
+typedef CGAL::Linear_cell_complex<2,3,Traits,Epithelium_Items>     Appical_sheet_3;
+typedef Appical_sheet_3::Dart_handle                               Dart_handle;
+typedef Appical_sheet_3::Point                                     Point;
+typedef Appical_sheet_3::FT                                        FT;
