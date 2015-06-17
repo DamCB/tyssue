@@ -89,8 +89,8 @@ struct Cell_split_functor
     ca2.info().volume = ca1.info().volume/2;
     ca1.info().contractility = ca1.info().contractility;
     ca2.info().contractility = ca1.info().contractility;
-    ca1.info().vol_eslasticity = ca1.info().vol_eslasticity;
-    ca2.info().vol_eslasticity = ca1.info().vol_eslasticity;
+    ca1.info().vol_elasticity = ca1.info().vol_elasticity;
+    ca2.info().vol_elasticity = ca1.info().vol_elasticity;
  }
 };
 

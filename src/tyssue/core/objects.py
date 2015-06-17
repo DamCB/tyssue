@@ -7,6 +7,9 @@ dl_import("from .. import libtyssue_core as libcore")
 
 dl_import("from ..libtyssue_core import Epithelium")
 
+dl_import("from ..libtyssue_core import Point")
+
+
 def test_import():
     planet = libcore.World()
     planet.set('howdy')
