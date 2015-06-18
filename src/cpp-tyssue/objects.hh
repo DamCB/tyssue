@@ -127,3 +127,5 @@ typedef CGAL::Linear_cell_complex<2,3,Traits,Epithelium_Items>     Appical_sheet
 typedef Appical_sheet_3::Dart_handle                               Dart_handle;
 typedef Appical_sheet_3::Point                                     Point;
 typedef Appical_sheet_3::FT                                        FT;
+typedef Appical_sheet_3::Vertex_attribute                          Vertex_attribute;
+typedef Appical_sheet_3::Vertex_attribute_handle                   Vertex_attribute_handle;
