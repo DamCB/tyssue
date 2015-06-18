@@ -89,6 +89,7 @@ double get_point_z(const Point point){
 void export_epithelium()
 {
   def ("make_hexagon", make_hexagon);
+  def ("make_polygon", make_polygon);
   //class_<Epithelium, bases<Poly> >("Epithelium")
   class_<Point>("Point", init<double, double, double>())
     .add_property("x", get_point_x)
