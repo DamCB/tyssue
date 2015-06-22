@@ -46,7 +46,7 @@ git clone https://github.com/CellModels/tyssue.git
 cd tyssue/
 mkdir build/ && cd build/
 cmake ..
-make && make
+make && make install
 ```
 
 If all went well, you have successfully installed tyssue. To test it, you can run `python -c "import tyssue; tyssue.core.test_import()"`. It should print `howdy`.

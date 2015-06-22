@@ -10,6 +10,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 # TODO: set it from the source code
 set(Tyssue_VERSION_MAJOR 0)
 set(Tyssue_VERSION_MINOR 1)
+set(Tyssue_VERSION ${Tyssue_VERSION_MAJOR}.${Tyssue_VERSION_MINOR})
 
 # Some screen output
 message(STATUS "OS detected: ${CMAKE_SYSTEM_NAME}")
