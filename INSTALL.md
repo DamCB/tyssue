@@ -34,9 +34,11 @@ sudo dpkg -i sparsehash_2.0.2-1_amd64.deb
 ### Create a virtual environment with `conda`
 
 ```bash
-conda create -n tyssue python=3.4 numpy scipy vispy matplotlib nose
+conda create -n tyssue python=3.4 numpy scipy vispy matplotlib
 ## activate the new environment
 source activate tyssue
+## install some friends
+pip install nose coverage vispy
 ```
 
 ### Download and complie `tyssue`
@@ -51,4 +53,10 @@ make && make install
 
 If all went well, you have successfully installed tyssue. To test it, you can run `python -c "import tyssue; tyssue.core.test_import()"`. It should print `howdy`.
 
-That should work !
+A `Makefile` provides some utility function. Try :
+
+```sh
+make flake8  # Check PEP8 on the code
+make tests  # Run tests with nose
+make coverage  # Run tests with coverage
+```
