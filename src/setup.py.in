@@ -7,7 +7,7 @@ LONG_DESCRIPTION = 'tyssue is going to conquer the world soon '
 MAINTAINER = 'Guillaume Gay'
 MAINTAINER_EMAIL = 'gllm.gay@gmail.com'
 URL = 'https://github.com/CellModels/tyssue'
-LICENSE = 'BSD 3-Clause'
+LICENSE = 'GPLv3'
 DOWNLOAD_URL = 'https://github.com/CellModels/tyssue.git'
 VERSION = '${Tyssue_VERSION}'
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
         classifiers=["Development Status :: 4 - Beta",
                      "Intended Audience :: Science/Research",
-                     "License :: OSI Approved :: BSD License",
+                     "License :: OSI Approved :: GPL License",
                      "Natural Language :: English",
                      "Operating System :: MacOS",
                      "Operating System :: Microsoft",
