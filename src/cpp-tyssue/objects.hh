@@ -5,7 +5,29 @@
 
 typedef CGAL::Simple_cartesian<double>               Kernel;
 
+struct Uid {
+public:
+  long new_id() {
+    id +=1;
+    return id;
+}
+  void reset() {id = 0;}
+private:
+  static long id
+};
+
+struct Vid::Uid {};
+
+struct Eid::Uid {};
+
+struct Cid::Uid {};
+
+struct Vertex_data {
+  long id = Vid.new_id();
+}
+
 struct Junction_data {
+  long id = Eid.new_id();
   typedef Kernel::Vector_3 Vector;
   Vector gradient;
   double length;
@@ -13,6 +35,7 @@ struct Junction_data {
 };
 
 struct Cell_data {
+  long id = Cid.new_id();
   double perimeter;
   double area;
   double volume;
@@ -32,7 +55,7 @@ struct Vertex_functor
 {
   template<class CellAttribute>
   void operator()(CellAttribute& ca1, CellAttribute& ca2)
-  { ca1.info()= (ca1.info() || ca2.info()); }
+  { ca2.info().id = Cid.new_id(); }
 };
 
 struct Junction_merge_functor
@@ -51,6 +74,7 @@ struct Junction_split_functor
   template<class CellAttribute>
   void operator()(CellAttribute& ca1, CellAttribute& ca2)
   {
+    //ca2.info().id = Cid.new_id();
     ca1.info().gradient= ca1.info().gradient/2.;
     ca2.info().gradient= ca2.info().gradient/2.;
     ca1.info().length= ca1.info().length/2;
