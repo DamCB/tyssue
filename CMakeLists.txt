@@ -37,7 +37,10 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost 1.54 REQUIRED COMPONENTS python-py34 REQUIRED)
+find_package(Boost 1.54 COMPONENTS python3 QUIET)
+if(NOT Boost_FOUND)
+  find_package(Boost 1.54 COMPONENTS python-py34 REQUIRED)
+endif()
 message(STATUS "Boost include dirs: ${Boost_INCLUDE_DIRS}")
 message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
 
@@ -53,7 +56,7 @@ find_package(CGAL REQUIRED)
 ##############################################################################
 
 # Add some flags to the compiler
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -frounding-math")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math")
 
 ##############################################################################
 
