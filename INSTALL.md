@@ -34,7 +34,7 @@ sudo dpkg -i sparsehash_2.0.2-1_amd64.deb
 ### Create a virtual environment with `conda`
 
 ```bash
-conda create -n tyssue python=3.4 numpy scipy
+conda create -n tyssue python=3.4 numpy scipy vispy matplotlib nose
 ## activate the new environment
 source activate tyssue
 ```

@@ -4,7 +4,7 @@ import libtyssue_core as core
 def test_import():
     planet = core.World()
     planet.set('howdy')
-    print(planet.greet())
+    return planet.greet()
 
 
 class Epithelium(core.Epithelium):

@@ -27,12 +27,6 @@ option(BUILD_SHARED_LIBS "Build shared library" ON)
 ## Build Option: when active headers will be installed in the CMAKE_INSTALL_PREFIX/include directory
 option(INSTALL_HEADERS "Installs the header files" ON)
 
-## Build option: enable test set.
-option(ENABLE_TESTS "Build test set." ON)
-
-## Build Option: build executable for the examples
-option(BUILD_EXAMPLES "Build examples." ON)
-
 ## Build Option: build documentation
 option(BUILD_DOC "Build documentation." ON)
 
@@ -66,14 +60,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -frounding-math")
 add_subdirectory("${CMAKE_SOURCE_DIR}/src")
 
 ##############################################################################
-
-if(ENABLE_TESTS)
-    # add_subdirectory("${CMAKE_SOURCE_DIR}/tests")
-endif(ENABLE_TESTS)
-
-if(BUILD_EXAMPLES)
-    # add_subdirectory("${CMAKE_SOURCE_DIR}/examples")
-endif(BUILD_EXAMPLES)
 
 if(BUILD_DOC)
     # add_subdirectory("${CMAKE_SOURCE_DIR}/doc")
