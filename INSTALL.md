@@ -1,7 +1,6 @@
 ## Installing tyssue
 
-Those are the instructions to install the package from source on a debian-like linux distribution
-
+Those are the instructions to install the package from source on a debian-like linux distribution.
 
 ### get Anaconda
 Go to http://continuum.io/downloads and grab anaconda for your architecture.
@@ -10,7 +9,7 @@ Go to http://continuum.io/downloads and grab anaconda for your architecture.
 
 ```bash
 bash Anaconda3-2.2.0-Linux-x86_64.sh
-source .bashrc ## updates your PATH
+source .bashrc # update your PATH
 ```
 
 ### Install package dependencies
@@ -35,9 +34,9 @@ sudo dpkg -i sparsehash_2.0.2-1_amd64.deb
 ### Create a virtual environment with `conda`
 
 ```bash
-conda create -n tyssue_env python=3.4 anaconda
+conda create -n tyssue python=3.4 numpy scipy
 ## activate the new environment
-source activate tyssue_env
+source activate tyssue
 ```
 
 ### Download and complie `tyssue`
@@ -45,22 +44,11 @@ source activate tyssue_env
 ```bash
 git clone https://github.com/CellModels/tyssue.git
 cd tyssue/
-which python ## outputs the current python binary
-export PYTHON={replace by what was output by which}
-export PYTHON_VERSION=3.4
-./autogen.sh
-./configure --with-boost-python=py34
-make
-sudo make install ## sudo should not be needed in the future
+mkdir build/ && cd build/
+cmake ..
+make && make
 ```
 
-If all went well, you have successfully installed tyssue
+If all went well, you have successfully installed tyssue. To test it, you can run `python -c "import tyssue; tyssue.core.test_import()"`. It should print `howdy`.
 
-You can now start a python interpreter (by typing `python` in the command line) and run:
-
-```python
-  >>> import tyssue
-  >>> tyssue.core.test_import #should print 'howdy'
-```
-
-That should work!
+That should work !

@@ -16,8 +16,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #define NUMPY_EXPORT
-#include "numpy_bind.hh"
-#include "objects.hh"
+#include "tyssue/numpy_bind.hh"
+#include "tyssue/objects.hh"
 
 #include <Python.h>
 #include <boost/python.hpp>
