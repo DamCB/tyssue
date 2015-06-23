@@ -1,5 +1,8 @@
-# tyssue
-## An epithelium simulation library
+# tyssue : An epithelium simulation library
+
+[![Build Status](https://travis-ci.org/CellModels/tyssue.svg?branch=master)](https://travis-ci.org/CellModels/tyssue)
+
+[![Coverage Status](https://coveralls.io/repos/CellModels/tyssue/badge.svg)](https://coveralls.io/r/CellModels/tyssue)
 
 The `tyssue` library seeks to provide a unified interface to implement
 bio-mechanical models of living tissues, with a focus on **epithelium** modeling.

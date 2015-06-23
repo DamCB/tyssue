@@ -1,26 +1,19 @@
+import libtyssue_core as core
 
-from ..dl_import import dl_import
-
-libcore = None ## Avoids code check complains od libcore being undefined
-
-dl_import("from .. import libtyssue_core as libcore")
-
-dl_import("from ..libtyssue_core import Epithelium")
 
 def test_import():
-    planet = libcore.World()
+    planet = core.World()
     planet.set('howdy')
-    print(planet.greet())
+    return planet.greet()
 
 
+class Epithelium(core.Epithelium):
 
-# class Epithelium(libcore.Epithelium):
-
-#     def __init__(self, eptm=None):
-#         if eptm is None:
-#             self.__eptm = libcore.Epithelium()
-#         else:
-#             self.__eptm = eptm.__eptm
+    def __init__(self, eptm=None):
+        if eptm is None:
+            self.__eptm = core.Epithelium()
+        else:
+            self.__eptm = eptm.__eptm
 
 
 class LinearCellComplex:
@@ -38,22 +31,26 @@ class LinearCellComplex:
           The surrounding space dimension (2 or 3, usually)
 
         '''
-        self.i = dim # as in i-cell in the doc.
+        self.i = dim  # as in i-cell in the doc.
+
 
 class Vertex(LinearCellComplex):
 
     def __init__(self):
         LinearCellComplex.__init__(self, 0)
 
+
 class Edge(LinearCellComplex):
 
     def __init__(self):
         LinearCellComplex.__init__(self, 1)
 
+
 class Face(LinearCellComplex):
 
     def __init__(self):
         LinearCellComplex.__init__(self, 2)
+
 
 class Volume(LinearCellComplex):
 
@@ -66,7 +63,6 @@ class Cell(LinearCellComplex):
     def __init__(self, dim):
         LinearCellComplex.__init__(self, dim)
 
-
     @property
     def j_edges(self):
         '''
@@ -74,7 +70,6 @@ class Cell(LinearCellComplex):
         '''
         for je in self._jnct_edges:
             yield je
-
 
     @property
     def faces(self):

@@ -32,7 +32,6 @@ install-sh
 ltmain.sh
 missing
 py-compile
-Makefile
 libtool
 libtool.m4
 config.h
