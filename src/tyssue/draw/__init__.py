@@ -1,1 +1,2 @@
-import vispy_draw, mpl_draw
+from . import vispy_draw
+from . import mpl_draw

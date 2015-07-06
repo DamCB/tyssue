@@ -1,48 +1,77 @@
+import libtyssue_core as core
 
 from ..dl_import import dl_import
 
 libcore = None ## Avoids code check complains od libcore being undefined
 
 dl_import("from .. import libtyssue_core as libcore")
-dl_import("from ..libtyssue_core import Point")
 
-#dl_import("from ..libtyssue_core import Epithelium")
-
-
+dl_import("from ..libtyssue_core import Epithelium")
 
 def test_import():
-    planet = libcore.World()
+    planet = core.World()
     planet.set('howdy')
-    print(planet.greet())
+    return planet.greet()
 
 
-
-class Epithelium():
+class Epithelium(core.Epithelium):
 
     def __init__(self, eptm=None):
         if eptm is None:
-            self._eptm = libcore.Epithelium()
+            self.__eptm = core.Epithelium()
         else:
-            self._eptm = eptm._eptm
-
-    def cells(self):
-        for cell in self._eptm.iter_cells():
-            yield cell
-
-    def junction_vertices(self):
-        for vertex in self._eptm.iter_junction_vertex():
-            yield vertex
-
-    def junction_edges(self):
-        for edge in self._eptm.iter_junction_edges():
-            yield edge
+            self.__eptm = eptm.__eptm
 
 
-class Cell():
+class LinearCellComplex:
+    '''
+    Just a stand up for the actual CGAL class
+    '''
+    def __init__(self, dim, space_dim):
+        '''
+        Parameters
+        ----------
+
+        dim: int
+          The dimension of the LCC (0 for a vertex, 1 for an edge, and so on)
+        space_dim: int
+          The surrounding space dimension (2 or 3, usually)
+
+        '''
+        self.i = dim  # as in i-cell in the doc.
+
+
+class Vertex(LinearCellComplex):
+
+    def __init__(self):
+        LinearCellComplex.__init__(self, 0)
+
+
+class Edge(LinearCellComplex):
+
+    def __init__(self):
+        LinearCellComplex.__init__(self, 1)
+
+
+class Face(LinearCellComplex):
+
+    def __init__(self):
+        LinearCellComplex.__init__(self, 2)
+
+
+class Volume(LinearCellComplex):
+
+    def __init__(self):
+        LinearCellComplex.__init__(self, 3)
+
+
+class Cell(LinearCellComplex):
 
     def __init__(self, dim):
-        self.dim = dim
+        LinearCellComplex.__init__(self, dim)
 
+
+    @property
     def j_edges(self):
         '''
         Iterate over the junction edges
@@ -50,13 +79,8 @@ class Cell():
         for je in self._jnct_edges:
             yield je
 
-    def j_vertices(self):
-        '''
-        Iterate over the junction edges
-        '''
-        for jv in self._jnct_vertices:
-            yield jv
 
+    @property
     def faces(self):
         '''
         Iterate over the faces

@@ -1,9 +1,11 @@
 #include <math.h>
+// #include <CGAL/Linear_cell_complex.h>
 #include <CGAL/Simple_cartesian.h>
 
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Polyhedron_items_with_id_3.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
+#include "objects.hh"
 
 #include <CGAL/Linear_cell_complex.h>
 #include <CGAL/Combinatorial_map.h>
@@ -38,6 +40,8 @@ class_<World>("World")
   .def("set", &World::set);
 }
 
+typedef Epithelium::HalfedgeDS                       HalfedgeDS;
+typedef Kernel::Point_3                              Point_3;
 
 void make_polygon(Appical_sheet_3 &sheet, std::vector<Point> &points) {
   std::size_t n_sides = points.size();
@@ -52,19 +56,40 @@ void make_polygon(Appical_sheet_3 &sheet, std::vector<Point> &points) {
   };
 };
 
+template <class HDS>
+class Build_hexagon : public CGAL::Modifier_base<HDS> {
+public:
+  Build_hexagon() {}
+  void operator()( HDS& hds ){
+    CGAL::Polyhedron_incremental_builder_3<HDS> B( hds, true);
+    typedef typename HDS::Vertex Vertex;
+    typedef typename Vertex::Point Point;
 
-void make_hexagon(Appical_sheet_3 &sheet ) {
-  Point p0, p1, p2, p3, p4, p5, p6;
-  p0 = Point(0, 0, 0);
-  p1 = Point(0, 1, 0);
-  p2 = Point(0.5, sqrt(3)/2, 0);
-  p3 = Point(0.5, -sqrt(3)/2, 0);
-  p4 = Point(0, -1, 0);
-  p5 = Point(-0.5, -sqrt(3)/2, 0);
-  p6 = Point(0.5, -sqrt(3)/2, 0);
+    // Point p1, p2, p3, p4, p5, p6;
+    // p1 = Point( 0, 1, 0);
+    // p2 = Point( 0.5, sqrt(3)/2, 0);
+    // p3 = Point( 0.5, -sqrt(3)/2, 0);
+    // p4 = Point( 0, -1, 0);
+    // p5 = Point( -0.5, -sqrt(3)/2, 0);
+    // p6 = Point( 0.5, -sqrt(3)/2, 0);
+    B.begin_surface(6, 1, 6);
 
-  std::vector<Point> points {p1, p2, p3, p4, p5, p6};
-  make_polygon(sheet, points);
+    B.add_vertex( Point( 0, 1, 0));
+    B.add_vertex( Point( 0.5, sqrt(3)/2, 0) );
+    B.add_vertex( Point( 0.5, -sqrt(3)/2, 0) );
+    B.add_vertex( Point( 0, -1, 0) );
+    B.add_vertex( Point( -0.5, -sqrt(3)/2, 0) );
+    B.add_vertex( Point( 0.5, -sqrt(3)/2, 0) );
+    B.begin_facet();
+    B.add_vertex_to_facet( 0);
+    B.add_vertex_to_facet( 1);
+    B.add_vertex_to_facet( 2);
+    B.add_vertex_to_facet( 3);
+    B.add_vertex_to_facet( 4);
+    B.add_vertex_to_facet( 5);
+    B.end_facet();
+    B.end_surface();
+  }
 };
 
 //void unslice_hexagon(

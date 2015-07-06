@@ -1,0 +1,35 @@
+language: cpp
+
+compiler:
+  - gcc
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install --yes build-essential
+  - sudo apt-get install --yes libexpat1-dev
+  - sudo apt-get install --yes git
+
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - conda create -q -n tyssue python=3.4 numpy scipy vispy matplotlib nose coverage vispy pip
+  - source activate tyssue
+  - conda install -c https://conda.binstar.org/osgeo boost cgal
+  - pip install coveralls
+
+install:
+  - mkdir build/
+  - cd build/
+  - cmake -DBoost_LIBRARY_DIR=$HOME/miniconda/envs/tyssue/lib/ -DBoost_INCLUDE_DIR=$HOME/miniconda/envs/tyssue/include/ ..
+  - make install
+
+script:
+  - cd ../
+  - make coverage
+
+after_success:
+  - coveralls

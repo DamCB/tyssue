@@ -1,0 +1,26 @@
+package:
+  name: tyssue
+  version: "0.1"
+
+source:
+  path: ../
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - python
+    - numpy
+    - scipy
+    - boost
+  run:
+    - python
+    - numpy
+    - scipy
+    - boost
+    - matplotlib
+
+about:
+  home: https://github.com/CellModels/tyssue
+  license: GPLv3
