@@ -7,27 +7,26 @@ typedef CGAL::Simple_cartesian<double>               Kernel;
 
 struct Uid {
 public:
-  long new_id() {
-    id +=1;
-    return id;
-}
+  Uid() {id += 1;}
+  int get_id() {return id;}
   void reset() {id = 0;}
 private:
-  static long id
+  static long id;
 };
 
-struct Vid::Uid {};
-
-struct Eid::Uid {};
-
-struct Cid::Uid {};
+// struct Vid::Uid {};
+//
+// struct Eid::Uid {};
+//
+// struct Cid::Uid {};
 
 struct Vertex_data {
-  long id = Vid.new_id();
-}
+  Uid vid = Uid();
+  long id = vid.get_id();
+};
 
 struct Junction_data {
-  long id = Eid.new_id();
+  //long id = Eid.new_id();
   typedef Kernel::Vector_3 Vector;
   Vector gradient;
   double length;
@@ -35,7 +34,7 @@ struct Junction_data {
 };
 
 struct Cell_data {
-  long id = Cid.new_id();
+  //long id = Cid.new_id();
   double perimeter;
   double area;
   double volume;
@@ -55,7 +54,7 @@ struct Vertex_functor
 {
   template<class CellAttribute>
   void operator()(CellAttribute& ca1, CellAttribute& ca2)
-  { ca2.info().id = Cid.new_id(); }
+  { ca2.info() = ca1.info(); }
 };
 
 struct Junction_merge_functor
@@ -128,7 +127,7 @@ struct Epithelium_Items
   {
     typedef CGAL::Dart<2, Refs > Dart;
     // Vertex attribute's info switch between active/inactive
-    typedef CGAL::Cell_attribute_with_point< Refs, bool, CGAL::Tag_true,
+    typedef CGAL::Cell_attribute_with_point< Refs, Vertex_data, CGAL::Tag_true,
                                              Vertex_functor >
     Vertex_attribute;
     typedef CGAL::Cell_attribute< Refs, Junction_data, CGAL::Tag_true,
