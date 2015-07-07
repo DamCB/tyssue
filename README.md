@@ -27,13 +27,14 @@ dissipation function formalism.
 
 * Cyprien Gay @cypriengay
 * Guillaume Gay (maintainer) - @glyg
+* Hadrien Mary (build wizard) - @hadim
 * François Molino
 * Magali Suzanne
 
 
 ## Dependencies
 
-As all the dependencies are allready completely supported in python 3.x, we won't be maintaining a
+As all the dependencies are already completely supported in python 3.x, we won't be maintaining a
 python 2.x version, because it's time to move on...
 
 ### Python

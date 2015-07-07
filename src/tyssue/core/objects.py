@@ -1,5 +1,12 @@
 import libtyssue_core as core
 
+from ..dl_import import dl_import
+
+libcore = None ## Avoids code check complains od libcore being undefined
+
+dl_import("from .. import libtyssue_core as libcore")
+
+dl_import("from ..libtyssue_core import Epithelium")
 
 def test_import():
     planet = core.World()
@@ -63,6 +70,7 @@ class Cell(LinearCellComplex):
     def __init__(self, dim):
         LinearCellComplex.__init__(self, dim)
 
+
     @property
     def j_edges(self):
         '''
@@ -70,6 +78,7 @@ class Cell(LinearCellComplex):
         '''
         for je in self._jnct_edges:
             yield je
+
 
     @property
     def faces(self):
