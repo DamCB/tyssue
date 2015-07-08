@@ -9,7 +9,8 @@ MAINTAINER_EMAIL = 'gllm.gay@gmail.com'
 URL = 'https://github.com/CellModels/tyssue'
 LICENSE = 'GPLv3'
 DOWNLOAD_URL = 'https://github.com/CellModels/tyssue.git'
-VERSION = '${Tyssue_VERSION}'
+# VERSION = '${Tyssue_VERSION}'
+VERSION = '0.1'
 
 if __name__ == "__main__":
 
@@ -39,7 +40,8 @@ if __name__ == "__main__":
                      "Topic :: Scientific/Engineering :: Medical Science Apps",
                      ],
 
-        packages=find_packages('${CMAKE_CURRENT_SOURCE_DIR}'),
-        package_dir={'': '${CMAKE_CURRENT_SOURCE_DIR}'},
+        packages=find_packages(),
+        package_data={'tyssue': ['*.so*', '*.a*', '*.lib*']},
+        include_package_data=True,
         zip_safe=False
     )
