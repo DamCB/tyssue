@@ -9,7 +9,15 @@
 
 #include "tyssue/objects.hh"
 
-long Uid::id;  // declares storage for static member Uid::id
+//long Uid::id;  // declares storage for static member Uid::id
+
+
+#include <CGAL/Linear_cell_complex.h>
+#include <CGAL/Linear_cell_complex_operations.h>
+#include <CGAL/Linear_cell_complex_constructors.h>
+#include <CGAL/Simple_cartesian.h>
+
+typedef CGAL::Simple_cartesian<double>               Kernel;
 
 
 struct World
@@ -35,8 +43,6 @@ class_<World>("World")
   .def("set", &World::set);
 }
 
-typedef Kernel::Point_3                              Point_3;
-
 void make_polygon(Appical_sheet_3 &sheet, std::vector<Point> &points) {
   std::size_t n_sides = points.size();
   Dart_handle dh = make_combinatorial_polygon(sheet, n_sides);
@@ -46,6 +52,8 @@ void make_polygon(Appical_sheet_3 &sheet, std::vector<Point> &points) {
     next = sheet.beta(prev, 1);
     Vertex_attribute_handle vh = sheet.create_vertex_attribute(*it);
     sheet.set_vertex_attribute(prev, vh);
+    //int id = sheet.info<0>(vh);
+    //std::cout<<"Point: " <<sheet.point_of_vertex_attribute(vh)<<std::endl;
     prev = next;
   };
 };
@@ -62,6 +70,14 @@ void make_hexagon(Appical_sheet_3 &sheet ) {
 
   std::vector<Point> points {p1, p2, p3, p4, p5, p6};
   make_polygon(sheet, points);
+  // for (Appical_sheet_3::Vertex_attribute_range::iterator
+  //      it=sheet.vertex_attributes().begin(),
+  //      itend=sheet.vertex_attributes().end();
+  //    it!=itend; ++it)
+  //    {
+  //      std::cout<<"point: "<<sheet.point_of_vertex_attribute(it)<<", "<<"id: "
+  //           <<sheet.info_of_attribute<0>(it).id<<std::endl;
+  //    }
 };
 
 double get_point_x(const Point point){

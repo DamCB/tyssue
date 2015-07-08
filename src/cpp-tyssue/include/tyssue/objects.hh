@@ -5,12 +5,13 @@
 
 typedef CGAL::Simple_cartesian<double>               Kernel;
 
-class Uid {
-private:
+struct Uid {
   static long id;
-public:
-  // Uid() {id += 1;}
-  long get_id() {id += 1; return id;}
+  long get_id() {
+    id += 1;
+    std::cout<<"new id: "<<id<<std::endl;
+    return id;
+    }
   void reset() {id = 0;}
 };
 
@@ -93,7 +94,7 @@ struct Cell_merge_functor
     ca1.info().area=(ca1.info().area + ca2.info().area);
     ca1.info().volume=(ca1.info().volume + ca2.info().volume);
     ca1.info().prefered_volume=(ca1.info().prefered_volume
-				+ ca2.info().prefered_volume)/2;
+				                        + ca2.info().prefered_volume)/2;
     ca1.info().contractility=(ca1.info().contractility + ca2.info().contractility)/2;
     ca1.info().vol_elasticity=(ca1.info().vol_elasticity + ca2.info().vol_elasticity)/2;
  }
@@ -126,7 +127,6 @@ struct Epithelium_Items
   struct Dart_wrapper
   {
     typedef CGAL::Dart<2, Refs > Dart;
-    // Vertex attribute's info switch between active/inactive
     typedef CGAL::Cell_attribute_with_point< Refs, Vertex_data, CGAL::Tag_true,
                                              Vertex_functor >
     Vertex_attribute;
@@ -147,6 +147,7 @@ struct Epithelium_Items
 
 typedef CGAL::Linear_cell_complex_traits<3, Kernel>                Traits;
 typedef CGAL::Linear_cell_complex<2,3,Traits,Epithelium_Items>     Appical_sheet_3;
+//typedef CGAL::Linear_cell_complex<3>                               Appical_sheet_3;
 typedef Appical_sheet_3::Dart_handle                               Dart_handle;
 typedef Appical_sheet_3::Point                                     Point;
 typedef Appical_sheet_3::FT                                        FT;

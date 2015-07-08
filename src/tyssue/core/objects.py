@@ -1,20 +1,25 @@
-import libtyssue_core as core
+import libtyssue_core as libcore
 from ..dl_import import dl_import
+
+import logging
+
+log = logging.getLogger(name=__name__)
 
 
 def test_import():
-    planet = core.World()
+    planet = libcore.World()
     planet.set('howdy')
     return planet.greet()
 
 
-class Epithelium(core.Epithelium):
+class Epithelium(libcore.Epithelium):
 
     def __init__(self, eptm=None):
         if eptm is None:
-            self.__eptm = core.Epithelium()
+            log.info('New epithelium')
+            self.ceptm = libcore.Epithelium()
         else:
-            self.__eptm = eptm.__eptm
+            self.ceptm = eptm.ceptm
 
 
 class LinearCellComplex:
