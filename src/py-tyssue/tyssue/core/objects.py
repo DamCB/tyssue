@@ -1,4 +1,4 @@
-import libtyssue_core as core
+from .. import libtyssue_core as core
 from ..dl_import import dl_import
 
 

@@ -55,6 +55,21 @@ find_package(CGAL REQUIRED)
 
 ##############################################################################
 
+# Installation path
+
+## By default installation prefix (CMAKE_INSTALL_PREFIX) will be set
+## according to the path of the Python interpreter. This way it works out
+## of the box with Anaconda installation.
+
+get_filename_component(INSTALL_PREFIX "${PYTHON_LIBRARIES}" PATH)
+get_filename_component(INSTALL_PREFIX "${INSTALL_PREFIX}" PATH)
+
+if (NOT ${INSTALL_PREFIX} STREQUAL "")
+  set(CMAKE_INSTALL_PREFIX "${INSTALL_PREFIX}")
+endif()
+
+##############################################################################
+
 # Add some flags to the compiler
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math -std=c++11")
 
@@ -70,14 +85,4 @@ endif(BUILD_DOC)
 
 ##############################################################################
 
-# Installation path
-
-## By default installation prefix (CMAKE_INSTALL_PREFIX) will be set
-## according to the path of the Python interpreter. This way it works out
-## of the box with Anaconda installation.
-
-get_filename_component(INSTALL_PREFIX "${PYTHON_LIBRARIES}" PATH)
-get_filename_component(INSTALL_PREFIX "${INSTALL_PREFIX}" PATH)
-
-set(CMAKE_INSTALL_PREFIX "${INSTALL_PREFIX}")
 message(STATUS "Tyssue will be installed to ${INSTALL_PREFIX}")
