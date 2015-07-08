@@ -56,7 +56,7 @@ find_package(CGAL REQUIRED)
 ##############################################################################
 
 # Add some flags to the compiler
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math -std=gnu++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math -std=c++11")
 
 ##############################################################################
 
