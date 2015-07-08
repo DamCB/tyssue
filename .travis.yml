@@ -10,7 +10,6 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get -qq install g++-4.8
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
-
   - sudo apt-get install --yes libexpat1-dev
   - sudo apt-get install --yes git
 

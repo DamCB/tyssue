@@ -1,12 +1,6 @@
 import libtyssue_core as core
-
 from ..dl_import import dl_import
 
-libcore = None ## Avoids code check complains od libcore being undefined
-
-dl_import("from .. import libtyssue_core as libcore")
-
-dl_import("from ..libtyssue_core import Epithelium")
 
 def test_import():
     planet = core.World()
