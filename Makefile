@@ -8,3 +8,6 @@ test:
 
 coverage:
 	nosetests tyssue --with-coverage --cover-package=tyssue -v
+
+full-test:
+	bash .full_test.sh

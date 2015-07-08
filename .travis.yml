@@ -20,8 +20,9 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda create -q -n tyssue python=3.4 numpy scipy vispy matplotlib nose coverage vispy pip
+  - conda create -q -n tyssue python=3.4
   - source activate tyssue
+  - conda install numpy scipy vispy matplotlib nose coverage vispy pip
   - conda install -c https://conda.binstar.org/osgeo boost cgal
   - pip install coveralls
 
