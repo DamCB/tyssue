@@ -5,13 +5,13 @@
 
 typedef CGAL::Simple_cartesian<double>               Kernel;
 
-struct Uid {
-public:
-  Uid() {id += 1;}
-  int get_id() {return id;}
-  void reset() {id = 0;}
+class Uid {
 private:
   static long id;
+public:
+  // Uid() {id += 1;}
+  long get_id() {id += 1; return id;}
+  void reset() {id = 0;}
 };
 
 // struct Vid::Uid {};
