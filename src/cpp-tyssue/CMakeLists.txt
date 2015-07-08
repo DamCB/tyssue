@@ -30,6 +30,13 @@ install(TARGETS tyssue_core
   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
 )
 
+# Copy C++ tyssue library to Python build directory
+set(TARGET_PY_DIR ${CMAKE_BINARY_DIR}/src/py-tyssue/tyssue/)
+add_custom_command(TARGET tyssue_core POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${TARGET_PY_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tyssue_core> ${TARGET_PY_DIR}
+)
+
 # Install header files
 if(INSTALL_HEADERS)
     INSTALL(FILES ${header_files} DESTINATION "include/tyssue")
