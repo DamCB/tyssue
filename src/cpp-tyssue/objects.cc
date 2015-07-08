@@ -9,6 +9,8 @@
 
 #include "tyssue/objects.hh"
 
+long Uid::id;  // declares storage for static member Uid::id
+
 
 struct World
 {
