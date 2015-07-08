@@ -1,5 +1,5 @@
 import libtyssue_core as libcore
-from ..dl_import import dl_import
+# from ..dl_import import dl_import
 
 import logging
 
