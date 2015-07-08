@@ -53,7 +53,7 @@ void make_polygon(Appical_sheet_3 &sheet, std::vector<Point> &points) {
     Vertex_attribute_handle vh = sheet.create_vertex_attribute(*it);
     sheet.set_vertex_attribute(prev, vh);
     //int id = sheet.info<0>(vh);
-    //std::cout<<"Point: " <<sheet.point_of_vertex_attribute(vh)<<std::endl;
+    std::cout<<"Point: " <<sheet.point_of_vertex_attribute(vh)<<std::endl;
     prev = next;
   };
 };
