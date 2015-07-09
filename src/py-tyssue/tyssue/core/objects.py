@@ -1,10 +1,8 @@
-import libtyssue_core as libcore
+from  .. import libtyssue_core as libcore
 # from ..dl_import import dl_import
 
 import logging
-
 log = logging.getLogger(name=__name__)
-
 
 def test_import():
     planet = libcore.World()
