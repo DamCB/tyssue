@@ -6,13 +6,33 @@
 typedef CGAL::Simple_cartesian<double>               Kernel;
 
 struct Uid {
-  static long id;
-  long get_id() {
-    id += 1;
-    std::cout<<"new id: "<<id<<std::endl;
-    return id;
+  static long vid; //vertex ID
+  static long eid; //edge ID
+  static long cid; //cell ID
+
+  long get_vid() {
+    vid += 1;
+    std::cout<<"new vertex id: "<<vid<<std::endl;
+    return vid;
     }
-  void reset() {id = 0;}
+
+  long get_eid() {
+    eid += 1;
+    std::cout<<"new edge id: "<<eid<<std::endl;
+    return eid;
+    }
+
+  long get_cid() {
+    cid += 1;
+    std::cout<<"new cell id: "<<cid<<std::endl;
+    return cid;
+    }
+    
+  void reset() {
+    vid = 0;
+    eid = 0;
+    cid = 0;
+    }
 };
 
 // struct Vid::Uid {};

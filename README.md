@@ -48,7 +48,7 @@ python 2.x version, because it's time to move on...
 
 ### C++
 - Boost >= 1.54
-- CGAL >= 3.5
+- CGAL >= 4.6
 
 
 ## Install
