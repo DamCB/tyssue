@@ -50,10 +50,12 @@ find_package(PythonLibsNew 3 REQUIRED)
 find_package(NumPy 3 REQUIRED)
 find_package(SciPy REQUIRED)
 
-# Find CGAL
 find_package(CGAL REQUIRED)
 message(STATUS "CGAL version: ${CGAL_VERSION}")
 
+if(NOT CGAL_FOUND OR ${CGAL_VERSION} VERSION_LESS 4.6)
+  message(FATAL_ERROR "Tyssue needs CGAL library >= 4.6.")
+endif()
 
 ##############################################################################
 

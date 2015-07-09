@@ -23,13 +23,13 @@ before_install:
   - conda create -q -n tyssue python=3.4
   - source activate tyssue
   - conda install numpy scipy vispy matplotlib nose coverage vispy pip
-  - conda install -c https://conda.binstar.org/osgeo boost cgal
+  - conda install -c https://conda.anaconda.org/osgeo boost cgal
   - pip install coveralls
 
 install:
   - mkdir build/
   - cd build/
-  - cmake -DBoost_LIBRARY_DIR=$HOME/miniconda/envs/tyssue/lib/ -DBoost_INCLUDE_DIR=$HOME/miniconda/envs/tyssue/include/ ..
+  - cmake -DBoost_INCLUDE_DIR=$HOME/miniconda/envs/tyssue/include/ ..
   - make install
 
 script:

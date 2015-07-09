@@ -34,7 +34,7 @@ conda create -n tyssue python=3.4 numpy scipy vispy matplotlib nose coverage
 ## activate the new environment
 source activate tyssue
 ## install some friends
-conda install -c https://conda.binstar.org/osgeo boost cgal
+conda install -c https://conda.anaconda.org/osgeo boost cgal
 pip install vispy
 ```
 
