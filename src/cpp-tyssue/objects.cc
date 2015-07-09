@@ -9,7 +9,9 @@
 
 #include "tyssue/objects.hh"
 
-long Uid::id;  // declares storage for static member Uid::id
+long Uid::vid;  // declares storage for static member Uid::id
+long Uid::eid;  // declares storage for static member Uid::id
+long Uid::cid;  // declares storage for static member Uid::id
 
 
 #include <CGAL/Linear_cell_complex.h>
@@ -75,7 +77,7 @@ void make_hexagon(Appical_sheet_3 &sheet ) {
      it!=itend; ++it)
      {
        std::cout<<"point: "<<sheet.point_of_vertex_attribute(it)<<", "<<"id: "
-            <<sheet.info_of_attribute<0>(it).id<<std::endl;
+            <<sheet.info_of_attribute<0>(it).vid<<std::endl;
      }
 };
 

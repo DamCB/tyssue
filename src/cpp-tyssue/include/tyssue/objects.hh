@@ -27,7 +27,7 @@ struct Uid {
     std::cout<<"new cell id: "<<cid<<std::endl;
     return cid;
     }
-    
+
   void reset() {
     vid = 0;
     eid = 0;
@@ -43,7 +43,7 @@ struct Uid {
 
 struct Vertex_data {
   Uid vid = Uid();
-  long id = vid.get_id();
+  long id = vid.get_vid();
 };
 
 struct Junction_data {
