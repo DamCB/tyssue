@@ -77,7 +77,7 @@ void make_hexagon(Appical_sheet_3 &sheet ) {
      it!=itend; ++it)
      {
        std::cout<<"point: "<<sheet.point_of_vertex_attribute(it)<<", "<<"id: "
-            <<sheet.info_of_attribute<0>(it).vid<<std::endl;
+            <<sheet.info_of_attribute<0>(it).id<<std::endl;
      }
 };
 
