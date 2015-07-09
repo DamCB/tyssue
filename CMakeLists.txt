@@ -51,7 +51,7 @@ find_package(NumPy 3 REQUIRED)
 find_package(SciPy REQUIRED)
 
 # Find CGAL
-find_package(CGAL 4.6 REQUIRED)
+find_package(CGAL REQUIRED)
 message(STATUS "CGAL version: ${CGAL_VERSION}")
 
 

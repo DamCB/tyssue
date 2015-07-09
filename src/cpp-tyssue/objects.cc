@@ -70,14 +70,14 @@ void make_hexagon(Appical_sheet_3 &sheet ) {
 
   std::vector<Point> points {p1, p2, p3, p4, p5, p6};
   make_polygon(sheet, points);
-  // for (Appical_sheet_3::Vertex_attribute_range::iterator
-  //      it=sheet.vertex_attributes().begin(),
-  //      itend=sheet.vertex_attributes().end();
-  //    it!=itend; ++it)
-  //    {
-  //      std::cout<<"point: "<<sheet.point_of_vertex_attribute(it)<<", "<<"id: "
-  //           <<sheet.info_of_attribute<0>(it).id<<std::endl;
-  //    }
+  for (Appical_sheet_3::Vertex_attribute_range::iterator
+       it=sheet.vertex_attributes().begin(),
+       itend=sheet.vertex_attributes().end();
+     it!=itend; ++it)
+     {
+       std::cout<<"point: "<<sheet.point_of_vertex_attribute(it)<<", "<<"id: "
+            <<sheet.info_of_attribute<0>(it).id<<std::endl;
+     }
 };
 
 double get_point_x(const Point point){
