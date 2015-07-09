@@ -9,7 +9,7 @@
 
 #include "tyssue/objects.hh"
 
-//long Uid::id;  // declares storage for static member Uid::id
+long Uid::id;  // declares storage for static member Uid::id
 
 
 #include <CGAL/Linear_cell_complex.h>

@@ -1,4 +1,5 @@
 from  .. import libtyssue_core as libcore
+
 # from ..dl_import import dl_import
 
 import logging
@@ -10,7 +11,12 @@ def test_import():
     return planet.greet()
 
 
-class Epithelium(libcore.Epithelium):
+
+def make_hexagon(eptm):
+
+    return libcore.make_hexagon(eptm.ceptm)
+
+class Epithelium():
 
     def __init__(self, eptm=None):
         if eptm is None:
