@@ -24,4 +24,4 @@ def test_3cells():
     assert je.source_idx == 0
     assert je.target_idx == 1
     assert je.cell_idx == 0
-    assert je.opposite_idx == (1, 0, 2)
+    assert je.oposite_idx == (1, 0, 2)

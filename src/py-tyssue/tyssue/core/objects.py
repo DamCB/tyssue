@@ -110,15 +110,15 @@ class Epithelium:
 
     @property
     def e_srce_idx(self):
-        return eptm.je_idx.get_level_values('srce')
+        return self.je_idx.get_level_values('srce')
 
     @property
     def e_trgt_idx(self):
-        return eptm.je_idx.get_level_values('trgt')
+        return self.je_idx.get_level_values('trgt')
 
     @property
     def e_cell_idx(self):
-        return eptm.je_idx.get_level_values('cell')
+        return self.je_idx.get_level_values('cell')
 
     @property
     def je_idx_array(self):
