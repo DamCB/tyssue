@@ -20,6 +20,8 @@ requirements:
     - scipy
     - boost
     - matplotlib
+    - pandas
+    - vispy
 
 about:
   home: https://github.com/CellModels/tyssue

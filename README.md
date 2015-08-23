@@ -44,7 +44,7 @@ python 2.x version, because it's time to move on...
 - scipy >= 0.12
 - pandas >= 0.13
 - matplotlib >= 1.3
-- graph_tool >= 2.2.37
+- vispy >= 0.4
 
 ### C++
 - Boost >= 1.54

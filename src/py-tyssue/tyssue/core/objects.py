@@ -126,6 +126,41 @@ class Epithelium:
                           self.e_trgt_idx,
                           self.e_cell_idx)).T
 
+    def triangular_mesh(self, coords):
+        '''
+        Return a triangulation of an epithelial sheet (2D in a 3D space),
+        with added edges between cell barycenters and junction vertices.
+
+        Parameters
+        ----------
+        coords: list of str:
+          pair of coordinates corresponding to column names
+          for eptm.cell_df and eptm.jv_df
+
+        Returns
+        -------
+        vertices: (eptm.Nc+eptm.Nv, 3) ndarray
+           all the vertices' coordinates
+        faces: (eptm.Nf, 3) ndarray of ints
+           triple of the vertices' indexes forming
+           the triangular faces. For each junction edge, this is simply
+           the index (srce, trgt, cell). This is correctly oriented.
+        cell_mask: (eptm.Nc + eptm.Nv,) mask with 1 iff the vertex corresponds
+           to a cell center
+        '''
+
+        vertices = np.concatenate((eptm.cell_df[coords],
+                                   eptm.jv_df[coords]), axis=0)
+
+        ## edge indices as (Nc + Nv) * 3 array
+        faces = np.asarray(eptm.je_idx.labels).T
+        ## The src, trgt, cell triangle is correctly oriented
+        ## both jv_idx cols are shifted by Nc
+        faces[:, :2] += eptm.Nc
+
+        cell_mask = np.arange(eptm.Nc + eptm.Nv) < eptm.Nc
+        return vertices, faces, cell_mask
+
 
     def _build_cell_cell_indexes(self):
         '''

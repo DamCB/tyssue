@@ -25,3 +25,5 @@ def test_3cells():
     assert je.target_idx == 1
     assert je.cell_idx == 0
     assert je.oposite_idx == (1, 0, 2)
+
+def test_triangular_mesh():
