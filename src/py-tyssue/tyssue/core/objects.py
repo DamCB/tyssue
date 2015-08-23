@@ -1,4 +1,6 @@
 from  .. import libtyssue_core as libcore
+from . import generation
+from .generation import make_df
 
 # from ..dl_import import dl_import
 
@@ -11,82 +13,233 @@ def test_import():
     return planet.greet()
 
 
+class Epithelium:
+    '''
+    The whole tissue.
 
-def make_hexagon(eptm):
+    '''
 
-    return libcore.make_hexagon(eptm.ceptm)
+    def __init__(self, identifier, cell_df, jv_df, je_df):
+        '''
+        Creates an epithelium
 
-class Epithelium():
+        '''
 
-    def __init__(self, eptm=None):
-        if eptm is None:
-            log.info('New epithelium')
-            self.ceptm = libcore.Epithelium()
+        self.identifier = identifier
+        self.cell_df = cell_df
+        self.jv_df = jv_df
+        self.je_df = je_df
+
+        self.cc_idx = self._build_cell_cell_indexes()
+
+
+    @classmethod
+    def from_points(cls, identifier, points,
+                    cell_idx, jv_idx, je_idx,
+                    cell_data=None, jv_data=None, je_data=None):
+        '''
+
+        '''
+
+        if points.shape[1] == 2:
+            coords = ['x', 'y']
+        elif points.shape[1] == 3:
+            coords = ['x', 'y', 'z']
         else:
-            self.ceptm = eptm.ceptm
+            raise ValueError('the `points` argument must be'
+                             ' a (Nv, 2) or (Nv, 3) array')
+        if cell_data is None:
+            cell_data = generation.cell_data
+            jv_data = generation.jv_data
+            je_data = generation.je_data
+        else:
+            cell_data = generation.cell_data.update(cell_data)
+            jv_data = generation.jv_data.update(jv_data)
+            je_data = generation.je_data.update(je_data)
+
+        ### Cells DataFrame
+        self.cell_df = make_df(index=cell_idx, data_dict=cell_data)
+
+        ### Junction vertices and edges DataFrames
+        self.jv_df = make_df(index=jv_idx, data_dict=jv_data)
+        self.je_df = make_df(index=je_idx, data_dict=je_data)
+
+        self.jv_df[coords] = points
+
+        return cls.__init__(identifier, cell_df, jv_df, je_df)
 
 
-class LinearCellComplex:
-    '''
-    Just a stand up for the actual CGAL class
-    '''
-    def __init__(self, dim, space_dim):
+    @classmethod
+    def from_file(cls, input_file, identifier):
         '''
-        Parameters
-        ----------
-
-        dim: int
-          The dimension of the LCC (0 for a vertex, 1 for an edge, and so on)
-        space_dim: int
-          The surrounding space dimension (2 or 3, usually)
+        Creates an `Epithelium` instance from parsing an input file
 
         '''
-        self.i = dim  # as in i-cell in the doc.
-
-
-class Vertex(LinearCellComplex):
-
-    def __init__(self):
-        LinearCellComplex.__init__(self, 0)
-
-
-class Edge(LinearCellComplex):
-
-    def __init__(self):
-        LinearCellComplex.__init__(self, 1)
-
-
-class Face(LinearCellComplex):
-
-    def __init__(self):
-        LinearCellComplex.__init__(self, 2)
-
-
-class Volume(LinearCellComplex):
-
-    def __init__(self):
-        LinearCellComplex.__init__(self, 3)
-
-
-class Cell(LinearCellComplex):
-
-    def __init__(self, dim):
-        LinearCellComplex.__init__(self, dim)
+        with open(input_file, 'r') as source:
+            input_data = parse(source)
+            return cls.__init__(identifier, *input_data)
 
 
     @property
-    def j_edges(self):
-        '''
-        Iterate over the junction edges
-        '''
-        for je in self._jnct_edges:
-            yield je
-
+    def cell_idx(self):
+        return self.cell_df.index
 
     @property
-    def faces(self):
+    def jv_idx(self):
+        return self.jv_df.index
+
+    @property
+    def je_idx(self):
+        return self.je_df.index
+
+    @property
+    def Nc(self):
+        return self.cell_df.shape[0]
+
+    @property
+    def Nv(self):
+        return self.jv_df.shape[0]
+
+    @property
+    def Nf(self):
+        return self.je_df.shape[0]
+
+    @property
+    def e_srce_idx(self):
+        return eptm.je_idx.get_level_values('srce')
+
+    @property
+    def e_trgt_idx(self):
+        return eptm.je_idx.get_level_values('trgt')
+
+    @property
+    def e_cell_idx(self):
+        return eptm.je_idx.get_level_values('cell')
+
+    @property
+    def je_idx_array(self):
+        return np.vstack((self.e_srce_idx,
+                          self.e_trgt_idx,
+                          self.e_cell_idx)).T
+
+
+    def _build_cell_cell_indexes(self):
         '''
-        Iterate over the faces
+        This is hackish and not optimized,
+        should be provided by CGAL
         '''
-        for face in self._faces:
-            yield face
+        cc_idx = []
+        for srce0, trgt0, cell0 in self.je_idx:
+            for srce1, trgt1, cell1 in self.je_idx:
+                if (cell0 != cell1
+                    and trgt0 == srce1
+                    and trgt1 == srce0
+                    and not (cell1, cell0) in cc_idx):
+                    cc_idx.append((cell0, cell1))
+        cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['cella', 'cellb'])
+        return cc_idx
+
+
+class Cell:
+    '''
+    Doesn't hold any data, just methods.
+
+    I think it should be instanciated on demand, not systematically
+    for the whole epithelium
+
+    '''
+    def __init__(self, eptm, index):
+
+        self.__eptm = eptm
+        self.__index = index
+
+    ### This should be implemented in CGAL
+    def je_orbit(self):
+        '''
+        Indexes of the cell's junction halfedges.
+
+        '''
+        mask, sub_idx = self.__eptm.je_idx.get_loc_level(self.__index,
+                                                         level='cell',
+                                                         drop_level=False)
+        return sub_idx
+
+    def jv_orbit(self):
+        '''
+        Index of the cell's junction vertices.
+
+        '''
+        je_orbit = self.je_orbit()
+        return je_orbit.get_level_values('srce')
+
+    @property
+    def num_sides(self):
+        return len(self.je_orbit())
+
+
+class JunctionVertex:
+
+    def __init__(self, eptm, index):
+
+        self.__index = index #from CGAL
+        self.__eptm = eptm #from CGAL
+
+
+    def je_orbit(self):
+        '''
+        Indexes of the neighboring junction edges, returned
+        as the indexes of the **outgoing** halfedges.
+        '''
+
+        mask, sub_idx = self.__eptm.je_idx.get_loc_level(self._index,
+                                                         level='srce',
+                                                         drop_level=False)
+        return sub_idx
+
+
+    def cell_orbit(self):
+        '''
+        Index of the junction's cells.
+
+        '''
+        je_orbit = self.je_orbit()
+        return je_orbit.get_level_values('cell')
+
+
+    def jv_orbit(self):
+        '''
+        Index of the junction's neighbor junction vertices.
+
+        '''
+        je_orbit = self.je_orbit()
+        return je_orbit.get_level_values('trgt')
+
+
+
+class JunctionEdge():
+    '''
+    Really a HalfEdge ...
+    '''
+
+
+    def __init__(self, eptm, index):
+
+        self.__index = index #from CGAL
+        self.__eptm = eptm #from CGAL
+
+    @property
+    def source_idx(self):
+        return self.__index[0]
+
+    @property
+    def target_idx(self):
+        return self.__index[1]
+
+    @property
+    def cell_idx(self):
+        return self.__index[2]
+
+    @property
+    def oposite_idx(self):
+        jei = self.__eptm.je_idx_array
+        return tuple(*jei[(jei[:, 0] == 1)*(jei[:, 1] == 0)])
