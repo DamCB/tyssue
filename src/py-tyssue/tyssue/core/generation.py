@@ -29,10 +29,10 @@ je_data = {
     'dy': (0., np.float),
     'dz': (0., np.float),
     'length': (0., np.float),
-    ### Normal
-    'n': (1., np.float)}
-
-
+    ### Normals
+    'nx': (0., np.float),
+    'ny': (0., np.float),
+    'nz': (0., np.float)}
 
 def three_cells_sheet_array(zaxis=False):
     '''

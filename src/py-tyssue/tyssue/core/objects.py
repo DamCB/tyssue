@@ -126,6 +126,22 @@ class Epithelium:
                           self.e_trgt_idx,
                           self.e_cell_idx)).T
 
+    def upcast_srce(self, columns):
+
+        upcast = self.jv_df.loc[self.e_srce_idx][columns]
+        upcast.set_index(self.je_idx, inplace=True)
+        return upcast
+
+    def upcast_trgt(self, columns):
+        upcast = self.jv_df.loc[self.e_trgt_idx][columns]
+        upcast.set_index(self.je_idx, inplace=True)
+        return upcast
+
+    def upcast_cell(self, columns):
+        upcast = self.cell_df.loc[self.e_cell_idx][columns]
+        upcast.set_index(self.je_idx, inplace=True)
+        return upcast
+
     def triangular_mesh(self, coords):
         '''
         Return a triangulation of an epithelial sheet (2D in a 3D space),
@@ -135,17 +151,17 @@ class Epithelium:
         ----------
         coords: list of str:
           pair of coordinates corresponding to column names
-          for eptm.cell_df and eptm.jv_df
+          for self.cell_df and self.jv_df
 
         Returns
         -------
-        vertices: (eptm.Nc+eptm.Nv, 3) ndarray
+        vertices: (self.Nc+self.Nv, 3) ndarray
            all the vertices' coordinates
-        faces: (eptm.Nf, 3) ndarray of ints
+        faces: (self.Nf, 3) ndarray of ints
            triple of the vertices' indexes forming
            the triangular faces. For each junction edge, this is simply
            the index (srce, trgt, cell). This is correctly oriented.
-        cell_mask: (eptm.Nc + eptm.Nv,) mask with 1 iff the vertex corresponds
+        cell_mask: (self.Nc + self.Nv,) mask with 1 iff the vertex corresponds
            to a cell center
         '''
 
