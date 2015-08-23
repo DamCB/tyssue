@@ -3,7 +3,7 @@ import numpy as np
 from tyssue.core import Epithelium
 from tyssue.core.generation import three_cells_sheet
 
-from tyssue.core.geometry import sheet_geometry as sgeom
+from tyssue.geometry import sheet_geometry as sgeom
 
 
 def test_3cells():
