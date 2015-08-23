@@ -27,3 +27,8 @@ def test_3cells():
     assert je.oposite_idx == (1, 0, 2)
 
 def test_triangular_mesh():
+    cell_df, jv_df, je_df = three_cells_sheet()
+    eptm = Epithelium('3cells_2D', cell_df, jv_df, je_df)
+    vertices, faces, cell_mask = eptm.triangular_mesh(['x', 'y', 'z'])
+    assert vertices.shape == (16, 3)
+    assert faces.shape == (18, 3)

@@ -149,16 +149,16 @@ class Epithelium:
            to a cell center
         '''
 
-        vertices = np.concatenate((eptm.cell_df[coords],
-                                   eptm.jv_df[coords]), axis=0)
+        vertices = np.concatenate((self.cell_df[coords],
+                                   self.jv_df[coords]), axis=0)
 
         ## edge indices as (Nc + Nv) * 3 array
-        faces = np.asarray(eptm.je_idx.labels).T
+        faces = np.asarray(self.je_idx.labels).T
         ## The src, trgt, cell triangle is correctly oriented
         ## both jv_idx cols are shifted by Nc
-        faces[:, :2] += eptm.Nc
+        faces[:, :2] += self.Nc
 
-        cell_mask = np.arange(eptm.Nc + eptm.Nv) < eptm.Nc
+        cell_mask = np.arange(self.Nc + self.Nv) < self.Nc
         return vertices, faces, cell_mask
 
 
