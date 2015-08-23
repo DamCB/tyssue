@@ -75,4 +75,4 @@ def update_areas(sheet, coords=['x', 'y', 'z']):
 
     ncoords = ['n' + c for c in coords]
     sheet.cell_df['area'] = np.linalg.norm(
-        sheet.je_df[ncoords].groupby(level='cell').sum())/2
+        sheet.je_df[ncoords].groupby(level='cell').sum(), axis=1)/2
