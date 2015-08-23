@@ -24,7 +24,7 @@
 import sys
 import os.path
 
-## see https://docs.python.org/3.4/whatsnew/3.3.html?highlight=dlfcn
+# see https://docs.python.org/3.4/whatsnew/3.3.html?highlight=dlfcn
 from os import RTLD_LAZY, RTLD_GLOBAL
 
 dl_flags = RTLD_LAZY | RTLD_GLOBAL
