@@ -1,3 +1,7 @@
+import numpy as np
+import pandas as pd
+
+
 from  .. import libtyssue_core as libcore
 from . import generation
 from .generation import make_df
@@ -191,7 +195,7 @@ class JunctionVertex:
         as the indexes of the **outgoing** halfedges.
         '''
 
-        mask, sub_idx = self.__eptm.je_idx.get_loc_level(self._index,
+        mask, sub_idx = self.__eptm.je_idx.get_loc_level(self.__index,
                                                          level='srce',
                                                          drop_level=False)
         return sub_idx

@@ -1,6 +1,5 @@
 from tyssue.core import Epithelium, Cell, JunctionVertex, JunctionEdge
-
-from tyssue.generation import three_cells_sheet
+from tyssue.core.generation import three_cells_sheet
 
 def test_world_import():
     import tyssue
@@ -11,7 +10,7 @@ def test_3cells():
 
     cell_df, jv_df, je_df = three_cells_sheet()
     eptm = Epithelium('3cells_2D', cell_df, jv_df, je_df)
-    assert (eptm.Nc, eptm.Nv, eptm.Nf) == (3, 13, 15)
+    assert (eptm.Nc, eptm.Nv, eptm.Nf) == (3, 13, 18)
 
     cell = Cell(eptm, 0)
     assert len(cell.jv_orbit()) == 6
