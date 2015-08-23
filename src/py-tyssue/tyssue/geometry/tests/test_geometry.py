@@ -27,3 +27,7 @@ def test_3cells():
     sgeom.update_areas(sheet)
     np.testing.assert_allclose(sheet.cell_df['area'],
                                np.sqrt(3)*1.5, rtol=1e-3)
+
+    sgeom.update_all(sheet)
+    np.testing.assert_allclose(sheet.cell_df['area'],
+                               np.sqrt(3)*1.5, rtol=1e-3)

@@ -52,7 +52,8 @@ def update_normals(sheet, coords=['x', 'y', 'z']):
 
 def update_areas(sheet, coords=['x', 'y', 'z']):
     '''
-    Updates the normal coordniate of each (srce, trgt, cell) face.
+    Updates the normal coordniates of each (srce, trgt, cell) face.
+    Modifies edge_df `['nx', 'ny', 'nz']` columns.
     '''
 
     ncoords = ['n' + c for c in coords]
