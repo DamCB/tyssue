@@ -2,6 +2,23 @@ import numpy as np
 import pandas as pd
 
 
+def update_all(sheet, coords=['x', 'y', 'z']):
+    '''
+    Updates the sheet geometry by updating:
+    * the edge vector coordinates
+    * the edge lengths
+    * the cell centroids
+    * the normals to each edge associated face
+    * the cells area
+    '''
+
+    update_dcoords(sheet, coords)
+    update_length(sheet, coords)
+    update_centroid(sheet, coords)
+    update_normals(sheet, coords)
+    update_areas(sheet, coords)
+
+
 def update_dcoords(sheet, coords=['x', 'y', 'z']):
     '''
     Update the edge vector coordinates  on the
@@ -20,7 +37,7 @@ def update_length(sheet, coords=['x', 'y', 'z']):
     Updates the edge_df `length` column on the `coords` basis
     '''
     dcoords = ['d' + c for c in coords]
-    sheet.je_df['length'] = np.linalg.norm(eptm.je_df[dcoords],
+    sheet.je_df['length'] = np.linalg.norm(sheet.je_df[dcoords],
                                            axis=1)
 
 
@@ -30,6 +47,7 @@ def update_centroid(sheet, coords=['x', 'y', 'z']):
     center of mass.
     '''
     upcast_pos = sheet.upcast_srce(coords)
+    # Now it's easy to compute the centroid of each cell
     sheet.cell_df[coords] = upcast_pos.groupby(level='cell').mean()
 
 
@@ -52,8 +70,7 @@ def update_normals(sheet, coords=['x', 'y', 'z']):
 
 def update_areas(sheet, coords=['x', 'y', 'z']):
     '''
-    Updates the normal coordniates of each (srce, trgt, cell) face.
-    Modifies edge_df `['nx', 'ny', 'nz']` columns.
+    Updates the normal coordniate of each (srce, trgt, cell) face.
     '''
 
     ncoords = ['n' + c for c in coords]
