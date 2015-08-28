@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-from  .. import libtyssue_core as libcore
+from .. import libtyssue_core as libcore
 from . import generation
 from .generation import make_df
 
@@ -10,6 +10,7 @@ from .generation import make_df
 
 import logging
 log = logging.getLogger(name=__name__)
+
 
 def test_import():
     planet = libcore.World()
@@ -33,8 +34,7 @@ class Epithelium:
         self.cell_df = cell_df
         self.jv_df = jv_df
         self.je_df = je_df
-
-        self.cc_idx = self._build_cell_cell_indexes()
+        # self.cc_idx = self._build_cell_cell_indexes()
 
 
     @classmethod
@@ -61,10 +61,10 @@ class Epithelium:
             jv_data = generation.jv_data.update(jv_data)
             je_data = generation.je_data.update(je_data)
 
-        ### Cells DataFrame
+        # Cells DataFrame
         self.cell_df = make_df(index=cell_idx, data_dict=cell_data)
 
-        ### Junction vertices and edges DataFrames
+        # Junction vertices and edges DataFrames
         self.jv_df = make_df(index=jv_idx, data_dict=jv_data)
         self.je_df = make_df(index=je_idx, data_dict=je_data)
 
