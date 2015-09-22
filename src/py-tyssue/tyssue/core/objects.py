@@ -36,7 +36,6 @@ class Epithelium:
         self.je_df = je_df
         # self.cc_idx = self._build_cell_cell_indexes()
 
-
     @classmethod
     def from_points(cls, identifier, points,
                     cell_idx, jv_idx, je_idx,
@@ -72,7 +71,6 @@ class Epithelium:
 
         return cls.__init__(identifier, cell_df, jv_df, je_df)
 
-
     @classmethod
     def from_file(cls, input_file, identifier):
         '''
@@ -82,7 +80,6 @@ class Epithelium:
         with open(input_file, 'r') as source:
             input_data = parse(source)
             return cls.__init__(identifier, *input_data)
-
 
     @property
     def cell_idx(self):
@@ -126,21 +123,31 @@ class Epithelium:
                           self.e_trgt_idx,
                           self.e_cell_idx)).T
 
-    def upcast_srce(self, columns):
+    def _upcast(self, idx, df,  columns=None):
 
-        upcast = self.jv_df.loc[self.e_srce_idx][columns]
+        if columns is not None:
+            upcast = df[columns].loc[idx]
+        else:
+            upcast = df.loc[idx]
         upcast.set_index(self.je_idx, inplace=True)
         return upcast
 
-    def upcast_trgt(self, columns):
-        upcast = self.jv_df.loc[self.e_trgt_idx][columns]
-        upcast.set_index(self.je_idx, inplace=True)
-        return upcast
+    def upcast_srce(self, columns=None, df=None):
+        ''' Reindexes input data to self.je_idx
+        '''
+        if df is None:
+            df = self.jv_df
+        return self._upcast(self.e_srce_idx, columns, df)
 
-    def upcast_cell(self, columns):
-        upcast = self.cell_df.loc[self.e_cell_idx][columns]
-        upcast.set_index(self.je_idx, inplace=True)
-        return upcast
+    def upcast_trgt(self, columns=None, df=None):
+        if df is None:
+            df = self.jv_df
+        return self._upcast(self.e_trgt_idx, columns, df)
+
+    def upcast_cell(self, columns=None, df=None):
+        if df is None:
+            df = self.cell_df
+        return self._upcast(self.e_cell_idx, columns, df)
 
     def triangular_mesh(self, coords):
         '''
@@ -168,15 +175,14 @@ class Epithelium:
         vertices = np.concatenate((self.cell_df[coords],
                                    self.jv_df[coords]), axis=0)
 
-        ## edge indices as (Nc + Nv) * 3 array
+        # edge indices as (Nc + Nv) * 3 array
         faces = np.asarray(self.je_idx.labels).T
-        ## The src, trgt, cell triangle is correctly oriented
-        ## both jv_idx cols are shifted by Nc
+        # The src, trgt, cell triangle is correctly oriented
+        # both jv_idx cols are shifted by Nc
         faces[:, :2] += self.Nc
 
         cell_mask = np.arange(self.Nc + self.Nv) < self.Nc
         return vertices, faces, cell_mask
-
 
     def _build_cell_cell_indexes(self):
         '''
@@ -186,10 +192,8 @@ class Epithelium:
         cc_idx = []
         for srce0, trgt0, cell0 in self.je_idx:
             for srce1, trgt1, cell1 in self.je_idx:
-                if (cell0 != cell1
-                    and trgt0 == srce1
-                    and trgt1 == srce0
-                    and not (cell1, cell0) in cc_idx):
+                if (cell0 != cell1 and trgt0 == srce1 and
+                    trgt1 == srce0 and not (cell1, cell0) in cc_idx):
                     cc_idx.append((cell0, cell1))
         cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['cella', 'cellb'])
         return cc_idx
@@ -208,7 +212,7 @@ class Cell:
         self.__eptm = eptm
         self.__index = index
 
-    ### This should be implemented in CGAL
+    # This should be implemented in CGAL
     def je_orbit(self):
         '''
         Indexes of the cell's junction halfedges.
@@ -236,9 +240,8 @@ class JunctionVertex:
 
     def __init__(self, eptm, index):
 
-        self.__index = index #from CGAL
-        self.__eptm = eptm #from CGAL
-
+        self.__index = index  # from CGAL
+        self.__eptm = eptm  # from CGAL
 
     def je_orbit(self):
         '''
@@ -251,7 +254,6 @@ class JunctionVertex:
                                                          drop_level=False)
         return sub_idx
 
-
     def cell_orbit(self):
         '''
         Index of the junction's cells.
@@ -259,7 +261,6 @@ class JunctionVertex:
         '''
         je_orbit = self.je_orbit()
         return je_orbit.get_level_values('cell')
-
 
     def jv_orbit(self):
         '''
@@ -270,17 +271,15 @@ class JunctionVertex:
         return je_orbit.get_level_values('trgt')
 
 
-
 class JunctionEdge():
     '''
     Really a HalfEdge ...
     '''
 
-
     def __init__(self, eptm, index):
 
-        self.__index = index #from CGAL
-        self.__eptm = eptm #from CGAL
+        self.__index = index  # from CGAL
+        self.__eptm = eptm  # from CGAL
 
     @property
     def source_idx(self):
