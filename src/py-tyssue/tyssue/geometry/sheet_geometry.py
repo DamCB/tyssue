@@ -26,8 +26,9 @@ def update_dcoords(sheet, coords=['x', 'y', 'z']):
     columns (i.e `['dx', 'dy', 'dz']`) in sheet.edge_df.
     '''
     dcoords = ['d'+c for c in coords]
-    srce_pos = sheet.upcast_srce(coords).values
-    trgt_pos = sheet.upcast_trgt(coords).values
+    data = sheet.jv_df[coords]
+    srce_pos = sheet.upcast_srce(data).values
+    trgt_pos = sheet.upcast_trgt(data).values
 
     sheet.je_df[dcoords] = (trgt_pos - srce_pos)
 
@@ -46,7 +47,7 @@ def update_centroid(sheet, coords=['x', 'y', 'z']):
     Updates the cell_df `coords` columns as the cell's vertices
     center of mass.
     '''
-    upcast_pos = sheet.upcast_srce(coords)
+    upcast_pos = sheet.upcast_srce(sheet.jv_df[coords])
     # Now it's easy to compute the centroid of each cell
     sheet.cell_df[coords] = upcast_pos.groupby(level='cell').mean()
 
@@ -56,9 +57,9 @@ def update_normals(sheet, coords=['x', 'y', 'z']):
     Updates the cell_df `coords` columns as the cell's vertices
     center of mass.
     '''
-    cell_pos = sheet.upcast_cell(coords).values
-    srce_pos = sheet.upcast_srce(coords).values
-    trgt_pos = sheet.upcast_trgt(coords).values
+    cell_pos = sheet.upcast_cell(sheet.cell_df[coords]).values
+    srce_pos = sheet.upcast_srce(sheet.cell_df[coords]).values
+    trgt_pos = sheet.upcast_trgt(sheet.cell_df[coords]).values
 
     normals = np.cross(srce_pos - cell_pos, trgt_pos - cell_pos)
     if len(coords) == 2:

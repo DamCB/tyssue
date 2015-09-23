@@ -123,31 +123,22 @@ class Epithelium:
                           self.e_trgt_idx,
                           self.e_cell_idx)).T
 
-    def _upcast(self, idx, df,  columns=None):
+    def _upcast(self, idx, df):
 
-        if columns is not None:
-            upcast = df[columns].loc[idx]
-        else:
-            upcast = df.loc[idx]
+        upcast = df.loc[idx]
         upcast.set_index(self.je_idx, inplace=True)
         return upcast
 
-    def upcast_srce(self, columns=None, df=None):
+    def upcast_srce(self, df):
         ''' Reindexes input data to self.je_idx
         '''
-        if df is None:
-            df = self.jv_df
-        return self._upcast(self.e_srce_idx, columns, df)
+        return self._upcast(self.e_srce_idx, df)
 
-    def upcast_trgt(self, columns=None, df=None):
-        if df is None:
-            df = self.jv_df
-        return self._upcast(self.e_trgt_idx, columns, df)
+    def upcast_trgt(self, df):
+        return self._upcast(self.e_trgt_idx, df)
 
-    def upcast_cell(self, columns=None, df=None):
-        if df is None:
-            df = self.cell_df
-        return self._upcast(self.e_cell_idx, columns, df)
+    def upcast_cell(self, df):
+        return self._upcast(self.e_cell_idx, df)
 
     def triangular_mesh(self, coords):
         '''
