@@ -1,9 +1,10 @@
 from tyssue.core import Epithelium, Cell, JunctionVertex, JunctionEdge
 from tyssue.core.generation import three_cells_sheet
 
-def test_world_import():
-    import tyssue
-    assert tyssue.core.test_import() == "howdy"
+
+#def test_world_import():
+#    import tyssue
+#    assert tyssue.core.test_import() == "howdy"
 
 
 def test_3cells():

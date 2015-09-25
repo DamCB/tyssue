@@ -17,6 +17,7 @@ def update_all(sheet, coords=['x', 'y', 'z']):
     update_centroid(sheet, coords)
     update_normals(sheet, coords)
     update_areas(sheet, coords)
+    update_perimeters(sheet, coords)
 
 
 def update_dcoords(sheet, coords=['x', 'y', 'z']):
@@ -58,8 +59,8 @@ def update_normals(sheet, coords=['x', 'y', 'z']):
     center of mass.
     '''
     cell_pos = sheet.upcast_cell(sheet.cell_df[coords]).values
-    srce_pos = sheet.upcast_srce(sheet.cell_df[coords]).values
-    trgt_pos = sheet.upcast_trgt(sheet.cell_df[coords]).values
+    srce_pos = sheet.upcast_srce(sheet.jv_df[coords]).values
+    trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords]).values
 
     normals = np.cross(srce_pos - cell_pos, trgt_pos - cell_pos)
     if len(coords) == 2:
@@ -75,5 +76,14 @@ def update_areas(sheet, coords=['x', 'y', 'z']):
     '''
 
     ncoords = ['n' + c for c in coords]
-    sheet.cell_df['area'] = np.linalg.norm(
-        sheet.je_df[ncoords].groupby(level='cell').sum(), axis=1)/2
+    sheet.je_df['sub_area'] = np.linalg.norm(sheet.je_df[ncoords], axis=1) / 2
+    sheet.cell_df['area'] = sheet.je_df['sub_area'].groupby(level='cell').sum()
+
+
+def update_perimeters(sheet, coords=['x', 'y', 'z']):
+    '''
+    Updates the perimeter of each cell.
+    '''
+
+    sheet.cell_df['perimeter'] = sheet.je_df['length'].groupby(
+        level='cell').sum()

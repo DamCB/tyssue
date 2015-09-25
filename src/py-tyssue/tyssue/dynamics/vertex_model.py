@@ -15,11 +15,10 @@ def compute_energy(eptm, full_output=False):
 
     E_t = eptm.je_df['line_tension'] * eptm.je_df['length']
 
-
-    E_v =  0.5 * (eptm.cell_df['vol_elasticity']
-                  * (eptm.cell_df['vol']
-                     - eptm.cell_df['prefered_vol'])**2
-                  ) * eptm.cell_df['is_alive']
+    E_v = 0.5 * (eptm.cell_df['vol_elasticity'] *
+                 (eptm.cell_df['vol'] -
+                  eptm.cell_df['prefered_vol'])**2
+                 ) * eptm.cell_df['is_alive']
     E_c = 0.5 * (eptm.cell_df['contractility'] *
                  eptm.cell_df['perimeter']**2) * eptm.cell_df['is_alive']
     if full_output:

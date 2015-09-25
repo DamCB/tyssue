@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
 
-
-from .. import libtyssue_core as libcore
+# from .. import libtyssue_core as libcore
 from . import generation
 from .generation import make_df
 
@@ -126,7 +125,7 @@ class Epithelium:
     def _upcast(self, idx, df):
 
         upcast = df.loc[idx]
-        upcast.set_index(self.je_idx, inplace=True)
+        upcast.index = self.je_idx
         return upcast
 
     def upcast_srce(self, df):
