@@ -1,6 +1,6 @@
 # tyssue : An epithelium simulation library
 
-[![Build Status](https://travis-ci.org/CellModels/tyssue.svg?branch=master)](https://travis-ci.org/CellModels/tyssue)
+[![Build Status](https://travis-ci.org/DamCB/tyssue.svg?branch=master)](https://travis-ci.org/DamCB/tyssue)
 
 [![Coverage Status](https://coveralls.io/repos/CellModels/tyssue/badge.svg)](https://coveralls.io/r/CellModels/tyssue)
 
@@ -45,6 +45,7 @@ python 2.x version, because it's time to move on...
 - pandas >= 0.13
 - matplotlib >= 1.3
 - vispy >= 0.4
+- pandas >= 0.16
 
 ### C++
 - Boost >= 1.54
