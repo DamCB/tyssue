@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from ..utils import _to_3d, set_data_columns
+from ..utils.utils import (_to_3d, set_data_columns,
+                           update_default)
 
 
 default_params = {
@@ -13,17 +14,15 @@ default_params = {
 default_coords = ['x', 'y', 'z']
 
 v_data = {'basal_shift':
-          (default_params['basal_shift'], np.float),}
+          (default_params['basal_shift'], np.float),
+          'rho': (0., np.float),}
 
 default_geo_data = {'cell': v_data,
                     'jv': v_data,
                     'je':{'sub_area': (0, np.float())}}
 
-
 def set_geometry_columns(sheet, geo_data=None):
-    if geo_data is None:
-        geo_data = default_geo_data
-    geo_data.update(default_geo_data)
+    geo_data = update_default(default_geo_data, geo_data)
     set_data_columns(sheet, geo_data)
 
 
@@ -40,9 +39,7 @@ def update_all(sheet, coords=default_coords, parameters=None):
 
     '''
 
-    if parameters is None:
-        parameters = default_params
-    parameters.update(default_params)
+    parameters = update_default(default_params, parameters)
 
     update_dcoords(sheet, coords)
     update_length(sheet, coords)
@@ -145,13 +142,15 @@ def update_height_cylindrical(sheet, parameters,
     '''
     w = parameters['height_axis']
     u, v = (c for c in coords if c != w)
+    sheet.cell_df['rho'] = np.hypot(sheet.cell_df[v],
+                                    sheet.cell_df[u])
+    sheet.cell_df['height'] = (sheet.cell_df['rho'] -
+                               sheet.cell_df['basal_shift'])
+    sheet.jv_df['rho'] = np.hypot(sheet.jv_df[v],
+                                        sheet.jv_df[u])
+    sheet.jv_df['height'] = (sheet.jv_df['rho'] -
+                               sheet.jv_df['basal_shift'])
 
-    sheet.cell_df['height'] = (np.hypot(sheet.cell_df[v],
-                                        sheet.cell_df[u])
-                               - sheet.cell_df['basal_shift'])
-    sheet.jv_df['height'] = (np.hypot(sheet.jv_df[v],
-                                      sheet.jv_df[u])
-                             - sheet.jv_df['basal_shift'])
 
 # ### Flat geometry specific
 
@@ -163,5 +162,7 @@ def update_height_flat(sheet, parameters,
     `parameters['basal_shift']` from the plane where
     the coordinate `coord` is equal to 0
     '''
+    sheet.cell_df['rho'] = sheet.cell_df[coord]
     sheet.cell_df['height'] = sheet.cell_df[coord] - sheet.cell_df['basal_shift']
+    sheet.jv_df['rho'] = sheet.jv_df[coord]
     sheet.jv_df['height'] = sheet.jv_df[coord] - sheet.jv_df['basal_shift']

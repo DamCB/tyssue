@@ -10,3 +10,9 @@ def set_data_columns(eptm, data_dicts):
         for col, (default, dtype) in data_dict.items():
             df = getattr(eptm, '{}_df'.format(name))
             df[col] = default
+
+def update_default(default_params, params=None):
+    _params = default_params.copy()
+    if params is not None:
+        _params.update(params)
+    return _params

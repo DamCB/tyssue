@@ -6,6 +6,9 @@ from scipy import optimize
 from ..geometry import sheet_geometry as geom
 from ..dynamics import sheet_vertex_model as model
 
+from ..utils.utils import (_to_3d, set_data_columns,
+                           update_default)
+
 default_params = {
     'l_bfgs_b_options': {'disp':False,
                          'gtol':1e-3},
@@ -15,10 +18,7 @@ default_params = {
 def find_energy_min(sheet, pos_idx=None, 
                     coords=None, parameters=None):
 
-    if parameters is None:
-        parameters = default_params.copy()
-    parameters.update(default_params)
-
+    parameters = update_default(default_params, parameters)
     if coords is None:
         coords = sheet.coords
     if pos_idx is None:
@@ -54,22 +54,23 @@ def opt_grad(pos, pos_idx, sheet, coords):
     grad_i = model.compute_gradient(sheet, components=False)
     return grad_i.values.flatten()
 
-def approx_grad(sheet, coords=['x', 'y', 'z']):
-    pos0 = sheet.jv_df[coords].values.flatten()
+def approx_grad(sheet, coords):
+    pos0 = sheet.jv_df[coords].values.ravel()
     pos_idx = sheet.jv_idx
     grad = optimize.approx_fprime(pos0,
                                   opt_energy,
-                                  1e-9, pos_idx, sheet)
+                                  1e-9, pos_idx, 
+                                  sheet, coords)
     return grad
 
     
-def check_local_grad(sheet, coords=['x', 'y', 'z']):
+def check_grad(sheet, coords):
     
-    pos0 = sheet.jv_df[coords].values.flatten()
+    pos0 = sheet.jv_df[coords].values.ravel()
     pos_idx = sheet.jv_idx
     grad_err = optimize.check_grad(opt_energy,
                                    opt_grad,
                                    pos0.flatten(),
                                    pos_idx,
-                                   sheet)
+                                   sheet, coords)
     return grad_err

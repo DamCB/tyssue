@@ -4,6 +4,7 @@ import pandas as pd
 # from .. import libtyssue_core as libcore
 from . import generation
 from .generation import make_df
+from ..utils.utils import update_default
 
 # from ..dl_import import dl_import
 
@@ -107,9 +108,7 @@ class Epithelium:
             raise ValueError('the `points` argument must be'
                              ' a (Nv, 2) or (Nv, 3) array')
         
-        if data_dicts is None:
-            data_dicts = generation.data_dicts
-        data_dicts.update(generation.data_dicts)
+        data_dicts = update_default(generation.data_dicts, data_dicts)
         datasets = {}
         for key, data_dict in data_dicts.items():
             datasets[key] = make_df(index=indices_dict[key],
