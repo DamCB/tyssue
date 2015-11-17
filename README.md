@@ -133,8 +133,7 @@ TODO
 
 ## Licence
 
-This project is distributed as a GPL licence v3 or above. Some parts of it, of
-potential general interest, will be distributed under a LGPL licence.
+This project is distributed under the terms of the [Modzilla Public Licence](https://www.mozilla.org/en-US/MPL/2.0/).
 
 
 ## Bibliography
