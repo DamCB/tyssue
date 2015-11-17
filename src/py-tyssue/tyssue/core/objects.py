@@ -11,10 +11,6 @@ import logging
 log = logging.getLogger(name=__name__)
 
 
-def test_import():
-    planet = libcore.World()
-    planet.set('howdy')
-    return planet.greet()
 
 
 class Epithelium:
@@ -23,22 +19,21 @@ class Epithelium:
 
     '''
 
-    def __init__(self, identifier, cell_df, jv_df, je_df):
+    def __init__(self, identifier, datasets):
         '''
         Creates an epithelium
 
         '''
 
         self.identifier = identifier
-        self.cell_df = cell_df
-        self.jv_df = jv_df
-        self.je_df = je_df
-        # self.cc_idx = self._build_cell_cell_indexes()
+        for name, data in datasets.items():
+            setattr(self, data)
+        self.data_names = list(datasets.keys())
 
     @classmethod
     def from_points(cls, identifier, points,
                     cell_idx, jv_idx, je_idx,
-                    cell_data=None, jv_data=None, je_data=None):
+                    data_dicts=None):
         '''
 
         '''
@@ -50,35 +45,18 @@ class Epithelium:
         else:
             raise ValueError('the `points` argument must be'
                              ' a (Nv, 2) or (Nv, 3) array')
-        if cell_data is None:
-            cell_data = generation.cell_data
-            jv_data = generation.jv_data
-            je_data = generation.je_data
-        else:
-            cell_data = generation.cell_data.update(cell_data)
-            jv_data = generation.jv_data.update(jv_data)
-            je_data = generation.je_data.update(je_data)
-
-        # Cells DataFrame
-        self.cell_df = make_df(index=cell_idx, data_dict=cell_data)
-
-        # Junction vertices and edges DataFrames
-        self.jv_df = make_df(index=jv_idx, data_dict=jv_data)
-        self.je_df = make_df(index=je_idx, data_dict=je_data)
+        
+        if data_dicts is None:
+            data_dicts = generation.data_dicts
+        data_dicts.update(generation.data_dicts)
+        datasets = {}
+        for key, data_dict in data_dicts.items():
+            datasets[key] = make_df(index=cell_idx,
+                                    data_dict=data_dict)
 
         self.jv_df[coords] = points
 
-        return cls.__init__(identifier, cell_df, jv_df, je_df)
-
-    @classmethod
-    def from_file(cls, input_file, identifier):
-        '''
-        Creates an `Epithelium` instance from parsing an input file
-
-        '''
-        with open(input_file, 'r') as source:
-            input_data = parse(source)
-            return cls.__init__(identifier, *input_data)
+        return cls.__init__(identifier, datasets)
 
     @property
     def cell_idx(self):
@@ -139,40 +117,6 @@ class Epithelium:
     def upcast_cell(self, df):
         return self._upcast(self.e_cell_idx, df)
 
-    def triangular_mesh(self, coords):
-        '''
-        Return a triangulation of an epithelial sheet (2D in a 3D space),
-        with added edges between cell barycenters and junction vertices.
-
-        Parameters
-        ----------
-        coords: list of str:
-          pair of coordinates corresponding to column names
-          for self.cell_df and self.jv_df
-
-        Returns
-        -------
-        vertices: (self.Nc+self.Nv, 3) ndarray
-           all the vertices' coordinates
-        faces: (self.Nf, 3) ndarray of ints
-           triple of the vertices' indexes forming
-           the triangular faces. For each junction edge, this is simply
-           the index (srce, trgt, cell). This is correctly oriented.
-        cell_mask: (self.Nc + self.Nv,) mask with 1 iff the vertex corresponds
-           to a cell center
-        '''
-
-        vertices = np.concatenate((self.cell_df[coords],
-                                   self.jv_df[coords]), axis=0)
-
-        # edge indices as (Nc + Nv) * 3 array
-        faces = np.asarray(self.je_idx.labels).T
-        # The src, trgt, cell triangle is correctly oriented
-        # both jv_idx cols are shifted by Nc
-        faces[:, :2] += self.Nc
-
-        cell_mask = np.arange(self.Nc + self.Nv) < self.Nc
-        return vertices, faces, cell_mask
 
     def _build_cell_cell_indexes(self):
         '''

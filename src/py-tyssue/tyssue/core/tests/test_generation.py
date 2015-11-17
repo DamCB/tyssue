@@ -1,13 +1,10 @@
 import numpy as np
 import pandas as pd
-import tyssue
-
 
 from tyssue.core import generation
 
 
 def test_3cells():
-
     cell_df, jv_df, je_df = generation.three_cells_sheet()
     edge_idx = pd.MultiIndex.from_tuples([(0, 1, 0),
                                           (1, 2, 0),

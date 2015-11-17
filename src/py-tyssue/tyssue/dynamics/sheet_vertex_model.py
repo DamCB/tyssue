@@ -1,26 +1,83 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import print_function
 
 import pandas as pd
 import numpy as np
 
 from ..utils import _to_3d
 
+default_params = {"line_tension": 0.12,
+                  "rho_lumen": 4.0,
+                  "contractility": 0.04,
+                  "vol_elasticity": 1.0,
+                  "prefered_height": 24.0,
+                  "prefered_area": 10.0}
 
-def compute_energy(eptm, full_output=False):
+cell_data = [
+    "contractility",
+    "vol_elasticity",
+    "prefered_height",
+    "prefered_area"
+    ]
 
-    E_t = eptm.je_df['line_tension'] * eptm.je_df['length']
+je_data = [
+    "contractility",
+    "vol_elasticity",
+    "prefered_height",
+    "prefered_area"
+    ]
 
-    E_v = 0.5 * (eptm.cell_df['vol_elasticity'] *
-                 (eptm.cell_df['vol'] -
-                  eptm.cell_df['prefered_vol'])**2
-                 ) * eptm.cell_df['is_alive']
-    E_c = 0.5 * (eptm.cell_df['contractility'] *
-                 eptm.cell_df['perimeter']**2) * eptm.cell_df['is_alive']
+jv_data = []
+
+def dimentionalize(parameters=None):
+
+    if parameters is None:
+        parameters = default_params.copy()
+    parameters.update(default_params)
+
+    dim_params = parameters.copy()
+    Kv = parameters['vol_elasticity']
+    A0 = parameters['prefered_area']
+    h0 = parameters['prefered_height']
+    dim_params['contractility'] = (parameters['contractility'] * 
+                                   Kv * A0 * h0**2))
+    dim_params['line_tension'] = (parameters['line_tension'] *
+                                  Kv * A0**1.5 * h0**2)
+    dim_params['prefered_vol'] = A0 * h0
+    return dim_params
+
+
+def set_dynamic_columns(sheet, parameters=None):
+    '''
+    parameters should be dimentionalized first (or should they?)
+    '''
+    if parameters is None:
+        parameters = default_params.copy()
+    parameters.update(default_params)
+
+    for col in cell_data:
+        sheet.cell_df[col] = parameters[col]
+    for col in jv_data:
+        sheet.jv_df[col] = parameters[col]
+    for col in je_data:
+        sheet.je_df[col] = parameters[col]
+
+
+def compute_energy(sheet, full_output=False):
+    '''
+    Computes the tissue sheet mesh energy.
+
+    Parameters
+    ----------
+    * mesh: a :class:`tyssue.object.sheet.Sheet` instance
+    
+    '''
+    E_t = sheet.je_df['line_tension'] * sheet.je_df['length']
+
+    E_v = 0.5 * (sheet.cell_df['vol_elasticity'] *
+                 (sheet.cell_df['vol'] -
+                  sheet.cell_df['prefered_vol'])**2
+                 ) * sheet.cell_df['is_alive']
+    E_c = 0.5 * (sheet.cell_df['contractility'] *
+                 sheet.cell_df['perimeter']**2) * sheet.cell_df['is_alive']
     if full_output:
         return E_t, E_c, E_v
     else:

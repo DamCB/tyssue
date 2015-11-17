@@ -1,38 +1,40 @@
 import pandas as pd
 import numpy as np
 
+
+
 ###
-cell_data = {
-    ## Cell Geometry
-    'perimeter': (0., np.float),
-    'area': (0., np.float),
-    ## Coordinates
-    'x': (0., np.float),
-    'y': (0., np.float),
-    'z': (0., np.float),
-    ## Topology
-    'num_sides': (1, np.int),
-    ## Masks
-    'is_alive': (1, np.bool)}
-
-jv_data = {
-    ## Coordinates
-    'x': (0., np.float),
-    'y': (0., np.float),
-    'z': (0., np.float),
-    ## Masks
-    'is_active': (1, np.bool)}
-
-je_data = {
-    ## Coordinates
-    'dx': (0., np.float),
-    'dy': (0., np.float),
-    'dz': (0., np.float),
-    'length': (0., np.float),
-    ### Normals
-    'nx': (0., np.float),
-    'ny': (0., np.float),
-    'nz': (0., np.float)}
+data_dicts = {
+    'cell': {
+        ## Cell Geometry
+        'perimeter': (0., np.float),
+        'area': (0., np.float),
+        ## Coordinates
+        'x': (0., np.float),
+        'y': (0., np.float),
+        'z': (0., np.float),
+        ## Topology
+        'num_sides': (1, np.int),
+        ## Masks
+        'is_alive': (1, np.bool)},
+    'jv': {
+        ## Coordinates
+        'x': (0., np.float),
+        'y': (0., np.float),
+        'z': (0., np.float),
+        ## Masks
+        'is_active': (1, np.bool)},
+    'je': {
+        ## Coordinates
+        'dx': (0., np.float),
+        'dy': (0., np.float),
+        'dz': (0., np.float),
+        'length': (0., np.float),
+        ### Normals
+        'nx': (0., np.float),
+        'ny': (0., np.float),
+        'nz': (0., np.float)}
+    }
 
 def three_cells_sheet_array(zaxis=False):
     '''
@@ -93,7 +95,8 @@ def three_cells_sheet_array(zaxis=False):
 def three_cells_sheet(zaxis=False):
     '''
     Creates the apical junctions mesh of three packed hexagonal cells.
-    If `zaxis` is `True` (defaults to False), adds a `z` coordinates, with `z = 0`.
+    If `zaxis` is `True` (defaults to False), adds a `z` coordinates,
+    with `z = 0`.
 
     Cells have a side length of 1.0 +/- 1e-3.
 
