@@ -9,8 +9,8 @@ from tyssue.core.generation import three_cells_sheet
 
 def test_3cells():
 
-    cell_df, jv_df, je_df = three_cells_sheet()
-    eptm = Epithelium('3cells_2D', cell_df, jv_df, je_df)
+    datasets = three_cells_sheet()
+    eptm = Epithelium('3cells_2D', datasets)
     assert (eptm.Nc, eptm.Nv, eptm.Nf) == (3, 13, 18)
 
     cell = Cell(eptm, 0)
@@ -28,8 +28,8 @@ def test_3cells():
     assert je.oposite_idx == (1, 0, 2)
 
 def test_triangular_mesh():
-    cell_df, jv_df, je_df = three_cells_sheet()
-    eptm = Epithelium('3cells_2D', cell_df, jv_df, je_df)
+    datasets = three_cells_sheet()
+    eptm = Epithelium('3cells_2D', datasets)
     vertices, faces, cell_mask = eptm.triangular_mesh(['x', 'y', 'z'])
     assert vertices.shape == (16, 3)
     assert faces.shape == (18, 3)

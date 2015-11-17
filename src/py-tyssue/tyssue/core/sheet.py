@@ -12,11 +12,18 @@ class Sheet(Epithelium):
     
     '''
 
-    def __init__(self, identifier, cell_df, jv_df, je_df):
+    def __init__(self, identifier, datasets):
         '''
+        Creates an epithelium sheet, such as the apical junction network.
+        
+        Parameters
+        ----------
+        identifier: `str`, the tissue name
+        cell_df: `pandas.DataFrame` indexed by the cells indexes
+            this df holds the vertices associated with 
         
         '''
-        super(Epithelium, self)
+        super().__init__(identifier, datasets)
 
     def triangular_mesh(self, coords):
         '''

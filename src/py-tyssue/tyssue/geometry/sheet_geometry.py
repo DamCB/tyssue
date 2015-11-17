@@ -1,22 +1,43 @@
 import numpy as np
 import pandas as pd
 
-default_params = {"rho_lumen": 4.0,
-                  "geometry": "cylindrical",
-                  "height_axis": 'z'}
-
-default_coords = ('x', 'y', 'z')
+from ..utils import _to_3d, set_data_columns
 
 
-def update_all(sheet, coords=default_coords, 
-               parameters=None):
+default_params = {
+    "basal_shift": 4.0,
+    "geometry": "cylindrical",
+    "height_axis": 'z'
+    }
+
+default_coords = ['x', 'y', 'z']
+
+v_data = {'basal_shift':
+          (default_params['basal_shift'], np.float),}
+
+default_geo_data = {'cell': v_data,
+                    'jv': v_data,
+                    'je':{'sub_area': (0, np.float())}}
+
+
+def set_geometry_columns(sheet, geo_data=None):
+    if geo_data is None:
+        geo_data = default_geo_data
+    geo_data.update(default_geo_data)
+    set_data_columns(sheet, geo_data)
+
+
+def update_all(sheet, coords=default_coords, parameters=None):
     '''
     Updates the sheet geometry by updating:
     * the edge vector coordinates
     * the edge lengths
     * the cell centroids
     * the normals to each edge associated face
-    * the cells area
+    * the cell areas
+    * the vertices heights (depends on geometry)
+    * the cell volumes (depends on geometry)
+
     '''
 
     if parameters is None:
@@ -35,6 +56,8 @@ def update_all(sheet, coords=default_coords,
         update_height_flat(sheet, parameters)
     update_vol(sheet)
 
+def scale(sheet, delta, coords):
+    sheet.jv_df[coords] = sheet.jv_df[coords] * delta
 
 def update_dcoords(sheet, coords=default_coords):
     '''
@@ -117,16 +140,18 @@ def update_height_cylindrical(sheet, parameters,
     '''
     Updates each cell height in a cylindrical geometry.
     e.g. cell anchor is assumed to lie at a distance 
-    `parameters['rho_lumen']` from the third axis of
+    `parameters['basal_shift']` from the third axis of
     the triplet `coords`
     '''
     w = parameters['height_axis']
     u, v = (c for c in coords if c != w)
 
-    sheet.cell_df['height'] = np.hypot(sheet.cell_df[v],
-                                       sheet.cell_df[u]) - parameters['rho_lumen']
-    sheet.jv_df['height'] = np.hypot(sheet.jv_df[v],
-                                     sheet.jv_df[u]) - parameters['rho_lumen']
+    sheet.cell_df['height'] = (np.hypot(sheet.cell_df[v],
+                                        sheet.cell_df[u])
+                               - sheet.cell_df['basal_shift'])
+    sheet.jv_df['height'] = (np.hypot(sheet.jv_df[v],
+                                      sheet.jv_df[u])
+                             - sheet.jv_df['basal_shift'])
 
 # ### Flat geometry specific
 
@@ -135,8 +160,8 @@ def update_height_flat(sheet, parameters,
     '''
     Updates each cell height in a flat geometry.
     e.g. cell anchor is assumed to lie at a distance 
-    `parameters['rho_lumen']` from the plane where
+    `parameters['basal_shift']` from the plane where
     the coordinate `coord` is equal to 0
     '''
-    sheet.cell_df['height'] = sheet.cell_df[coord] - parameters['rho_lumen']
-    sheet.jv_df['height'] = sheet.jv_df[coord] - parameters['rho_lumen']
+    sheet.cell_df['height'] = sheet.cell_df[coord] - sheet.cell_df['basal_shift']
+    sheet.jv_df['height'] = sheet.jv_df[coord] - sheet.jv_df['basal_shift']

@@ -10,6 +10,51 @@ from .generation import make_df
 import logging
 log = logging.getLogger(name=__name__)
 
+''' 
+
+The following data is an exemple of the `data_dicts`.
+It is a nested dictionnary with two levels.
+
+The first key design objects names: ('cell', 'je', 'jv') They will
+correspond to the dataframes attributes of the Epithelium instance,
+(e.g eptm.cell_df);
+
+The second level keys design column names of the
+above dataframes, and their default values as a (value, dtype) pair.
+
+
+    data_dicts = {
+        'cell': {
+            ## Cell Geometry
+            'perimeter': (0., np.float),
+            'area': (0., np.float),
+            ## Coordinates
+            'x': (0., np.float),
+            'y': (0., np.float),
+            'z': (0., np.float),
+            ## Topology
+            'num_sides': (1, np.int),
+            ## Masks
+            'is_alive': (1, np.bool)},
+        'jv': {
+            ## Coordinates
+            'x': (0., np.float),
+            'y': (0., np.float),
+            'z': (0., np.float),
+            ## Masks
+            'is_active': (1, np.bool)},
+        'je': {
+            ## Coordinates
+            'dx': (0., np.float),
+            'dy': (0., np.float),
+            'dz': (0., np.float),
+            'length': (0., np.float),
+            ### Normals
+            'nx': (0., np.float),
+            'ny': (0., np.float),
+            'nz': (0., np.float)}
+        }
+'''
 
 
 
@@ -18,30 +63,46 @@ class Epithelium:
     The whole tissue.
 
     '''
+    default_coords = ['x', 'y', 'z']
 
-    def __init__(self, identifier, datasets):
+    def __init__(self, identifier, datasets, coords=None):
         '''
         Creates an epithelium
 
+        Parameters:
+        -----------
+        identifier: string
+        datasets: dictionary of dataframes
+        the datasets dict specifies the names, data columns
+        and value types of the modeled tyssue 
+        
         '''
+        if coords is None:
+            self.coords = self.default_coords
+        else:
+            self.coords = coords
 
         self.identifier = identifier
+        if not set(('cell', 'jv', 'je')).issubset(datasets) :
+            raise ValueError('''The `datasets` dictionnary should
+            contain at least the 'cell', 'jv' and 'je' keys''')
         for name, data in datasets.items():
-            setattr(self, data)
+            setattr(self, '{}_df'.format(name), data)
         self.data_names = list(datasets.keys())
 
     @classmethod
     def from_points(cls, identifier, points,
-                    cell_idx, jv_idx, je_idx,
+                    indices_dict,
+                    points_dataset='jv',
                     data_dicts=None):
         '''
 
         '''
 
         if points.shape[1] == 2:
-            coords = ['x', 'y']
+            coords = cls.default_coords[:2]
         elif points.shape[1] == 3:
-            coords = ['x', 'y', 'z']
+            coords = cls.default_coords
         else:
             raise ValueError('the `points` argument must be'
                              ' a (Nv, 2) or (Nv, 3) array')
@@ -51,10 +112,9 @@ class Epithelium:
         data_dicts.update(generation.data_dicts)
         datasets = {}
         for key, data_dict in data_dicts.items():
-            datasets[key] = make_df(index=cell_idx,
+            datasets[key] = make_df(index=indices_dict[key],
                                     data_dict=data_dict)
-
-        self.jv_df[coords] = points
+        datasets[points_dataset][coords] = points
 
         return cls.__init__(identifier, datasets)
 

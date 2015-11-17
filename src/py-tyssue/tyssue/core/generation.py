@@ -150,7 +150,9 @@ def three_cells_sheet(zaxis=False):
     je_df = make_df(index=je_idx, data_dict=je_data)
 
     jv_df[coords] = points
-    return cell_df, jv_df, je_df
+    
+    datasets = {'cell': cell_df, 'jv': jv_df, 'je': je_df}
+    return sheets
 
 
 
