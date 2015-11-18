@@ -13,9 +13,8 @@ default_params = {
     "prefered_area": 10.0
     }
 
-
-cell_dtypes = ["contractility", 
-               "vol_elasticity", 
+cell_dtypes = ["contractility",
+               "vol_elasticity",
                "prefered_height",
                "prefered_area",
                "prefered_vol"]
@@ -34,7 +33,7 @@ def get_dyn_data(paramters):
     return dyn_data
 
 def set_dynamic_columns(sheet, parameters=None):
-    
+
     parameters = update_default(default_params, parameters)
     dyn_data = get_dyn_data(parameters)
     set_data_columns(sheet, dyn_data)
@@ -47,7 +46,7 @@ def dimentionalize(parameters=None):
     Kv = parameters['vol_elasticity']
     A0 = parameters['prefered_area']
     h0 = parameters['prefered_height']
-    dim_params['contractility'] = (parameters['contractility'] * 
+    dim_params['contractility'] = (parameters['contractility'] *
                                    Kv * A0 * h0**2)
     dim_params['line_tension'] = (parameters['line_tension'] *
                                   Kv * A0**1.5 * h0**2)
@@ -80,7 +79,7 @@ def compute_energy(sheet, full_output=False):
         return E_t.sum() + (E_c+E_v).sum()
 
 
-def compute_gradient(sheet, components=False, 
+def compute_gradient(sheet, components=False,
                      dcoords=None, ncoords=None):
     '''
     If components is True, returns the individual terms
@@ -90,7 +89,7 @@ def compute_gradient(sheet, components=False,
         dcoords = ['d'+c for c in sheet.coords]
     if ncoords is None:
         ncoords = ['n'+c for c in sheet.coords]
-    
+
     sheet.grad_i_lij = - (sheet.je_df[dcoords] /
                           _to_3d(sheet.je_df['length']))
 
@@ -130,7 +129,7 @@ def contractile_grad(sheet):
 
 def volume_grad(sheet, dcoords=None, ncoords=None):
     '''
-    Computes 
+    Computes
     :math:`\sum_\alpha\nabla_i \left(K (V_\alpha - V_0)^2\right)`
     '''
     if dcoords is None:
@@ -149,7 +148,7 @@ def volume_grad(sheet, dcoords=None, ncoords=None):
 
     # edge vertices
     r_ijs = sheet.je_df[dcoords]
-    
+
     cross_ur = pd.DataFrame(
         np.cross(sheet.je_df[ncoords], r_ijs),
         index=sheet.je_idx, columns=sheet.coords)
@@ -158,15 +157,15 @@ def volume_grad(sheet, dcoords=None, ncoords=None):
 
     cell_term = sheet.upcast_cell(cell_term_)
     grad_v = cell_term.groupby(level='srce').sum()
-    
+
     r_to_rho = sheet.jv_df[sheet.coords] / _to_3d(sheet.jv_df['rho'])
     r_to_rho = sheet.upcast_srce(df=r_to_rho)
     r_to_rho.columns = sheet.coords
-    
+
     r_aj = (sheet.upcast_trgt(sheet.jv_df[sheet.coords]) -
             sheet.upcast_cell(sheet.cell_df[sheet.coords]))
     r_aj.columns = sheet.coords
-    
+
     normals = sheet.je_df[ncoords]
     cross_aj = pd.DataFrame(np.cross(r_aj, normals),
                             columns=sheet.coords, index=sheet.je_idx)

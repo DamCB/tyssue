@@ -17,13 +17,13 @@ v_data = {'basal_shift':
           (default_params['basal_shift'], np.float),
           'rho': (0., np.float),}
 
-default_geo_data = {'cell': v_data,
-                    'jv': v_data,
-                    'je':{'sub_area': (0, np.float())}}
+extra_geom_spec = {'cell': v_data,
+                   'jv': v_data,
+                   'je':{'sub_area': (0, np.float())}}
 
-def set_geometry_columns(sheet, geo_data=None):
-    geo_data = update_default(default_geo_data, geo_data)
-    set_data_columns(sheet, geo_data)
+def set_geometry_columns(sheet, geom_spec=None):
+    geom_spec = update_default(extra_geom_spec, geom_spec)
+    set_data_columns(sheet, geom_spec)
 
 
 def update_all(sheet, coords=default_coords, parameters=None):
@@ -54,6 +54,10 @@ def update_all(sheet, coords=default_coords, parameters=None):
     update_vol(sheet)
 
 def scale(sheet, delta, coords):
+    ''' Scales the coordinates `coords`
+    by a factor `delta`
+    '''
+    sheet.cell_df[coords] = sheet.cell_df[coords] * delta
     sheet.jv_df[coords] = sheet.jv_df[coords] * delta
 
 def update_dcoords(sheet, coords=default_coords):
@@ -136,7 +140,7 @@ def update_height_cylindrical(sheet, parameters,
                               coords=default_coords):
     '''
     Updates each cell height in a cylindrical geometry.
-    e.g. cell anchor is assumed to lie at a distance 
+    e.g. cell anchor is assumed to lie at a distance
     `parameters['basal_shift']` from the third axis of
     the triplet `coords`
     '''
@@ -144,25 +148,25 @@ def update_height_cylindrical(sheet, parameters,
     u, v = (c for c in coords if c != w)
     sheet.cell_df['rho'] = np.hypot(sheet.cell_df[v],
                                     sheet.cell_df[u])
-    sheet.cell_df['height'] = (sheet.cell_df['rho'] -
+    sheet.cell_df['height'] = (sheet.cell_df['rho'] +
                                sheet.cell_df['basal_shift'])
     sheet.jv_df['rho'] = np.hypot(sheet.jv_df[v],
-                                        sheet.jv_df[u])
-    sheet.jv_df['height'] = (sheet.jv_df['rho'] -
+                                  sheet.jv_df[u])
+    sheet.jv_df['height'] = (sheet.jv_df['rho'] +
                                sheet.jv_df['basal_shift'])
 
 
 # ### Flat geometry specific
 
-def update_height_flat(sheet, parameters,
-                       coord='z'):
+def update_height_flat(sheet, parameters):
     '''
     Updates each cell height in a flat geometry.
-    e.g. cell anchor is assumed to lie at a distance 
+    e.g. cell anchor is assumed to lie at a distance
     `parameters['basal_shift']` from the plane where
     the coordinate `coord` is equal to 0
     '''
+    coord = parameters['height_axis']
     sheet.cell_df['rho'] = sheet.cell_df[coord]
-    sheet.cell_df['height'] = sheet.cell_df[coord] - sheet.cell_df['basal_shift']
+    sheet.cell_df['height'] = sheet.cell_df[coord] + sheet.cell_df['basal_shift']
     sheet.jv_df['rho'] = sheet.jv_df[coord]
-    sheet.jv_df['height'] = sheet.jv_df[coord] - sheet.jv_df['basal_shift']
+    sheet.jv_df['height'] = sheet.jv_df[coord] + sheet.jv_df['basal_shift']

@@ -108,7 +108,7 @@ def three_cells_sheet(zaxis=False):
     je_df: the junction edges `DataFrame`
 
     '''
-    points, edges, (Nc, Nv, Ne) = three_cells_sheet_array(zaxis)
+    points, _, (Nc, Nv, _) = three_cells_sheet_array(zaxis)
 
     if zaxis:
         coords = ['x', 'y', 'z']
@@ -143,16 +143,17 @@ def three_cells_sheet(zaxis=False):
     cc_idx = [(0, 1), (1, 2), (0, 2)]
     cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['cella', 'cellb'])
     ### Cells DataFrame
-    cell_df = make_df(index=cell_idx, data_dict=cell_data)
+    cell_df = make_df(index=cell_idx, data_dict=data_dicts['cell'])
 
     ### Junction vertices and edges DataFrames
-    jv_df = make_df(index=jv_idx, data_dict=jv_data)
-    je_df = make_df(index=je_idx, data_dict=je_data)
+    jv_df = make_df(index=jv_idx, data_dict=data_dicts['jv'])
+    je_df = make_df(index=je_idx, data_dict=data_dicts['je'])
 
-    jv_df[coords] = points
-    
+    jv_df.loc[:, coords[:2]] = points
+    jv_df.loc[:, coords[2:]] = 0.
+
     datasets = {'cell': cell_df, 'jv': jv_df, 'je': je_df}
-    return sheets
+    return datasets
 
 
 

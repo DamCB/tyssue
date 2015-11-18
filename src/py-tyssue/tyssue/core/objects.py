@@ -11,7 +11,7 @@ from ..utils.utils import update_default
 import logging
 log = logging.getLogger(name=__name__)
 
-''' 
+'''
 
 The following data is an exemple of the `data_dicts`.
 It is a nested dictionnary with two levels.
@@ -64,7 +64,7 @@ class Epithelium:
     The whole tissue.
 
     '''
-    default_coords = ['x', 'y', 'z']
+    coords = ['x', 'y', 'z']
 
     def __init__(self, identifier, datasets, coords=None):
         '''
@@ -75,14 +75,13 @@ class Epithelium:
         identifier: string
         datasets: dictionary of dataframes
         the datasets dict specifies the names, data columns
-        and value types of the modeled tyssue 
-        
+        and value types of the modeled tyssue
+
         '''
-        if coords is None:
-            self.coords = self.default_coords
-        else:
+        if coords is not None:
             self.coords = coords
 
+        self.je_df, self.cell_df, self.jv_df = None, None, None
         self.identifier = identifier
         if not set(('cell', 'jv', 'je')).issubset(datasets) :
             raise ValueError('''The `datasets` dictionnary should
@@ -101,13 +100,13 @@ class Epithelium:
         '''
 
         if points.shape[1] == 2:
-            coords = cls.default_coords[:2]
+            coords = cls.coords[:2]
         elif points.shape[1] == 3:
-            coords = cls.default_coords
+            coords = cls.coords
         else:
             raise ValueError('the `points` argument must be'
                              ' a (Nv, 2) or (Nv, 3) array')
-        
+
         data_dicts = update_default(generation.data_dicts, data_dicts)
         datasets = {}
         for key, data_dict in data_dicts.items():
@@ -176,6 +175,20 @@ class Epithelium:
     def upcast_cell(self, df):
         return self._upcast(self.e_cell_idx, df)
 
+    def get_orbits(self, center, periph):
+        orbits = self.je_df.groupby(level=center).apply(
+            lambda df: df.get_level_values(periph))
+        return orbits
+
+    def cell_polygons(self, coords):
+        polys = self.je_df.groupby(level='cell').apply(
+            lambda df: self.jv_df.loc[
+                df.index.get_level_values('srce'),
+                coords
+                ]
+            )
+        return polys
+
 
     def _build_cell_cell_indexes(self):
         '''
@@ -211,9 +224,9 @@ class Cell:
         Indexes of the cell's junction halfedges.
 
         '''
-        mask, sub_idx = self.__eptm.je_idx.get_loc_level(self.__index,
-                                                         level='cell',
-                                                         drop_level=False)
+        _, sub_idx = self.__eptm.je_idx.get_loc_level(self.__index,
+                                                      level='cell',
+                                                      drop_level=False)
         return sub_idx
 
     def jv_orbit(self):
@@ -242,7 +255,7 @@ class JunctionVertex:
         as the indexes of the **outgoing** halfedges.
         '''
 
-        mask, sub_idx = self.__eptm.je_idx.get_loc_level(self.__index,
+        _, sub_idx = self.__eptm.je_idx.get_loc_level(self.__index,
                                                          level='srce',
                                                          drop_level=False)
         return sub_idx
