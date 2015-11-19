@@ -5,28 +5,30 @@ from ..utils.utils import (_to_3d, set_data_columns,
                            update_default)
 
 
-default_params = {
-    "basal_shift": 4.0,
-    "geometry": "cylindrical",
-    "height_axis": 'z'
-    }
-
-default_coords = ['x', 'y', 'z']
-
-v_data = {'basal_shift':
-          (default_params['basal_shift'], np.float),
-          'rho': (0., np.float),}
-
-extra_geom_spec = {'cell': v_data,
-                   'jv': v_data,
-                   'je':{'sub_area': (0, np.float())}}
-
-def set_geometry_columns(sheet, geom_spec=None):
-    geom_spec = update_default(extra_geom_spec, geom_spec)
-    set_data_columns(sheet, geom_spec)
+def get_default_geom_specs():
+    default_geom_specs = {
+        "cell": {
+            "num_sides": (6, np.int),
+            "rho": (0., np.float),
+            "basal_shift": (4., np.float), # previously rho_lumen
+            },
+        "jv": {
+            "rho": (0., np.float),
+            "basal_shift": (4., np.float), # previously rho_lumen
+            },
+        "settings": {
+            "geometry": "cylindrical",
+            "height_axis": 'z'
+            }
+        }
+    return default_geom_specs
 
 
-def update_all(sheet, coords=default_coords, parameters=None):
+
+
+
+
+def update_all(sheet, coords=None, **geom_spec):
     '''
     Updates the sheet geometry by updating:
     * the edge vector coordinates
@@ -38,8 +40,10 @@ def update_all(sheet, coords=default_coords, parameters=None):
     * the cell volumes (depends on geometry)
 
     '''
+    if coords is None:
+        coords = sheet.coords
 
-    parameters = update_default(default_params, parameters)
+    geom_spec.update(get_default_geom_specs())
 
     update_dcoords(sheet, coords)
     update_length(sheet, coords)
@@ -47,10 +51,11 @@ def update_all(sheet, coords=default_coords, parameters=None):
     update_normals(sheet, coords)
     update_areas(sheet, coords)
     update_perimeters(sheet)
-    if parameters['geometry'] == 'cylindrical':
-        update_height_cylindrical(sheet, parameters)
-    elif parameters['geometry'] == 'flat':
-        update_height_flat(sheet, parameters)
+    if geom_spec['settings']['geometry'] == 'cylindrical':
+        update_height_cylindrical(sheet, coords,
+                                  geom_spec['settings'])
+    elif geom_spec['settings']['geometry'] == 'flat':
+        update_height_flat(sheet, geom_spec['settings'])
     update_vol(sheet)
 
 def scale(sheet, delta, coords):
@@ -60,7 +65,7 @@ def scale(sheet, delta, coords):
     sheet.cell_df[coords] = sheet.cell_df[coords] * delta
     sheet.jv_df[coords] = sheet.jv_df[coords] * delta
 
-def update_dcoords(sheet, coords=default_coords):
+def update_dcoords(sheet, coords):
     '''
     Update the edge vector coordinates  on the
     `coords` basis (`default_coords` by default). Modifies the corresponding
@@ -74,7 +79,7 @@ def update_dcoords(sheet, coords=default_coords):
     sheet.je_df[dcoords] = (trgt_pos - srce_pos)
 
 
-def update_length(sheet, coords=default_coords):
+def update_length(sheet, coords):
     '''
     Updates the edge_df `length` column on the `coords` basis
     '''
@@ -83,7 +88,7 @@ def update_length(sheet, coords=default_coords):
                                            axis=1)
 
 
-def update_centroid(sheet, coords=default_coords):
+def update_centroid(sheet, coords):
     '''
     Updates the cell_df `coords` columns as the cell's vertices
     center of mass.
@@ -92,7 +97,7 @@ def update_centroid(sheet, coords=default_coords):
     sheet.cell_df[coords] = upcast_pos.groupby(level='cell').mean()
 
 
-def update_normals(sheet, coords=default_coords):
+def update_normals(sheet, coords):
     '''
     Updates the cell_df `coords` columns as the cell's vertices
     center of mass.
@@ -109,7 +114,7 @@ def update_normals(sheet, coords=default_coords):
         sheet.je_df[ncoords] = normals
 
 
-def update_areas(sheet, coords=default_coords):
+def update_areas(sheet, coords):
     '''
     Updates the normal coordniate of each (srce, trgt, cell) face.
     '''
@@ -136,36 +141,32 @@ def update_vol(sheet):
 
 # ### Cylindrical geometry specific
 
-def update_height_cylindrical(sheet, parameters,
-                              coords=default_coords):
+def update_height_cylindrical(sheet, coords, settings):
     '''
     Updates each cell height in a cylindrical geometry.
     e.g. cell anchor is assumed to lie at a distance
     `parameters['basal_shift']` from the third axis of
     the triplet `coords`
     '''
-    w = parameters['height_axis']
+    w = settings['height_axis']
     u, v = (c for c in coords if c != w)
-    sheet.cell_df['rho'] = np.hypot(sheet.cell_df[v],
-                                    sheet.cell_df[u])
-    sheet.cell_df['height'] = (sheet.cell_df['rho'] +
-                               sheet.cell_df['basal_shift'])
     sheet.jv_df['rho'] = np.hypot(sheet.jv_df[v],
                                   sheet.jv_df[u])
-    sheet.jv_df['height'] = (sheet.jv_df['rho'] +
+    sheet.jv_df['height'] = (sheet.jv_df['rho'] -
                                sheet.jv_df['basal_shift'])
+    update_centroid(sheet, ['height', 'rho'])
 
 
 # ### Flat geometry specific
 
-def update_height_flat(sheet, parameters):
+def update_height_flat(sheet, settings):
     '''
     Updates each cell height in a flat geometry.
     e.g. cell anchor is assumed to lie at a distance
     `parameters['basal_shift']` from the plane where
     the coordinate `coord` is equal to 0
     '''
-    coord = parameters['height_axis']
+    coord = settings['height_axis']
     sheet.cell_df['rho'] = sheet.cell_df[coord]
     sheet.cell_df['height'] = sheet.cell_df[coord] + sheet.cell_df['basal_shift']
     sheet.jv_df['rho'] = sheet.jv_df[coord]

@@ -1,59 +1,78 @@
 
+
+"""
+Vertex model for an Epithelial sheet (see definitions).
+
+Depends on the sheet vertex geometry functions.
+"""
+
 import pandas as pd
 import numpy as np
+from copy import deepcopy
 
 from ..utils.utils import (_to_3d, set_data_columns,
                            update_default)
 
-default_params = {
-    "line_tension": 0.12,
-    "contractility": 0.04,
-    "vol_elasticity": 1.0,
-    "prefered_height": 24.0,
-    "prefered_area": 10.0
-    }
-
-cell_dtypes = ["contractility",
-               "vol_elasticity",
-               "prefered_height",
-               "prefered_area",
-               "prefered_vol"]
-
-je_dtypes = ['line_tension',]
-
-
-def get_dyn_data(paramters):
-
-    dyn_data = {
-        'cell': {key: (paramters[key], np.float)
-                 for key in cell_dtypes},
-        'je': {key: (paramters[key], np.float)
-                 for key in je_dtypes},
+def get_default_mod_specs():
+    default_mod_specs = {
+        "cell": {
+            "contractility": (0.04, np.float),
+            "vol_elasticity": (1., np.float),
+            "prefered_height": (10., np.float),
+            "prefered_area": (24., np.float),
+            "prefered_vol": (0., np.float),
+            },
+        "je": {
+            "line_tension": (0.12, np.float),
+            },
+        "jv": {
+            "radial_tension": (0., np.float),
+            }
         }
-    return dyn_data
+    return default_mod_specs
 
-def set_dynamic_columns(sheet, parameters=None):
+def dimentionalize(mod_specs, **kwargs):
 
-    parameters = update_default(default_params, parameters)
-    dyn_data = get_dyn_data(parameters)
-    set_data_columns(sheet, dyn_data)
+    dim_mod_specs = deepcopy(mod_specs)
+    dim_mod_specs.update(**kwargs)
+
+    Kv = dim_mod_specs['cell']['vol_elasticity'][0]
+    A0 = dim_mod_specs['cell']['prefered_area'][0]
+    h0 = dim_mod_specs['cell']['prefered_height'][0]
+    lbda = dim_mod_specs['je']['line_tension'][0]
+    gamma = dim_mod_specs['cell']['contractility'][0]
+
+    dim_mod_specs['cell']['contractility'] = (gamma * Kv*A0 * h0**2,
+                                              np.float)
+
+    dim_mod_specs['cell']['prefered_vol'] = (A0 * h0, np.float)
+    dim_mod_specs['je']['line_tension'] = (lbda * Kv * A0**1.5 * h0**2,
+                                           np.float)
+    norm_factor = Kv*(A0*h0)**2
+
+    return dim_mod_specs, norm_factor
 
 
-def dimentionalize(parameters=None):
+def elastic_force(element_df,
+                  var='vol',
+                  elasticity='vol_elasticity',
+                  prefered='prefered_vol'):
+    params = {'x': var,
+              'K': elasticity,
+              'x0': prefered}
+    force = element_df.eval('{K} * ({x} - {x0})'.format(**params))
+    return force
 
-    parameters = update_default(default_params, parameters)
-    dim_params = parameters.copy()
-    Kv = parameters['vol_elasticity']
-    A0 = parameters['prefered_area']
-    h0 = parameters['prefered_height']
-    dim_params['contractility'] = (parameters['contractility'] *
-                                   Kv * A0 * h0**2)
-    dim_params['line_tension'] = (parameters['line_tension'] *
-                                  Kv * A0**1.5 * h0**2)
-    dim_params['prefered_vol'] = A0 * h0
-    dim_params['norm_factor'] = Kv * (A0 * h0)**2
 
-    return dim_params
+def elastic_energy(element_df,
+                   var='vol',
+                   elasticity='vol_elasticity',
+                   prefered='prefered_vol'):
+    params = {'x': var,
+              'K': elasticity,
+              'x0': prefered}
+    energy = element_df.eval('0.5 * {K} * ({x} - {x0}) ** 2'.format(**params))
+    return energy
 
 
 def compute_energy(sheet, full_output=False):
@@ -65,14 +84,17 @@ def compute_energy(sheet, full_output=False):
     * mesh: a :class:`tyssue.object.sheet.Sheet` instance
     * full_output: if True, returns the enery components
     '''
-    E_t = sheet.je_df['line_tension'] * sheet.je_df['length']
-    E_v = 0.5 * (sheet.cell_df['vol_elasticity'] *
-                  (sheet.cell_df['vol'] -
-                   sheet.cell_df['prefered_vol'])**2 *
-                   sheet.cell_df['is_alive'])
-    E_c = 0.5 * (sheet.cell_df['contractility'] *
-                 sheet.cell_df['perimeter']**2 *
-                 sheet.cell_df['is_alive'])
+    # consider only live cells:
+    live_cell_df = sheet.cell_df[sheet.cell_df.is_alive==1]
+    upcast_alive = sheet.upcast_cell(sheet.cell_df.is_alive)
+    live_je_df = sheet.je_df[upcast_alive==1]
+
+    E_t = live_je_df.eval('line_tension * length / 2')
+    E_v = elastic_energy(live_cell_df,
+                         var='vol',
+                         elasticity='vol_elasticity',
+                         prefered='prefered_vol')
+    E_c = live_cell_df.eval('0.5 * contractility * perimeter ** 2')
     if full_output:
         return E_t, E_c, E_v
     else:
@@ -85,6 +107,7 @@ def compute_gradient(sheet, components=False,
     If components is True, returns the individual terms
     (grad_t, grad_c, grad_v)
     '''
+
     if dcoords is None:
         dcoords = ['d'+c for c in sheet.coords]
     if ncoords is None:
@@ -96,7 +119,7 @@ def compute_gradient(sheet, components=False,
     sheet.grad_i_lij.columns = sheet.coords
     grad_t = tension_grad(sheet)
     grad_c = contractile_grad(sheet)
-    grad_v = volume_grad(sheet, dcoords, ncoords)
+    grad_v = volume_grad(sheet, sheet.coords)
 
     grad_i = grad_t + grad_c + grad_v
     if components:
@@ -127,57 +150,60 @@ def contractile_grad(sheet):
     return grad_c
 
 
-def volume_grad(sheet, dcoords=None, ncoords=None):
+def volume_grad(sheet, coords=None):
+    ''' Computes
+    :math:`\sum_\alpha\nabla_i \left(K (V_\alpha - V_0)^2\right)`:
     '''
-    Computes
-    :math:`\sum_\alpha\nabla_i \left(K (V_\alpha - V_0)^2\right)`
-    '''
-    if dcoords is None:
-        dcoords = ['d'+c for c in sheet.coords]
-    if ncoords is None:
-        ncoords = ['n'+c for c in sheet.coords]
+    if coords is None:
+        coords = sheet.coords
+    dcoords = ['d'+c for c in sheet.coords]
+    ncoords = ['n'+c for c in sheet.coords]
 
-    # volumic elastic modulus
-    elasticity = sheet.cell_df['vol_elasticity']
-    pref_V = sheet.cell_df['prefered_vol']
-    V = sheet.cell_df['vol']
+    # volumic elastic force
     # this is K * (V - V0)
-    KV_V0 = elasticity * (V - pref_V) * sheet.cell_df['is_alive']
-    tri_KV_V0 = sheet.upcast_cell(KV_V0)
-    h_nu = sheet.cell_df['height'] / (2 * sheet.cell_df['num_sides'])
+    kv_v0_ = elastic_force(sheet.cell_df,
+                           var='vol',
+                           elasticity='vol_elasticity',
+                           prefered='prefered_vol')
 
-    # edge vertices
-    r_ijs = sheet.je_df[dcoords]
+    kv_v0_ = (kv_v0_ * sheet.cell_df['is_alive'])
+    kv_v0 = sheet.upcast_cell(kv_v0_)
 
+    # # First term of the gradient
+    # ## cross product of normals with edge
     cross_ur = pd.DataFrame(
-        np.cross(sheet.je_df[ncoords], r_ijs),
-        index=sheet.je_idx, columns=sheet.coords)
-
-    cell_term_ = cross_ur.groupby(level='cell').sum() * _to_3d(KV_V0 * h_nu)
-
+        np.cross(sheet.je_df[ncoords],
+                 sheet.je_df[dcoords]),
+        index=sheet.je_idx, columns=sheet.coords
+        )
+    # ## mutliplicative factor
+    h_nu = sheet.cell_df.eval('height / 2 * num_sides')
+    cell_term_ = cross_ur.groupby(level='cell').sum() * _to_3d(h_nu)
     cell_term = sheet.upcast_cell(cell_term_)
-    grad_v = cell_term.groupby(level='srce').sum()
 
+    # # Second term of the gradient
+    # ## r_i / rho_i
     r_to_rho = sheet.jv_df[sheet.coords] / _to_3d(sheet.jv_df['rho'])
     r_to_rho = sheet.upcast_srce(df=r_to_rho)
     r_to_rho.columns = sheet.coords
 
+    # ## cross product of cell to target vector with the normals
     r_aj = (sheet.upcast_trgt(sheet.jv_df[sheet.coords]) -
             sheet.upcast_cell(sheet.cell_df[sheet.coords]))
     r_aj.columns = sheet.coords
-
     normals = sheet.je_df[ncoords]
     cross_aj = pd.DataFrame(np.cross(r_aj, normals),
                             columns=sheet.coords, index=sheet.je_idx)
-
+    # ## cell sub volume
     tri_height = sheet.upcast_cell(sheet.cell_df['height'])
-
     sub_area = sheet.je_df['sub_area']
 
-    ij_term = _to_3d(tri_KV_V0) * (_to_3d(sub_area / 2) * r_to_rho +
-                                    _to_3d(tri_height / 2) * cross_aj)
-    ij_term = pd.DataFrame(ij_term, index=sheet.je_idx,
+    ij_term_ = (_to_3d(sub_area / 2) * r_to_rho +
+                _to_3d(tri_height / 2) * cross_aj)
+    ij_term = pd.DataFrame(ij_term_,
+                           index=sheet.je_idx,
                            columns=sheet.coords)
-    grad_v = grad_v + ij_term.groupby(level='srce').sum()
-    grad_v = grad_v
+
+    grad_v = (_to_3d(kv_v0) *
+              (cell_term + ij_term)).groupby(level='srce').sum()
     return grad_v.loc[sheet.jv_idx]
