@@ -138,13 +138,10 @@ def tension_grad(sheet):
 
 def contractile_grad(sheet):
 
-    contract = sheet.cell_df['contractility']
-    perimeter = sheet.cell_df['perimeter']
+    gamma_ = sheet.cell_df.eval('contractility * perimeter')
+    gamma = sheet.upcast_cell(gamma_)
 
-    gamma_L = contract * perimeter
-    gamma_L = sheet.upcast_cell(gamma_L)
-
-    _grad_c = sheet.grad_i_lij * _to_3d(gamma_L)
+    _grad_c = sheet.grad_i_lij * _to_3d(gamma)
     grad_c = _grad_c.sum(level='srce').loc[sheet.jv_idx]
 
     return grad_c
@@ -177,7 +174,7 @@ def volume_grad(sheet, coords=None):
         index=sheet.je_idx, columns=sheet.coords
         )
     # ## mutliplicative factor
-    h_nu = sheet.cell_df.eval('height / 2 * num_sides')
+    h_nu = sheet.cell_df.eval('height / (2 * num_sides)')
     cell_term_ = cross_ur.groupby(level='cell').sum() * _to_3d(h_nu)
     cell_term = sheet.upcast_cell(cell_term_)
 
@@ -192,14 +189,16 @@ def volume_grad(sheet, coords=None):
             sheet.upcast_cell(sheet.cell_df[sheet.coords]))
     r_aj.columns = sheet.coords
     normals = sheet.je_df[ncoords]
+
     cross_aj = pd.DataFrame(np.cross(r_aj, normals),
                             columns=sheet.coords, index=sheet.je_idx)
     # ## cell sub volume
-    tri_height = sheet.upcast_cell(sheet.cell_df['height'])
-    sub_area = sheet.je_df['sub_area']
-
-    ij_term_ = (_to_3d(sub_area / 2) * r_to_rho +
-                _to_3d(tri_height / 2) * cross_aj)
+    tri_h_to_nu = sheet.upcast_cell(sheet.cell_df.eval(
+        'height / (2 * num_sides)'))
+    a_to_nu_ = sheet.cell_df.eval('area / (2 * num_sides)')
+    a_to_nu = sheet.upcast_cell(a_to_nu_)
+    ij_term_ = (_to_3d(a_to_nu) * r_to_rho +
+                _to_3d(tri_h_to_nu / 2) * cross_aj)
     ij_term = pd.DataFrame(ij_term_,
                            index=sheet.je_idx,
                            columns=sheet.coords)

@@ -20,8 +20,7 @@ def isotropic_relax(sheet, **mod_specs):
     area0 = mod_specs['cell']['prefered_area'][0]
     h_0 = mod_specs['cell']['prefered_height'][0]
 
-    live_cell_idx = (sheet.cell_df.is_alive==1).index
-    live_cells = sheet.cell_df.loc[live_cell_idx]
+    live_cells = sheet.cell_df[sheet.cell_df.is_alive==1]
 
     area_avg = live_cells.area.mean()
     rho_avg = live_cells.rho.mean()
