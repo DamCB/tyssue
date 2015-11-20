@@ -5,44 +5,48 @@ from scipy import optimize
 
 from ..geometry import sheet_geometry as geom
 from ..dynamics import sheet_vertex_model as model
+import numpy as np
 
-from ..utils.utils import (_to_3d, set_data_columns,
-                           update_default)
 
-default_params = {
-    'l_bfgs_b_options': {'disp':False,
-                         'gtol':1e-3},
-    'min_length':1e-6,
-    }
+def get_default_settings():
+    default_settings = {
+        'norm_factor': 1,
+        'minimize':{
+            'jac': None,
+            'method':'L-BFGS-B',
+            'options': {'disp':False,
+                        'gtol':1e-3},
+            }
+        }
+    return default_settings
 
-def find_energy_min(sheet, pos_idx=None, 
-                    coords=None, parameters=None):
+def find_energy_min(sheet, pos_idx=None,
+                    coords=None, **settings_kw):
 
-    parameters = update_default(default_params, parameters)
+    settings = get_default_settings()
+    settings.update(**settings_kw)
+
     if coords is None:
         coords = sheet.coords
     if pos_idx is None:
         pos0 = sheet.jv_df[coords].values.ravel()
+        pos_idx = sheet.jv_df.index
     else:
         pos0 = sheet.jv_df.loc[pos_idx, coords].values.ravel()
-    
-    max_length = sheet.je_df['length'].max()
-    min_length = parameters['min_length']
-    bounds = np.vstack([pos0 - min_length, 
-                        pos0 + max_length]).T
 
-    l_bfgs_b_options = default_params['l_bfgs_b_options']
+    max_length = 2 * sheet.je_df['length'].max()
+    bounds = np.vstack([pos0 - max_length,
+                        pos0 + max_length]).T
+    if settings['minimize']['jac'] is None:
+        return
     res = optimize.minimize(opt_energy, pos0,
-                            args=(sheet, coords),
-                            bounds=bounds,
-                            jac=opt_grad,
-                            method='L-BFGS-B',
-                            options=l_bfgs_b_options)
+                            args=(pos_idx, sheet, coords),
+                            bounds=bounds, **settings['minimize'])
     return res
 
 def set_pos(pos, pos_idx, sheet, coords):
-    pos = pos.reshape((pos.size//3, 3))
-    sheet.jv_df.loc[pos_idx, coords] = pos
+    pos_ = pos.reshape((pos.size//3, 3))
+    sheet.jv_df.loc[pos_idx, coords] = pos_
 
 def opt_energy(pos, pos_idx, sheet, coords):
     set_pos(pos, pos_idx, sheet, coords)
@@ -59,13 +63,13 @@ def approx_grad(sheet, coords):
     pos_idx = sheet.jv_idx
     grad = optimize.approx_fprime(pos0,
                                   opt_energy,
-                                  1e-9, pos_idx, 
+                                  1e-9, pos_idx,
                                   sheet, coords)
     return grad
 
-    
+
 def check_grad(sheet, coords):
-    
+
     pos0 = sheet.jv_df[coords].values.ravel()
     pos_idx = sheet.jv_idx
     grad_err = optimize.check_grad(opt_energy,

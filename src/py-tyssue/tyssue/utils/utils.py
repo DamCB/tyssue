@@ -1,6 +1,12 @@
 import numpy as np
 import warnings
 
+def _to_2d(df):
+
+    df_2d = np.asarray(df).repeat(2).reshape((df.size, 2))
+    return df_2d
+
+
 def _to_3d(df):
 
     df_3d = np.asarray(df).repeat(3).reshape((df.size, 3))

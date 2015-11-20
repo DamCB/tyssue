@@ -9,6 +9,45 @@ from .sheet_vertex_model import get_default_mod_specs
 
 mu = 6 * np.sqrt(2. / (3 * np.sqrt(3)))
 
+def elasticity(delta):
+    return (delta**3 - 1 )**2 / 2.
+
+def contractility(delta, gamma):
+    return gamma * mu**2 * delta**2 / 2.
+
+def tension(delta, lbda):
+    return lbda * mu * delta / 2.
+
+def isotropic_energies(sheet, model, geom, deltas, dim_mod_specs):
+    ### Cells only area and height
+    area_avg = sheet.cell_df[sheet.cell_df['is_alive'] == 1].area.mean()
+    rho_avg = sheet.jv_df.rho.mean()
+    area0 = dim_mod_specs['cell']['prefered_area'][0]
+    h_0 = dim_mod_specs['cell']['prefered_height'][0]
+
+    ### Set height and area to height0 and area0
+    delta_0 = (area0 / area_avg)**0.5
+    geom.scale(sheet, delta_0, sheet.coords)
+    sheet.cell_df['basal_height'] = rho_avg * delta_0 - h_0
+    geom.update_all(sheet)
+
+    energies = np.zeros((deltas.size, 3))
+    #scales = np.linspace(0.5, 1.2, 20) / eptm.delta_o
+    for n, delta in enumerate(deltas):
+        geom.scale(sheet, delta,
+                   sheet.coords+['basal_shift'])
+        geom.update_all(sheet)
+
+        Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
+        energies[n, :] = [Et.sum(), Ec.sum(), Ev.sum()]
+        #energies /= sheet.norm_factor
+        geom.scale(sheet, 1/delta, sheet.coords+['basal_shift'])
+        geom.update_all(sheet)
+
+    isotropic_relax(sheet)
+    return(energies)
+
+
 def isotropic_relax(sheet, **mod_specs):
     """Deforms the sheet so that the cells area and
     pseudo-volume are at their isotropic optimum (on average)
@@ -23,7 +62,7 @@ def isotropic_relax(sheet, **mod_specs):
     live_cells = sheet.cell_df[sheet.cell_df.is_alive==1]
 
     area_avg = live_cells.area.mean()
-    rho_avg = live_cells.rho.mean()
+    rho_avg = sheet.jv_df.rho.mean()
 
     ### Set height and area to height0 and area0
     delta = (area0 / area_avg)**0.5

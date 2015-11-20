@@ -9,8 +9,6 @@ def get_default_geom_specs():
     default_geom_specs = {
         "cell": {
             "num_sides": (6, np.int),
-            "rho": (0., np.float),
-            "basal_shift": (4., np.float), # previously rho_lumen
             },
         "jv": {
             "rho": (0., np.float),
@@ -24,11 +22,7 @@ def get_default_geom_specs():
     return default_geom_specs
 
 
-
-
-
-
-def update_all(sheet, coords=None, **geom_spec):
+def update_all(sheet, coords=None, **geom_spec_kw):
     '''
     Updates the sheet geometry by updating:
     * the edge vector coordinates
@@ -42,8 +36,8 @@ def update_all(sheet, coords=None, **geom_spec):
     '''
     if coords is None:
         coords = sheet.coords
-
-    geom_spec.update(get_default_geom_specs())
+    geom_spec = get_default_geom_specs()
+    geom_spec.update(**geom_spec_kw)
 
     update_dcoords(sheet, coords)
     update_length(sheet, coords)
@@ -135,9 +129,11 @@ def update_perimeters(sheet):
 def update_vol(sheet):
     '''
     Note that this is an approximation of the sheet geometry
-    package. Cells are assumed to be anchored by their center
+    package.
+
     '''
-    sheet.cell_df['vol'] = sheet.cell_df['height'] * sheet.cell_df['area']
+    sheet.je_df['sub_vol'] = sheet.upcast_srce(sheet.jv_df['height']) * sheet.je_df['sub_area']
+    sheet.cell_df['vol'] = sheet.je_df['sub_vol'].groupby(level='cell').sum()
 
 # ### Cylindrical geometry specific
 
@@ -153,8 +149,7 @@ def update_height_cylindrical(sheet, coords, settings):
     sheet.jv_df['rho'] = np.hypot(sheet.jv_df[v],
                                   sheet.jv_df[u])
     sheet.jv_df['height'] = (sheet.jv_df['rho'] -
-                               sheet.jv_df['basal_shift'])
-    update_centroid(sheet, ['height', 'rho'])
+                             sheet.jv_df['basal_shift'])
 
 
 # ### Flat geometry specific
@@ -167,7 +162,5 @@ def update_height_flat(sheet, settings):
     the coordinate `coord` is equal to 0
     '''
     coord = settings['height_axis']
-    sheet.cell_df['rho'] = sheet.cell_df[coord]
-    sheet.cell_df['height'] = sheet.cell_df[coord] + sheet.cell_df['basal_shift']
     sheet.jv_df['rho'] = sheet.jv_df[coord]
     sheet.jv_df['height'] = sheet.jv_df[coord] + sheet.jv_df['basal_shift']
