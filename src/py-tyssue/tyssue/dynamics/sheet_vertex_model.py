@@ -1,5 +1,3 @@
-
-
 """
 Vertex model for an Epithelial sheet (see definitions).
 
@@ -29,7 +27,8 @@ def get_default_mod_specs():
             "radial_tension": (0., np.float),
             },
         "settings": {
-            'norm_factor': 1.,
+            'grad_norm_factor': 1.,
+            'nrj_norm_factor': 1.,
             }
         }
     return default_mod_specs
@@ -54,8 +53,8 @@ def dimentionalize(mod_specs, **kwargs):
     dim_mod_specs['je']['line_tension'] = (lbda * Kv * A0**1.5 * h0**2,
                                            np.float)
 
-    dim_mod_specs['settings']['norm_factor'] = Kv*(A0*h0)**2
-    dim_mod_specs['settings']['E_norm_factor'] = Kv*(A0*h0)**2
+    dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5 * h0**2
+    dim_mod_specs['settings']['nrj_norm_factor'] = Kv * (A0*h0)**2
 
     return dim_mod_specs
 
@@ -103,9 +102,9 @@ def compute_energy(sheet, full_output=False):
                          prefered='prefered_vol')
     E_c = live_cell_df.eval('0.5 * contractility * perimeter ** 2')
     if full_output:
-        return (E / sheet.norm_factor for E in (E_t, E_c, E_v))
+        return (E / sheet.nrj_norm_factor for E in (E_t, E_c, E_v))
     else:
-        return (E_t.sum() + (E_c+E_v).sum()) / sheet.norm_factor
+        return (E_t.sum() + (E_c+E_v).sum()) / sheet.nrj_norm_factor
 
 def compute_gradient(sheet, components=False,
                      dcoords=None, ncoords=None):
@@ -118,7 +117,7 @@ def compute_gradient(sheet, components=False,
         dcoords = ['d'+c for c in sheet.coords]
     if ncoords is None:
         ncoords = ['n'+c for c in sheet.coords]
-    norm_factor = sheet.norm_factor
+    norm_factor = sheet.grad_norm_factor
 
     sheet.grad_i_lij = - (sheet.je_df[dcoords] /
                           _to_3d(sheet.je_df['length']))
@@ -129,6 +128,8 @@ def compute_gradient(sheet, components=False,
     grad_v = volume_grad(sheet, sheet.coords)
 
     grad_i = grad_t + grad_c + grad_v
+    live_je = sheet.upcast_cell(sheet.cell_df['is_alive'])
+    grad_i = grad_i * _to_3d(live_je)
     if components:
         return grad_i, grad_t, grad_c, grad_v
     return grad_i.sum(level='srce') / norm_factor
@@ -169,7 +170,6 @@ def area_grad(sheet, coords):
         coords = sheet.coords
     ncoords = ['n'+c for c in sheet.coords]
     dcoords = ['d'+c for c in sheet.coords]
-    ### Topology fonction, should not be here
     inv_area = sheet.je_df.eval('1 / (2 * sub_area)')
 
     # ## cross product of normals with edge
@@ -184,10 +184,10 @@ def area_grad(sheet, coords):
 
     cross_aij_aj = np.cross(sheet.je_df[ncoords], r_aj)
 
-    grad_a  = _to_3d(inv_area) * (cross_aij_ij + cross_aij_aj)
+    grad_a = _to_3d(inv_area) * (cross_aij_ij - cross_aij_aj)
     #grad_a = sheet.upcast_cell(grad_a_).sum(level='cell')
 
-    return - grad_a
+    return grad_a
 
 
 def volume_grad(sheet, coords=None):

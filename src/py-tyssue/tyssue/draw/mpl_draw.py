@@ -105,7 +105,7 @@ def draw_je(sheet, coords, ax, **draw_spec_kw):
         s, t, c = e
         ax.arrow(sheet.jv_df[x].loc[s], sheet.jv_df[y].loc[s],
                  sheet.je_df[dx].loc[e], sheet.je_df[dy].loc[e],
-                 **draw_spec_kw)
+                 **draw_spec)
     return ax
 
 
@@ -114,11 +114,11 @@ def plot_forces(sheet, model,
                 ax=None,
                 approx_grad=None,
                 **draw_spec_kws):
-    """Plot the net forces at each vertex, with their amplitudes divided
-    by norm_factor
+    """Plot the net forces at each vertex, with their amplitudes multiplied
+    by `scaling`
     """
     draw_specs = get_default_draw_specs()
-    draw_spec_kws.update(**draw_spec_kws)
+    draw_specs.update(**draw_spec_kws)
     gcoords = ['g'+c for c in coords]
     if approx_grad is not None:
         app_grad = approx_grad(sheet, sheet.coords)

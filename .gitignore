@@ -43,7 +43,8 @@ depcomp
 .libs
 lt*.m4
 
-
+# optimizer
+iterate.dat
 
 # Installer logs
 pip-log.txt

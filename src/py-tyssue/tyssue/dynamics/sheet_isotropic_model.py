@@ -40,10 +40,10 @@ def isotropic_energies(sheet, model, geom, deltas, dim_mod_specs):
 
         Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
         energies[n, :] = [Et.sum(), Ec.sum(), Ev.sum()]
-        #energies /= sheet.norm_factor
         geom.scale(sheet, 1/delta, sheet.coords+['basal_shift'])
         geom.update_all(sheet)
 
+    energies /= sheet.cell_df['is_alive'].sum()
     isotropic_relax(sheet)
     return(energies)
 
