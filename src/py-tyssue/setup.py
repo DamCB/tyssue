@@ -2,12 +2,14 @@ from setuptools import setup
 from setuptools import find_packages
 
 DISTNAME = 'tyssue'
-DESCRIPTION = 'tyssue is stronger than Arnold Schwarzenegge'
-LONG_DESCRIPTION = 'tyssue is going to conquer the world soon '
+DESCRIPTION = 'tyssue is a living tissues, cell level, modeling library'
+LONG_DESCRIPTION = ('tyssue uses the scientific python echosystem and CGAL'
+                    ' LinearCellComplex library to model epithelium at the'
+                    ' cellular level')
 MAINTAINER = 'Guillaume Gay'
-MAINTAINER_EMAIL = 'gllm.gay@gmail.com'
+MAINTAINER_EMAIL = 'guillaume@damcb.com'
 URL = 'https://github.com/CellModels/tyssue'
-LICENSE = 'GPLv3'
+LICENSE = 'MPL'
 DOWNLOAD_URL = 'https://github.com/CellModels/tyssue.git'
 # VERSION = '${Tyssue_VERSION}'
 VERSION = '0.1'
@@ -27,7 +29,7 @@ if __name__ == "__main__":
 
         classifiers=["Development Status :: 4 - Beta",
                      "Intended Audience :: Science/Research",
-                     "License :: OSI Approved :: GPL License",
+                     "License :: OSI Approved :: MPL v2.0",
                      "Natural Language :: English",
                      "Operating System :: MacOS",
                      "Operating System :: Microsoft",
@@ -36,7 +38,6 @@ if __name__ == "__main__":
                      "Programming Language :: Python :: Implementation :: CPython",
                      "Topic :: Scientific/Engineering :: Artificial Intelligence",
                      "Topic :: Scientific/Engineering :: Bio-Informatics",
-                     "Topic :: Scientific/Engineering :: Image Recognition",
                      "Topic :: Scientific/Engineering :: Medical Science Apps",
                      ],
 

@@ -16,15 +16,7 @@ source .bashrc # update your PATH
 
 ```bash
 sudo apt-get install build-essential
-sudo apt-get install libexpat1-dev
 sudo apt-get install git
-```
-
-### Install spareshash
-
-```bash
-wget https://sparsehash.googlecode.com/files/sparsehash_2.0.2-1_amd64.deb
-sudo dpkg -i sparsehash_2.0.2-1_amd64.deb
 ```
 
 ### Create a virtual environment with `conda`
@@ -34,7 +26,7 @@ conda create -n tyssue python=3.4 numpy scipy vispy matplotlib nose coverage
 ## activate the new environment
 source activate tyssue
 ## install some friends
-conda install -c https://conda.anaconda.org/osgeo boost cgal
+conda install -c https://conda.anaconda.org/osgeo cgal
 pip install vispy
 ```
 
@@ -48,7 +40,7 @@ cmake ..
 make && make install
 ```
 
-If all went well, you have successfully installed tyssue. To test it, you can run `python -c "import tyssue; tyssue.core.test_import()"`. It should print `howdy`.
+If all went well, you have successfully installed tyssue.
 
 A `Makefile` provides some utility function. Try :
 

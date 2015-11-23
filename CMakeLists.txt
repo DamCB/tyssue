@@ -13,9 +13,9 @@ set(Tyssue_VERSION_MINOR 1)
 set(Tyssue_VERSION ${Tyssue_VERSION_MAJOR}.${Tyssue_VERSION_MINOR})
 
 # Some screen output
-message(STATUS "OS detected: ${CMAKE_SYSTEM_NAME}")
-message(STATUS "CXX Compiler detected: ${CMAKE_CXX_COMPILER_ID}")
-message(STATUS "CMake additional search path for libraries: ${CMAKE_LIBRARY_PATH}")
+# message(STATUS "OS detected: ${CMAKE_SYSTEM_NAME}")
+# message(STATUS "CXX Compiler detected: ${CMAKE_CXX_COMPILER_ID}")
+# message(STATUS "CMake additional search path for libraries: ${CMAKE_LIBRARY_PATH}")
 
 ##############################################################################
 
@@ -32,30 +32,18 @@ option(BUILD_DOC "Build documentation." ON)
 
 ##############################################################################
 
-# Find boost
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-
-find_package(Boost 1.54 COMPONENTS python3 QUIET)
-if(NOT Boost_FOUND)
-  find_package(Boost 1.54 COMPONENTS python-py34 REQUIRED)
-endif()
-message(STATUS "Boost include dirs: ${Boost_INCLUDE_DIRS}")
-message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
-
 # Find Python 3 (with numpy)
-find_package(PythonInterp 3 REQUIRED)
-find_package(PythonLibsNew 3 REQUIRED)
-find_package(NumPy 3 REQUIRED)
-find_package(SciPy REQUIRED)
+# find_package(PythonInterp 3 REQUIRED)
+# find_package(PythonLibsNew 3 REQUIRED)
+# find_package(NumPy 3 REQUIRED)
+# find_package(SciPy REQUIRED)
 
-find_package(CGAL REQUIRED)
-message(STATUS "CGAL version: ${CGAL_VERSION}")
+# find_package(CGAL REQUIRED)
+# message(STATUS "CGAL version: ${CGAL_VERSION}")
 
-if(NOT CGAL_FOUND OR ${CGAL_VERSION} VERSION_LESS 4.6)
-  message(FATAL_ERROR "Tyssue needs CGAL library >= 4.6.")
-endif()
+# if(NOT CGAL_FOUND OR ${CGAL_VERSION} VERSION_LESS 4.6)
+#   message(FATAL_ERROR "Tyssue needs CGAL library >= 4.6.")
+# endif()
 
 ##############################################################################
 
@@ -75,7 +63,7 @@ endif()
 ##############################################################################
 
 # Add some flags to the compiler
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math -std=c++11")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frounding-math -std=c++11")
 
 ##############################################################################
 
