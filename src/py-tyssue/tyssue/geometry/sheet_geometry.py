@@ -1,8 +1,4 @@
 import numpy as np
-import pandas as pd
-
-from ..utils.utils import (_to_3d, set_data_columns,
-                           update_default)
 
 
 def get_default_geom_specs():
@@ -163,4 +159,4 @@ def update_height_flat(sheet, settings):
     '''
     coord = settings['height_axis']
     sheet.jv_df['rho'] = sheet.jv_df[coord]
-    sheet.jv_df['height'] = sheet.jv_df[coord] + sheet.jv_df['basal_shift']
+    sheet.jv_df['height'] = sheet.jv_df[coord] - sheet.jv_df['basal_shift']

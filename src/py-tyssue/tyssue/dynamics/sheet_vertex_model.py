@@ -204,7 +204,7 @@ def volume_grad(sheet, coords=None):
                            elasticity='vol_elasticity',
                            prefered='prefered_vol')
 
-    kv_v0_ = (kv_v0_ * sheet.cell_df['is_alive'])
+    kv_v0_ = kv_v0_ * sheet.cell_df['is_alive']
     kv_v0 = _to_3d(sheet.upcast_cell(kv_v0_))
 
     je_h = _to_3d(sheet.upcast_srce(sheet.jv_df['height']))
