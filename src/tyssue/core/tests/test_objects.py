@@ -1,10 +1,6 @@
 from tyssue.core import Epithelium, Cell, JunctionVertex, JunctionEdge
+from tyssue.core.sheet import Sheet
 from tyssue.core.generation import three_cells_sheet
-
-
-#def test_world_import():
-#    import tyssue
-#    assert tyssue.core.test_import() == "howdy"
 
 
 def test_3cells():
@@ -29,7 +25,7 @@ def test_3cells():
 
 def test_triangular_mesh():
     datasets = three_cells_sheet()
-    eptm = Epithelium('3cells_2D', datasets)
+    eptm = Sheet('3cells_2D', datasets)
     vertices, faces, cell_mask = eptm.triangular_mesh(['x', 'y', 'z'])
     assert vertices.shape == (16, 3)
     assert faces.shape == (18, 3)

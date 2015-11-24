@@ -7,7 +7,6 @@ from matplotlib.patches import Polygon
 import pandas as pd
 import numpy as np
 
-from ..utils.utils import update_default
 
 def get_default_draw_specs():
     default_draw_specs = {

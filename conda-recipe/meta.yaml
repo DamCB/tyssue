@@ -13,16 +13,14 @@ requirements:
     - python
     - numpy
     - scipy
-    - boost
   run:
     - python
     - numpy
     - scipy
-    - boost
     - matplotlib
     - pandas
     - vispy
 
 about:
   home: https://github.com/CellModels/tyssue
-  license: GPLv3
+  license: MPLv2.0

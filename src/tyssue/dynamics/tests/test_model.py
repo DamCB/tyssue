@@ -17,6 +17,10 @@ def test_adim():
         },
     "jv": {
         "radial_tension": (0., None),
+        },
+    "settings": {
+        "grad_norm_factor": 1.,
+        "nrj_norm_factor": 1.,
         }
     }
     new_mod_specs = deepcopy(default_mod_specs)

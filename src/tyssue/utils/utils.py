@@ -1,5 +1,4 @@
 import numpy as np
-import warnings
 
 def _to_2d(df):
 
@@ -20,11 +19,3 @@ def set_data_columns(eptm, data_specs):
         for col, (default, dtype) in data_dict.items():
             df = getattr(eptm, '{}_df'.format(name))
             df[col] = default
-
-def update_default(default_params, params=None):
-    warnings.warn('Deprecated, use kwargs instead')
-    _params = default_params
-    if params is not None:
-
-        _params.update(params)
-    return _params

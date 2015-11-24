@@ -14,7 +14,7 @@ data_dicts = {
         'y': (0., np.float),
         'z': (0., np.float),
         ## Topology
-        'num_sides': (1, np.int),
+        'num_sides': (6, np.int),
         ## Masks
         'is_alive': (1, np.bool)},
     'jv': {
@@ -36,7 +36,7 @@ data_dicts = {
         'nz': (0., np.float)}
     }
 
-def three_cells_sheet_array(zaxis=False):
+def three_cells_sheet_array():
     '''
     Creates the apical junctions mesh of three packed hexagonal cells.
     If `zaxis` is `True` (defaults to False), adds a `z` coordinates, with `z = 0`.
@@ -108,7 +108,7 @@ def three_cells_sheet(zaxis=False):
     je_df: the junction edges `DataFrame`
 
     '''
-    points, _, (Nc, Nv, _) = three_cells_sheet_array(zaxis)
+    points, _, (Nc, Nv, _) = three_cells_sheet_array()
 
     if zaxis:
         coords = ['x', 'y', 'z']
@@ -150,7 +150,8 @@ def three_cells_sheet(zaxis=False):
     je_df = make_df(index=je_idx, data_dict=data_dicts['je'])
 
     jv_df.loc[:, coords[:2]] = points
-    jv_df.loc[:, coords[2:]] = 0.
+    if zaxis:
+        jv_df.loc[:, coords[2:]] = 0.
 
     datasets = {'cell': cell_df, 'jv': jv_df, 'je': je_df}
     return datasets

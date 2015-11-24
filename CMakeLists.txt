@@ -13,30 +13,30 @@ set(Tyssue_VERSION_MINOR 1)
 set(Tyssue_VERSION ${Tyssue_VERSION_MAJOR}.${Tyssue_VERSION_MINOR})
 
 # Some screen output
-# message(STATUS "OS detected: ${CMAKE_SYSTEM_NAME}")
-# message(STATUS "CXX Compiler detected: ${CMAKE_CXX_COMPILER_ID}")
-# message(STATUS "CMake additional search path for libraries: ${CMAKE_LIBRARY_PATH}")
+message(STATUS "OS detected: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "CXX Compiler detected: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "CMake additional search path for libraries: ${CMAKE_LIBRARY_PATH}")
 
 ##############################################################################
 
 # Provides build options to CMake
 
 ## Build option: build shared library (should be automatically put to static for win32)
-option(BUILD_SHARED_LIBS "Build shared library" ON)
+# option(BUILD_SHARED_LIBS "Build shared library" ON)
 
 ## Build Option: when active headers will be installed in the CMAKE_INSTALL_PREFIX/include directory
-option(INSTALL_HEADERS "Installs the header files" ON)
+# option(INSTALL_HEADERS "Installs the header files" ON)
 
 ## Build Option: build documentation
-option(BUILD_DOC "Build documentation." ON)
+# option(BUILD_DOC "Build documentation." ON)
 
 ##############################################################################
 
 # Find Python 3 (with numpy)
-# find_package(PythonInterp 3 REQUIRED)
-# find_package(PythonLibsNew 3 REQUIRED)
-# find_package(NumPy 3 REQUIRED)
-# find_package(SciPy REQUIRED)
+find_package(PythonInterp 3 REQUIRED)
+find_package(PythonLibsNew 3 REQUIRED)
+find_package(NumPy 3 REQUIRED)
+find_package(SciPy REQUIRED)
 
 # find_package(CGAL REQUIRED)
 # message(STATUS "CGAL version: ${CGAL_VERSION}")
@@ -59,6 +59,8 @@ get_filename_component(INSTALL_PREFIX "${INSTALL_PREFIX}" PATH)
 if (NOT ${INSTALL_PREFIX} STREQUAL "")
   set(CMAKE_INSTALL_PREFIX "${INSTALL_PREFIX}")
 endif()
+
+message(STATUS "Install prefix: ${INSTALL_PREFIX}")
 
 ##############################################################################
 

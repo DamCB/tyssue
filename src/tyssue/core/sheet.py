@@ -1,3 +1,5 @@
+
+import numpy as np
 from .objects import Epithelium
 
 class Sheet(Epithelium):
@@ -6,22 +8,22 @@ class Sheet(Epithelium):
     akin to a HalfEdge data structure in CGAL.
 
     The geometric properties are defined in `tyssue.geometry.sheet_geometry`
-    A dynamical model derived from Fahradifar et al. 2007 is provided in 
+    A dynamical model derived from Fahradifar et al. 2007 is provided in
     `tyssue.dynamics.sheet_vertex_model`
 
-    
+
     '''
 
     def __init__(self, identifier, datasets):
         '''
         Creates an epithelium sheet, such as the apical junction network.
-        
+
         Parameters
         ----------
         identifier: `str`, the tissue name
         cell_df: `pandas.DataFrame` indexed by the cells indexes
-            this df holds the vertices associated with 
-        
+            this df holds the vertices associated with
+
         '''
         super().__init__(identifier, datasets)
 

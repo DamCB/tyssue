@@ -5,7 +5,8 @@ from tyssue.core import generation
 
 
 def test_3cells():
-    cell_df, jv_df, je_df = generation.three_cells_sheet()
+    datasets = generation.three_cells_sheet()
+    je_df = datasets['je']
     edge_idx = pd.MultiIndex.from_tuples([(0, 1, 0),
                                           (1, 2, 0),
                                           (2, 3, 0),
@@ -24,4 +25,4 @@ def test_3cells():
                                           (11, 12, 2),
                                           (12, 1, 2),
                                           (1, 0, 2)])
-    np.testing.assert_array_equal(edge_idx.values, je_df.index.values)
+    np.testing.assert_array_equal(edge_idx.values, je_df.index)
