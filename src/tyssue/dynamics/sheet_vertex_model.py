@@ -4,14 +4,23 @@ Vertex model for an Epithelial sheet (see definitions).
 Depends on the sheet vertex geometry functions.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from copy import deepcopy
 
-from ..utils.utils import _to_3d, _to_2d
+from ..utils.utils import _to_3d
 
 
 def get_default_mod_specs():
+    """
+    Loads the default model specifications
+
+    Returns
+    -------
+    defautl_mod_spec: dict, the default values for the model
+      specifications
+    """
     default_mod_specs = {
         "cell": {
             "contractility": (0.04, np.float),
@@ -35,6 +44,11 @@ def get_default_mod_specs():
 
 
 def dimentionalize(mod_specs, **kwargs):
+    """
+    Changes the values of the input gamma and lambda parameters
+    from the values of the prefered height and area.
+    Computes the norm factor.
+    """
 
     dim_mod_specs = deepcopy(mod_specs)
     dim_mod_specs.update(**kwargs)
@@ -91,9 +105,9 @@ def compute_energy(sheet, full_output=False):
     * full_output: if True, returns the enery components
     '''
     # consider only live cells:
-    live_cell_df = sheet.cell_df[sheet.cell_df.is_alive==1]
+    live_cell_df = sheet.cell_df[sheet.cell_df.is_alive == 1]
     upcast_alive = sheet.upcast_cell(sheet.cell_df.is_alive)
-    live_je_df = sheet.je_df[upcast_alive==1]
+    live_je_df = sheet.je_df[upcast_alive == 1]
 
     E_t = live_je_df.eval('line_tension * length / 2')
     E_v = elastic_energy(live_cell_df,
@@ -117,28 +131,31 @@ def compute_gradient(sheet, components=False,
         dcoords = ['d'+c for c in sheet.coords]
     if ncoords is None:
         ncoords = ['n'+c for c in sheet.coords]
-    norm_factor = sheet.grad_norm_factor
+    norm_factor = sheet.nrj_norm_factor
 
+    # TODO: make this columns of a dataframe
     sheet.grad_i_lij = - (sheet.je_df[dcoords] /
                           _to_3d(sheet.je_df['length']))
 
     sheet.grad_i_lij.columns = sheet.coords
+
     grad_t = tension_grad(sheet)
     grad_c = contractile_grad(sheet)
-    grad_v = volume_grad(sheet, sheet.coords)
+    grad_v_srce, grad_v_trgt = volume_grad(sheet, sheet.coords)# * _to_3d(live_je)
 
-    grad_i = grad_t + grad_c + grad_v
-    live_je = sheet.upcast_cell(sheet.cell_df['is_alive'])
-    grad_i = grad_i * _to_3d(live_je)
+    grad_i = ((grad_t.sum(level='srce') - grad_t.sum(level='trgt'))/2 +
+              grad_c.sum(level='srce') - grad_c.sum(level='trgt') +
+              grad_v_srce.sum(level='srce') + grad_v_trgt.sum(level='trgt'))
     if components:
-        return grad_i, grad_t, grad_c, grad_v
-    return grad_i.sum(level='srce') / norm_factor
-
+        return grad_t, grad_c, grad_v_srce, grad_v_trgt
+    #return (grad_i.sum(level='srce') - grad_i.sum(level='trgt')) / norm_factor
+    return grad_i / norm_factor
 
 def tension_grad(sheet):
 
+    live_je = sheet.upcast_cell(sheet.cell_df['is_alive'])
     grad_t = (sheet.grad_i_lij
-              * _to_3d(sheet.je_df['line_tension']))
+              * _to_3d(sheet.je_df['line_tension'] * live_je))
 
     #grad_t = _grad_t.sum(level='srce').loc[sheet.jv_idx]
     return grad_t
@@ -146,7 +163,7 @@ def tension_grad(sheet):
 
 def contractile_grad(sheet):
 
-    gamma_ = sheet.cell_df.eval('contractility * perimeter')
+    gamma_ = sheet.cell_df.eval('contractility * perimeter * is_alive')
     gamma = sheet.upcast_cell(gamma_)
 
     grad_c = sheet.grad_i_lij * _to_3d(gamma)
@@ -162,7 +179,7 @@ def height_grad(sheet, coords):
 
     r_to_rho = sheet.upcast_srce(df=r_to_rho)
     r_to_rho.columns = sheet.coords
-    return r_to_rho / 2
+    return r_to_rho/2
 
 def area_grad(sheet, coords):
 
@@ -170,29 +187,29 @@ def area_grad(sheet, coords):
         coords = sheet.coords
     ncoords = ['n'+c for c in sheet.coords]
     dcoords = ['d'+c for c in sheet.coords]
-    inv_area = sheet.je_df.eval('1 / (2 * sub_area)')
+    inv_area = sheet.je_df.eval('1 / (4 * sub_area)')
 
     # ## cross product of normals with edge
-    n_sides_cor_ = sheet.upcast_cell(1/sheet.cell_df['num_sides'])
-    n_sides_cor = _to_3d(n_sides_cor_)
-    cross_aij_ij = n_sides_cor * np.cross(sheet.je_df[ncoords],
-                                          sheet.je_df[dcoords])
+    inv_n_sides_ = sheet.upcast_cell(1/sheet.cell_df['num_sides'])
+    inv_n_sides = _to_3d(inv_n_sides_)
+    r_ij = (1 - inv_n_sides) * sheet.je_df[dcoords]
+    r_ij.columns = coords
+
+    r_ki = inv_n_sides * sheet.je_df[dcoords]
+    r_ki.columns = coords
 
     cell_pos = sheet.upcast_cell(sheet.cell_df[coords])
-    trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords])
-    r_aj = trgt_pos - cell_pos
-
-    cross_aij_aj = np.cross(sheet.je_df[ncoords], r_aj)
-
-    grad_a = _to_3d(inv_area) * (cross_aij_ij - cross_aij_aj)
-    #grad_a = sheet.upcast_cell(grad_a_).sum(level='cell')
-
-    return grad_a
+    srce_pos = sheet.upcast_srce(sheet.jv_df[coords])
+    r_ak = r_ai = srce_pos - cell_pos
+    grad_a_srce = _to_3d(inv_area) * np.cross(r_ij + r_ai, sheet.je_df[ncoords])
+    grad_a_trgt = _to_3d(inv_area) * np.cross(sheet.je_df[ncoords], r_ki + r_ak)
+    return (pd.DataFrame(grad_a_srce, index=sheet.je_idx, columns=sheet.coords),
+            pd.DataFrame(grad_a_trgt, index=sheet.je_idx, columns=sheet.coords))
 
 
 def volume_grad(sheet, coords=None):
     ''' Computes
-    :math:`\sum_\alpha\nabla_i \left(K (V_\alpha - V_0)^2\right)`:
+    :math:`\nabla_i \left(K (V_\alpha - V_0)^2\right)`:
     '''
     if coords is None:
         coords = sheet.coords
@@ -210,8 +227,10 @@ def volume_grad(sheet, coords=None):
     je_h = _to_3d(sheet.upcast_srce(sheet.jv_df['height']))
     area_ = sheet.je_df['sub_area']
     area = _to_3d(area_)
-    grad_v = kv_v0 * (
-        je_h * area_grad(sheet, coords) +
-        area * height_grad(sheet, coords)
-        )
-    return grad_v
+    grad_a_srce, grad_a_trgt = area_grad(sheet, coords)
+
+    grad_v_srce = kv_v0 * (je_h * grad_a_srce +
+                           area * height_grad(sheet, coords))
+    grad_v_trgt = kv_v0 * (je_h * grad_a_trgt)
+
+    return grad_v_srce, grad_v_trgt

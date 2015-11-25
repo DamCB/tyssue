@@ -30,7 +30,7 @@ def get_default_draw_specs():
         'grad': {
             'color':'b',
             'alpha':0.5,
-            'width':0.01,
+            'width':0.04,
             },
         "cell": {
             'visible': False,
@@ -40,7 +40,6 @@ def get_default_draw_specs():
             }
         }
     return default_draw_specs
-
 
 
 COORDS = ['x', 'y']
@@ -102,6 +101,9 @@ def draw_je(sheet, coords, ax, **draw_spec_kw):
     dx, dy = ('d'+c for c in coords)
     for e in sheet.je_idx:
         s, t, c = e
+        if np.hypot(sheet.je_df[dx].loc[e],
+                    sheet.je_df[dy].loc[e]) < 1e-6:
+            continue
         ax.arrow(sheet.jv_df[x].loc[s], sheet.jv_df[y].loc[s],
                  sheet.je_df[dx].loc[e], sheet.je_df[dy].loc[e],
                  **draw_spec)

@@ -18,6 +18,14 @@ def get_default_geom_specs():
     return default_geom_specs
 
 
+def scale(sheet, delta, coords):
+    ''' Scales the coordinates `coords`
+    by a factor `delta`
+    '''
+    sheet.cell_df[coords] = sheet.cell_df[coords] * delta
+    sheet.jv_df[coords] = sheet.jv_df[coords] * delta
+
+
 def update_all(sheet, coords=None, **geom_spec_kw):
     '''
     Updates the sheet geometry by updating:
@@ -48,12 +56,6 @@ def update_all(sheet, coords=None, **geom_spec_kw):
         update_height_flat(sheet, geom_spec['settings'])
     update_vol(sheet)
 
-def scale(sheet, delta, coords):
-    ''' Scales the coordinates `coords`
-    by a factor `delta`
-    '''
-    sheet.cell_df[coords] = sheet.cell_df[coords] * delta
-    sheet.jv_df[coords] = sheet.jv_df[coords] * delta
 
 def update_dcoords(sheet, coords):
     '''
@@ -96,12 +98,17 @@ def update_normals(sheet, coords):
     srce_pos = sheet.upcast_srce(sheet.jv_df[coords]).values
     trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords]).values
 
-    normals = np.cross(srce_pos - cell_pos, trgt_pos - cell_pos)
+    normals = np.cross(srce_pos - cell_pos, trgt_pos - srce_pos)
     if len(coords) == 2:
         sheet.je_df['nz'] = normals
     else:
         ncoords = ['n' + c for c in coords]
         sheet.je_df[ncoords] = normals
+
+def update_num_sides(sheet):
+
+    sheet.cell_df['num_sides'] = sheet.je_idx.get_level_values(
+        'cell').value_counts().sort_index()
 
 
 def update_areas(sheet, coords):
@@ -121,6 +128,7 @@ def update_perimeters(sheet):
 
     sheet.cell_df['perimeter'] = sheet.je_df['length'].groupby(
         level='cell').sum()
+
 
 def update_vol(sheet):
     '''

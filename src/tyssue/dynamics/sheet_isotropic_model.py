@@ -3,7 +3,6 @@ Isotropic functions
 '''
 import numpy as np
 
-from ..utils.utils import update_default
 from ..geometry.sheet_geometry import scale, update_all
 from .sheet_vertex_model import get_default_mod_specs
 
@@ -87,10 +86,10 @@ def isotropic_energy(delta, mod_specs):
     """
     lbda = mod_specs['je']['line_tension'][0]
     gamma = mod_specs['cell']['contractility'][0]
-    elasticity = (delta**3 - 1 )**2 / 2.
-    contractility = gamma * mu**2 * delta**2 / 2.
-    tension = lbda * mu * delta / 2.
-    energy = elasticity + contractility + tension
+    elasticity_ = (delta**3 - 1 )**2 / 2.
+    contractility_ = gamma * mu**2 * delta**2 / 2.
+    tension_ = lbda * mu * delta / 2.
+    energy = elasticity_ + contractility_ + tension_
     return energy
 
 def isotropic_grad_poly(mod_specs):
