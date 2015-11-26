@@ -10,6 +10,11 @@ def get_default_geom_specs():
             "rho": (0., np.float),
             "basal_shift": (4., np.float), # previously rho_lumen
             },
+        "je": {
+            "nx": (0., np.float),
+            "ny": (0., np.float),
+            "nz": (0., np.float),
+            },
         "settings": {
             "geometry": "cylindrical",
             "height_axis": 'z'
@@ -22,7 +27,6 @@ def scale(sheet, delta, coords):
     ''' Scales the coordinates `coords`
     by a factor `delta`
     '''
-    sheet.cell_df[coords] = sheet.cell_df[coords] * delta
     sheet.jv_df[coords] = sheet.jv_df[coords] * delta
 
 
@@ -46,14 +50,14 @@ def update_all(sheet, coords=None, **geom_spec_kw):
     update_dcoords(sheet, coords)
     update_length(sheet, coords)
     update_centroid(sheet, coords)
-    update_normals(sheet, coords)
-    update_areas(sheet, coords)
-    update_perimeters(sheet)
     if geom_spec['settings']['geometry'] == 'cylindrical':
         update_height_cylindrical(sheet, coords,
                                   geom_spec['settings'])
     elif geom_spec['settings']['geometry'] == 'flat':
         update_height_flat(sheet, geom_spec['settings'])
+    update_normals(sheet, coords)
+    update_areas(sheet, coords)
+    update_perimeters(sheet)
     update_vol(sheet)
 
 
@@ -115,7 +119,6 @@ def update_areas(sheet, coords):
     '''
     Updates the normal coordniate of each (srce, trgt, cell) face.
     '''
-
     ncoords = ['n' + c for c in coords]
     sheet.je_df['sub_area'] = np.linalg.norm(sheet.je_df[ncoords], axis=1) / 2
     sheet.cell_df['area'] = sheet.je_df['sub_area'].groupby(level='cell').sum()
@@ -137,7 +140,7 @@ def update_vol(sheet):
 
     '''
     sheet.je_df['sub_vol'] = sheet.upcast_srce(sheet.jv_df['height']) * sheet.je_df['sub_area']
-    sheet.cell_df['vol'] = sheet.je_df['sub_vol'].groupby(level='cell').sum()
+    sheet.cell_df['vol'] = sheet.je_df['sub_vol'].sum(level='cell')
 
 # ### Cylindrical geometry specific
 

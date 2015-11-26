@@ -201,6 +201,7 @@ def area_grad(sheet, coords):
     cell_pos = sheet.upcast_cell(sheet.cell_df[coords])
     srce_pos = sheet.upcast_srce(sheet.jv_df[coords])
     r_ak = r_ai = srce_pos - cell_pos
+
     grad_a_srce = _to_3d(inv_area) * np.cross(r_ij + r_ai, sheet.je_df[ncoords])
     grad_a_trgt = _to_3d(inv_area) * np.cross(sheet.je_df[ncoords], r_ki + r_ak)
     return (pd.DataFrame(grad_a_srce, index=sheet.je_idx, columns=sheet.coords),
