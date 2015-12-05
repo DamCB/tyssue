@@ -30,30 +30,37 @@ def height_grad(sheet, coords):
 
     r_to_rho = sheet.upcast_srce(df=r_to_rho)
     r_to_rho.columns = sheet.coords
-    return r_to_rho/2
+    return r_to_rho
 
 def area_grad(sheet, coords):
 
     if coords is None:
         coords = sheet.coords
     ncoords = ['n'+c for c in sheet.coords]
-    dcoords = ['d'+c for c in sheet.coords]
+    # dcoords = ['d'+c for c in sheet.coords]
     inv_area = sheet.je_df.eval('1 / (4 * sub_area)')
 
     # ## cross product of normals with edge
-    inv_n_sides_ = sheet.upcast_cell(1/sheet.cell_df['num_sides'])
-    inv_n_sides = _to_3d(inv_n_sides_)
-    r_ij = (1 - inv_n_sides) * sheet.je_df[dcoords]
-    r_ij.columns = coords
+    # inv_n_sides_ = sheet.upcast_cell(1/sheet.cell_df['num_sides'])
+    # inv_n_sides = _to_3d(inv_n_sides_)
+    # # r_ij = (1 - inv_n_sides) * sheet.je_df[dcoords]
+    # r_ij = sheet.je_df[dcoords]
 
-    r_ki = inv_n_sides * sheet.je_df[dcoords]
-    r_ki.columns = coords
+    # r_ij.columns = coords
+
+    # # r_ki = inv_n_sides * sheet.je_df[dcoords]
+    # r_ki = sheet.je_df[dcoords]
+    # r_ki.columns = coords
 
     cell_pos = sheet.upcast_cell(sheet.cell_df[coords])
     srce_pos = sheet.upcast_srce(sheet.jv_df[coords])
-    r_ak = r_ai = srce_pos - cell_pos
+    trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords])
 
-    grad_a_srce = _to_3d(inv_area) * np.cross(r_ij + r_ai, sheet.je_df[ncoords])
-    grad_a_trgt = _to_3d(inv_area) * np.cross(sheet.je_df[ncoords], r_ki + r_ak)
+    r_ak = srce_pos - cell_pos
+    r_aj = trgt_pos - cell_pos
+
+    grad_a_srce = _to_3d(inv_area) * np.cross(r_aj, sheet.je_df[ncoords])
+    # grad_a_trgt = _to_3d(inv_area) * np.cross(sheet.je_df[ncoords], r_ki + r_ak)
+    grad_a_trgt = _to_3d(inv_area) * np.cross(sheet.je_df[ncoords], r_ak)
     return (pd.DataFrame(grad_a_srce, index=sheet.je_idx, columns=sheet.coords),
             pd.DataFrame(grad_a_trgt, index=sheet.je_idx, columns=sheet.coords))
