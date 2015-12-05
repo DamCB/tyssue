@@ -36,6 +36,35 @@ data_dicts = {
         'nz': (0., np.float)}
     }
 
+###
+data_dicts2d = {
+    'cell': {
+        ## Cell Geometry
+        'perimeter': (0., np.float),
+        'area': (0., np.float),
+        ## Coordinates
+        'x': (0., np.float),
+        'y': (0., np.float),
+        ## Topology
+        'num_sides': (6, np.int),
+        ## Masks
+        'is_alive': (1, np.bool)},
+    'jv': {
+        ## Coordinates
+        'x': (0., np.float),
+        'y': (0., np.float),
+        ## Masks
+        'is_active': (1, np.bool)},
+    'je': {
+        ## Coordinates
+        'dx': (0., np.float),
+        'dy': (0., np.float),
+        'length': (0., np.float),
+        ### Normals
+        'nz': (0., np.float)}
+    }
+
+
 def three_cells_sheet_array():
     '''
     Creates the apical junctions mesh of three packed hexagonal cells.

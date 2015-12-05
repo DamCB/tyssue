@@ -1,7 +1,5 @@
 """
-Vertex model for an Epithelial sheet (see definitions).
-
-Depends on the sheet vertex geometry functions.
+Base gradients for sheet like geometries
 """
 
 import numpy as np
@@ -10,25 +8,17 @@ import pandas as pd
 from ..utils.utils import _to_3d
 
 
-def length_grad(sheet):
-    '''returns -(dx/l, dy/l, dz/l), ie grad_i(l_ij))
-    '''
-    dcoords = ['d'+c for c in sheet.coords]
-    grad_lij = - (sheet.je_df[dcoords] /
-                  _to_3d(sheet.je_df['length']))
-    grad_lij.columns = sheet.coords
-    return grad_lij
-
-
 def height_grad(sheet, coords):
 
     r_to_rho = sheet.jv_df[coords] / _to_3d(sheet.jv_df['rho'])
+
     ### Cyl. geom
     r_to_rho['z'] = 0.
 
     r_to_rho = sheet.upcast_srce(df=r_to_rho)
     r_to_rho.columns = sheet.coords
     return r_to_rho
+
 
 def area_grad(sheet, coords):
 

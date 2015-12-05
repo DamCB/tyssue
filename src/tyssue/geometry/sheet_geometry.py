@@ -87,7 +87,7 @@ def update_vol(sheet):
 
     '''
     sheet.je_df['sub_vol'] = (sheet.upcast_srce(sheet.jv_df['height']) *
-                              sheet.je_df['sub_area']))
+                              sheet.je_df['sub_area'])
     sheet.cell_df['vol'] = sheet.je_df['sub_vol'].sum(level='cell')
 
 # ### Cylindrical geometry specific

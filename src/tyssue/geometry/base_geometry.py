@@ -1,3 +1,5 @@
+import numpy as np
+
 def scale(sheet, delta, coords):
     ''' Scales the coordinates `coords`
     by a factor `delta`

@@ -57,6 +57,7 @@ def update_perimeters(sheet):
     sheet.cell_df['perimeter'] = sheet.je_df['length'].groupby(
         level='cell').sum()
 
+
 def update_normals(sheet, coords):
 
     cell_pos = sheet.upcast_cell(sheet.cell_df[coords]).values
@@ -65,6 +66,7 @@ def update_normals(sheet, coords):
 
     normals = np.cross(srce_pos - cell_pos, trgt_pos - srce_pos)
     sheet.je_df["nz"] = normals
+
 
 def update_areas(sheet):
     '''
