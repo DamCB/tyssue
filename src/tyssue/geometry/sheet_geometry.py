@@ -1,4 +1,7 @@
 import numpy as np
+from .base_geometry import (scale, update_dcoords,
+                            update_length, update_centroid)
+from .planar_geometry import update_num_sides, update_perimeters
 
 
 def get_default_geom_specs():
@@ -21,13 +24,6 @@ def get_default_geom_specs():
             }
         }
     return default_geom_specs
-
-
-def scale(sheet, delta, coords):
-    ''' Scales the coordinates `coords`
-    by a factor `delta`
-    '''
-    sheet.jv_df[coords] = sheet.jv_df[coords] * delta
 
 
 def update_all(sheet, coords=None, **geom_spec_kw):
@@ -61,38 +57,6 @@ def update_all(sheet, coords=None, **geom_spec_kw):
     update_vol(sheet)
 
 
-def update_dcoords(sheet, coords):
-    '''
-    Update the edge vector coordinates  on the
-    `coords` basis (`default_coords` by default). Modifies the corresponding
-    columns (i.e `['dx', 'dy', 'dz']`) in sheet.edge_df.
-    '''
-    dcoords = ['d'+c for c in coords]
-    data = sheet.jv_df[coords]
-    srce_pos = sheet.upcast_srce(data).values
-    trgt_pos = sheet.upcast_trgt(data).values
-
-    sheet.je_df[dcoords] = (trgt_pos - srce_pos)
-
-
-def update_length(sheet, coords):
-    '''
-    Updates the edge_df `length` column on the `coords` basis
-    '''
-    dcoords = ['d' + c for c in coords]
-    sheet.je_df['length'] = np.linalg.norm(sheet.je_df[dcoords],
-                                           axis=1)
-
-
-def update_centroid(sheet, coords):
-    '''
-    Updates the cell_df `coords` columns as the cell's vertices
-    center of mass.
-    '''
-    upcast_pos = sheet.upcast_srce(sheet.jv_df[coords])
-    sheet.cell_df[coords] = upcast_pos.groupby(level='cell').mean()
-
-
 def update_normals(sheet, coords):
     '''
     Updates the cell_df `coords` columns as the cell's vertices
@@ -103,16 +67,8 @@ def update_normals(sheet, coords):
     trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords]).values
 
     normals = np.cross(srce_pos - cell_pos, trgt_pos - srce_pos)
-    if len(coords) == 2:
-        sheet.je_df['nz'] = normals
-    else:
-        ncoords = ['n' + c for c in coords]
-        sheet.je_df[ncoords] = normals
-
-def update_num_sides(sheet):
-
-    sheet.cell_df['num_sides'] = sheet.je_idx.get_level_values(
-        'cell').value_counts().sort_index()
+    ncoords = ['n' + c for c in coords]
+    sheet.je_df[ncoords] = normals
 
 
 def update_areas(sheet, coords):
@@ -124,22 +80,14 @@ def update_areas(sheet, coords):
     sheet.cell_df['area'] = sheet.je_df['sub_area'].groupby(level='cell').sum()
 
 
-def update_perimeters(sheet):
-    '''
-    Updates the perimeter of each cell.
-    '''
-
-    sheet.cell_df['perimeter'] = sheet.je_df['length'].groupby(
-        level='cell').sum()
-
-
 def update_vol(sheet):
     '''
     Note that this is an approximation of the sheet geometry
     package.
 
     '''
-    sheet.je_df['sub_vol'] = sheet.upcast_srce(sheet.jv_df['height']) * sheet.je_df['sub_area']
+    sheet.je_df['sub_vol'] = (sheet.upcast_srce(sheet.jv_df['height']) *
+                              sheet.je_df['sub_area']))
     sheet.cell_df['vol'] = sheet.je_df['sub_vol'].sum(level='cell')
 
 # ### Cylindrical geometry specific
