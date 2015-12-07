@@ -110,7 +110,7 @@ def draw_je(sheet, coords, ax, **draw_spec_kw):
     return ax
 
 
-def plot_forces(sheet, model,
+def plot_forces(sheet, geom, model,
                 coords, scaling,
                 ax=None,
                 approx_grad=None,
@@ -122,9 +122,9 @@ def plot_forces(sheet, model,
     draw_specs.update(**draw_spec_kws)
     gcoords = ['g'+c for c in coords]
     if approx_grad is not None:
-        app_grad = approx_grad(sheet, sheet.coords)
+        app_grad = approx_grad(sheet, geom, model)
         grad_i = pd.DataFrame(index=sheet.jv_idx,
-                              data=app_grad.reshape((-1, 3)),
+                              data=app_grad.reshape((-1, len(sheet.coords))),
                               columns=sheet.coords) * scaling
 
     else:

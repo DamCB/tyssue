@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ..utils.utils import _to_3d
+from ..utils.utils import _to_2d, _to_3d
 
 from copy import deepcopy
 
@@ -116,8 +116,12 @@ def compute_gradient(sheet, components=False,
 def tension_grad(sheet, grad_lij):
 
     live_je = sheet.upcast_cell(sheet.cell_df['is_alive'])
-    grad_t = (grad_lij
-              * _to_3d(sheet.je_df['line_tension'] * live_je))
+    if len(sheet.coords) == 2:
+        grad_t = (grad_lij
+                  * _to_2d(sheet.je_df['line_tension'] * live_je))
+    elif len(sheet.coords) == 3:
+        grad_t = (grad_lij
+                  * _to_3d(sheet.je_df['line_tension'] * live_je))
 
     #grad_t = _grad_t.sum(level='srce').loc[sheet.jv_idx]
     return grad_t
@@ -127,7 +131,11 @@ def contractile_grad(sheet, grad_lij):
 
     gamma_ = sheet.cell_df.eval('contractility * perimeter * is_alive')
     gamma = sheet.upcast_cell(gamma_)
-    grad_c = grad_lij * _to_3d(gamma)
+    if len(sheet.coords) == 2:
+        grad_c = grad_lij * _to_2d(gamma)
+    elif len(sheet.coords) == 3:
+        grad_c = grad_lij * _to_3d(gamma)
+
     return grad_c
 
 
@@ -146,8 +154,10 @@ def elastic_grad(sheet, coords=None):
                            prefered='prefered_area')
 
     ka_a0_ = ka_a0_ * sheet.cell_df['is_alive']
-    ka_a0 = _to_3d(sheet.upcast_cell(ka_a0_))
-
+    if len(coords) == 2:
+        ka_a0 = _to_2d(sheet.upcast_cell(ka_a0_))
+    elif len(coords) == 3:
+        ka_a0 = _to_3d(sheet.upcast_cell(ka_a0_))
     grad_a_srce, grad_a_trgt = area_grad(sheet, coords)
     grad_v_srce = ka_a0 * grad_a_srce
     grad_v_trgt = ka_a0 * grad_a_trgt

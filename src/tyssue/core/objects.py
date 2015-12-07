@@ -4,6 +4,7 @@ import pandas as pd
 # from .. import libtyssue_core as libcore
 from . import generation
 from .generation import make_df
+from ..utils.utils import set_data_columns
 
 import logging
 log = logging.getLogger(name=__name__)
@@ -112,6 +113,21 @@ class Epithelium:
         datasets[points_dataset][coords] = points
 
         return cls.__init__(identifier, datasets)
+
+    def set_geom(self, geom, **geom_specs):
+
+        specs = geom.get_default_geom_specs()
+        specs.update(**geom_specs)
+        set_data_columns(self, specs)
+        return specs
+
+    def set_model(self, model, **mod_specs):
+
+        specs = model.get_default_mod_specs()
+        specs.update(**mod_specs)
+        dim_specs = model.dimentionalize(specs)
+        set_data_columns(self, dim_specs)
+        return specs, dim_specs
 
     @property
     def cell_idx(self):
