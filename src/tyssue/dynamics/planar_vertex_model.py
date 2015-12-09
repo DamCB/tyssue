@@ -78,39 +78,33 @@ def compute_energy(sheet, full_output=False):
     live_je_df = sheet.je_df[upcast_alive == 1]
 
     E_t = live_je_df.eval('line_tension * length / 2')
-    E_v = elastic_energy(live_cell_df,
+    E_a = elastic_energy(live_cell_df,
                          var='area',
                          elasticity='area_elasticity',
                          prefered='prefered_area')
     E_c = live_cell_df.eval('0.5 * contractility * perimeter ** 2')
     if full_output:
-        return (E / sheet.nrj_norm_factor for E in (E_t, E_c, E_v))
+        return (E / sheet.nrj_norm_factor for E in (E_t, E_c, E_a))
     else:
-        return (E_t.sum() + (E_c+E_v).sum()) / sheet.nrj_norm_factor
+        return (E_t.sum() + (E_c + E_a).sum()) / sheet.nrj_norm_factor
 
-def compute_gradient(sheet, components=False,
-                     dcoords=None, ncoords=None):
+def compute_gradient(sheet, components=False):
     '''
     If components is True, returns the individual terms
     (grad_t, grad_c, grad_v)
     '''
 
-    if dcoords is None:
-        dcoords = ['d'+c for c in sheet.coords]
-    if ncoords is None:
-        ncoords = ['n'+c for c in sheet.coords]
     norm_factor = sheet.nrj_norm_factor
-
     grad_lij = length_grad(sheet)
 
     grad_t = tension_grad(sheet, grad_lij)
     grad_c = contractile_grad(sheet, grad_lij)
-    grad_v_srce, grad_v_trgt = elastic_grad(sheet, sheet.coords)
+    grad_a_srce, grad_a_trgt = elastic_grad(sheet, sheet.coords)
     grad_i = ((grad_t.sum(level='srce') - grad_t.sum(level='trgt'))/2 +
               grad_c.sum(level='srce') - grad_c.sum(level='trgt') +
-              grad_v_srce.sum(level='srce') + grad_v_trgt.sum(level='trgt'))
+              grad_a_srce.sum(level='srce') + grad_a_trgt.sum(level='trgt'))
     if components:
-        return grad_t, grad_c, grad_v_srce, grad_v_trgt
+        return grad_t, grad_c, grad_a_srce, grad_a_trgt
     return grad_i / norm_factor
 
 def tension_grad(sheet, grad_lij):
@@ -159,7 +153,7 @@ def elastic_grad(sheet, coords=None):
     elif len(coords) == 3:
         ka_a0 = _to_3d(sheet.upcast_cell(ka_a0_))
     grad_a_srce, grad_a_trgt = area_grad(sheet, coords)
-    grad_v_srce = ka_a0 * grad_a_srce
-    grad_v_trgt = ka_a0 * grad_a_trgt
+    grad_a_srce = ka_a0 * grad_a_srce
+    grad_a_trgt = ka_a0 * grad_a_trgt
 
-    return grad_v_srce, grad_v_trgt
+    return grad_a_srce, grad_a_trgt

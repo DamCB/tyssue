@@ -26,9 +26,6 @@ def update_all(sheet, coords=None, **geom_spec_kw):
     * the cell centroids
     * the normals to each edge associated face
     * the cell areas
-    * the vertices heights (depends on geometry)
-    * the cell volumes (depends on geometry)
-
     '''
     if coords is None:
         coords = sheet.coords

@@ -217,6 +217,78 @@ class Epithelium:
         cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['cella', 'cellb'])
         return cc_idx
 
+    def get_valid(self):
+        """Set true if the cell is a closed polygon
+        """
+        is_valid = self.je_df.groupby(level='cell').apply(_test_valid)
+        self.je_df['is_valid'] = self.upcast_cell(is_valid)
+
+    def get_invalid(self):
+        """Set true if the cell is a closed polygon
+        """
+        is_invalid = self.je_df.groupby(level='cell').apply(_test_invalid)
+        return self.upcast_cell(is_invalid)
+
+    def sanitize(self):
+        """Removes invalid cells and associated vertices
+        """
+        invalid_jes = self.get_invalid()
+        self.remove(invalid_jes)
+
+    def remove(self, je_out):
+        """Removes edges and associated cells where je_out is True
+        """
+        to_remove = self.je_df[je_out].index
+        cell_out = to_remove.get_level_values('cell')
+
+        self.je_df = self.je_df.drop(cell_out, level='cell')
+        all_jvs = np.unique(np.concatenate([self.je_df.index.get_level_values('srce'),
+                                            self.je_df.index.get_level_values('trgt')]))
+        self.jv_df = self.jv_df.loc[all_jvs]
+        cell_idxs = np.unique(self.je_df.index.get_level_values('cell'))
+        self.cell_df = self.cell_df.loc[cell_idxs]
+
+    def cut_out(self, low_x, high_x, low_y, high_y):
+        """Removes cells with vertices outside the
+        region defined by low_x, low_y, high_x, high_y_
+        TODO: find a way to generalize  this function
+        to higher dims..
+        """
+
+        jv_out = ((self.jv_df['y'] < low_y) |
+                  (self.jv_df['y'] > high_y) |
+                  (self.jv_df['x'] < low_x) |
+                  (self.jv_df['x'] > high_x))
+
+        srce_out = self.upcast_srce(jv_out)
+        trgt_out = self.upcast_trgt(jv_out)
+        je_out = trgt_out | srce_out
+        self.remove(je_out)
+
+    def set_bbox(self, margin=1.):
+        '''Sets the attribute `bbox` with pairs of values bellow
+        and above the min and max of the jv coords, with a margin.
+        '''
+        self.bbox = np.array([[self.jv_df[c].min() - margin,
+                               self.jv_df[c].max() + margin]
+                              for c in self.coords])
+
+
+def _test_invalid(cell):
+    """ Returns true iff the sources and targets of the cells polygon
+    are different
+    """
+    s1 = set(cell.index.get_level_values('srce'))
+    s2 = set(cell.index.get_level_values('trgt'))
+    return s1 != s2
+
+
+def _test_valid(cell):
+    """ Returns true iff all sources are also targets for the cells polygon
+    """
+    s1 = set(cell.index.get_level_values('srce'))
+    s2 = set(cell.index.get_level_values('trgt'))
+    return s1 == s2
 
 class Cell:
     '''
