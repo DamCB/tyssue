@@ -70,11 +70,17 @@ def sheet_view(sheet, coords=COORDS, **draw_specs_kw):
 
 def draw_cell(sheet, coords, ax, **draw_spec_kw):
     """Draws epithelial sheet polygonal cells in matplotlib
+    Keyword values can be specified at the element
+    level as columns of the sheet.cell_df
     """
     draw_spec = get_default_draw_specs()['cell']
     draw_spec.update(**draw_spec_kw)
+    per_element_kw = set(draw_spec.keys()).intersection(sheet.cell_df.columns)
+
     polys = sheet.cell_polygons(coords).groupby(level='cell')
-    for _, poly in polys:
+    for idx, poly in polys:
+        draw_spec.update({kw: sheet.cell_df.loc[idx, kw]
+                          for kw in per_element_kw})
         patch = Polygon(poly,
                         fill=True,
                         closed=True,
@@ -82,11 +88,17 @@ def draw_cell(sheet, coords, ax, **draw_spec_kw):
         ax.add_patch(patch)
         return ax
 
+
 def draw_jv(sheet, coords, ax, **draw_spec_kw):
     """Draw junction vertices in matplotlib
     """
     draw_spec = get_default_draw_specs()['jv']
+
     draw_spec.update(**draw_spec_kw)
+    per_element_kw = set(draw_spec.keys()).intersection(sheet.jv_df.columns)
+    draw_spec.update({key: sheet.jv_df[key]
+                      for key in per_element_kw})
+
     x, y = coords
     ax.scatter(sheet.jv_df[x], sheet.jv_df[y], **draw_spec_kw)
     return ax
@@ -96,6 +108,7 @@ def draw_je(sheet, coords, ax, **draw_spec_kw):
     """
     draw_spec = get_default_draw_specs()['je']
     draw_spec.update(**draw_spec_kw)
+    per_element_kw = set(draw_spec.keys()).intersection(sheet.je_df.columns)
 
     x, y = coords
     dx, dy = ('d'+c for c in coords)
@@ -104,6 +117,8 @@ def draw_je(sheet, coords, ax, **draw_spec_kw):
         if np.hypot(sheet.je_df[dx].loc[e],
                     sheet.je_df[dy].loc[e]) < 1e-6:
             continue
+        draw_spec.update({key: sheet.je_df.loc[e, key]
+                          for key in per_element_kw})
         ax.arrow(sheet.jv_df[x].loc[s], sheet.jv_df[y].loc[s],
                  sheet.je_df[dx].loc[e], sheet.je_df[dy].loc[e],
                  **draw_spec)
