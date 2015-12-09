@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 DISTNAME = 'tyssue'
 DESCRIPTION = 'tyssue is a living tissues, cell level, modeling library'
-LONG_DESCRIPTION = ('tyssue uses the scientific python echosystem and CGAL'
+LONG_DESCRIPTION = ('tyssue uses the scientific python ecosystem and CGAL'
                     ' LinearCellComplex library to model epithelium at the'
                     ' cellular level')
 MAINTAINER = 'Guillaume Gay'
