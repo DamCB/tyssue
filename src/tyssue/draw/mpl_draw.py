@@ -77,8 +77,8 @@ def draw_cell(sheet, coords, ax, **draw_spec_kw):
     draw_spec.update(**draw_spec_kw)
     per_element_kw = set(draw_spec.keys()).intersection(sheet.cell_df.columns)
 
-    polys = sheet.cell_polygons(coords).groupby(level='cell')
-    for idx, poly in polys:
+    polys = sheet.cell_polygons(coords)
+    for idx, poly in polys.items():
         draw_spec.update({kw: sheet.cell_df.loc[idx, kw]
                           for kw in per_element_kw})
         patch = Polygon(poly,

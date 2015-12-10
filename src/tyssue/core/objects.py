@@ -194,12 +194,11 @@ class Epithelium:
         return orbits
 
     def cell_polygons(self, coords):
-        polys = self.je_df.groupby(level='cell').apply(
-            lambda df: self.jv_df.loc[
-                df.index.get_level_values('srce'),
-                coords
-                ]
-            )
+        def _get_jvs_pos(cell):
+            jes = _ordered_jes(cell)
+            return np.array([self.jv_df.loc[idx[0], coords]
+                             for idx in jes])
+        polys = self.je_df.groupby(level='cell').apply(_get_jvs_pos)
         return polys
 
 
@@ -273,6 +272,17 @@ class Epithelium:
                                self.jv_df[c].max() + margin]
                               for c in self.coords])
 
+def _ordered_jes(cell):
+    """Returns the junction edges vertices of the cells
+    organized clockwise
+    """
+    srces, trgts, cells = cell.index.labels
+    srce, trgt = srces[0], trgts[0]
+    jes = [(srce, trgt, cell)]
+    for cell in cells[1:]:
+        srce, trgt = trgt, trgts[srces == trgt][0]
+        jes.append((srce, trgt, cell))
+    return jes
 
 def _test_invalid(cell):
     """ Returns true iff the sources and targets of the cells polygon
@@ -289,6 +299,7 @@ def _test_valid(cell):
     s1 = set(cell.index.get_level_values('srce'))
     s2 = set(cell.index.get_level_values('trgt'))
     return s1 == s2
+
 
 class Cell:
     '''
@@ -341,8 +352,8 @@ class JunctionVertex:
         '''
 
         _, sub_idx = self.__eptm.je_idx.get_loc_level(self.__index,
-                                                         level='srce',
-                                                         drop_level=False)
+                                                      level='srce',
+                                                      drop_level=False)
         return sub_idx
 
     def cell_orbit(self):
