@@ -9,11 +9,12 @@ import numpy as np
 def get_default_settings():
     default_settings = {
         'norm_factor': 1,
-        'minimize':{
-            'jac': None,
-            'method':'L-BFGS-B',
-            'options': {'disp':False,
-                        'gtol':1e-3},
+        'minimize': {
+            'jac': opt_grad,
+            'method': 'L-BFGS-B',
+            'options': {'disp': False,
+                        'ftol': 1e-4,
+                        'gtol': 1e-3},
             }
         }
     return default_settings
