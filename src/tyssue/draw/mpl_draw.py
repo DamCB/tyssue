@@ -86,7 +86,7 @@ def draw_cell(sheet, coords, ax, **draw_spec_kw):
                         closed=True,
                         **draw_spec)
         ax.add_patch(patch)
-        return ax
+    return ax
 
 
 def draw_jv(sheet, coords, ax, **draw_spec_kw):
