@@ -13,7 +13,7 @@ def get_default_settings():
             'jac': opt_grad,
             'method': 'L-BFGS-B',
             'options': {'disp': False,
-                        'ftol': 1e-4,
+                        'ftol': 1e-6,
                         'gtol': 1e-3},
             }
         }
