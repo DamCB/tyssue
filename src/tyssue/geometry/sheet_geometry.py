@@ -26,7 +26,7 @@ def get_default_geom_specs():
     return default_geom_specs
 
 
-def update_all(sheet, coords=None, **geom_spec_kw):
+def update_all(sheet, **geom_spec_kw):
     '''
     Updates the sheet geometry by updating:
     * the edge vector coordinates
@@ -38,46 +38,43 @@ def update_all(sheet, coords=None, **geom_spec_kw):
     * the cell volumes (depends on geometry)
 
     '''
-    if coords is None:
-        coords = sheet.coords
     geom_spec = get_default_geom_specs()
     geom_spec.update(**geom_spec_kw)
 
-    update_dcoords(sheet, coords)
-    update_length(sheet, coords)
-    update_centroid(sheet, coords)
+    update_dcoords(sheet)
+    update_length(sheet)
+    update_centroid(sheet)
     if geom_spec['settings']['geometry'] == 'cylindrical':
-        update_height_cylindrical(sheet, coords,
+        update_height_cylindrical(sheet,
                                   geom_spec['settings'])
     elif geom_spec['settings']['geometry'] == 'flat':
         update_height_flat(sheet, geom_spec['settings'])
-    update_normals(sheet, coords)
-    update_areas(sheet, coords)
+    update_normals(sheet)
+    update_areas(sheet)
     update_perimeters(sheet)
     update_vol(sheet)
 
 
-def update_normals(sheet, coords):
+def update_normals(sheet):
     '''
     Updates the cell_df `coords` columns as the cell's vertices
     center of mass.
     '''
+    coords = sheet.coords
     cell_pos = sheet.upcast_cell(sheet.cell_df[coords]).values
     srce_pos = sheet.upcast_srce(sheet.jv_df[coords]).values
     trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords]).values
 
     normals = np.cross(srce_pos - cell_pos, trgt_pos - srce_pos)
-    ncoords = ['n' + c for c in coords]
-    sheet.je_df[ncoords] = normals
+    sheet.je_df[sheet.ncoords] = normals
 
 
-def update_areas(sheet, coords):
+def update_areas(sheet):
     '''
     Updates the normal coordniate of each (srce, trgt, cell) face.
     '''
-    ncoords = ['n' + c for c in coords]
-    sheet.je_df['sub_area'] = np.linalg.norm(sheet.je_df[ncoords], axis=1) / 2
-    sheet.cell_df['area'] = sheet.je_df['sub_area'].groupby(level='cell').sum()
+    sheet.je_df['sub_area'] = np.linalg.norm(sheet.je_df[sheet.ncoords], axis=1) / 2
+    sheet.cell_df['area'] = sheet.sum_cell(sheet.je_df['sub_area'])
 
 
 def update_vol(sheet):
@@ -88,11 +85,11 @@ def update_vol(sheet):
     '''
     sheet.je_df['sub_vol'] = (sheet.upcast_srce(sheet.jv_df['height']) *
                               sheet.je_df['sub_area'])
-    sheet.cell_df['vol'] = sheet.je_df['sub_vol'].sum(level='cell')
+    sheet.cell_df['vol'] = sheet.sum_cell(sheet.je_df['sub_vol'])
 
 # ### Cylindrical geometry specific
 
-def update_height_cylindrical(sheet, coords, settings):
+def update_height_cylindrical(sheet, settings):
     '''
     Updates each cell height in a cylindrical geometry.
     e.g. cell anchor is assumed to lie at a distance
@@ -100,7 +97,7 @@ def update_height_cylindrical(sheet, coords, settings):
     the triplet `coords`
     '''
     w = settings['height_axis']
-    u, v = (c for c in coords if c != w)
+    u, v = (c for c in sheet.coords if c != w)
     sheet.jv_df['rho'] = np.hypot(sheet.jv_df[v],
                                   sheet.jv_df[u])
     sheet.jv_df['height'] = (sheet.jv_df['rho'] -

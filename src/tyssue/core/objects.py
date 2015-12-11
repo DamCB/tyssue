@@ -78,15 +78,22 @@ class Epithelium:
         '''
         if coords is not None:
             self.coords = coords
-
+        # edge's dx, dy, dz
+        self.dcoords = ['d'+c for c in self.coords]
+        self.dim = len(self.coords)
+        # edge's normals
+        if self.dim == 3:
+            self.ncoords = ['n'+c for c in self.coords]
         self.je_df, self.cell_df, self.jv_df = None, None, None
         self.identifier = identifier
-        if not set(('cell', 'jv', 'je')).issubset(datasets) :
+        if not set(('cell', 'jv', 'je')).issubset(datasets):
             raise ValueError('''The `datasets` dictionnary should
             contain at least the 'cell', 'jv' and 'je' keys''')
         for name, data in datasets.items():
             setattr(self, '{}_df'.format(name), data)
         self.data_names = list(datasets.keys())
+        self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
+                                                   names=['srce', 'trgt', 'cell'])
 
     @classmethod
     def from_points(cls, identifier, points,
@@ -94,7 +101,7 @@ class Epithelium:
                     points_dataset='jv',
                     data_dicts=None):
         '''
-
+        TODO: not sure this works as expected with the new indexing
         '''
 
         if points.shape[1] == 2:
@@ -112,7 +119,7 @@ class Epithelium:
                                     data_dict=data_dict)
         datasets[points_dataset][coords] = points
 
-        return cls.__init__(identifier, datasets)
+        return cls.__init__(identifier, datasets, coords)
 
     def set_geom(self, geom, **geom_specs):
 
@@ -139,7 +146,7 @@ class Epithelium:
 
     @property
     def je_idx(self):
-        return self.je_df.index
+        return self.je_df[['srce', 'trgt', 'cell']]
 
     @property
     def Nc(self):
@@ -155,15 +162,15 @@ class Epithelium:
 
     @property
     def e_srce_idx(self):
-        return self.je_idx.get_level_values('srce')
+        return self.je_df['srce']
 
     @property
     def e_trgt_idx(self):
-        return self.je_idx.get_level_values('trgt')
+        return self.je_df['trgt']
 
     @property
     def e_cell_idx(self):
-        return self.je_idx.get_level_values('cell')
+        return self.je_df['cell']
 
     @property
     def je_idx_array(self):
@@ -174,11 +181,12 @@ class Epithelium:
     def _upcast(self, idx, df):
 
         upcast = df.loc[idx]
-        upcast.index = self.je_idx
+        upcast.index = self.je_df.index
         return upcast
 
     def upcast_srce(self, df):
         ''' Reindexes input data to self.je_idx
+        by repeating the values for each source entry
         '''
         return self._upcast(self.e_srce_idx, df)
 
@@ -188,19 +196,33 @@ class Epithelium:
     def upcast_cell(self, df):
         return self._upcast(self.e_cell_idx, df)
 
+    def _lvl_sum(self, df, lvl):
+        df_ = df.copy()
+        df_.index = self.je_mindex
+        return df_.sum(level=lvl)
+
+    def sum_srce(self, df):
+        return self._lvl_sum(df, 'srce')
+
+    def sum_trgt(self, df):
+        return self._lvl_sum(df, 'trgt')
+
+    def sum_cell(self, df):
+        return self._lvl_sum(df, 'cell')
+
     def get_orbits(self, center, periph):
-        orbits = self.je_df.groupby(level=center).apply(
-            lambda df: df.get_level_values(periph))
+        orbits = self.je_df.groupby(center).apply(
+            lambda df: df[periph])
         return orbits
 
     def cell_polygons(self, coords):
         def _get_jvs_pos(cell):
+            # TODO: return jes as a 2d array
             jes = _ordered_jes(cell)
             return np.array([self.jv_df.loc[idx[0], coords]
                              for idx in jes])
-        polys = self.je_df.groupby(level='cell').apply(_get_jvs_pos)
+        polys = self.je_df.groupby('cell').apply(_get_jvs_pos)
         return polys
-
 
     def _build_cell_cell_indexes(self):
         '''
@@ -219,13 +241,13 @@ class Epithelium:
     def get_valid(self):
         """Set true if the cell is a closed polygon
         """
-        is_valid = self.je_df.groupby(level='cell').apply(_test_valid)
+        is_valid = self.je_df.groupby('cell').apply(_test_valid)
         self.je_df['is_valid'] = self.upcast_cell(is_valid)
 
     def get_invalid(self):
         """Set true if the cell is a closed polygon
         """
-        is_invalid = self.je_df.groupby(level='cell').apply(_test_invalid)
+        is_invalid = self.je_df.groupby('cell').apply(_test_invalid)
         return self.upcast_cell(is_invalid)
 
     def sanitize(self):
@@ -238,13 +260,10 @@ class Epithelium:
         """Removes edges and associated cells where je_out is True
         """
         to_remove = self.je_df[je_out].index
-        cell_out = to_remove.get_level_values('cell')
-
-        self.je_df = self.je_df.drop(cell_out, level='cell')
-        all_jvs = np.unique(np.concatenate([self.je_df.index.get_level_values('srce'),
-                                            self.je_df.index.get_level_values('trgt')]))
+        self.je_df = self.je_df.drop(to_remove)
+        all_jvs = np.unique(self.je_df['srce', 'trgt'])
         self.jv_df = self.jv_df.loc[all_jvs]
-        cell_idxs = np.unique(self.je_df.index.get_level_values('cell'))
+        cell_idxs = self.je_df['cell'].unique()
         self.cell_df = self.cell_df.loc[cell_idxs]
 
     def cut_out(self, low_x, high_x, low_y, high_y):
@@ -278,26 +297,26 @@ def _ordered_jes(cell):
     """
     srces, trgts, cells = cell.index.labels
     srce, trgt = srces[0], trgts[0]
-    jes = [(srce, trgt, cell)]
+    jes = [[srce, trgt, cell]]
     for cell in cells[1:]:
         srce, trgt = trgt, trgts[srces == trgt][0]
-        jes.append((srce, trgt, cell))
+        jes.append([srce, trgt, cell])
     return jes
 
 def _test_invalid(cell):
-    """ Returns true iff the sources and targets of the cells polygon
+    """ Returns true iff the source and target sets of the cells polygon
     are different
     """
-    s1 = set(cell.index.get_level_values('srce'))
-    s2 = set(cell.index.get_level_values('trgt'))
+    s1 = set(cell['srce'])
+    s2 = set(cell['trgt'])
     return s1 != s2
 
 
 def _test_valid(cell):
     """ Returns true iff all sources are also targets for the cells polygon
     """
-    s1 = set(cell.index.get_level_values('srce'))
-    s2 = set(cell.index.get_level_values('trgt'))
+    s1 = set(cell['srce'])
+    s2 = set(cell['trgt'])
     return s1 == s2
 
 
@@ -320,9 +339,8 @@ class Cell:
         Indexes of the cell's junction halfedges.
 
         '''
-        _, sub_idx = self.__eptm.je_idx.get_loc_level(self.__index,
-                                                      level='cell',
-                                                      drop_level=False)
+        sub_idx = self.__eptm.je_idx[
+            self.__eptm.je_idx['cell'] == self.__index].index
         return sub_idx
 
     def jv_orbit(self):
@@ -331,7 +349,7 @@ class Cell:
 
         '''
         je_orbit = self.je_orbit()
-        return je_orbit.get_level_values('srce')
+        return self.__eptm.je_df.loc[je_orbit, 'srce']
 
     @property
     def num_sides(self):
@@ -351,9 +369,8 @@ class JunctionVertex:
         as the indexes of the **outgoing** halfedges.
         '''
 
-        _, sub_idx = self.__eptm.je_idx.get_loc_level(self.__index,
-                                                      level='srce',
-                                                      drop_level=False)
+        sub_idx = self.__eptm.je_idx[
+            self.__eptm.je_idx['srce'] == self.__index].index
         return sub_idx
 
     def cell_orbit(self):
@@ -362,7 +379,7 @@ class JunctionVertex:
 
         '''
         je_orbit = self.je_orbit()
-        return je_orbit.get_level_values('cell')
+        return self.__eptm.je_df.loc[je_orbit, 'cell']
 
     def jv_orbit(self):
         '''
@@ -370,7 +387,7 @@ class JunctionVertex:
 
         '''
         je_orbit = self.je_orbit()
-        return je_orbit.get_level_values('trgt')
+        return self.__eptm.je_df.loc[je_orbit, 'trgt']
 
 
 class JunctionEdge():
@@ -385,17 +402,12 @@ class JunctionEdge():
 
     @property
     def source_idx(self):
-        return self.__index[0]
+        return self.__eptm.je_df.loc[self.__index, 'srce']
 
     @property
     def target_idx(self):
-        return self.__index[1]
+        return self.__eptm.je_df.loc[self.__index, 'trgt']
 
     @property
     def cell_idx(self):
-        return self.__index[2]
-
-    @property
-    def oposite_idx(self):
-        jei = self.__eptm.je_idx_array
-        return tuple(*jei[(jei[:, 0] == 1)*(jei[:, 1] == 0)])
+        return self.__eptm.je_df.loc[self.__index, 'cell']

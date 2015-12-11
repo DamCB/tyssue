@@ -25,6 +25,10 @@ data_dicts = {
         ## Masks
         'is_active': (1, np.bool)},
     'je': {
+        ## associated elements indexes
+        'srce': (0, np.int),
+        'trgt': (0, np.int),
+        'cell': (0, np.int),
         ## Coordinates
         'dx': (0., np.float),
         'dy': (0., np.float),
@@ -56,6 +60,10 @@ data_dicts2d = {
         ## Masks
         'is_active': (1, np.bool)},
     'je': {
+        ## associated elements indexes
+        'srce': (0, np.int),
+        'trgt': (0, np.int),
+        'cell': (0, np.int),
         ## Coordinates
         'dx': (0., np.float),
         'dy': (0., np.float),
@@ -137,7 +145,7 @@ def three_cells_sheet(zaxis=False):
     je_df: the junction edges `DataFrame`
 
     '''
-    points, _, (Nc, Nv, _) = three_cells_sheet_array()
+    points, _, (Nc, Nv, Ne) = three_cells_sheet_array()
 
     if zaxis:
         coords = ['x', 'y', 'z']
@@ -147,26 +155,26 @@ def three_cells_sheet(zaxis=False):
     cell_idx = pd.Index(range(Nc), name='cell')
     jv_idx = pd.Index(range(Nv), name='jv')
 
-    _je_idx = [(0, 1, 0),
-               (1, 2, 0),
-               (2, 3, 0),
-               (3, 4, 0),
-               (4, 5, 0),
-               (5, 0, 0),
-               (0, 5, 1),
-               (5, 6, 1),
-               (6, 7, 1),
-               (7, 8, 1),
-               (8, 9, 1),
-               (9, 0, 1),
-               (0, 9, 2),
-               (9, 10, 2),
-               (10, 11, 2),
-               (11, 12, 2),
-               (12, 1, 2),
-               (1, 0, 2)]
+    _je_e_idx = np.array([[0, 1, 0],
+                          [1, 2, 0],
+                          [2, 3, 0],
+                          [3, 4, 0],
+                          [4, 5, 0],
+                          [5, 0, 0],
+                          [0, 5, 1],
+                          [5, 6, 1],
+                          [6, 7, 1],
+                          [7, 8, 1],
+                          [8, 9, 1],
+                          [9, 0, 1],
+                          [0, 9, 2],
+                          [9, 10, 2],
+                          [10, 11, 2],
+                          [11, 12, 2],
+                          [12, 1, 2],
+                          [1, 0, 2]])
 
-    je_idx = pd.MultiIndex.from_tuples(_je_idx, names=['srce', 'trgt', 'cell'])
+    je_idx = pd.Index(range(_je_e_idx.shape[0]), name='je')
 
     ### Cell - cell graph
     cc_idx = [(0, 1), (1, 2), (0, 2)]
@@ -177,6 +185,9 @@ def three_cells_sheet(zaxis=False):
     ### Junction vertices and edges DataFrames
     jv_df = make_df(index=jv_idx, data_dict=data_dicts['jv'])
     je_df = make_df(index=je_idx, data_dict=data_dicts['je'])
+    je_df['srce'] = _je_e_idx[:, 0]
+    je_df['trgt'] = _je_e_idx[:, 1]
+    je_df['cell'] = _je_e_idx[:, 2]
 
     jv_df.loc[:, coords[:2]] = points
     if zaxis:
@@ -186,7 +197,6 @@ def three_cells_sheet(zaxis=False):
     return datasets
 
 
-
 def make_df(index, data_dict):
     '''
     Creates a pd.DataFrame indexed by `index` with
@@ -194,9 +204,6 @@ def make_df(index, data_dict):
     value given by the `data_dict` values.
 
     '''
-    #### See this pandas issue on how to specify mixed
-    #### dtypes at instentiation time:
-
     dtypes = np.dtype([(name, val[1]) for name, val in data_dict.items()])
     N = len(index)
     arr = np.empty(N, dtype=dtypes)

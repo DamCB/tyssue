@@ -100,9 +100,9 @@ def compute_gradient(sheet, components=False):
     grad_t = tension_grad(sheet, grad_lij)
     grad_c = contractile_grad(sheet, grad_lij)
     grad_a_srce, grad_a_trgt = elastic_grad(sheet, sheet.coords)
-    grad_i = ((grad_t.sum(level='srce') - grad_t.sum(level='trgt'))/2 +
-              grad_c.sum(level='srce') - grad_c.sum(level='trgt') +
-              grad_a_srce.sum(level='srce') + grad_a_trgt.sum(level='trgt'))
+    grad_i = ((sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
+              sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
+              sheet.sum_srce(grad_a_srce) + sheet.sum_trgt(grad_a_trgt))
     if components:
         return grad_t, grad_c, grad_a_srce, grad_a_trgt
     return grad_i / norm_factor
@@ -117,7 +117,6 @@ def tension_grad(sheet, grad_lij):
         grad_t = (grad_lij
                   * _to_3d(sheet.je_df['line_tension'] * live_je))
 
-    #grad_t = _grad_t.sum(level='srce').loc[sheet.jv_idx]
     return grad_t
 
 

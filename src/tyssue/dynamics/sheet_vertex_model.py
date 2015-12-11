@@ -101,37 +101,32 @@ def compute_energy(sheet, full_output=False):
     else:
         return (E_t.sum() + (E_c+E_v).sum()) / sheet.nrj_norm_factor
 
-def compute_gradient(sheet, components=False,
-                     dcoords=None, ncoords=None):
+def compute_gradient(sheet, components=False):
     '''
     If components is True, returns the individual terms
     (grad_t, grad_c, grad_v)
     '''
 
-    if dcoords is None:
-        dcoords = ['d'+c for c in sheet.coords]
-    if ncoords is None:
-        ncoords = ['n'+c for c in sheet.coords]
     norm_factor = sheet.nrj_norm_factor
 
     grad_lij = length_grad(sheet)
 
     grad_t = tension_grad(sheet, grad_lij)
     grad_c = contractile_grad(sheet, grad_lij)
-    grad_v_srce, grad_v_trgt = elastic_grad(sheet, sheet.coords)
-    grad_i = ((grad_t.sum(level='srce') - grad_t.sum(level='trgt'))/2 +
-              grad_c.sum(level='srce') - grad_c.sum(level='trgt') +
-              grad_v_srce.sum(level='srce') + grad_v_trgt.sum(level='trgt'))
+    grad_v_srce, grad_v_trgt = elastic_grad(sheet)
+
+    grad_i = ((sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
+              sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
+              sheet.sum_srce(grad_v_srce) + sheet.sum_trgt(grad_v_trgt))
     if components:
         return grad_t, grad_c, grad_v_srce, grad_v_trgt
     return grad_i / norm_factor
 
-def elastic_grad(sheet, coords=None):
+def elastic_grad(sheet):
     ''' Computes
     :math:`\nabla_i \left(K (V_\alpha - V_0)^2\right)`:
     '''
-    if coords is None:
-        coords = sheet.coords
+    coords = sheet.coords
 
     # volumic elastic force
     # this is K * (V - V0)
@@ -146,10 +141,10 @@ def elastic_grad(sheet, coords=None):
     je_h = _to_3d(sheet.upcast_srce(sheet.jv_df['height']))
     area_ = sheet.je_df['sub_area']
     area = _to_3d(area_)
-    grad_a_srce, grad_a_trgt = area_grad(sheet, coords)
+    grad_a_srce, grad_a_trgt = area_grad(sheet)
 
     grad_v_srce = kv_v0 * (je_h * grad_a_srce +
-                           area * height_grad(sheet, coords))
+                           area * height_grad(sheet))
     grad_v_trgt = kv_v0 * (je_h * grad_a_trgt)
 
     return grad_v_srce, grad_v_trgt

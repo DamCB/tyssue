@@ -112,15 +112,15 @@ def draw_je(sheet, coords, ax, **draw_spec_kw):
 
     x, y = coords
     dx, dy = ('d'+c for c in coords)
-    for e in sheet.je_idx:
-        s, t, c = e
-        if np.hypot(sheet.je_df[dx].loc[e],
-                    sheet.je_df[dy].loc[e]) < 1e-6:
-            continue
-        draw_spec.update({key: sheet.je_df.loc[e, key]
+    app_length = np.hypot(sheet.je_df[dx],
+                          sheet.je_df[dy])
+
+    for idx, je in sheet.je_df[app_length > 1e-6].iterrows():
+        srce  = int(je['srce'])
+        draw_spec.update({key: sheet.je_df.loc[idx, key]
                           for key in per_element_kw})
-        ax.arrow(sheet.jv_df[x].loc[s], sheet.jv_df[y].loc[s],
-                 sheet.je_df[dx].loc[e], sheet.je_df[dy].loc[e],
+        ax.arrow(sheet.jv_df[x].loc[srce], sheet.jv_df[y].loc[srce],
+                 sheet.je_df[dx].loc[idx], sheet.je_df[dy].loc[idx],
                  **draw_spec)
     return ax
 

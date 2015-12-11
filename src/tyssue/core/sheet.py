@@ -71,7 +71,7 @@ class Sheet(Epithelium):
                                    self.jv_df[coords]), axis=0)
 
         # edge indices as (Nc + Nv) * 3 array
-        faces = np.asarray(self.je_idx.labels).T
+        faces = self.je_idx.values
         # The src, trgt, cell triangle is correctly oriented
         # both jv_idx cols are shifted by Nc
         faces[:, :2] += self.Nc

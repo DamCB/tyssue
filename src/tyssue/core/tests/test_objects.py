@@ -17,11 +17,11 @@ def test_3cells():
     assert len(jv.jv_orbit()) == 3
 
 
-    je = JunctionEdge(eptm, (0, 1, 0))
-    assert je.source_idx == 0
-    assert je.target_idx == 1
+    je = JunctionEdge(eptm, 5)
+    assert je.source_idx == 5
+    assert je.target_idx == 0
     assert je.cell_idx == 0
-    assert je.oposite_idx == (1, 0, 2)
+
 
 def test_triangular_mesh():
     datasets = three_cells_sheet()
