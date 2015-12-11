@@ -31,7 +31,7 @@ class Sheet(Epithelium):
 
     '''
 
-    def __init__(self, identifier, datasets):
+    def __init__(self, identifier, datasets, coords=None):
         '''
         Creates an epithelium sheet, such as the apical junction network.
 
@@ -42,7 +42,7 @@ class Sheet(Epithelium):
             this df holds the vertices associated with
 
         '''
-        super().__init__(identifier, datasets)
+        super().__init__(identifier, datasets, coords)
 
     def triangular_mesh(self, coords):
         '''

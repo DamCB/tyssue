@@ -38,11 +38,6 @@ def update_all(sheet, **geom_spec_kw):
     update_perimeters(sheet)
 
 
-def update_num_sides(sheet):
-
-    sheet.cell_df['num_sides'] = sheet.je_df['cell'].value_count().loc[sheet.cell_df.index]
-
-
 def update_perimeters(sheet):
     '''
     Updates the perimeter of each cell.

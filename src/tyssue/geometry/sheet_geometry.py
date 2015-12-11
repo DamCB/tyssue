@@ -1,7 +1,7 @@
 import numpy as np
-from .base_geometry import (scale, update_dcoords,
+from .base_geometry import (update_dcoords,
                             update_length, update_centroid)
-from .planar_geometry import update_num_sides, update_perimeters
+from .planar_geometry import update_perimeters
 
 
 def get_default_geom_specs():

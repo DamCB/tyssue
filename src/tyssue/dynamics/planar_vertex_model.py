@@ -99,7 +99,7 @@ def compute_gradient(sheet, components=False):
 
     grad_t = tension_grad(sheet, grad_lij)
     grad_c = contractile_grad(sheet, grad_lij)
-    grad_a_srce, grad_a_trgt = elastic_grad(sheet, sheet.coords)
+    grad_a_srce, grad_a_trgt = elastic_grad(sheet)
     grad_i = ((sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
               sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
               sheet.sum_srce(grad_a_srce) + sheet.sum_trgt(grad_a_trgt))
@@ -132,12 +132,11 @@ def contractile_grad(sheet, grad_lij):
     return grad_c
 
 
-def elastic_grad(sheet, coords=None):
+def elastic_grad(sheet):
     ''' Computes
     :math:`\nabla_i \left(K (A_\alpha - A_0)^2\right)`:
     '''
-    if coords is None:
-        coords = sheet.coords
+    coords = sheet.coords
 
     # volumic elastic force
     # this is K * (A - A0)
@@ -151,7 +150,7 @@ def elastic_grad(sheet, coords=None):
         ka_a0 = _to_2d(sheet.upcast_cell(ka_a0_))
     elif len(coords) == 3:
         ka_a0 = _to_3d(sheet.upcast_cell(ka_a0_))
-    grad_a_srce, grad_a_trgt = area_grad(sheet, coords)
+    grad_a_srce, grad_a_trgt = area_grad(sheet)
     grad_a_srce = ka_a0 * grad_a_srce
     grad_a_trgt = ka_a0 * grad_a_trgt
 

@@ -94,6 +94,7 @@ class Epithelium:
         self.data_names = list(datasets.keys())
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
                                                    names=['srce', 'trgt', 'cell'])
+        self.update_num_sides()
 
     @classmethod
     def from_points(cls, identifier, points,
@@ -135,6 +136,17 @@ class Epithelium:
         dim_specs = model.dimentionalize(specs)
         set_data_columns(self, dim_specs)
         return specs, dim_specs
+
+    def update_num_sides(self):
+        self.cell_df['num_sides'] = self.je_df.cell.value_counts().loc[
+            self.cell_df.index]
+
+    def update_mindex(self):
+        self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
+                                                   names=['srce', 'trgt', 'cell'])
+    def reset_topo(self):
+        self.update_num_sides()
+        self.update_mindex()
 
     @property
     def cell_idx(self):
@@ -261,10 +273,11 @@ class Epithelium:
         """
         to_remove = self.je_df[je_out].index
         self.je_df = self.je_df.drop(to_remove)
-        all_jvs = np.unique(self.je_df['srce', 'trgt'])
+        all_jvs = np.unique(self.je_df[['srce', 'trgt']])
         self.jv_df = self.jv_df.loc[all_jvs]
         cell_idxs = self.je_df['cell'].unique()
         self.cell_df = self.cell_df.loc[cell_idxs]
+        self.reset_topo()
 
     def cut_out(self, low_x, high_x, low_y, high_y):
         """Removes cells with vertices outside the
@@ -295,7 +308,7 @@ def _ordered_jes(cell):
     """Returns the junction edges vertices of the cells
     organized clockwise
     """
-    srces, trgts, cells = cell.index.labels
+    srces, trgts, cells = cell[['srce', 'trgt', 'cell']].values.T
     srce, trgt = srces[0], trgts[0]
     jes = [[srce, trgt, cell]]
     for cell in cells[1:]:
