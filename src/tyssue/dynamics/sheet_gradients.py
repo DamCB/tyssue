@@ -26,12 +26,12 @@ def area_grad(sheet):
     ncoords = sheet.ncoords
     inv_area = sheet.je_df.eval('1 / (4 * sub_area)')
 
-    cell_pos = sheet.upcast_cell(sheet.cell_df[coords])
+    face_pos = sheet.upcast_face(sheet.face_df[coords])
     srce_pos = sheet.upcast_srce(sheet.jv_df[coords])
     trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords])
 
-    r_ak = srce_pos - cell_pos
-    r_aj = trgt_pos - cell_pos
+    r_ak = srce_pos - face_pos
+    r_aj = trgt_pos - face_pos
 
     grad_a_srce = _to_3d(inv_area) * np.cross(r_aj, sheet.je_df[ncoords])
     grad_a_trgt = _to_3d(inv_area) * np.cross(sheet.je_df[ncoords], r_ak)

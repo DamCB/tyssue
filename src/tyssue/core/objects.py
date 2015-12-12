@@ -14,17 +14,17 @@ log = logging.getLogger(name=__name__)
 The following data is an exemple of the `data_dicts`.
 It is a nested dictionnary with two levels.
 
-The first key design objects names: ('cell', 'je', 'jv') They will
+The first key design objects names: ('face', 'je', 'jv') They will
 correspond to the dataframes attributes of the Epithelium instance,
-(e.g eptm.cell_df);
+(e.g eptm.face_df);
 
 The second level keys design column names of the
 above dataframes, and their default values as a (value, dtype) pair.
 
 
     data_dicts = {
-        'cell': {
-            ## Cell Geometry
+        'face': {
+            ## Face Geometry
             'perimeter': (0., np.float),
             'area': (0., np.float),
             ## Coordinates
@@ -84,16 +84,16 @@ class Epithelium:
         # edge's normals
         if self.dim == 3:
             self.ncoords = ['n'+c for c in self.coords]
-        self.je_df, self.cell_df, self.jv_df = None, None, None
+        self.je_df, self.face_df, self.jv_df = None, None, None
         self.identifier = identifier
-        if not set(('cell', 'jv', 'je')).issubset(datasets):
+        if not set(('face', 'jv', 'je')).issubset(datasets):
             raise ValueError('''The `datasets` dictionnary should
-            contain at least the 'cell', 'jv' and 'je' keys''')
+            contain at least the 'face', 'jv' and 'je' keys''')
         for name, data in datasets.items():
             setattr(self, '{}_df'.format(name), data)
         self.data_names = list(datasets.keys())
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
-                                                   names=['srce', 'trgt', 'cell'])
+                                                   names=['srce', 'trgt', 'face'])
         self.update_num_sides()
 
     @classmethod
@@ -138,19 +138,19 @@ class Epithelium:
         return specs, dim_specs
 
     def update_num_sides(self):
-        self.cell_df['num_sides'] = self.je_df.cell.value_counts().loc[
-            self.cell_df.index]
+        self.face_df['num_sides'] = self.je_df.face.value_counts().loc[
+            self.face_df.index]
 
     def update_mindex(self):
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
-                                                   names=['srce', 'trgt', 'cell'])
+                                                   names=['srce', 'trgt', 'face'])
     def reset_topo(self):
         self.update_num_sides()
         self.update_mindex()
 
     @property
-    def cell_idx(self):
-        return self.cell_df.index
+    def face_idx(self):
+        return self.face_df.index
 
     @property
     def jv_idx(self):
@@ -158,11 +158,11 @@ class Epithelium:
 
     @property
     def je_idx(self):
-        return self.je_df[['srce', 'trgt', 'cell']]
+        return self.je_df[['srce', 'trgt', 'face']]
 
     @property
     def Nc(self):
-        return self.cell_df.shape[0]
+        return self.face_df.shape[0]
 
     @property
     def Nv(self):
@@ -181,14 +181,14 @@ class Epithelium:
         return self.je_df['trgt']
 
     @property
-    def e_cell_idx(self):
-        return self.je_df['cell']
+    def e_face_idx(self):
+        return self.je_df['face']
 
     @property
     def je_idx_array(self):
         return np.vstack((self.e_srce_idx,
                           self.e_trgt_idx,
-                          self.e_cell_idx)).T
+                          self.e_face_idx)).T
 
     def _upcast(self, idx, df):
 
@@ -205,8 +205,8 @@ class Epithelium:
     def upcast_trgt(self, df):
         return self._upcast(self.e_trgt_idx, df)
 
-    def upcast_cell(self, df):
-        return self._upcast(self.e_cell_idx, df)
+    def upcast_face(self, df):
+        return self._upcast(self.e_face_idx, df)
 
     def _lvl_sum(self, df, lvl):
         df_ = df.copy()
@@ -219,68 +219,68 @@ class Epithelium:
     def sum_trgt(self, df):
         return self._lvl_sum(df, 'trgt')
 
-    def sum_cell(self, df):
-        return self._lvl_sum(df, 'cell')
+    def sum_face(self, df):
+        return self._lvl_sum(df, 'face')
 
     def get_orbits(self, center, periph):
         orbits = self.je_df.groupby(center).apply(
             lambda df: df[periph])
         return orbits
 
-    def cell_polygons(self, coords):
-        def _get_jvs_pos(cell):
+    def face_polygons(self, coords):
+        def _get_jvs_pos(face):
             # TODO: return jes as a 2d array
-            jes = _ordered_jes(cell)
+            jes = _ordered_jes(face)
             return np.array([self.jv_df.loc[idx[0], coords]
                              for idx in jes])
-        polys = self.je_df.groupby('cell').apply(_get_jvs_pos)
+        polys = self.je_df.groupby('face').apply(_get_jvs_pos)
         return polys
 
-    def _build_cell_cell_indexes(self):
+    def _build_face_face_indexes(self):
         '''
         This is hackish and not optimized,
         should be provided by CGAL
         '''
         cc_idx = []
-        for srce0, trgt0, cell0 in self.je_idx:
-            for srce1, trgt1, cell1 in self.je_idx:
-                if (cell0 != cell1 and trgt0 == srce1 and
-                    trgt1 == srce0 and not (cell1, cell0) in cc_idx):
-                    cc_idx.append((cell0, cell1))
-        cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['cella', 'cellb'])
+        for srce0, trgt0, face0 in self.je_idx:
+            for srce1, trgt1, face1 in self.je_idx:
+                if (face0 != face1 and trgt0 == srce1 and
+                    trgt1 == srce0 and not (face1, face0) in cc_idx):
+                    cc_idx.append((face0, face1))
+        cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['facea', 'faceb'])
         return cc_idx
 
     def get_valid(self):
-        """Set true if the cell is a closed polygon
+        """Set true if the face is a closed polygon
         """
-        is_valid = self.je_df.groupby('cell').apply(_test_valid)
-        self.je_df['is_valid'] = self.upcast_cell(is_valid)
+        is_valid = self.je_df.groupby('face').apply(_test_valid)
+        self.je_df['is_valid'] = self.upcast_face(is_valid)
 
     def get_invalid(self):
-        """Set true if the cell is a closed polygon
+        """Set true if the face is a closed polygon
         """
-        is_invalid = self.je_df.groupby('cell').apply(_test_invalid)
-        return self.upcast_cell(is_invalid)
+        is_invalid = self.je_df.groupby('face').apply(_test_invalid)
+        return self.upcast_face(is_invalid)
 
     def sanitize(self):
-        """Removes invalid cells and associated vertices
+        """Removes invalid faces and associated vertices
         """
         invalid_jes = self.get_invalid()
         self.remove(invalid_jes)
 
     def remove(self, je_out):
-        """Removes edges and associated cells where je_out is True
+        """Removes edges and associated faces where je_out is True
         """
         to_remove = self.je_df[je_out].index
         self.je_df = self.je_df.drop(to_remove)
         all_jvs = np.unique(self.je_df[['srce', 'trgt']])
         self.jv_df = self.jv_df.loc[all_jvs]
-        cell_idxs = self.je_df['cell'].unique()
-        self.cell_df = self.cell_df.loc[cell_idxs]
+        face_idxs = self.je_df['face'].unique()
+        self.face_df = self.face_df.loc[face_idxs]
         self.reset_topo()
 
     def cut_out(self, low_x, high_x, low_y, high_y):
-        """Removes cells with vertices outside the
+        """Removes faces with vertices outside the
         region defined by low_x, low_y, high_x, high_y_
         TODO: find a way to generalize  this function
         to higher dims..
@@ -304,36 +304,36 @@ class Epithelium:
                                self.jv_df[c].max() + margin]
                               for c in self.coords])
 
-def _ordered_jes(cell):
-    """Returns the junction edges vertices of the cells
+def _ordered_jes(face):
+    """Returns the junction edges vertices of the faces
     organized clockwise
     """
-    srces, trgts, cells = cell[['srce', 'trgt', 'cell']].values.T
+    srces, trgts, faces = face[['srce', 'trgt', 'face']].values.T
     srce, trgt = srces[0], trgts[0]
-    jes = [[srce, trgt, cell]]
-    for cell in cells[1:]:
+    jes = [[srce, trgt, face]]
+    for face in faces[1:]:
         srce, trgt = trgt, trgts[srces == trgt][0]
-        jes.append([srce, trgt, cell])
+        jes.append([srce, trgt, face])
     return jes
 
-def _test_invalid(cell):
-    """ Returns true iff the source and target sets of the cells polygon
+def _test_invalid(face):
+    """ Returns true iff the source and target sets of the faces polygon
     are different
     """
-    s1 = set(cell['srce'])
-    s2 = set(cell['trgt'])
+    s1 = set(face['srce'])
+    s2 = set(face['trgt'])
     return s1 != s2
 
 
-def _test_valid(cell):
-    """ Returns true iff all sources are also targets for the cells polygon
+def _test_valid(face):
+    """ Returns true iff all sources are also targets for the faces polygon
     """
-    s1 = set(cell['srce'])
-    s2 = set(cell['trgt'])
+    s1 = set(face['srce'])
+    s2 = set(face['trgt'])
     return s1 == s2
 
 
-class Cell:
+class Face:
     '''
     Doesn't hold any data, just methods.
 
@@ -349,16 +349,16 @@ class Cell:
     # This should be implemented in CGAL
     def je_orbit(self):
         '''
-        Indexes of the cell's junction halfedges.
+        Indexes of the face's junction halfedges.
 
         '''
         sub_idx = self.__eptm.je_idx[
-            self.__eptm.je_idx['cell'] == self.__index].index
+            self.__eptm.je_idx['face'] == self.__index].index
         return sub_idx
 
     def jv_orbit(self):
         '''
-        Index of the cell's junction vertices.
+        Index of the face's junction vertices.
 
         '''
         je_orbit = self.je_orbit()
@@ -386,13 +386,13 @@ class JunctionVertex:
             self.__eptm.je_idx['srce'] == self.__index].index
         return sub_idx
 
-    def cell_orbit(self):
+    def face_orbit(self):
         '''
-        Index of the junction's cells.
+        Index of the junction's faces.
 
         '''
         je_orbit = self.je_orbit()
-        return self.__eptm.je_df.loc[je_orbit, 'cell']
+        return self.__eptm.je_df.loc[je_orbit, 'face']
 
     def jv_orbit(self):
         '''
@@ -422,5 +422,5 @@ class JunctionEdge():
         return self.__eptm.je_df.loc[self.__index, 'trgt']
 
     @property
-    def cell_idx(self):
-        return self.__eptm.je_df.loc[self.__index, 'cell']
+    def face_idx(self):
+        return self.__eptm.je_df.loc[self.__index, 'face']

@@ -38,7 +38,7 @@ class Sheet(Epithelium):
         Parameters
         ----------
         identifier: `str`, the tissue name
-        cell_df: `pandas.DataFrame` indexed by the cells indexes
+        face_df: `pandas.DataFrame` indexed by the faces indexes
             this df holds the vertices associated with
 
         '''
@@ -47,13 +47,13 @@ class Sheet(Epithelium):
     def triangular_mesh(self, coords):
         '''
         Return a triangulation of an epithelial sheet (2D in a 3D space),
-        with added edges between cell barycenters and junction vertices.
+        with added edges between face barycenters and junction vertices.
 
         Parameters
         ----------
         coords: list of str:
           pair of coordinates corresponding to column names
-          for self.cell_df and self.jv_df
+          for self.face_df and self.jv_df
 
         Returns
         -------
@@ -62,19 +62,19 @@ class Sheet(Epithelium):
         faces: (self.Nf, 3) ndarray of ints
            triple of the vertices' indexes forming
            the triangular faces. For each junction edge, this is simply
-           the index (srce, trgt, cell). This is correctly oriented.
-        cell_mask: (self.Nc + self.Nv,) mask with 1 iff the vertex corresponds
-           to a cell center
+           the index (srce, trgt, face). This is correctly oriented.
+        face_mask: (self.Nc + self.Nv,) mask with 1 iff the vertex corresponds
+           to a face center
         '''
 
-        vertices = np.concatenate((self.cell_df[coords],
+        vertices = np.concatenate((self.face_df[coords],
                                    self.jv_df[coords]), axis=0)
 
         # edge indices as (Nc + Nv) * 3 array
         faces = self.je_idx.values
-        # The src, trgt, cell triangle is correctly oriented
+        # The src, trgt, face triangle is correctly oriented
         # both jv_idx cols are shifted by Nc
         faces[:, :2] += self.Nc
 
-        cell_mask = np.arange(self.Nc + self.Nv) < self.Nc
-        return vertices, faces, cell_mask
+        face_mask = np.arange(self.Nc + self.Nv) < self.Nc
+        return vertices, faces, face_mask

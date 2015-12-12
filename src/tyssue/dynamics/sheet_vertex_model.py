@@ -25,7 +25,7 @@ def get_default_mod_specs():
       specifications
     """
     default_mod_specs = {
-        "cell": {
+        "face": {
             "contractility": (0.04, np.float),
             "vol_elasticity": (1., np.float),
             "prefered_height": (10., np.float),
@@ -56,15 +56,15 @@ def dimentionalize(mod_specs, **kwargs):
     dim_mod_specs = deepcopy(mod_specs)
     dim_mod_specs.update(**kwargs)
 
-    Kv = dim_mod_specs['cell']['vol_elasticity'][0]
-    A0 = dim_mod_specs['cell']['prefered_area'][0]
-    h0 = dim_mod_specs['cell']['prefered_height'][0]
-    gamma = dim_mod_specs['cell']['contractility'][0]
+    Kv = dim_mod_specs['face']['vol_elasticity'][0]
+    A0 = dim_mod_specs['face']['prefered_area'][0]
+    h0 = dim_mod_specs['face']['prefered_height'][0]
+    gamma = dim_mod_specs['face']['contractility'][0]
 
-    dim_mod_specs['cell']['contractility'] = (gamma * Kv*A0 * h0**2,
+    dim_mod_specs['face']['contractility'] = (gamma * Kv*A0 * h0**2,
                                               np.float)
 
-    dim_mod_specs['cell']['prefered_vol'] = (A0 * h0, np.float)
+    dim_mod_specs['face']['prefered_vol'] = (A0 * h0, np.float)
 
     lbda = dim_mod_specs['je']['line_tension'][0]
     dim_mod_specs['je']['line_tension'] = (lbda * Kv * A0**1.5 * h0**2,
@@ -85,17 +85,17 @@ def compute_energy(sheet, full_output=False):
     * mesh: a :class:`tyssue.object.sheet.Sheet` instance
     * full_output: if True, returns the enery components
     '''
-    # consider only live cells:
-    live_cell_df = sheet.cell_df[sheet.cell_df.is_alive == 1]
-    upcast_alive = sheet.upcast_cell(sheet.cell_df.is_alive)
+    # consider only live faces:
+    live_face_df = sheet.face_df[sheet.face_df.is_alive == 1]
+    upcast_alive = sheet.upcast_face(sheet.face_df.is_alive)
     live_je_df = sheet.je_df[upcast_alive == 1]
 
     E_t = live_je_df.eval('line_tension * length / 2')
-    E_v = elastic_energy(live_cell_df,
+    E_v = elastic_energy(live_face_df,
                          var='vol',
                          elasticity='vol_elasticity',
                          prefered='prefered_vol')
-    E_c = live_cell_df.eval('0.5 * contractility * perimeter ** 2')
+    E_c = live_face_df.eval('0.5 * contractility * perimeter ** 2')
     if full_output:
         return (E / sheet.nrj_norm_factor for E in (E_t, E_c, E_v))
     else:
@@ -130,13 +130,13 @@ def elastic_grad(sheet):
 
     # volumic elastic force
     # this is K * (V - V0)
-    kv_v0_ = elastic_force(sheet.cell_df,
+    kv_v0_ = elastic_force(sheet.face_df,
                            var='vol',
                            elasticity='vol_elasticity',
                            prefered='prefered_vol')
 
-    kv_v0_ = kv_v0_ * sheet.cell_df['is_alive']
-    kv_v0 = _to_3d(sheet.upcast_cell(kv_v0_))
+    kv_v0_ = kv_v0_ * sheet.face_df['is_alive']
+    kv_v0 = _to_3d(sheet.upcast_face(kv_v0_))
 
     je_h = _to_3d(sheet.upcast_srce(sheet.jv_df['height']))
     area_ = sheet.je_df['sub_area']

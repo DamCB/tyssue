@@ -1,12 +1,12 @@
 import numpy as np
-from .base_geometry import (update_dcoords,
+from .base_geometry import (update_dcoords, scale,
                             update_length, update_centroid)
 from .planar_geometry import update_perimeters
 
 
 def get_default_geom_specs():
     default_geom_specs = {
-        "cell": {
+        "face": {
             "num_sides": (6, np.int),
             },
         "jv": {
@@ -31,11 +31,11 @@ def update_all(sheet, **geom_spec_kw):
     Updates the sheet geometry by updating:
     * the edge vector coordinates
     * the edge lengths
-    * the cell centroids
+    * the face centroids
     * the normals to each edge associated face
-    * the cell areas
+    * the face areas
     * the vertices heights (depends on geometry)
-    * the cell volumes (depends on geometry)
+    * the face volumes (depends on geometry)
 
     '''
     geom_spec = get_default_geom_specs()
@@ -57,24 +57,24 @@ def update_all(sheet, **geom_spec_kw):
 
 def update_normals(sheet):
     '''
-    Updates the cell_df `coords` columns as the cell's vertices
+    Updates the face_df `coords` columns as the face's vertices
     center of mass.
     '''
     coords = sheet.coords
-    cell_pos = sheet.upcast_cell(sheet.cell_df[coords]).values
+    face_pos = sheet.upcast_face(sheet.face_df[coords]).values
     srce_pos = sheet.upcast_srce(sheet.jv_df[coords]).values
     trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords]).values
 
-    normals = np.cross(srce_pos - cell_pos, trgt_pos - srce_pos)
+    normals = np.cross(srce_pos - face_pos, trgt_pos - srce_pos)
     sheet.je_df[sheet.ncoords] = normals
 
 
 def update_areas(sheet):
     '''
-    Updates the normal coordniate of each (srce, trgt, cell) face.
+    Updates the normal coordniate of each (srce, trgt, face) face.
     '''
     sheet.je_df['sub_area'] = np.linalg.norm(sheet.je_df[sheet.ncoords], axis=1) / 2
-    sheet.cell_df['area'] = sheet.sum_cell(sheet.je_df['sub_area'])
+    sheet.face_df['area'] = sheet.sum_face(sheet.je_df['sub_area'])
 
 
 def update_vol(sheet):
@@ -85,14 +85,14 @@ def update_vol(sheet):
     '''
     sheet.je_df['sub_vol'] = (sheet.upcast_srce(sheet.jv_df['height']) *
                               sheet.je_df['sub_area'])
-    sheet.cell_df['vol'] = sheet.sum_cell(sheet.je_df['sub_vol'])
+    sheet.face_df['vol'] = sheet.sum_face(sheet.je_df['sub_vol'])
 
 # ### Cylindrical geometry specific
 
 def update_height_cylindrical(sheet, settings):
     '''
-    Updates each cell height in a cylindrical geometry.
-    e.g. cell anchor is assumed to lie at a distance
+    Updates each face height in a cylindrical geometry.
+    e.g. face anchor is assumed to lie at a distance
     `parameters['basal_shift']` from the third axis of
     the triplet `coords`
     '''
@@ -108,8 +108,8 @@ def update_height_cylindrical(sheet, settings):
 
 def update_height_flat(sheet, settings):
     '''
-    Updates each cell height in a flat geometry.
-    e.g. cell anchor is assumed to lie at a distance
+    Updates each face height in a flat geometry.
+    e.g. face anchor is assumed to lie at a distance
     `parameters['basal_shift']` from the plane where
     the coordinate `coord` is equal to 0
     '''

@@ -5,8 +5,8 @@ import numpy as np
 
 ###
 data_dicts = {
-    'cell': {
-        ## Cell Geometry
+    'face': {
+        ## Face Geometry
         'perimeter': (0., np.float),
         'area': (0., np.float),
         ## Coordinates
@@ -28,7 +28,7 @@ data_dicts = {
         ## associated elements indexes
         'srce': (0, np.int),
         'trgt': (0, np.int),
-        'cell': (0, np.int),
+        'face': (0, np.int),
         ## Coordinates
         'dx': (0., np.float),
         'dy': (0., np.float),
@@ -42,8 +42,8 @@ data_dicts = {
 
 ###
 data_dicts2d = {
-    'cell': {
-        ## Cell Geometry
+    'face': {
+        ## Face Geometry
         'perimeter': (0., np.float),
         'area': (0., np.float),
         ## Coordinates
@@ -63,7 +63,7 @@ data_dicts2d = {
         ## associated elements indexes
         'srce': (0, np.int),
         'trgt': (0, np.int),
-        'cell': (0, np.int),
+        'face': (0, np.int),
         ## Coordinates
         'dx': (0., np.float),
         'dy': (0., np.float),
@@ -73,12 +73,12 @@ data_dicts2d = {
     }
 
 
-def three_cells_sheet_array():
+def three_faces_sheet_array():
     '''
-    Creates the apical junctions mesh of three packed hexagonal cells.
+    Creates the apical junctions mesh of three packed hexagonal faces.
     If `zaxis` is `True` (defaults to False), adds a `z` coordinates, with `z = 0`.
 
-    Cells have a side length of 1.0 +/- 1e-3.
+    Faces have a side length of 1.0 +/- 1e-3.
 
     Returns
     -------
@@ -88,12 +88,12 @@ def three_cells_sheet_array():
     edges: (15, 2)  np.array of ints
       indices of the edges
     (Nc, Nv, Ne): triple of ints
-      number of cells, vertices and edges (3, 13, 15)
+      number of faces, vertices and edges (3, 13, 15)
 
     '''
 
 
-    Nc = 3 # Number of cells
+    Nc = 3 # Number of faces
 
     points = np.array([[0., 0.],
                        [1.0, 0.0],
@@ -129,30 +129,30 @@ def three_cells_sheet_array():
     return points, edges, (Nc, Nv, Ne)
 
 
-def three_cells_sheet(zaxis=False):
+def three_faces_sheet(zaxis=False):
     '''
-    Creates the apical junctions mesh of three packed hexagonal cells.
+    Creates the apical junctions mesh of three packed hexagonal faces.
     If `zaxis` is `True` (defaults to False), adds a `z` coordinates,
     with `z = 0`.
 
-    Cells have a side length of 1.0 +/- 1e-3.
+    Faces have a side length of 1.0 +/- 1e-3.
 
     Returns
     -------
 
-    cell_df: the cells `DataFrame` indexed from 0 to 2
+    face_df: the faces `DataFrame` indexed from 0 to 2
     jv_df: the junction vertices `DataFrame`
     je_df: the junction edges `DataFrame`
 
     '''
-    points, _, (Nc, Nv, Ne) = three_cells_sheet_array()
+    points, _, (Nc, Nv, Ne) = three_faces_sheet_array()
 
     if zaxis:
         coords = ['x', 'y', 'z']
     else:
         coords = ['x', 'y']
 
-    cell_idx = pd.Index(range(Nc), name='cell')
+    face_idx = pd.Index(range(Nc), name='face')
     jv_idx = pd.Index(range(Nv), name='jv')
 
     _je_e_idx = np.array([[0, 1, 0],
@@ -176,24 +176,24 @@ def three_cells_sheet(zaxis=False):
 
     je_idx = pd.Index(range(_je_e_idx.shape[0]), name='je')
 
-    ### Cell - cell graph
+    ### Face - face graph
     cc_idx = [(0, 1), (1, 2), (0, 2)]
-    cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['cella', 'cellb'])
-    ### Cells DataFrame
-    cell_df = make_df(index=cell_idx, data_dict=data_dicts['cell'])
+    cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['facea', 'faceb'])
+    ### Faces DataFrame
+    face_df = make_df(index=face_idx, data_dict=data_dicts['face'])
 
     ### Junction vertices and edges DataFrames
     jv_df = make_df(index=jv_idx, data_dict=data_dicts['jv'])
     je_df = make_df(index=je_idx, data_dict=data_dicts['je'])
     je_df['srce'] = _je_e_idx[:, 0]
     je_df['trgt'] = _je_e_idx[:, 1]
-    je_df['cell'] = _je_e_idx[:, 2]
+    je_df['face'] = _je_e_idx[:, 2]
 
     jv_df.loc[:, coords[:2]] = points
     if zaxis:
         jv_df.loc[:, coords[2:]] = 0.
 
-    datasets = {'cell': cell_df, 'jv': jv_df, 'je': je_df}
+    datasets = {'face': face_df, 'jv': jv_df, 'je': je_df}
     return datasets
 
 

@@ -29,9 +29,9 @@ def update_length(sheet):
 
 def update_centroid(sheet):
     '''
-    Updates the cell_df `coords` columns as the cell's vertices
+    Updates the face_df `coords` columns as the face's vertices
     center of mass.
     '''
     upcast_pos = sheet.upcast_srce(sheet.jv_df[sheet.coords])
-    upcast_pos = upcast_pos.set_index(sheet.je_df['cell'], append=True)
-    sheet.cell_df[sheet.coords] = upcast_pos.mean(level='cell')
+    upcast_pos = upcast_pos.set_index(sheet.je_df['face'], append=True)
+    sheet.face_df[sheet.coords] = upcast_pos.mean(level='face')
