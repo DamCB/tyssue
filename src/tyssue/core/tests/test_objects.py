@@ -7,7 +7,7 @@ def test_3faces():
 
     datasets = three_faces_sheet()
     eptm = Epithelium('3faces_2D', datasets)
-    assert (eptm.Nc, eptm.Nv, eptm.Nf) == (3, 13, 18)
+    assert (eptm.Nc, eptm.Nv, eptm.Ne) == (3, 13, 18)
 
     face = Face(eptm, 0)
     assert len(face.jv_orbit()) == 6

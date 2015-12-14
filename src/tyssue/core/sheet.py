@@ -57,24 +57,24 @@ class Sheet(Epithelium):
 
         Returns
         -------
-        vertices: (self.Nc+self.Nv, 3) ndarray
+        vertices: (self.Nf+self.Nv, 3) ndarray
            all the vertices' coordinates
-        faces: (self.Nf, 3) ndarray of ints
+        triangles: (self.Ne, 3) ndarray of ints
            triple of the vertices' indexes forming
-           the triangular faces. For each junction edge, this is simply
+           the triangular elements. For each junction edge, this is simply
            the index (srce, trgt, face). This is correctly oriented.
-        face_mask: (self.Nc + self.Nv,) mask with 1 iff the vertex corresponds
+        face_mask: (self.Nf + self.Nv,) mask with 1 iff the vertex corresponds
            to a face center
         '''
 
         vertices = np.concatenate((self.face_df[coords],
                                    self.jv_df[coords]), axis=0)
 
-        # edge indices as (Nc + Nv) * 3 array
-        faces = self.je_idx.values
+        # edge indices as (Nf + Nv) * 3 array
+        triangles = self.je_df[['srce', 'trgt', 'face']].values
         # The src, trgt, face triangle is correctly oriented
-        # both jv_idx cols are shifted by Nc
-        faces[:, :2] += self.Nc
+        # both jv_idx cols are shifted by Nf
+        triangles[:, :2] += self.Nf
 
-        face_mask = np.arange(self.Nc + self.Nv) < self.Nc
-        return vertices, faces, face_mask
+        face_mask = np.arange(self.Nf + self.Nv) < self.Nf
+        return vertices, triangles, face_mask

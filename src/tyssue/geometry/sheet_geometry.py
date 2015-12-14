@@ -73,14 +73,15 @@ def update_areas(sheet):
     '''
     Updates the normal coordniate of each (srce, trgt, face) face.
     '''
-    sheet.je_df['sub_area'] = np.linalg.norm(sheet.je_df[sheet.ncoords], axis=1) / 2
+    sheet.je_df['sub_area'] = np.linalg.norm(sheet.je_df[sheet.ncoords],
+                                             axis=1) / 2
     sheet.face_df['area'] = sheet.sum_face(sheet.je_df['sub_area'])
 
 
 def update_vol(sheet):
     '''
     Note that this is an approximation of the sheet geometry
-    package.
+    module.
 
     '''
     sheet.je_df['sub_vol'] = (sheet.upcast_srce(sheet.jv_df['height']) *

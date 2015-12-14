@@ -92,8 +92,12 @@ class Epithelium:
         for name, data in datasets.items():
             setattr(self, '{}_df'.format(name), data)
         self.data_names = list(datasets.keys())
+        if len(datasets.keys()) == 3:
+            self.element_names = ['srce', 'trgt', 'face']
+        elif len(datasets.keys()) == 4:
+            self.element_names = ['srce', 'trgt', 'face', 'cell']
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
-                                                   names=['srce', 'trgt', 'face'])
+                                                   names=self.element_names)
         self.update_num_sides()
 
     @classmethod
@@ -141,16 +145,27 @@ class Epithelium:
         self.face_df['num_sides'] = self.je_df.face.value_counts().loc[
             self.face_df.index]
 
+    def update_num_faces(self):
+        self.cell_df['num_faces'] = self.je_df.cell.value_counts().loc[
+            self.cell_df.index]
+
+
     def update_mindex(self):
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
-                                                   names=['srce', 'trgt', 'face'])
+                                                   names=self.element_names)
     def reset_topo(self):
         self.update_num_sides()
         self.update_mindex()
+        if hasattr(self, 'cell_df'):
+            self.update_num_faces()
 
     @property
     def face_idx(self):
         return self.face_df.index
+
+    @property
+    def cell_idx(self):
+        return self.cell_df.index
 
     @property
     def jv_idx(self):
@@ -158,11 +173,14 @@ class Epithelium:
 
     @property
     def je_idx(self):
-        return self.je_df[['srce', 'trgt', 'face']]
+        return self.je_df[self.element_names]
 
     @property
     def Nc(self):
-        return self.face_df.shape[0]
+        if 'cell' in self.element_names:
+            return self.cell_df.shape[0]
+        elif 'face' in self.element_names:
+            return self.face_df.shape[0]
 
     @property
     def Nv(self):
@@ -170,6 +188,10 @@ class Epithelium:
 
     @property
     def Nf(self):
+        return self.face_df.shape[0]
+
+    @property
+    def Ne(self):
         return self.je_df.shape[0]
 
     @property
@@ -183,6 +205,10 @@ class Epithelium:
     @property
     def e_face_idx(self):
         return self.je_df['face']
+
+    @property
+    def e_cell_idx(self):
+        return self.je_df['cell']
 
     @property
     def je_idx_array(self):
@@ -208,6 +234,9 @@ class Epithelium:
     def upcast_face(self, df):
         return self._upcast(self.e_face_idx, df)
 
+    def upcast_cell(self, df):
+        return self._upcast(self.e_cell_idx, df)
+
     def _lvl_sum(self, df, lvl):
         df_ = df.copy()
         df_.index = self.je_mindex
@@ -221,6 +250,9 @@ class Epithelium:
 
     def sum_face(self, df):
         return self._lvl_sum(df, 'face')
+
+    def sum_cell(self, df):
+        return self._lvl_sum(df, 'cell')
 
     def get_orbits(self, center, periph):
         orbits = self.je_df.groupby(center).apply(
@@ -277,6 +309,10 @@ class Epithelium:
         self.jv_df = self.jv_df.loc[all_jvs]
         face_idxs = self.je_df['face'].unique()
         self.face_df = self.face_df.loc[face_idxs]
+        if 'cell' in self.element_names:
+            cell_idxs = self.je_df['cell'].unique()
+            self.cell_df = self.cell_df.loc[cell_idxs]
+
         self.reset_topo()
 
     def cut_out(self, low_x, high_x, low_y, high_y):
