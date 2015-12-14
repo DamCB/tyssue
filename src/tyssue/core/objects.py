@@ -340,6 +340,42 @@ class Epithelium:
                                self.jv_df[c].max() + margin]
                               for c in self.coords])
 
+    def triangular_mesh(self, coords):
+        '''
+        Return a triangulation of an epithelial sheet (2D in a 3D space),
+        with added edges between face barycenters and junction vertices.
+
+        Parameters
+        ----------
+        coords: list of str:
+          pair of coordinates corresponding to column names
+          for self.face_df and self.jv_df
+
+        Returns
+        -------
+        vertices: (self.Nf+self.Nv, 3) ndarray
+           all the vertices' coordinates
+        triangles: (self.Ne, 3) ndarray of ints
+           triple of the vertices' indexes forming
+           the triangular elements. For each junction edge, this is simply
+           the index (srce, trgt, face). This is correctly oriented.
+        face_mask: (self.Nf + self.Nv,) mask with 1 iff the vertex corresponds
+           to a face center
+        '''
+
+        vertices = np.concatenate((self.face_df[coords],
+                                   self.jv_df[coords]), axis=0)
+
+        # edge indices as (Nf + Nv) * 3 array
+        triangles = self.je_df[['srce', 'trgt', 'face']].values
+        # The src, trgt, face triangle is correctly oriented
+        # both jv_idx cols are shifted by Nf
+        triangles[:, :2] += self.Nf
+
+        face_mask = np.arange(self.Nf + self.Nv) < self.Nf
+        return vertices, triangles, face_mask
+
+
 def _ordered_jes(face):
     """Returns the junction edges vertices of the faces
     organized clockwise

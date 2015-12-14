@@ -15,6 +15,8 @@ def get_default_geom_specs():
             "num_sides": (6, np.int),
             },
         "je": {
+            "sub_vol": (0., np.float),
+            "sub_area": (0., np.float),
             "nx": (0., np.float),
             "ny": (0., np.float),
             "nz": (0., np.float),
@@ -50,8 +52,9 @@ def update_vol(eptm):
     face_pos = eptm.upcast_face(eptm.face_df[eptm.coords])
     cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords])
 
-    eptm.je_df['sub_vol'] = np.dot((cell_pos - face_pos).values,
-                                   eptm.je_df[eptm.ncoords]) / 6
+    eptm.je_df['sub_vol'] = np.sum(
+        (face_pos - cell_pos) *
+        eptm.je_df[eptm.ncoords].values, axis=1) / 6
 
     eptm.cell_df['vol'] = eptm.sum_cell(eptm.je_df['sub_vol'])
 
