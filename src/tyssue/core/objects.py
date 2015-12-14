@@ -315,17 +315,24 @@ class Epithelium:
 
         self.reset_topo()
 
-    def cut_out(self, low_x, high_x, low_y, high_y):
+    def cut_out(self, bbox, coords=None):
         """Removes faces with vertices outside the
-        region defined by low_x, low_y, high_x, high_y_
-        TODO: find a way to generalize  this function
-        to higher dims..
-        """
+        region defined by the bbox
 
-        jv_out = ((self.jv_df['y'] < low_y) |
-                  (self.jv_df['y'] > high_y) |
-                  (self.jv_df['x'] < low_x) |
-                  (self.jv_df['x'] > high_x))
+        Parameters
+        ----------
+        bbox : dim * 2 array
+             the bounding box as pairs of coordinates
+        coords : list of str of len dim
+             the coords corresponding to the bbox
+        """
+        if coords is None:
+            coords = self.coords
+        jv_out = ((self.jv_df[coords[0]] < bbox[0][0]) |
+                  (self.jv_df[coords[0]] > bbox[0][1]))
+        for c, bounds in zip(coords[:1], bbox[:1]):
+            jv_out = jv_out | ((self.jv_df[c] < bounds[0]) |
+                               (self.jv_df[c] > bounds[1]))
 
         srce_out = self.upcast_srce(jv_out)
         trgt_out = self.upcast_trgt(jv_out)
