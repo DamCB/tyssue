@@ -312,7 +312,7 @@ def from_3d_voronoi(voro):
             edge_v = fv1 - fv0
             fto0 = fv0 - f_center
             normal = np.cross(fto0, edge_v)
-            dotp = ctof @ normal
+            dotp = np.dot(ctof, normal)
             if np.sign(dotp) > 0:
                 el_idx.append([rv0, rv1, f_idx, rp[0]])
                 el_idx.append([rv1, rv0, f_idx, rp[1]])
