@@ -251,7 +251,7 @@ def three_faces_sheet(zaxis=False):
         jv_df.loc[:, coords[2:]] = 0.
 
     datasets = {'face': face_df, 'jv': jv_df, 'je': je_df}
-    return datasets
+    return datasets, data_dicts
 
 
 def make_df(index, data_dict):

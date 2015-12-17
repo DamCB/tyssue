@@ -64,7 +64,8 @@ class Epithelium:
     '''
     coords = ['x', 'y', 'z']
 
-    def __init__(self, identifier, datasets, coords=None):
+    def __init__(self, identifier, datasets,
+                 coords=None, datadicts=None):
         '''
         Creates an epithelium
 
@@ -76,15 +77,17 @@ class Epithelium:
         and value types of the modeled tyssue
 
         '''
-        if coords is not None:
-            self.coords = coords
+        if coords is  None:
+            coords = ['x', 'y', 'z']
+        self.coords = coords
         # edge's dx, dy, dz
         self.dcoords = ['d'+c for c in self.coords]
         self.dim = len(self.coords)
         # edge's normals
         if self.dim == 3:
             self.ncoords = ['n'+c for c in self.coords]
-        self.je_df, self.face_df, self.jv_df = None, None, None
+        #
+        self.je_df, self.face_df, self.jv_df, self.cell_df = (None,) * 4
         self.identifier = identifier
         if not set(('face', 'jv', 'je')).issubset(datasets):
             raise ValueError('''The `datasets` dictionnary should
@@ -92,19 +95,23 @@ class Epithelium:
         for name, data in datasets.items():
             setattr(self, '{}_df'.format(name), data)
         self.data_names = list(datasets.keys())
+        if datadicts is None:
+            datadicts = {name:{} for name in self.data_names}
+        self.datadicts = datadicts
         if len(datasets.keys()) == 3:
             self.element_names = ['srce', 'trgt', 'face']
         elif len(datasets.keys()) == 4:
             self.element_names = ['srce', 'trgt', 'face', 'cell']
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
                                                    names=self.element_names)
-        self.update_num_sides()
+
+        ## Topology (geometry independant)
+        self.reset_topo()
 
     @classmethod
     def from_points(cls, identifier, points,
-                    indices_dict,
-                    points_dataset='jv',
-                    data_dicts=None):
+                    indices_dict, data_dicts,
+                    points_dataset='jv'):
         '''
         TODO: not sure this works as expected with the new indexing
         '''
@@ -126,11 +133,17 @@ class Epithelium:
 
         return cls.__init__(identifier, datasets, coords)
 
+    def update_datadicts(self, new):
+        for key, datadict in self.datadicts.items():
+            if new.get(key) is not None:
+                self.datadict.update(new[key])
+
     def set_geom(self, geom, **geom_specs):
 
         specs = geom.get_default_geom_specs()
         specs.update(**geom_specs)
         set_data_columns(self, specs)
+        self.update_datadicts(specs)
         return specs
 
     def set_model(self, model, **mod_specs):
@@ -139,6 +152,7 @@ class Epithelium:
         specs.update(**mod_specs)
         dim_specs = model.dimentionalize(specs)
         set_data_columns(self, dim_specs)
+        self.update_datadicts(dim_specs)
         return specs, dim_specs
 
     def update_num_sides(self):
@@ -321,25 +335,27 @@ class Epithelium:
 
         Parameters
         ----------
-        bbox : dim * 2 array
-             the bounding box as pairs of coordinates
+        bbox : sequence of shape (dim, 2)
+             the bounding box as (min, max) pairs for
+             each coordinates.
         coords : list of str of len dim
-             the coords corresponding to the bbox
+             the coords corresponding to the bbox.
         """
         if coords is None:
             coords = self.coords
-        jv_out = ((self.jv_df[coords[0]] < bbox[0][0]) |
-                  (self.jv_df[coords[0]] > bbox[0][1]))
-        for c, bounds in zip(coords[:1], bbox[:1]):
-            jv_out = jv_out | ((self.jv_df[c] < bounds[0]) |
-                               (self.jv_df[c] > bounds[1]))
+        upcast_srce = self.upcast_srce(self.jv_df[coords])
+        upcast_trgt = self.upcast_trgt(self.jv_df[coords])
+        outs = pd.DataFrame(index=self.je_df.index,
+                            columns=coords)
+        for c, bounds in zip(coords, bbox):
+            outs[c] = ((upcast_srce[c] < bounds[0]) |
+                       (upcast_srce[c] > bounds[1]) |
+                       (upcast_trgt[c] < bounds[0]) |
+                       (upcast_trgt[c] > bounds[1]))
+        je_out = outs.sum(axis=1).astype(np.bool)
+        return je_out
 
-        srce_out = self.upcast_srce(jv_out)
-        trgt_out = self.upcast_trgt(jv_out)
-        je_out = trgt_out | srce_out
-        self.remove(je_out)
-
-    def set_bbox(self, margin=1.):
+   def set_bbox(self, margin=1.):
         '''Sets the attribute `bbox` with pairs of values bellow
         and above the min and max of the jv coords, with a margin.
         '''
@@ -410,6 +426,7 @@ def _test_valid(face):
     s1 = set(face['srce'])
     s2 = set(face['trgt'])
     return s1 == s2
+
 
 
 class Face:
