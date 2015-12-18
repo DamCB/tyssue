@@ -95,18 +95,17 @@ class Epithelium:
         for name, data in datasets.items():
             setattr(self, '{}_df'.format(name), data)
         self.data_names = list(datasets.keys())
+        self.element_names = ['srce', 'trgt',
+                              'face', 'cell'][:len(self.data_names)]
         if datadicts is None:
             datadicts = {name:{} for name in self.data_names}
         self.datadicts = datadicts
-        if len(datasets.keys()) == 3:
-            self.element_names = ['srce', 'trgt', 'face']
-        elif len(datasets.keys()) == 4:
-            self.element_names = ['srce', 'trgt', 'face', 'cell']
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
                                                    names=self.element_names)
-
         ## Topology (geometry independant)
         self.reset_topo()
+        self.bbox = None
+        self.set_bbox()
 
     @classmethod
     def from_points(cls, identifier, points,
@@ -133,10 +132,11 @@ class Epithelium:
 
         return cls.__init__(identifier, datasets, coords)
 
+
     def update_datadicts(self, new):
         for key, datadict in self.datadicts.items():
             if new.get(key) is not None:
-                self.datadict.update(new[key])
+                datadict.update(new[key])
 
     def set_geom(self, geom, **geom_specs):
 
@@ -170,7 +170,7 @@ class Epithelium:
     def reset_topo(self):
         self.update_num_sides()
         self.update_mindex()
-        if hasattr(self, 'cell_df'):
+        if 'cell' in self.data_names:
             self.update_num_faces()
 
     @property
@@ -276,10 +276,14 @@ class Epithelium:
     def face_polygons(self, coords):
         def _get_jvs_pos(face):
             # TODO: return jes as a 2d array
-            jes = _ordered_jes(face)
+            try:
+                jes = _ordered_jes(face)
+            except IndexError:
+                log.warning('Face {} is not closed'.format(face['face'][0]))
+                return np.nan
             return np.array([self.jv_df.loc[idx[0], coords]
                              for idx in jes])
-        polys = self.je_df.groupby('face').apply(_get_jvs_pos)
+        polys = self.je_df.groupby('face').apply(_get_jvs_pos).dropna()
         return polys
 
     def _build_face_face_indexes(self):
@@ -303,7 +307,7 @@ class Epithelium:
         self.je_df['is_valid'] = self.upcast_face(is_valid)
 
     def get_invalid(self):
-        """Set true if the face is a closed polygon
+        """Returns a mask over je for invalid faces
         """
         is_invalid = self.je_df.groupby('face').apply(_test_invalid)
         return self.upcast_face(is_invalid)
@@ -315,18 +319,25 @@ class Epithelium:
         self.remove(invalid_jes)
 
     def remove(self, je_out):
-        """Removes edges and associated faces where je_out is True
-        """
-        to_remove = self.je_df[je_out].index
-        self.je_df = self.je_df.drop(to_remove)
-        all_jvs = np.unique(self.je_df[['srce', 'trgt']])
-        self.jv_df = self.jv_df.loc[all_jvs]
-        face_idxs = self.je_df['face'].unique()
-        self.face_df = self.face_df.loc[face_idxs]
-        if 'cell' in self.element_names:
-            cell_idxs = self.je_df['cell'].unique()
-            self.cell_df = self.cell_df.loc[cell_idxs]
 
+        top_level = self.element_names[-1]
+        fto_rm = self.je_df[je_out][top_level].unique()
+        fto_rm.sort()
+        je_df_ = self.je_df.set_index(top_level,
+                                      append=True).swaplevel(0, 1).sort_index()
+        to_rm = np.concatenate([je_df_.loc[c].index.values
+                                for c in fto_rm])
+        to_rm.sort()
+        self.je_df = self.je_df.drop(to_rm)
+
+        remaining_jvs = np.unique(self.je_df[['srce', 'trgt']])
+        self.jv_df = self.jv_df.loc[remaining_jvs]
+        if top_level == 'face':
+            self.face_df = self.face_df.drop(fto_rm)
+        elif top_level == 'cell':
+            remaining_faces = np.unique(self.je_df['face'])
+            self.face_df = self.face_df.loc[remaining_faces]
+            self.cell_df = self.cell_df.drop(fto_rm)
         self.reset_topo()
 
     def cut_out(self, bbox, coords=None):
@@ -343,19 +354,18 @@ class Epithelium:
         """
         if coords is None:
             coords = self.coords
-        upcast_srce = self.upcast_srce(self.jv_df[coords])
-        upcast_trgt = self.upcast_trgt(self.jv_df[coords])
         outs = pd.DataFrame(index=self.je_df.index,
                             columns=coords)
         for c, bounds in zip(coords, bbox):
-            outs[c] = ((upcast_srce[c] < bounds[0]) |
-                       (upcast_srce[c] > bounds[1]) |
-                       (upcast_trgt[c] < bounds[0]) |
-                       (upcast_trgt[c] > bounds[1]))
+            out_jv_ = ((self.jv_df[c] < bounds[0]) |
+                       (self.jv_df[c] > bounds[1]))
+            outs[c] = (self.upcast_srce(out_jv_) |
+                       self.upcast_trgt(out_jv_))
+
         je_out = outs.sum(axis=1).astype(np.bool)
         return je_out
 
-   def set_bbox(self, margin=1.):
+    def set_bbox(self, margin=1.):
         '''Sets the attribute `bbox` with pairs of values bellow
         and above the min and max of the jv coords, with a margin.
         '''
@@ -409,6 +419,7 @@ def _ordered_jes(face):
     for face in faces[1:]:
         srce, trgt = trgt, trgts[srces == trgt][0]
         jes.append([srce, trgt, face])
+
     return jes
 
 def _test_invalid(face):
