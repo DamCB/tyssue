@@ -107,6 +107,9 @@ class Epithelium:
         self.bbox = None
         self.set_bbox()
 
+    def copy(self):
+        raise NotImplementedError
+
     @classmethod
     def from_points(cls, identifier, points,
                     indices_dict, data_dicts,
@@ -172,6 +175,21 @@ class Epithelium:
         self.update_mindex()
         if 'cell' in self.data_names:
             self.update_num_faces()
+
+    @property
+    def datasets(self):
+        datasets = {
+            'je': self.je_df,
+            'jv': self.jv_df,
+            'face': self.face_df,
+            }
+        if 'cell' in self.data_names:
+            datasets['cell'] = self.cell_df
+        return datasets
+
+    @datasets.getter
+    def datasets(self, level):
+        return getattr(self, '{}_df'.format(level))
 
     @property
     def face_idx(self):
@@ -279,7 +297,7 @@ class Epithelium:
             try:
                 jes = _ordered_jes(face)
             except IndexError:
-                log.warning('Face {} is not closed'.format(face['face'][0]))
+                log.warning('Face is not closed')
                 return np.nan
             return np.array([self.jv_df.loc[idx[0], coords]
                              for idx in jes])
@@ -321,8 +339,15 @@ class Epithelium:
     def remove(self, je_out):
 
         top_level = self.element_names[-1]
+        log.info('Removing cells at the {} level'.format(top_level))
         fto_rm = self.je_df[je_out][top_level].unique()
+        if not len(fto_rm):
+            log.info('Nothing to remove')
+            return
         fto_rm.sort()
+        log.info('{} {} level elements will be removed'.format(len(fto_rm),
+                                                               top_level))
+
         je_df_ = self.je_df.set_index(top_level,
                                       append=True).swaplevel(0, 1).sort_index()
         to_rm = np.concatenate([je_df_.loc[c].index.values
@@ -339,6 +364,7 @@ class Epithelium:
             self.face_df = self.face_df.loc[remaining_faces]
             self.cell_df = self.cell_df.drop(fto_rm)
         self.reset_topo()
+        self.reset_index()
 
     def cut_out(self, bbox, coords=None):
         """Removes faces with vertices outside the
@@ -372,6 +398,33 @@ class Epithelium:
         self.bbox = np.array([[self.jv_df[c].min() - margin,
                                self.jv_df[c].max() + margin]
                               for c in self.coords])
+
+    def reset_index(self):
+
+        new_jvidx = pd.Series(np.arange(self.jv_df.shape[0]),
+                              index=self.jv_df.index)
+        self.je_df['srce'] = self.upcast_srce(new_jvidx)
+        self.je_df['trgt'] = self.upcast_trgt(new_jvidx)
+        new_fidx = pd.Series(np.arange(self.face_df.shape[0]),
+                             index=self.face_df.index)
+        self.je_df['face'] = self.upcast_face(new_fidx)
+
+        self.jv_df.reset_index(drop=True, inplace=True)
+        self.jv_df.index.name = 'jv'
+
+        self.face_df.reset_index(drop=True, inplace=True)
+        self.face_df.index.name = 'face'
+
+        if 'cell' in self.data_names:
+            new_cidx = pd.Series(np.arange(self.cell_df.shape[0]),
+                                 index=self.cell_df.index)
+            self.je_df['cell'] = self.upcast_cell(new_cidx)
+            self.cell_df.reset_index(drop=True, inplace=True)
+            self.cell_df.index.name = 'cell'
+
+        self.je_df.reset_index(drop=True, inplace=True)
+        self.je_df.index.name = 'je'
+
 
     def triangular_mesh(self, coords):
         '''

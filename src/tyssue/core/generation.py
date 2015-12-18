@@ -337,7 +337,8 @@ def from_3d_voronoi(voro):
     cell_df = make_df(cell_idx, data_dicts3d['cell'])
     cell_df[coords] = voro.points
 
-    face_idx = pd.Index(range(f_idx), name='face')
+    nfaces = voro.ridge_vertices.shape[0]
+    face_idx = pd.Index(np.arange(nfaces), name='face')
     face_df = make_df(face_idx, data_dicts3d['cell'])
     je_df.sort_values(by='cell', inplace=True)
 
