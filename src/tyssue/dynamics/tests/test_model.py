@@ -5,7 +5,7 @@ from copy import deepcopy
 def test_adim():
 
     default_mod_specs = {
-    "cell": {
+    "face": {
         "contractility": (0.12, None),
         "vol_elasticity": (1., None),
         "prefered_height": (10., None),

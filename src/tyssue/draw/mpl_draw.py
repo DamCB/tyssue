@@ -32,7 +32,7 @@ def get_default_draw_specs():
             'alpha':0.5,
             'width':0.04,
             },
-        "cell": {
+        "face": {
             'visible': False,
             'color':'#8aa678',
             'alpha': 1,
@@ -60,26 +60,26 @@ def sheet_view(sheet, coords=COORDS, **draw_specs_kw):
     if je_spec['visible']:
         ax = draw_je(sheet, coords, ax, **je_spec)
 
-    cell_spec = draw_specs['cell']
-    if cell_spec['visible']:
-        ax = draw_cell(sheet, coords, ax, **cell_spec)
+    face_spec = draw_specs['face']
+    if face_spec['visible']:
+        ax = draw_face(sheet, coords, ax, **face_spec)
 
     ax.set_aspect('equal')
     ax.grid()
     return fig, ax
 
-def draw_cell(sheet, coords, ax, **draw_spec_kw):
-    """Draws epithelial sheet polygonal cells in matplotlib
+def draw_face(sheet, coords, ax, **draw_spec_kw):
+    """Draws epithelial sheet polygonal faces in matplotlib
     Keyword values can be specified at the element
-    level as columns of the sheet.cell_df
+    level as columns of the sheet.face_df
     """
-    draw_spec = get_default_draw_specs()['cell']
+    draw_spec = get_default_draw_specs()['face']
     draw_spec.update(**draw_spec_kw)
-    per_element_kw = set(draw_spec.keys()).intersection(sheet.cell_df.columns)
+    per_element_kw = set(draw_spec.keys()).intersection(sheet.face_df.columns)
 
-    polys = sheet.cell_polygons(coords)
+    polys = sheet.face_polygons(coords)
     for idx, poly in polys.items():
-        draw_spec.update({kw: sheet.cell_df.loc[idx, kw]
+        draw_spec.update({kw: sheet.face_df.loc[idx, kw]
                           for kw in per_element_kw})
         patch = Polygon(poly,
                         fill=True,
@@ -112,15 +112,15 @@ def draw_je(sheet, coords, ax, **draw_spec_kw):
 
     x, y = coords
     dx, dy = ('d'+c for c in coords)
-    for e in sheet.je_idx:
-        s, t, c = e
-        if np.hypot(sheet.je_df[dx].loc[e],
-                    sheet.je_df[dy].loc[e]) < 1e-6:
-            continue
-        draw_spec.update({key: sheet.je_df.loc[e, key]
+    app_length = np.hypot(sheet.je_df[dx],
+                          sheet.je_df[dy])
+
+    for idx, je in sheet.je_df[app_length > 1e-6].iterrows():
+        srce  = int(je['srce'])
+        draw_spec.update({key: sheet.je_df.loc[idx, key]
                           for key in per_element_kw})
-        ax.arrow(sheet.jv_df[x].loc[s], sheet.jv_df[y].loc[s],
-                 sheet.je_df[dx].loc[e], sheet.je_df[dy].loc[e],
+        ax.arrow(sheet.jv_df[x].loc[srce], sheet.jv_df[y].loc[srce],
+                 sheet.je_df[dx].loc[idx], sheet.je_df[dy].loc[idx],
                  **draw_spec)
     return ax
 
@@ -169,7 +169,7 @@ def plot_analytical_to_numeric_comp(sheet, model, geom,
     deltas = np.linspace(0.1, 1.8, 50)
 
     lbda = mod_specs['je']['line_tension'][0]
-    gamma = mod_specs['cell']['contractility'][0]
+    gamma = mod_specs['face']['contractility'][0]
 
     ax.plot(deltas, iso.isotropic_energy(deltas, mod_specs), 'k-',
             label='Analytical total')

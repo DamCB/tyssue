@@ -11,11 +11,12 @@ def _to_3d(df):
     df_3d = np.asarray(df).repeat(3).reshape((df.size, 3))
     return df_3d
 
-def set_data_columns(eptm, data_specs):
+def set_data_columns(eptm, data_specs, reset=False):
 
     for name, data_dict in data_specs.items():
         if 'setting' in name:
             continue
+        df = getattr(eptm, '{}_df'.format(name))
         for col, (default, dtype) in data_dict.items():
-            df = getattr(eptm, '{}_df'.format(name))
-            df[col] = default
+            if not col in df.columns or reset:
+                df[col] = default

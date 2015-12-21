@@ -14,7 +14,7 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda create -q -n tyssue python=3.4
+  - conda create -q -n tyssue python=3.5
   - source activate tyssue
   - conda install numpy scipy pandas matplotlib nose coverage vispy pip
   - conda install -c https://conda.anaconda.org/osgeo cgal
@@ -23,7 +23,7 @@ before_install:
 install:
   - mkdir build/
   - cd build/
-  - cmake -DBoost_INCLUDE_DIR=$HOME/miniconda/envs/tyssue/include/ ..
+  - cmake ..
   - make install
 
 script:
