@@ -65,7 +65,7 @@ class Epithelium:
     coords = ['x', 'y', 'z']
 
     def __init__(self, identifier, datasets,
-                 coords=None, datadicts=None):
+                 datadicts=None, coords=None):
         '''
         Creates an epithelium
 

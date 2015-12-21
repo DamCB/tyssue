@@ -277,12 +277,12 @@ def hexa_grid3d(nx, ny, nz, distx=1., disty=1., distz=1., noise=None):
     cx = cx.astype(np.float)
     cy = cy.astype(np.float)
     cz = cz.astype(np.float)
-    cx[1::2, :] += 0.5
+    cx[::2, :] += 0.5
     cy[::2, :] += 0.5
 
-
     centers = np.vstack([cx.flatten(),
-                         cy.flatten(), cz.flatten()]).T
+                         cy.flatten(),
+                         cz.flatten()]).T
     centers[:, 0] *= distx
     centers[:, 1] *= disty
     centers[:, 2] *= distz
@@ -337,7 +337,7 @@ def from_3d_voronoi(voro):
     cell_df = make_df(cell_idx, data_dicts3d['cell'])
     cell_df[coords] = voro.points
 
-    nfaces = voro.ridge_vertices.shape[0]
+    nfaces = len(voro.ridge_vertices)
     face_idx = pd.Index(np.arange(nfaces), name='face')
     face_df = make_df(face_idx, data_dicts3d['cell'])
     je_df.sort_values(by='cell', inplace=True)

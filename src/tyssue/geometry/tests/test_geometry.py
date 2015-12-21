@@ -7,8 +7,8 @@ from tyssue.geometry import sheet_geometry as sgeom
 from tyssue.utils.utils import set_data_columns
 
 def test_3faces():
-    datasets = three_faces_sheet()
-    sheet = Sheet('3faces_2D', datasets)
+    datasets, data_dicts = three_faces_sheet()
+    sheet = Sheet('3faces_2D', datasets, data_dicts)
     geom_specs = sgeom.get_default_geom_specs()
     set_data_columns(sheet, geom_specs)
     #sgeom.update_all(sheet, coords=sheet.coords)
