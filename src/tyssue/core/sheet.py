@@ -31,7 +31,8 @@ class Sheet(Epithelium):
 
     '''
 
-    def __init__(self, identifier, datasets, coords=None):
+    def __init__(self, identifier, datasets,
+                 datadicts=None, coords=None):
         '''
         Creates an epithelium sheet, such as the apical junction network.
 
@@ -42,4 +43,5 @@ class Sheet(Epithelium):
             this df holds the vertices associated with
 
         '''
-        super().__init__(identifier, datasets, coords)
+        super().__init__(identifier, datasets,
+                         datadicts, coords)

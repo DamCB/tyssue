@@ -154,7 +154,7 @@ class Epithelium:
         specs = model.get_default_mod_specs()
         specs.update(**mod_specs)
         dim_specs = model.dimentionalize(specs)
-        set_data_columns(self, dim_specs)
+        set_data_columns(self, dim_specs, reset=True)
         self.update_datadicts(dim_specs)
         return specs, dim_specs
 
