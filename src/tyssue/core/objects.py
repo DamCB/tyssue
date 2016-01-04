@@ -363,8 +363,8 @@ class Epithelium:
             remaining_faces = np.unique(self.je_df['face'])
             self.face_df = self.face_df.loc[remaining_faces]
             self.cell_df = self.cell_df.drop(fto_rm)
-        self.reset_topo()
         self.reset_index()
+        self.reset_topo()
 
     def cut_out(self, bbox, coords=None):
         """Removes faces with vertices outside the
