@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+import logging
+log = logging.getLogger(name=__name__)
 
 
 ###
@@ -277,8 +279,10 @@ def hexa_grid3d(nx, ny, nz, distx=1., disty=1., distz=1., noise=None):
     cx = cx.astype(np.float)
     cy = cy.astype(np.float)
     cz = cz.astype(np.float)
-    cx[::2, :] += 0.5
-    cy[::2, :] += 0.5
+    cx[:, ::2] += 0.5
+    print('new')
+    # cx[1::2, 1::2] += 0.5
+    # cy[1::2, :] += 0.5
 
     centers = np.vstack([cx.flatten(),
                          cy.flatten(),
