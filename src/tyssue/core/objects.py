@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 # from .. import libtyssue_core as libcore
-from . import generation
+# from . import generation
 from .generation import make_df
 from ..utils.utils import set_data_columns
 
@@ -89,7 +89,7 @@ class Epithelium:
         #
         self.je_df, self.face_df, self.jv_df, self.cell_df = (None,) * 4
         self.identifier = identifier
-        if not set(('face', 'jv', 'je')).issubset(datasets):
+        if not {'face', 'jv', 'je'}.issubset(datasets):
             raise ValueError('''The `datasets` dictionnary should
             contain at least the 'face', 'jv' and 'je' keys''')
         for name, data in datasets.items():
@@ -108,6 +108,7 @@ class Epithelium:
         self.set_bbox()
 
     def copy(self):
+        # TODO
         raise NotImplementedError
 
     @classmethod
@@ -165,7 +166,6 @@ class Epithelium:
     def update_num_faces(self):
         self.cell_df['num_faces'] = self.je_df.cell.value_counts().loc[
             self.cell_df.index]
-
 
     def update_mindex(self):
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
@@ -293,7 +293,6 @@ class Epithelium:
 
     def face_polygons(self, coords):
         def _get_jvs_pos(face):
-            # TODO: return jes as a 2d array
             try:
                 jes = _ordered_jes(face)
             except IndexError:
@@ -461,19 +460,41 @@ class Epithelium:
         face_mask = np.arange(self.Nf + self.Nv) < self.Nf
         return vertices, triangles, face_mask
 
+    def jverts_mesh(self, coords, vertex_normals=True):
+        ''' Returns the vertex coordinates and a list of vertex indices
+        for each face of the tissue.
+        If `vertex_normals` is True, also returns the normals of each vertex
+        (set as the average of the vertex' edges), suitable for .OBJ export
+        '''
+        vertices = self.jv_df[coords]
+        faces = self.je_df.groupby('face').apply(ordered_jv_idxs)
+        faces = faces.dropna()
+        if vertex_normals:
+            normals = (self.je_df.groupby('srce')[self.ncoords].mean() +
+                       self.je_df.groupby('trgt')[self.ncoords].mean()) / 2.
+            return vertices, faces, normals
+        return vertices, faces
+
 
 def _ordered_jes(face):
     """Returns the junction edges vertices of the faces
     organized clockwise
     """
     srces, trgts, faces = face[['srce', 'trgt', 'face']].values.T
-    srce, trgt = srces[0], trgts[0]
-    jes = [[srce, trgt, face]]
-    for face in faces[1:]:
+    srce, trgt, face_ = srces[0], trgts[0], faces[0]
+    jes = [[srce, trgt, face_]]
+    for face_ in faces[1:]:
         srce, trgt = trgt, trgts[srces == trgt][0]
-        jes.append([srce, trgt, face])
-
+        jes.append([srce, trgt, face_])
     return jes
+
+
+def ordered_jv_idxs(face):
+    try:
+        return [idxs[0] for idxs in _ordered_jes(face)]
+    except IndexError:
+        return np.nan
+
 
 def _test_invalid(face):
     """ Returns true iff the source and target sets of the faces polygon
@@ -584,3 +605,157 @@ class JunctionEdge():
     @property
     def face_idx(self):
         return self.__eptm.je_df.loc[self.__index, 'face']
+
+
+class CellCellMesh():
+    """
+    Class to manipulate cell centric models
+    """
+
+    def __init__(self, identifier, datasets,
+                 datadicts=None, coords=None):
+        '''
+        Creates an epithelium
+
+        Parameters:
+        -----------
+        identifier: string
+        datasets: dictionary of dataframes
+        the datasets dict specifies the names, data columns
+        and value types of the modeled tyssue
+
+        '''
+        if coords is  None:
+            coords = ['x', 'y', 'z']
+        self.coords = coords
+        # edge's dx, dy, dz
+        self.dcoords = ['d'+c for c in self.coords]
+        self.dim = len(self.coords)
+        self.cell_df, self.cc_df = None, None
+        self.identifier = identifier
+        if not {'cell', 'cc'}.issubset(datasets):
+            raise ValueError('''The `datasets` dictionnary should
+            contain at least the 'cell' and 'cc' keys ''')
+        self.data_names = list(datasets.keys())
+        self.element_names = ['srce', 'trgt']
+        for name, data in datasets.items():
+            setattr(self, '{}_df'.format(name), data)
+        if datadicts is None:
+            datadicts = {name:{} for name in self.data_names}
+        self.datadicts = datadicts
+        self.cc_mindex = pd.MultiIndex.from_arrays(self.cc_df[['srce', 'trgt']].values.T,
+                                                   names=['srce', 'trgt'])
+
+
+
+    def copy(self):
+        # TODO
+        raise NotImplementedError
+
+    def update_datadicts(self, new):
+        for key, datadict in self.datadicts.items():
+            if new.get(key) is not None:
+                datadict.update(new[key])
+
+    def set_geom(self, geom, **geom_specs):
+
+        specs = geom.get_default_geom_specs()
+        specs.update(**geom_specs)
+        set_data_columns(self, specs)
+        self.update_datadicts(specs)
+        return specs
+
+    def set_model(self, model, **mod_specs):
+
+        specs = model.get_default_mod_specs()
+        specs.update(**mod_specs)
+        dim_specs = model.dimentionalize(specs)
+        set_data_columns(self, dim_specs, reset=True)
+        self.update_datadicts(dim_specs)
+        return specs, dim_specs
+
+
+    @property
+    def datasets(self):
+        datasets = {
+            'cc': self.cc_df,
+            'cell': self.cell_df,
+            }
+        return datasets
+
+    @datasets.getter
+    def datasets(self, level):
+        return getattr(self, '{}_df'.format(level))
+
+    @property
+    def cell_idx(self):
+        return self.cell_df.index
+
+    @property
+    def cc_idx(self):
+        return self.cc_df[self.element_names]
+
+    @property
+    def e_srce_idx(self):
+        return self.cc_df['srce']
+
+    @property
+    def e_trgt_idx(self):
+        return self.cc_df['trgt']
+
+
+    @property
+    def Nc(self):
+        return self.cell_df.shape[0]
+
+    @property
+    def Ne(self):
+        return self.cc_df.shape[0]
+
+    def _upcast(self, idx, df):
+
+        upcast = df.loc[idx]
+        upcast.index = self.cc_df.index
+        return upcast
+
+    def upcast_srce(self, df):
+        ''' Reindexes input data to self.cc_idx
+        by repeating the values for each source entry
+        '''
+        return self._upcast(self.e_srce_idx, df)
+
+    def upcast_trgt(self, df):
+        return self._upcast(self.e_trgt_idx, df)
+
+    def reset_topo(self):
+        self.cc_mindex = pd.MultiIndex.from_arrays(self.cc_df['srce', 'trgt'].values,
+                                                   names=['srce', 'trgt'])
+
+    def _lvl_sum(self, df, lvl):
+        df_ = df.copy()
+        df_.index = self.cc_mindex
+        return df_.sum(level=lvl)
+
+    def sum_srce(self, df):
+        return self._lvl_sum(df, 'srce')
+
+    def sum_trgt(self, df):
+        return self._lvl_sum(df, 'trgt')
+
+    def set_bbox(self, margin=1.):
+        '''Sets the attribute `bbox` with pairs of values bellow
+        and above the min and max of the cell coords, with a margin.
+        '''
+        self.bbox = np.array([[self.cell_df[c].min() - margin,
+                               self.cell_df[c].max() + margin]
+                              for c in self.coords])
+    def reset_index(self):
+
+        new_cellidx = pd.Series(np.arange(self.cell_df.shape[0]),
+                                index=self.cell_df.index)
+        self.cc_df['srce'] = self.upcast_srce(new_cellidx)
+        self.cc_df['trgt'] = self.upcast_trgt(new_cellidx)
+        self.cell_df.reset_index(drop=True, inplace=True)
+        self.cell_df.index.name = 'cell'
+        self.cc_df.reset_index(drop=True, inplace=True)
+        self.cc_df.index.name = 'cc'

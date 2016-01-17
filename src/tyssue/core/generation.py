@@ -272,6 +272,24 @@ def make_df(index, data_dict):
     return df
 
 
+def hexa_grid2d(nx, ny, distx, disty, noise=None):
+    """Creates an hexagonal grid of points
+    """
+    cy, cx = np.mgrid[0:ny, 0:nx]
+    cx = cx.astype(np.float)
+    cy = cy.astype(np.float)
+    cx[::2, :] += 0.5
+
+    centers = np.vstack([cx.flatten(),
+                         cy.flatten()]).astype(np.float).T
+    centers[:, 0] *= distx
+    centers[:, 1] *= disty
+    if noise is not None:
+        pos_noise = np.random.normal(scale=noise, size=centers.shape)
+        centers += pos_noise
+    return centers
+
+
 def hexa_grid3d(nx, ny, nz, distx=1., disty=1., distz=1., noise=None):
     """Creates an hexagonal grid of points
     """
@@ -279,9 +297,10 @@ def hexa_grid3d(nx, ny, nz, distx=1., disty=1., distz=1., noise=None):
     cx = cx.astype(np.float)
     cy = cy.astype(np.float)
     cz = cz.astype(np.float)
-    cx[::2, ::2] += 0.5
-    cx[1::2, 1::2] += 0.5
-    cy[1::2, :] += 0.5
+    cx[:, ::2] += 0.5
+    cy[::2, :] += 0.5
+    cy *= np.sqrt(3) / 2
+    cz *= np.sqrt(3) / 2
 
     centers = np.vstack([cx.flatten(),
                          cy.flatten(),
@@ -296,6 +315,8 @@ def hexa_grid3d(nx, ny, nz, distx=1., disty=1., distz=1., noise=None):
 
 
 def from_3d_voronoi(voro):
+    """
+    """
     el_idx = []
 
     for f_idx, (rv, rp) in enumerate(
@@ -342,7 +363,7 @@ def from_3d_voronoi(voro):
 
     nfaces = len(voro.ridge_vertices)
     face_idx = pd.Index(np.arange(nfaces), name='face')
-    face_df = make_df(face_idx, data_dicts3d['cell'])
+    face_df = make_df(face_idx, data_dicts3d['face'])
     je_df.sort_values(by='cell', inplace=True)
 
     datasets= {
@@ -354,19 +375,48 @@ def from_3d_voronoi(voro):
     return datasets
 
 
-def hexa_grid2d(nh, nv, disth, distv, noise=None):
-    """Creates an hexagonal grid of points
+def from_2d_voronoi(voro):
     """
-    cy, cx = np.mgrid[0:nv, 0:nh]
-    cx = cx.astype(np.float)
-    cy = cy.astype(np.float)
-    cx[::2, :] += 0.5
+    """
+    el_idx = []
 
-    centers = np.vstack([cx.flatten(),
-                         cy.flatten()]).astype(np.float).T
-    centers[:, 0] *= disth
-    centers[:, 1] *= distv
-    if noise is not None:
-        pos_noise = np.random.normal(scale=noise, size=centers.shape)
-        centers += pos_noise
-    return centers
+    for rv, rp in zip(voro.ridge_vertices,
+                      voro.ridge_points):
+
+        if -1 in rv:
+            continue
+        f_center = voro.points[rp[0]]
+        for rv0, rv1 in zip(rv, np.roll(rv, 1, axis=0)):
+            fv0 = voro.vertices[rv0]
+            fv1 = voro.vertices[rv1]
+            edge_v = fv1 - fv0
+            fto0 = fv0 - f_center
+            normal = np.cross(fto0, edge_v)
+            if np.sign(normal) > 0:
+                el_idx.append([rv0, rv1, rp[0]])
+            else:
+                el_idx.append([rv0, rv1, rp[1]])
+
+    el_idx = np.array(el_idx)
+    coords = ['x', 'y']
+    je_idx = pd.Index(range(el_idx.shape[0]), name='je')
+    je_df = make_df(je_idx, data_dicts['je'])
+
+    for i, elem in enumerate(['srce', 'trgt', 'face']):
+        je_df[elem] = el_idx[:, i]
+
+    jv_idx = pd.Index(range(voro.vertices.shape[0]), name='jv')
+    jv_df = make_df(jv_idx, data_dicts['jv'])
+
+    jv_df[coords] = voro.vertices
+
+    face_idx = pd.Index(range(voro.points.shape[0]), name='face')
+    face_df = make_df(face_idx, data_dicts['face'])
+    face_df[coords] = voro.points
+
+    datasets= {
+        'jv': jv_df,
+        'je': je_df,
+        'face': face_df,
+        }
+    return datasets
