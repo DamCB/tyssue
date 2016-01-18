@@ -3,10 +3,7 @@ Generic forces and energies
 '''
 
 
-def elastic_force(element_df,
-                  var='vol',
-                  elasticity='vol_elasticity',
-                  prefered='prefered_vol'):
+def elastic_force(element_df, var, elasticity, prefered):
     params = {'x': var,
               'K': elasticity,
               'x0': prefered}
@@ -14,10 +11,7 @@ def elastic_force(element_df,
     return force
 
 
-def elastic_energy(element_df,
-                   var='vol',
-                   elasticity='vol_elasticity',
-                   prefered='prefered_vol'):
+def elastic_energy(element_df, var, elasticity, prefered):
     params = {'x': var,
               'K': elasticity,
               'x0': prefered}

@@ -643,9 +643,9 @@ class CellCellMesh():
         if datadicts is None:
             datadicts = {name:{} for name in self.data_names}
         self.datadicts = datadicts
-        self.cc_mindex = pd.MultiIndex.from_arrays(self.cc_df[['srce', 'trgt']].values.T,
-                                                   names=['srce', 'trgt'])
-
+        self.cc_mindex = pd.MultiIndex.from_arrays(
+            self.cc_df[['srce', 'trgt']].values.T,
+            names=['srce', 'trgt'])
 
 
     def copy(self):
@@ -672,6 +672,7 @@ class CellCellMesh():
         dim_specs = model.dimentionalize(specs)
         set_data_columns(self, dim_specs, reset=True)
         self.update_datadicts(dim_specs)
+        self.nrj_norm_factor = dim_specs['settings']['nrj_norm_factor']
         return specs, dim_specs
 
 
