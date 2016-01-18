@@ -38,17 +38,14 @@ def update_all(sheet, **geom_spec_kw):
     * the face volumes (depends on geometry)
 
     '''
+    # TODO : why do this here?
     geom_spec = get_default_geom_specs()
     geom_spec.update(**geom_spec_kw)
 
     update_dcoords(sheet)
     update_length(sheet)
     update_centroid(sheet)
-    if geom_spec['settings']['geometry'] == 'cylindrical':
-        update_height_cylindrical(sheet,
-                                  geom_spec['settings'])
-    elif geom_spec['settings']['geometry'] == 'flat':
-        update_height_flat(sheet, geom_spec['settings'])
+    update_height(sheet)
     update_normals(sheet)
     update_areas(sheet)
     update_perimeters(sheet)
@@ -88,32 +85,19 @@ def update_vol(sheet):
                               sheet.je_df['sub_area'])
     sheet.face_df['vol'] = sheet.sum_face(sheet.je_df['sub_vol'])
 
-# ### Cylindrical geometry specific
 
-def update_height_cylindrical(sheet, settings):
-    '''
-    Updates each face height in a cylindrical geometry.
-    e.g. face anchor is assumed to lie at a distance
-    `parameters['basal_shift']` from the third axis of
-    the triplet `coords`
-    '''
-    w = settings['height_axis']
+def update_height(sheet):
+
+    w = sheet.settings['height_axis']
     u, v = (c for c in sheet.coords if c != w)
-    sheet.jv_df['rho'] = np.hypot(sheet.jv_df[v],
-                                  sheet.jv_df[u])
-    sheet.jv_df['height'] = (sheet.jv_df['rho'] -
-                             sheet.jv_df['basal_shift'])
+    if sheet.settings['geometry'] == 'cylindrical':
 
+        sheet.jv_df['rho'] = np.hypot(sheet.jv_df[v],
+                                      sheet.jv_df[u])
+        sheet.jv_df['height'] = (sheet.jv_df['rho'] -
+                                 sheet.jv_df['basal_shift'])
 
-# ### Flat geometry specific
+    elif sheet.settings['geometry'] == 'flat':
 
-def update_height_flat(sheet, settings):
-    '''
-    Updates each face height in a flat geometry.
-    e.g. face anchor is assumed to lie at a distance
-    `parameters['basal_shift']` from the plane where
-    the coordinate `coord` is equal to 0
-    '''
-    coord = settings['height_axis']
-    sheet.jv_df['rho'] = sheet.jv_df[coord]
-    sheet.jv_df['height'] = sheet.jv_df[coord] - sheet.jv_df['basal_shift']
+        sheet.jv_df['rho'] = sheet.jv_df[w]
+        sheet.jv_df['height'] = sheet.jv_df[w] - sheet.jv_df['basal_shift']

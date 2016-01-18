@@ -100,6 +100,7 @@ class Epithelium:
         if datadicts is None:
             datadicts = {name:{} for name in self.data_names}
         self.datadicts = datadicts
+        self.settings = {}
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
                                                    names=self.element_names)
         ## Topology (geometry independant)
@@ -141,11 +142,14 @@ class Epithelium:
         for key, datadict in self.datadicts.items():
             if new.get(key) is not None:
                 datadict.update(new[key])
+        if 'settings' in new:
+            self.settings.update(new['settings'])
 
     def set_geom(self, geom, **geom_specs):
 
         specs = geom.get_default_geom_specs()
-        specs.update(**geom_specs)
+        for key, newspecs in geom_specs.items():
+            specs[key].update(newspecs)
         set_data_columns(self, specs)
         self.update_datadicts(specs)
         return specs
@@ -153,7 +157,8 @@ class Epithelium:
     def set_model(self, model, **mod_specs):
 
         specs = model.get_default_mod_specs()
-        specs.update(**mod_specs)
+        for key, newspecs in mod_specs.items():
+            specs[key].update(newspecs)
         dim_specs = model.dimentionalize(specs)
         set_data_columns(self, dim_specs, reset=True)
         self.update_datadicts(dim_specs)
@@ -646,7 +651,7 @@ class CellCellMesh():
         self.cc_mindex = pd.MultiIndex.from_arrays(
             self.cc_df[['srce', 'trgt']].values.T,
             names=['srce', 'trgt'])
-
+        self.settings = {}
 
     def copy(self):
         # TODO
@@ -656,6 +661,8 @@ class CellCellMesh():
         for key, datadict in self.datadicts.items():
             if new.get(key) is not None:
                 datadict.update(new[key])
+        if 'settings' in new:
+            self.settings.update(new['settings'])
 
     def set_geom(self, geom, **geom_specs):
 

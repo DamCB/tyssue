@@ -54,20 +54,21 @@ def dimentionalize(mod_specs, **kwargs):
     """
 
     dim_mod_specs = deepcopy(mod_specs)
-    dim_mod_specs.update(**kwargs)
+    for key, specs in kwargs.items():
+        dim_mod_specs[key].update(specs)
 
     Kv = dim_mod_specs['face']['vol_elasticity'][0]
     A0 = dim_mod_specs['face']['prefered_area'][0]
     h0 = dim_mod_specs['face']['prefered_height'][0]
     gamma = dim_mod_specs['face']['contractility'][0]
 
-    dim_mod_specs['face']['contractility'] = (gamma * Kv*A0 * h0**2,
+    dim_mod_specs['face']['contractility'] = (gamma * Kv*A0**2,
                                               np.float)
 
     dim_mod_specs['face']['prefered_vol'] = (A0 * h0, np.float)
 
     lbda = dim_mod_specs['je']['line_tension'][0]
-    dim_mod_specs['je']['line_tension'] = (lbda * Kv * A0**1.5 * h0**2,
+    dim_mod_specs['je']['line_tension'] = (lbda * Kv * A0**2.5,
                                            np.float)
 
     dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5 * h0**2

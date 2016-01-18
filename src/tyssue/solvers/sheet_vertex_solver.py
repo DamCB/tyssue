@@ -22,7 +22,7 @@ def get_default_settings():
 def find_energy_min(sheet, geom, model,
                     pos_idx=None,
                     **settings_kw):
-
+    # TODO: that shall be set at init time
     settings = get_default_settings()
     settings.update(**settings_kw)
 

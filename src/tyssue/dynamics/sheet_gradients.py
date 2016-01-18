@@ -10,13 +10,18 @@ from ..utils.utils import _to_3d
 
 def height_grad(sheet):
 
-    r_to_rho = sheet.jv_df[sheet.coords] / _to_3d(sheet.jv_df['rho'])
 
-    ### Cyl. geom
-    r_to_rho['z'] = 0.
+    if sheet.settings['geometry'] == 'cylindrical':
+        r_to_rho = sheet.jv_df[sheet.coords] / _to_3d(sheet.jv_df['rho'])
+        r_to_rho['z'] = 0.
+
+    elif sheet.settings['geometry'] == 'flat':
+        r_to_rho = sheet.jv_df[sheet.coords].copy()
+        r_to_rho[['x', 'y']] = 0.
+        r_to_rho[['z']] = 1.
+
 
     r_to_rho = sheet.upcast_srce(df=r_to_rho)
-    r_to_rho.columns = sheet.coords
     return r_to_rho
 
 
