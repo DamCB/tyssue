@@ -54,10 +54,11 @@ def isotropic_relax(sheet, **mod_specs):
 
     The specified model specs is assumed to be non-dimentional
     """
-    mod_specs.update(get_default_mod_specs())
+    def_mod_specs = get_default_mod_specs()
+    def_mod_specs.update(**mod_specs)
 
-    area0 = mod_specs['face']['prefered_area'][0]
-    h_0 = mod_specs['face']['prefered_height'][0]
+    area0 = sheet.face_df['prefered_area'].mean()
+    h_0 = sheet.face_df['prefered_height'].mean()
 
     live_faces = sheet.face_df[sheet.face_df.is_alive==1]
 
@@ -72,7 +73,7 @@ def isotropic_relax(sheet, **mod_specs):
     update_all(sheet)
 
     ### Optimal value for delta
-    delta_o = find_grad_roots(mod_specs)
+    delta_o = find_grad_roots(def_mod_specs)
     if not np.isfinite(delta_o):
         raise ValueError('invalid parameters values')
     sheet.delta_o = delta_o
