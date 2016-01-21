@@ -128,8 +128,9 @@ segmentation of the whole tissue. The (yet to be) implemented model is
 based on the formalism described in [Tlili2013]
 
 ## Similar softwares
+* See [this publication](http://bioinformatics.oxfordjournals.org.gate1.inist.fr/content/32/2/219/F2.expansion.html) by Jereky's lab, softawre available [here](http://www.biocenter.helsinki.fi/salazar/software.html)
 
-TODO
+TBC
 
 ## Licence
 
