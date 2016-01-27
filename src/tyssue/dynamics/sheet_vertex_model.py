@@ -120,7 +120,8 @@ def compute_gradient(sheet, components=False):
 
     grad_i = ((sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
               sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
-              sheet.sum_srce(grad_v_srce) + sheet.sum_trgt(grad_v_trgt))
+              sheet.sum_srce(grad_v_srce) + sheet.sum_trgt(grad_v_trgt) *
+              sheet.jv_df.is_active)
     return grad_i / norm_factor
 
 def elastic_grad(sheet):
