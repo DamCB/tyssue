@@ -72,3 +72,6 @@ dist/
 *.aux
 *.log
 *.out
+
+## Blender packups
+*.blend[1-9]

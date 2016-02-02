@@ -56,6 +56,7 @@ def opt_energy(pos, pos_idx, sheet, geom, model):
 # The unused arguments bellow are legit, need same call sig as above
 def opt_grad(pos, pos_idx, sheet, geom, model):
     grad_i = model.compute_gradient(sheet, components=False)
+    grad_i = grad_i.loc[pos_idx]
     return grad_i.values.flatten()
 
 def approx_grad(sheet, geom, model):
