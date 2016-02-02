@@ -4,44 +4,6 @@ import numpy as np
 import logging
 log = logging.getLogger(name=__name__)
 
-
-###
-data_dicts = {
-    'face': {
-        ## Face Geometry
-        'perimeter': (0., np.float),
-        'area': (0., np.float),
-        ## Coordinates
-        'x': (0., np.float),
-        'y': (0., np.float),
-        'z': (0., np.float),
-        ## Topology
-        'num_sides': (6, np.int),
-        ## Masks
-        'is_alive': (1, np.bool)},
-    'jv': {
-        ## Coordinates
-        'x': (0., np.float),
-        'y': (0., np.float),
-        'z': (0., np.float),
-        ## Masks
-        'is_active': (1, np.bool)},
-    'je': {
-        ## associated elements indexes
-        'srce': (0, np.int),
-        'trgt': (0, np.int),
-        'face': (0, np.int),
-        ## Coordinates
-        'dx': (0., np.float),
-        'dy': (0., np.float),
-        'dz': (0., np.float),
-        'length': (0., np.float),
-        ### Normals
-        'nx': (0., np.float),
-        'ny': (0., np.float),
-        'nz': (0., np.float)}
-    }
-
 ###
 data_dicts2d = {
     'face': {
@@ -128,6 +90,44 @@ data_dicts3d = {
         'nz': (0., np.float)
         }
     }
+
+### 2D mesh in 3D
+data_dicts_sheet = {
+    'face': {
+        ## Face Geometry
+        'perimeter': (0., np.float),
+        'area': (0., np.float),
+        ## Coordinates
+        'x': (0., np.float),
+        'y': (0., np.float),
+        'z': (0., np.float),
+        ## Topology
+        'num_sides': (6, np.int),
+        ## Masks
+        'is_alive': (1, np.bool)},
+    'jv': {
+        ## Coordinates
+        'x': (0., np.float),
+        'y': (0., np.float),
+        'z': (0., np.float),
+        ## Masks
+        'is_active': (1, np.bool)},
+    'je': {
+        ## associated elements indexes
+        'srce': (0, np.int),
+        'trgt': (0, np.int),
+        'face': (0, np.int),
+        ## Coordinates
+        'dx': (0., np.float),
+        'dy': (0., np.float),
+        'dz': (0., np.float),
+        'length': (0., np.float),
+        ### Normals
+        'nx': (0., np.float),
+        'ny': (0., np.float),
+        'nz': (0., np.float)}
+    }
+
 
 
 
@@ -239,11 +239,11 @@ def three_faces_sheet(zaxis=False):
     cc_idx = [(0, 1), (1, 2), (0, 2)]
     cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['facea', 'faceb'])
     ### Faces DataFrame
-    face_df = make_df(index=face_idx, data_dict=data_dicts['face'])
+    face_df = make_df(index=face_idx, data_dict=data_dicts_sheet['face'])
 
     ### Junction vertices and edges DataFrames
-    jv_df = make_df(index=jv_idx, data_dict=data_dicts['jv'])
-    je_df = make_df(index=je_idx, data_dict=data_dicts['je'])
+    jv_df = make_df(index=jv_idx, data_dict=data_dicts_sheet['jv'])
+    je_df = make_df(index=je_idx, data_dict=data_dicts_sheet['je'])
     je_df['srce'] = _je_e_idx[:, 0]
     je_df['trgt'] = _je_e_idx[:, 1]
     je_df['face'] = _je_e_idx[:, 2]
@@ -253,7 +253,7 @@ def three_faces_sheet(zaxis=False):
         jv_df.loc[:, coords[2:]] = 0.
 
     datasets = {'face': face_df, 'jv': jv_df, 'je': je_df}
-    return datasets, data_dicts
+    return datasets, data_dicts_sheet
 
 
 def make_df(index, data_dict):
@@ -375,9 +375,11 @@ def from_3d_voronoi(voro):
     return datasets
 
 
-def from_2d_voronoi(voro):
+def from_2d_voronoi(voro, data_dicts=None):
     """
     """
+    if data_dicts is None:
+        data_dicts = data_dicts_sheet #default
     el_idx = []
 
     for rv, rp in zip(voro.ridge_vertices,
