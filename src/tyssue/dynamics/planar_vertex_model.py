@@ -21,12 +21,12 @@ def get_default_mod_specs():
     """
     default_mod_specs = {
         "face": {
-            "contractility": (0.04, np.float),
-            "area_elasticity": (1., np.float),
-            "prefered_area": (1., np.float),
+            "contractility": 0.04,
+            "area_elasticity": 1.,
+            "prefered_area": 1.,
             },
         "je": {
-            "line_tension": (0.12, np.float),
+            "line_tension": 0.12,
             },
         "settings": {
             'grad_norm_factor': 1.,
@@ -45,16 +45,16 @@ def dimentionalize(mod_specs, **kwargs):
     dim_mod_specs = deepcopy(mod_specs)
     dim_mod_specs.update(**kwargs)
 
-    Kv = dim_mod_specs['face']['area_elasticity'][0]
-    A0 = dim_mod_specs['face']['prefered_area'][0]
-    gamma = dim_mod_specs['face']['contractility'][0]
+    Kv = dim_mod_specs['face']['area_elasticity']
+    A0 = dim_mod_specs['face']['prefered_area']
+    gamma = dim_mod_specs['face']['contractility']
 
     dim_mod_specs['face']['contractility'] = (gamma * Kv*A0,
                                               np.float)
 
-    dim_mod_specs['face']['prefered_area'] = (A0, np.float)
+    dim_mod_specs['face']['prefered_area'] = (A0
 
-    lbda = dim_mod_specs['je']['line_tension'][0]
+    lbda = dim_mod_specs['je']['line_tension']
     dim_mod_specs['je']['line_tension'] = (lbda * Kv * A0**1.5,
                                            np.float)
 

@@ -6,17 +6,14 @@ from .planar_geometry import update_perimeters
 
 def get_default_geom_specs():
     default_geom_specs = {
-        "face": {
-            "num_sides": (6, np.int),
-            },
         "jv": {
-            "rho": (0., np.float),
-            "basal_shift": (4., np.float), # previously rho_lumen
+            "rho": 0.,
+            "basal_shift": 4., # previously rho_lumen
             },
         "je": {
-            "nx": (0., np.float),
-            "ny": (0., np.float),
-            "nz": (0., np.float),
+            "nx": 0.,
+            "ny": 0.,
+            "nz": 0.,
             },
         "settings": {
             "geometry": "cylindrical",

@@ -3,7 +3,7 @@ import numpy as np
 def get_default_geom_specs():
     default_geom_specs = {
         "cc": {
-            "nz": (0., np.float),
+            "nz": 0.,
             },
         }
     return default_geom_specs

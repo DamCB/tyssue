@@ -8,86 +8,86 @@ log = logging.getLogger(name=__name__)
 data_dicts2d = {
     'face': {
         ## Face Geometry
-        'perimeter': (0., np.float),
-        'area': (0., np.float),
+        'perimeter': 0.,
+        'area': 0.,
         ## Coordinates
-        'x': (0., np.float),
-        'y': (0., np.float),
+        'x': 0.,
+        'y': 0.,
         ## Topology
-        'num_sides': (6, np.int),
+        'num_sides': 6,
         ## Masks
-        'is_alive': (1, np.bool)
+        'is_alive': True,
         },
     'jv': {
         ## Coordinates
-        'x': (0., np.float),
-        'y': (0., np.float),
+        'x': 0.,
+        'y': 0.,
         ## Masks
-        'is_active': (1, np.bool)
+        'is_active': True,
         },
     'je': {
         ## associated elements indexes
-        'srce': (0, np.int),
-        'trgt': (0, np.int),
-        'face': (0, np.int),
+        'srce': 0,
+        'trgt': 0,
+        'face': 0,
         ## Coordinates
-        'dx': (0., np.float),
-        'dy': (0., np.float),
-        'length': (0., np.float),
+        'dx': 0.,
+        'dy': 0.,
+        'length': 0.,
         ### Normals
-        'nz': (0., np.float)
+        'nz': 0.,
         }
     }
 
 data_dicts3d = {
     'cell': {
         ## Face Geometry
-        'vol': (0., np.float),
+        'vol': 0.,
         ## Coordinates
-        'x': (0., np.float),
-        'y': (0., np.float),
-        'z': (0., np.float),
+        'x': 0.,
+        'y': 0.,
+        'z': 0.,
         ## Topology
-        'num_faces': (6, np.int),
+        'num_faces': 6,
         ## Masks
-        'is_alive': (1, np.bool)
+        'is_alive': True,
         },
     'face': {
         ## Face Geometry
-        'perimeter': (0., np.float),
-        'area': (0., np.float),
+        'perimeter': 0.,
+        'area': 0.,
         ## Coordinates
-        'x': (0., np.float),
-        'y': (0., np.float),
-        'z': (0., np.float),
+        'x': 0.,
+        'y': 0.,
+        'z': 0.,
         ## Topology
-        'num_sides': (6, np.int),
+        'num_sides': 6,
         ## Masks
-        'is_alive': (1, np.bool)
+        'is_alive': True,
         },
     'jv': {
         ## Coordinates
-        'x': (0., np.float),
-        'y': (0., np.float),
-        'z': (0., np.float),
+        'x': 0.,
+        'y': 0.,
+        'z': 0.,
         ## Masks
-        'is_active': (1, np.bool)
+        'is_active': True,
         },
     'je': {
         ## associated elements indexes
-        'srce': (0, np.int),
-        'trgt': (0, np.int),
-        'face': (0, np.int),
-        'cell': (0, np.int),
+        'srce': 0,
+        'trgt': 0,
+        'face': 0,
+        'cell': 0,
         ## Coordinates
-        'dx': (0., np.float),
-        'dy': (0., np.float),
-        'dz': (0., np.float),
-        'length': (0., np.float),
+        'dx': 0.,
+        'dy': 0.,
+        'dz': 0.,
+        'length': 0.,
         ### Normals
-        'nx': (0., np.float),
-        'ny': (0., np.float),
-        'nz': (0., np.float)
+        'nx': 0.,
+        'ny': 0.,
+        'nz': 0.,
         }
     }
 
@@ -95,37 +95,37 @@ data_dicts3d = {
 data_dicts_sheet = {
     'face': {
         ## Face Geometry
-        'perimeter': (0., np.float),
-        'area': (0., np.float),
+        'perimeter': 0.,
+        'area': 0.,
         ## Coordinates
-        'x': (0., np.float),
-        'y': (0., np.float),
-        'z': (0., np.float),
+        'x': 0.,
+        'y': 0.,
+        'z': 0.,
         ## Topology
-        'num_sides': (6, np.int),
+        'num_sides': 6,
         ## Masks
-        'is_alive': (1, np.bool)},
+        'is_alive': True,},
     'jv': {
         ## Coordinates
-        'x': (0., np.float),
-        'y': (0., np.float),
-        'z': (0., np.float),
+        'x': 0.,
+        'y': 0.,
+        'z': 0.,
         ## Masks
-        'is_active': (1, np.bool)},
+        'is_active': True,},
     'je': {
         ## associated elements indexes
-        'srce': (0, np.int),
-        'trgt': (0, np.int),
-        'face': (0, np.int),
+        'srce': 0,
+        'trgt': 0,
+        'face': 0,
         ## Coordinates
-        'dx': (0., np.float),
-        'dy': (0., np.float),
-        'dz': (0., np.float),
-        'length': (0., np.float),
+        'dx': 0.,
+        'dy': 0.,
+        'dz': 0.,
+        'length': 0.,
         ### Normals
-        'nx': (0., np.float),
-        'ny': (0., np.float),
-        'nz': (0., np.float)}
+        'nx': 0.,
+        'ny': 0.,
+        'nz': 0., }
     }
 
 
@@ -268,7 +268,7 @@ def make_df(index, data_dict):
     arr = np.empty(N, dtype=dtypes)
     df = pd.DataFrame.from_records(arr, index=index)
     for name, val in data_dict.items():
-        df[name] = val[0]
+        df[name] = val
     return df
 
 

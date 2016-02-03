@@ -7,10 +7,10 @@ from .base_geometry import (update_dcoords, scale,
 def get_default_geom_specs():
     default_geom_specs = {
         "face": {
-            "num_sides": (6, np.int),
+            "num_sides": 6,
             },
         "je": {
-            "nz": (0., np.float),
+            "nz": 0.,
             },
         "settings": {
             "geometry": "plannar",

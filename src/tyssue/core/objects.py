@@ -18,40 +18,40 @@ The first key design objects names: ('face', 'je', 'jv') They will
 correspond to the dataframes attributes of the Epithelium instance,
 (e.g eptm.face_df);
 
-The second level keys design column names of the
-above dataframes, and their default values as a (value, dtype) pair.
-
+The second level keys design column names of the above dataframes,
+default values is allways infered from the python parsed type. Thus
+`1` will be cast as `int`, `1.` as `float` and `True` as a `bool`.
 
     data_dicts = {
         'face': {
             ## Face Geometry
-            'perimeter': (0., np.float),
-            'area': (0., np.float),
+            'perimeter': 0.,
+            'area': 0.,
             ## Coordinates
-            'x': (0., np.float),
-            'y': (0., np.float),
-            'z': (0., np.float),
+            'x': 0.,
+            'y': 0.,
+            'z': 0.,
             ## Topology
-            'num_sides': (1, np.int),
+            'num_sides': 6,
             ## Masks
-            'is_alive': (1, np.bool)},
+            'is_alive': True},
         'jv': {
             ## Coordinates
-            'x': (0., np.float),
-            'y': (0., np.float),
-            'z': (0., np.float),
+            'x': 0.,
+            'y': 0.,
+            'z': 0.,
             ## Masks
-            'is_active': (1, np.bool)},
+            'is_active': True},
         'je': {
             ## Coordinates
-            'dx': (0., np.float),
-            'dy': (0., np.float),
-            'dz': (0., np.float),
-            'length': (0., np.float),
+            'dx': 0.,
+            'dy': 0.,
+            'dz': 0.,
+            'length': 0.,
             ### Normals
-            'nx': (0., np.float),
-            'ny': (0., np.float),
-            'nz': (0., np.float)}
+            'nx': 0.,
+            'ny': 0.,
+            'nz': 1.}
         }
 '''
 

@@ -22,8 +22,8 @@ def isotropic_energies(sheet, model, geom, deltas, dim_mod_specs):
     ### Faces only area and height
     area_avg = sheet.face_df[sheet.face_df['is_alive'] == 1].area.mean()
     rho_avg = sheet.jv_df.rho.mean()
-    area0 = dim_mod_specs['face']['prefered_area'][0]
-    h_0 = dim_mod_specs['face']['prefered_height'][0]
+    area0 = dim_mod_specs['face']['prefered_area']
+    h_0 = dim_mod_specs['face']['prefered_height']
 
     ### Set height and area to height0 and area0
     delta_0 = (area0 / area_avg)**0.5
@@ -86,8 +86,8 @@ def isotropic_energy(delta, mod_specs):
     Computes the theoritical energy per face for the given
     parameters.
     """
-    lbda = mod_specs['je']['line_tension'][0]
-    gamma = mod_specs['face']['contractility'][0]
+    lbda = mod_specs['je']['line_tension']
+    gamma = mod_specs['face']['contractility']
     elasticity_ = (delta**3 - 1 )**2 / 2.
     contractility_ = gamma * mu**2 * delta**2 / 2.
     tension_ = lbda * mu * delta / 2.
@@ -95,8 +95,8 @@ def isotropic_energy(delta, mod_specs):
     return energy
 
 def isotropic_grad_poly(mod_specs):
-    lbda = mod_specs['je']['line_tension'][0]
-    gamma = mod_specs['face']['contractility'][0]
+    lbda = mod_specs['je']['line_tension']
+    gamma = mod_specs['face']['contractility']
     grad_poly = [3, 0, 0,
                  -3,
                  mu**2 * gamma,
@@ -115,6 +115,6 @@ def find_grad_roots(mod_specs):
     if len(good_roots) == 1:
         return good_roots
     elif len(good_roots) > 1:
-        return good_roots[0]
+        return good_roots
     else:
         return np.nan

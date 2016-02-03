@@ -31,8 +31,8 @@ def get_default_mod_specs():
         "cell": {
             },
         "cc": {
-            "elasticity": (1, np.float),
-            "prefered_length": (1., np.float),
+            "elasticity": 1.,
+            "prefered_length": 1.,
             },
         "settings": {
             'grad_norm_factor': 1.,
@@ -50,8 +50,8 @@ def dimentionalize(mod_specs, **kwargs):
 
     dim_mod_specs = deepcopy(mod_specs)
     dim_mod_specs.update(**kwargs)
-    K = dim_mod_specs['cc']['elasticity'][0]
-    l0 = dim_mod_specs['cc']['prefered_length'][0]
+    K = dim_mod_specs['cc']['elasticity']
+    l0 = dim_mod_specs['cc']['prefered_length']
     dim_mod_specs['settings']['grad_norm_factor'] = K * l0
     dim_mod_specs['settings']['nrj_norm_factor'] = K * l0**2
     return dim_mod_specs

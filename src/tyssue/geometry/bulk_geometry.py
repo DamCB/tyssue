@@ -7,19 +7,19 @@ from .sheet_geometry import update_normals, update_areas
 def get_default_geom_specs():
     default_geom_specs = {
         "cell": {
-            'num_faces': (0, np.int),
-            'vol': (0, np.float),
-            'area':  (0, np.float),
+            'num_faces': 0,
+            'vol': 0.,
+            'area':  0.,
             },
         "face": {
-            "num_sides": (6, np.int),
+            "num_sides": 6,
             },
         "je": {
-            "sub_vol": (0., np.float),
-            "sub_area": (0., np.float),
-            "nx": (0., np.float),
-            "ny": (0., np.float),
-            "nz": (0., np.float),
+            "sub_vol": 0.,
+            "sub_area": 0.,
+            "nx": 0.,
+            "ny": 0.,
+            "nz": 0.,
             },
         }
     return default_geom_specs
