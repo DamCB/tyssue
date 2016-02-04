@@ -49,14 +49,12 @@ def dimentionalize(mod_specs, **kwargs):
     A0 = dim_mod_specs['face']['prefered_area']
     gamma = dim_mod_specs['face']['contractility']
 
-    dim_mod_specs['face']['contractility'] = (gamma * Kv*A0,
-                                              np.float)
+    dim_mod_specs['face']['contractility'] = gamma * Kv*A0
 
-    dim_mod_specs['face']['prefered_area'] = (A0
+    dim_mod_specs['face']['prefered_area'] = A0
 
     lbda = dim_mod_specs['je']['line_tension']
-    dim_mod_specs['je']['line_tension'] = (lbda * Kv * A0**1.5,
-                                           np.float)
+    dim_mod_specs['je']['line_tension'] = lbda * Kv * A0**1.5
 
     dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5
     dim_mod_specs['settings']['nrj_norm_factor'] = Kv * A0**2

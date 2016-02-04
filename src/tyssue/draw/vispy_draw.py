@@ -4,7 +4,8 @@ from vispy import app, gloo, visuals, scene
 from vispy.geometry import MeshData
 
 def draw_tyssue(eptm):
-
+    """TODO: refactor to accept datasets as arguments
+    """
     vertices, faces, _ = eptm.triangular_mesh(['z', 'x', 'y'])
 
     canvas = scene.SceneCanvas(keys='interactive', show=True)

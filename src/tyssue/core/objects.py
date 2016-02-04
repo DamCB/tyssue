@@ -3,15 +3,16 @@ import pandas as pd
 
 # from .. import libtyssue_core as libcore
 # from . import generation
+from ..utils.utils import set_data_columns, spec_updater
+from ..config.json_parser import load_default
 from .generation import make_df
-from ..utils.utils import set_data_columns
 
 import logging
 log = logging.getLogger(name=__name__)
 
 '''
 
-The following data is an exemple of the `data_dicts`.
+The following data is an exemple of the `specs`.
 It is a nested dictionnary with two levels.
 
 The first key design objects names: ('face', 'je', 'jv') They will
@@ -22,7 +23,7 @@ The second level keys design column names of the above dataframes,
 default values is allways infered from the python parsed type. Thus
 `1` will be cast as `int`, `1.` as `float` and `True` as a `bool`.
 
-    data_dicts = {
+    specs = {
         'face': {
             ## Face Geometry
             'perimeter': 0.,
@@ -62,10 +63,9 @@ class Epithelium:
     The whole tissue.
 
     '''
-    coords = ['x', 'y', 'z']
 
     def __init__(self, identifier, datasets,
-                 datadicts=None, coords=None):
+                 specs=None, coords=None):
         '''
         Creates an epithelium
 
@@ -86,20 +86,31 @@ class Epithelium:
         # edge's normals
         if self.dim == 3:
             self.ncoords = ['n'+c for c in self.coords]
-        #
-        self.je_df, self.face_df, self.jv_df, self.cell_df = (None,) * 4
+
+        # each of those has a separate dataframe, as well as entries in
+        # the settings files
+        frame_types =  {'je', 'jv', 'face',
+                        'cell', 'cc'}
+
+        # Really just to ensure the debugger is silent
+        [   self.je_df,
+            self.jv_df,
+            self.face_df,
+            self.cell_df,
+            self.cc_df    ] = [None,] * 5
+
         self.identifier = identifier
-        if not {'face', 'jv', 'je'}.issubset(datasets):
+        if not set(datasets).issubset(frame_types):
             raise ValueError('''The `datasets` dictionnary should
-            contain at least the 'face', 'jv' and 'je' keys''')
+            contain keys in {}'''.format(frame_types))
         for name, data in datasets.items():
             setattr(self, '{}_df'.format(name), data)
         self.data_names = list(datasets.keys())
         self.element_names = ['srce', 'trgt',
                               'face', 'cell'][:len(self.data_names)]
-        if datadicts is None:
-            datadicts = {name:{} for name in self.data_names}
-        self.datadicts = datadicts
+        if specs is None:
+            specs = {name:{} for name in self.data_names}
+        self.specs = specs
         self.settings = {}
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
                                                    names=self.element_names)
@@ -112,57 +123,60 @@ class Epithelium:
         # TODO
         raise NotImplementedError
 
+
+
     @classmethod
     def from_points(cls, identifier, points,
-                    indices_dict, data_dicts,
+                    indices_dict, specs,
                     points_dataset='jv'):
         '''
         TODO: not sure this works as expected with the new indexing
         '''
 
         if points.shape[1] == 2:
-            coords = cls.coords[:2]
+            coords = ['x', 'y']
         elif points.shape[1] == 3:
-            coords = cls.coords
+            coords = ['x', 'y', 'z']
         else:
             raise ValueError('the `points` argument must be'
                              ' a (Nv, 2) or (Nv, 3) array')
 
-        # data_dicts = update_default(generation.data_dicts, data_dicts)
         datasets = {}
-        for key, data_dict in data_dicts.items():
+        for key, spec in specs.items():
             datasets[key] = make_df(index=indices_dict[key],
-                                    data_dict=data_dict)
+                                    spec=spec)
         datasets[points_dataset][coords] = points
 
         return cls.__init__(identifier, datasets, coords)
 
 
-    def update_datadicts(self, new):
-        for key, datadict in self.datadicts.items():
-            if new.get(key) is not None:
-                datadict.update(new[key])
+    def update_specs(self, new, reset=False):
+
+        spec_updater(self.specs, new)
         if 'settings' in new:
             self.settings.update(new['settings'])
+        set_data_columns(self.datasets, new, reset)
 
-    def set_geom(self, geom, **geom_specs):
+    def set_specs(self, domain, base,
+                  new_specs=None,
+                  default_base=None, reset=False):
 
-        specs = geom.get_default_geom_specs()
-        for key, newspecs in geom_specs.items():
-            specs[key].update(newspecs)
-        set_data_columns(self, specs)
-        self.update_datadicts(specs)
-        return specs
+        if base is None:
+            self.update_specs(load_default(domain, default_base), reset)
+        else:
+            self.update_specs(load_default(domain, base), reset)
+        if new_specs is not None:
+            self.update_specs(new_specs, reset)
 
-    def set_model(self, model, **mod_specs):
+    def set_geom(self, base=None, new_specs=None, ):
 
-        specs = model.get_default_mod_specs()
-        for key, newspecs in mod_specs.items():
-            specs[key].update(newspecs)
-        dim_specs = model.dimentionalize(specs)
-        set_data_columns(self, dim_specs, reset=True)
-        self.update_datadicts(dim_specs)
-        return specs, dim_specs
+        self.set_specs('geometry', base, new_specs,
+                       default_base='core', reset=False)
+
+    def set_model(self, base=None, new_specs=None, reset=True):
+
+        self.set_specs('dynamics', base, new_specs,
+                       default_base='core', reset=reset)
 
     def update_num_sides(self):
         self.face_df['num_sides'] = self.je_df.face.value_counts().loc[
@@ -183,18 +197,17 @@ class Epithelium:
 
     @property
     def datasets(self):
-        datasets = {
-            'je': self.je_df,
-            'jv': self.jv_df,
-            'face': self.face_df,
-            }
-        if 'cell' in self.data_names:
-            datasets['cell'] = self.cell_df
+        datasets = {level: getattr(self, '{}_df'.format(level))
+                    for level in self.data_names}
         return datasets
 
-    @datasets.getter
-    def datasets(self, level):
-        return getattr(self, '{}_df'.format(level))
+    # @datasets.getter
+    # def datasets(self, level):
+    #     return getattr(self, '{}_df'.format(level))
+
+    @datasets.setter
+    def datasets(self, level, new_df):
+        setattr(self, '{}_df'.format(level), new_df)
 
     @property
     def face_idx(self):
@@ -214,9 +227,9 @@ class Epithelium:
 
     @property
     def Nc(self):
-        if 'cell' in self.element_names:
+        if 'cell' in self.data_names:
             return self.cell_df.shape[0]
-        elif 'face' in self.element_names:
+        elif 'face' in self.data_names:
             return self.face_df.shape[0]
 
     @property
@@ -618,7 +631,7 @@ class CellCellMesh():
     """
 
     def __init__(self, identifier, datasets,
-                 datadicts=None, coords=None):
+                 specs=None, coords=None):
         '''
         Creates an epithelium
 
@@ -645,9 +658,9 @@ class CellCellMesh():
         self.element_names = ['srce', 'trgt']
         for name, data in datasets.items():
             setattr(self, '{}_df'.format(name), data)
-        if datadicts is None:
-            datadicts = {name:{} for name in self.data_names}
-        self.datadicts = datadicts
+        if specs is None:
+            specs = {name:{} for name in self.data_names}
+        self.specs = specs
         self.cc_mindex = pd.MultiIndex.from_arrays(
             self.cc_df[['srce', 'trgt']].values.T,
             names=['srce', 'trgt'])
@@ -657,8 +670,8 @@ class CellCellMesh():
         # TODO
         raise NotImplementedError
 
-    def update_datadicts(self, new):
-        for key, datadict in self.datadicts.items():
+    def update_specs(self, new):
+        for key, datadict in self.specs.items():
             if new.get(key) is not None:
                 datadict.update(new[key])
         if 'settings' in new:
@@ -668,8 +681,7 @@ class CellCellMesh():
 
         specs = geom.get_default_geom_specs()
         specs.update(**geom_specs)
-        set_data_columns(self, specs)
-        self.update_datadicts(specs)
+        self.update_specs(specs)
         return specs
 
     def set_model(self, model, **mod_specs):
@@ -677,8 +689,7 @@ class CellCellMesh():
         specs = model.get_default_mod_specs()
         specs.update(**mod_specs)
         dim_specs = model.dimentionalize(specs)
-        set_data_columns(self, dim_specs, reset=True)
-        self.update_datadicts(dim_specs)
+        self.update_specs(dim_specs)
         self.nrj_norm_factor = dim_specs['settings']['nrj_norm_factor']
         return specs, dim_specs
 

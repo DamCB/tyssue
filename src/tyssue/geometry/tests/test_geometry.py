@@ -9,7 +9,7 @@ from tyssue.utils.utils import set_data_columns
 def test_3faces():
     datasets, data_dicts = three_faces_sheet()
     sheet = Sheet('3faces_2D', datasets, data_dicts)
-    sheet.set_geom(sgeom)
+    sheet.set_geom('sheet')
 
     #sgeom.update_all(sheet, coords=sheet.coords)
 

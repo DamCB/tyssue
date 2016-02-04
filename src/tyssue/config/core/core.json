@@ -1,0 +1,13 @@
+{
+    'face': {
+        'is_alive': true,
+         },
+    'je': {
+        'face': 0,
+        'srce': 0,
+        'trgt': 0
+         },
+    'jv': {
+        'is_active': true,
+         }
+}

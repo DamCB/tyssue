@@ -5,7 +5,6 @@ import numpy as np
 
 from ..geometry.base_geometry import scale
 from ..geometry.sheet_geometry import update_all
-from .sheet_vertex_model import get_default_mod_specs
 
 mu = 6 * np.sqrt(2. / (3 * np.sqrt(3)))
 
@@ -18,12 +17,14 @@ def contractility(delta, gamma):
 def tension(delta, lbda):
     return lbda * mu * delta / 2.
 
-def isotropic_energies(sheet, model, geom, deltas, dim_mod_specs):
+def isotropic_energies(sheet, model, geom,
+                       deltas, nondim_specs):
+
     ### Faces only area and height
     area_avg = sheet.face_df[sheet.face_df['is_alive'] == 1].area.mean()
     rho_avg = sheet.jv_df.rho.mean()
-    area0 = dim_mod_specs['face']['prefered_area']
-    h_0 = dim_mod_specs['face']['prefered_height']
+    area0 = sheet.specs['face']['prefered_area']
+    h_0 = sheet.specs['face']['prefered_height']
 
     ### Set height and area to height0 and area0
     delta_0 = (area0 / area_avg)**0.5
@@ -32,7 +33,6 @@ def isotropic_energies(sheet, model, geom, deltas, dim_mod_specs):
     geom.update_all(sheet)
 
     energies = np.zeros((deltas.size, 3))
-    #scales = np.linspace(0.5, 1.2, 20) / eptm.delta_o
     for n, delta in enumerate(deltas):
         geom.scale(sheet, delta,
                    sheet.coords+['basal_shift'])
@@ -44,18 +44,16 @@ def isotropic_energies(sheet, model, geom, deltas, dim_mod_specs):
         geom.update_all(sheet)
 
     energies /= sheet.face_df['is_alive'].sum()
-    isotropic_relax(sheet)
-    return(energies)
+    isotropic_relax(sheet, nondim_specs)
+    return energies
 
 
-def isotropic_relax(sheet, **mod_specs):
+def isotropic_relax(sheet, nondim_specs):
     """Deforms the sheet so that the faces area and
     pseudo-volume are at their isotropic optimum (on average)
 
     The specified model specs is assumed to be non-dimentional
     """
-    def_mod_specs = get_default_mod_specs()
-    def_mod_specs.update(**mod_specs)
 
     area0 = sheet.face_df['prefered_area'].mean()
     h_0 = sheet.face_df['prefered_height'].mean()
@@ -73,7 +71,7 @@ def isotropic_relax(sheet, **mod_specs):
     update_all(sheet)
 
     ### Optimal value for delta
-    delta_o = find_grad_roots(def_mod_specs)
+    delta_o = find_grad_roots(nondim_specs)
     if not np.isfinite(delta_o):
         raise ValueError('invalid parameters values')
     sheet.delta_o = delta_o
@@ -97,11 +95,11 @@ def isotropic_energy(delta, mod_specs):
 def isotropic_grad_poly(mod_specs):
     lbda = mod_specs['je']['line_tension']
     gamma = mod_specs['face']['contractility']
-    grad_poly = [3, 0, 0,
-                 -3,
+    grad_poly = [3, 0, 0, -3,
                  mu**2 * gamma,
                  mu * lbda / 2.]
     return grad_poly
+
 
 def isotropic_grad(mod_specs, delta):
     grad_poly = isotropic_grad_poly(mod_specs)
@@ -115,6 +113,7 @@ def find_grad_roots(mod_specs):
     if len(good_roots) == 1:
         return good_roots
     elif len(good_roots) > 1:
-        return good_roots
+        print('multiple roots')
+        return good_roots[0]
     else:
         return np.nan

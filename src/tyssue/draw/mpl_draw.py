@@ -162,18 +162,19 @@ def plot_forces(sheet, geom, model,
 
 
 def plot_analytical_to_numeric_comp(sheet, model, geom,
-                                    dim_mod_specs, mod_specs):
-    import tyssue.dynamics.sheet_isotropic_model as iso
+                                    isotropic_model, nondim_specs):
 
+    iso = isotropic_model
     fig, ax = plt.subplots(figsize=(8, 8))
+
     deltas = np.linspace(0.1, 1.8, 50)
 
-    lbda = mod_specs['je']['line_tension'][0]
-    gamma = mod_specs['face']['contractility'][0]
+    lbda = nondim_specs['je']['line_tension']
+    gamma = nondim_specs['face']['contractility']
 
-    ax.plot(deltas, iso.isotropic_energy(deltas, mod_specs), 'k-',
+    ax.plot(deltas, iso.isotropic_energy(deltas, nondim_specs), 'k-',
             label='Analytical total')
-    ax.plot(sheet.delta_o, iso.isotropic_energy(sheet.delta_o, mod_specs), 'ro')
+    ax.plot(sheet.delta_o, iso.isotropic_energy(sheet.delta_o, nondim_specs), 'ro')
     ax.plot(deltas, iso.elasticity(deltas), 'b-',
             label='Analytical volume elasticity')
     ax.plot(deltas, iso.contractility(deltas, gamma), color='orange', ls='-',
@@ -185,7 +186,7 @@ def plot_analytical_to_numeric_comp(sheet, model, geom,
     ax.set_ylabel(r'Isotropic energie $\bar E$')
 
     energies = iso.isotropic_energies(sheet, model, geom,
-                                      deltas, dim_mod_specs)
+                                      deltas, nondim_specs)
     # energies = energies / norm
     ax.plot(deltas, energies[:, 2], 'bo:', lw=2, alpha=0.8,
             label='Computed volume elasticity')

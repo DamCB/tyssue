@@ -14,6 +14,11 @@ DOWNLOAD_URL = 'https://github.com/CellModels/tyssue.git'
 # VERSION = '${Tyssue_VERSION}'
 VERSION = '0.1'
 
+
+files = ['*.so*', '*.a*', '*.lib*',
+         'config/*/*.json',]
+
+
 if __name__ == "__main__":
 
     setup(
@@ -42,7 +47,7 @@ if __name__ == "__main__":
                      ],
 
         packages=find_packages(),
-        package_data={'tyssue': ['*.so*', '*.a*', '*.lib*']},
+        package_data={'tyssue': files},
         include_package_data=True,
         zip_safe=False
     )

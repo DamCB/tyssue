@@ -15,38 +15,8 @@ from .effectors import elastic_force, elastic_energy
 
 from ..utils.utils import _to_3d
 
-def get_default_mod_specs():
-    """
-    Loads the default model specifications
 
-    Returns
-    -------
-    defautl_mod_spec: dict, the default values for the model
-      specifications
-    """
-    default_mod_specs = {
-        "face": {
-            "contractility": (0.04, np.float),
-            "vol_elasticity": (1., np.float),
-            "prefered_height": (10., np.float),
-            "prefered_area": (24., np.float),
-            "prefered_vol": (0., np.float),
-            },
-        "je": {
-            "line_tension": (0.12, np.float),
-            },
-        "jv": {
-            "radial_tension": (0., np.float),
-            },
-        "settings": {
-            'grad_norm_factor': 1.,
-            'nrj_norm_factor': 1.,
-            }
-        }
-    return default_mod_specs
-
-
-def dimentionalize(mod_specs, **kwargs):
+def dimentionalize(mod_specs):
     """
     Changes the values of the input gamma and lambda parameters
     from the values of the prefered height and area.
@@ -54,22 +24,17 @@ def dimentionalize(mod_specs, **kwargs):
     """
 
     dim_mod_specs = deepcopy(mod_specs)
-    for key, specs in kwargs.items():
-        dim_mod_specs[key].update(specs)
 
-    Kv = dim_mod_specs['face']['vol_elasticity'][0]
-    A0 = dim_mod_specs['face']['prefered_area'][0]
-    h0 = dim_mod_specs['face']['prefered_height'][0]
-    gamma = dim_mod_specs['face']['contractility'][0]
+    Kv = dim_mod_specs['face']['vol_elasticity']
+    A0 = dim_mod_specs['face']['prefered_area']
+    h0 = dim_mod_specs['face']['prefered_height']
+    gamma = dim_mod_specs['face']['contractility']
 
-    dim_mod_specs['face']['contractility'] = (gamma * Kv* A0 * h0**2,
-                                              np.float)
+    dim_mod_specs['face']['contractility'] = gamma * Kv* A0 * h0**2
+    dim_mod_specs['face']['prefered_vol'] = A0 * h0
 
-    dim_mod_specs['face']['prefered_vol'] = (A0 * h0, np.float)
-
-    lbda = dim_mod_specs['je']['line_tension'][0]
-    dim_mod_specs['je']['line_tension'] = (lbda * Kv * A0**1.5 * h0**2,
-                                           np.float)
+    lbda = dim_mod_specs['je']['line_tension']
+    dim_mod_specs['je']['line_tension'] = lbda * Kv * A0**1.5 * h0**2
 
     dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5 * h0**2
     dim_mod_specs['settings']['nrj_norm_factor'] = Kv * (A0*h0)**2
