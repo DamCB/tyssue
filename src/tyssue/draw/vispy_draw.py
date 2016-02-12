@@ -1,47 +1,39 @@
 
 import vispy as vp
-from vispy import app, gloo, visuals, scene
-from vispy.geometry import MeshData
+from vispy import app, scene
+from ..config.json_parser import load_default
+from ..utils.utils import spec_updater
 
-def draw_tyssue(eptm):
-    """TODO: refactor to accept datasets as arguments
-    """
-    vertices, faces, _ = eptm.triangular_mesh(['z', 'x', 'y'])
 
+def draw_tyssue(sheet, coords=None, **draw_specs_kw):
+
+    draw_specs = load_default('draw', 'sheet')
+    spec_updater(draw_specs, draw_specs_kw)
+
+    if coords is None:
+        coords = ['x', 'y', 'z']
+    vertices, faces, _ = sheet.triangular_mesh(coords)
     canvas = scene.SceneCanvas(keys='interactive', show=True)
-
     grid = canvas.central_widget.add_grid()
     view = grid.add_view(0, 1)
-    #view = canvas.central_widget.add_view()
     view.camera =  'turntable'
     view.camera.aspect = 1
-
-
     view.bgcolor = vp.color.Color('#aaaaaa')
 
+    if draw_specs['face']['visible']:
+        mesh = scene.visuals.Mesh(vertices=vertices,
+                                  faces=faces)
+        view.add(mesh)
 
+    if draw_specs['je']['visible']:
 
-    mesh = vp.scene.visuals.Mesh(vertices=vertices,
-                                 faces=faces)
+        wire_pos = vertices[sheet.Nc:].copy()
+        wire = vp.scene.visuals.Line(pos=wire_pos,
+                                     connect=faces[:, :2] - sheet.Nc,
+                                     color=[0.1, 0.1, 0.3, 0.8],
+                                     width=1)
+        view.add(wire)
 
-    wire_pos = vertices[eptm.Nc:].copy()
-
-
-    wire = vp.scene.visuals.Line(pos=wire_pos,
-                                 connect=faces[:, :2] - eptm.Nc,
-                                 color=[0.1, 0.1, 0.3, 0.8],
-                                 width=1)
-    fcenters = vp.scene.visuals.Markers(
-        pos=eptm.face_df[eptm.coords].values,
-        face_color=[1, 1, 1])
-
-    ccenters = vp.scene.visuals.Markers(
-        pos=eptm.cell_df[eptm.coords].values,
-        face_color=[1, 1, 1])
-
-    view.add(mesh)
-    view.add(wire)
-    view.add(fcenters)
+    view.camera.set_range()
     canvas.show()
-
     app.run()

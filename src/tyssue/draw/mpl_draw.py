@@ -10,43 +10,8 @@ import numpy as np
 from ..config.json_parser import load_default
 from ..utils.utils import spec_updater
 
-
-
-def get_default_draw_specs():
-    default_draw_specs = {
-        "je": {
-            'visible': True,
-            'width': 0.01,
-            'head_width': 0.02,
-            'length_includes_head': True,
-            'shape': 'right',
-            'color': '#2b5d0a',
-            'alpha': 0.8,
-            'zorder': 1
-            },
-        "jv": {
-            'visible': True,
-            's': 100,
-            'c': '#000a4b',
-            'alpha': 0.3,
-            'zorder': 2,
-            },
-        'grad': {
-            'color':'b',
-            'alpha':0.5,
-            'width':0.04,
-            },
-        "face": {
-            'visible': False,
-            'color':'#8aa678',
-            'alpha': 1,
-            'zorder': -1,
-            }
-        }
-    return default_draw_specs
-
-
 COORDS = ['x', 'y']
+
 
 def sheet_view(sheet, coords=COORDS, **draw_specs_kw):
     """ Base view function, parametrizable
@@ -86,11 +51,24 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
     for idx, poly in polys.items():
         patch = Polygon(poly,
                         fill=True,
-                        closed=True,
-                        **draw_spec)
+                        closed=True)
         patches.append(patch)
-    ax.add_collection(PatchCollection(patches, True))
+    collection_specs = parse_face_specs(draw_spec)
+    ax.add_collection(PatchCollection(patches, False,
+                                      **collection_specs))
     return ax
+
+def parse_face_specs(face_draw_specs):
+
+    collection_specs = {}
+    if "color" in face_draw_specs:
+        collection_specs['facecolors'] = face_draw_specs['color']
+    if "alpha" in face_draw_specs:
+        collection_specs['alpha'] = face_draw_specs['alpha']
+    if "zorder" in face_draw_specs:
+        collection_specs['zorder'] = face_draw_specs['zorder']
+
+    return collection_specs
 
 
 def draw_jv(sheet, coords, ax, **draw_spec_kw):
@@ -115,19 +93,35 @@ def draw_je(sheet, coords, ax, **draw_spec_kw):
                           sheet.je_df[dy])
 
     patches = []
-    arrow_args = ["visible", "head_width", "shape", "zorder"]
-    collection_args = ["width", "color"]
+    arrow_specs, collections_specs = parse_je_specs(draw_spec)
     for idx, je in sheet.je_df[app_length > 1e-6].iterrows():
         srce  = int(je['srce'])
         arrow = FancyArrow(sheet.jv_df[x].loc[srce],
                            sheet.jv_df[y].loc[srce],
                            sheet.je_df[dx].loc[idx],
                            sheet.je_df[dy].loc[idx],
-                            **draw_spec)
+                            **arrow_specs)
         patches.append(arrow)
 
-    ax.add_collection(PatchCollection(patches, True))
+    ax.add_collection(PatchCollection(patches, True, **collections_specs))
     return ax
+
+
+def parse_je_specs(je_draw_specs):
+
+    arrow_keys = ['head_width',
+                  'length_includes_head',
+                  'shape']
+    arrow_specs = {key: val for key, val in je_draw_specs.items()
+                   if key in arrow_keys}
+    collection_specs = {}
+    if "color" in je_draw_specs:
+        collection_specs['edgecolors'] = je_draw_specs['color']
+    if "width" in je_draw_specs:
+        collection_specs['linewidths'] = je_draw_specs['width']
+    if "alpha" in je_draw_specs:
+        collection_specs['alpha'] = je_draw_specs['alpha']
+    return arrow_specs, collection_specs
 
 
 def plot_forces(sheet, geom, model,
