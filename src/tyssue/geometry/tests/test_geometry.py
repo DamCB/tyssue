@@ -3,15 +3,13 @@ import numpy as np
 from tyssue.core.sheet import Sheet
 from tyssue.core.generation import three_faces_sheet
 
-from tyssue.geometry import sheet_geometry as sgeom
-from tyssue.utils.utils import set_data_columns
+from tyssue.geometry.sheet_geometry import SheetGeometry as sgeom
 
 def test_3faces():
-    datasets, data_dicts = three_faces_sheet()
-    sheet = Sheet('3faces_2D', datasets, data_dicts)
+    datasets, specs = three_faces_sheet()
+    sheet = Sheet('3faces_2D', datasets, specs)
     sheet.set_geom('sheet')
 
-    #sgeom.update_all(sheet, coords=sheet.coords)
 
     sgeom.update_dcoords(sheet)
     sgeom.update_length(sheet)

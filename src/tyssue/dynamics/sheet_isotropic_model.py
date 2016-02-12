@@ -2,9 +2,7 @@
 Isotropic functions
 '''
 import numpy as np
-
-from ..geometry.base_geometry import scale
-from ..geometry.sheet_geometry import update_all
+from ..geometry.sheet_geometry import SheetGeometry as sgeom
 
 mu = 6 * np.sqrt(2. / (3 * np.sqrt(3)))
 
@@ -48,7 +46,7 @@ def isotropic_energies(sheet, model, geom,
     return energies
 
 
-def isotropic_relax(sheet, nondim_specs):
+def isotropic_relax(sheet, nondim_specs, geom=sgeom):
     """Deforms the sheet so that the faces area and
     pseudo-volume are at their isotropic optimum (on average)
 
@@ -65,10 +63,10 @@ def isotropic_relax(sheet, nondim_specs):
 
     ### Set height and area to height0 and area0
     delta = (area0 / area_avg)**0.5
-    scale(sheet, delta, coords=sheet.coords)
+    geom.scale(sheet, delta, coords=sheet.coords)
     sheet.face_df['basal_shift'] = rho_avg * delta - h_0
     sheet.jv_df['basal_shift'] = rho_avg * delta - h_0
-    update_all(sheet)
+    geom.update_all(sheet)
 
     ### Optimal value for delta
     delta_o = find_grad_roots(nondim_specs)
@@ -76,8 +74,8 @@ def isotropic_relax(sheet, nondim_specs):
         raise ValueError('invalid parameters values')
     sheet.delta_o = delta_o
     ### Scaling
-    scale(sheet, delta_o, coords=sheet.coords+['basal_shift',])
-    update_all(sheet)
+    geom.scale(sheet, delta_o, coords=sheet.coords+['basal_shift',])
+    geom.update_all(sheet)
 
 def isotropic_energy(delta, mod_specs):
     """

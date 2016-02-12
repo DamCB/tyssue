@@ -3,9 +3,13 @@ Matplotlib based plotting
 """
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon
+from matplotlib.patches import Polygon, FancyArrow
+from matplotlib.collections import PatchCollection
 import pandas as pd
 import numpy as np
+from ..config.json_parser import load_default
+from ..utils.utils import spec_updater
+
 
 
 def get_default_draw_specs():
@@ -48,8 +52,8 @@ def sheet_view(sheet, coords=COORDS, **draw_specs_kw):
     """ Base view function, parametrizable
     through draw_secs
     """
-    draw_specs = get_default_draw_specs()
-    draw_specs.update(**draw_specs_kw)
+    draw_specs = load_default('draw', 'sheet')
+    spec_updater(draw_specs, draw_specs_kw)
 
     fig, ax = plt.subplots()
     jv_spec = draw_specs['jv']
@@ -73,31 +77,27 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
     Keyword values can be specified at the element
     level as columns of the sheet.face_df
     """
-    draw_spec = get_default_draw_specs()['face']
+
+    draw_spec = load_default('draw', 'sheet')['face']
     draw_spec.update(**draw_spec_kw)
-    per_element_kw = set(draw_spec.keys()).intersection(sheet.face_df.columns)
 
     polys = sheet.face_polygons(coords)
+    patches = []
     for idx, poly in polys.items():
-        draw_spec.update({kw: sheet.face_df.loc[idx, kw]
-                          for kw in per_element_kw})
         patch = Polygon(poly,
                         fill=True,
                         closed=True,
                         **draw_spec)
-        ax.add_patch(patch)
+        patches.append(patch)
+    ax.add_collection(PatchCollection(patches, True))
     return ax
 
 
 def draw_jv(sheet, coords, ax, **draw_spec_kw):
     """Draw junction vertices in matplotlib
     """
-    draw_spec = get_default_draw_specs()['jv']
-
+    draw_spec = load_default('draw', 'sheet')['jv']
     draw_spec.update(**draw_spec_kw)
-    per_element_kw = set(draw_spec.keys()).intersection(sheet.jv_df.columns)
-    draw_spec.update({key: sheet.jv_df[key]
-                      for key in per_element_kw})
 
     x, y = coords
     ax.scatter(sheet.jv_df[x], sheet.jv_df[y], **draw_spec_kw)
@@ -106,22 +106,27 @@ def draw_jv(sheet, coords, ax, **draw_spec_kw):
 def draw_je(sheet, coords, ax, **draw_spec_kw):
     """
     """
-    draw_spec = get_default_draw_specs()['je']
+    draw_spec = load_default('draw', 'sheet')['je']
     draw_spec.update(**draw_spec_kw)
-    per_element_kw = set(draw_spec.keys()).intersection(sheet.je_df.columns)
 
     x, y = coords
     dx, dy = ('d'+c for c in coords)
     app_length = np.hypot(sheet.je_df[dx],
                           sheet.je_df[dy])
 
+    patches = []
+    arrow_args = ["visible", "head_width", "shape", "zorder"]
+    collection_args = ["width", "color"]
     for idx, je in sheet.je_df[app_length > 1e-6].iterrows():
         srce  = int(je['srce'])
-        draw_spec.update({key: sheet.je_df.loc[idx, key]
-                          for key in per_element_kw})
-        ax.arrow(sheet.jv_df[x].loc[srce], sheet.jv_df[y].loc[srce],
-                 sheet.je_df[dx].loc[idx], sheet.je_df[dy].loc[idx],
-                 **draw_spec)
+        arrow = FancyArrow(sheet.jv_df[x].loc[srce],
+                           sheet.jv_df[y].loc[srce],
+                           sheet.je_df[dx].loc[idx],
+                           sheet.je_df[dy].loc[idx],
+                            **draw_spec)
+        patches.append(arrow)
+
+    ax.add_collection(PatchCollection(patches, True))
     return ax
 
 
@@ -129,12 +134,12 @@ def plot_forces(sheet, geom, model,
                 coords, scaling,
                 ax=None,
                 approx_grad=None,
-                **draw_spec_kws):
+                **draw_specs_kw):
     """Plot the net forces at each vertex, with their amplitudes multiplied
     by `scaling`
     """
-    draw_specs = get_default_draw_specs()
-    draw_specs.update(**draw_spec_kws)
+    draw_specs = load_default('draw', 'sheet')
+    spec_updater(draw_specs, draw_specs_kw)
     gcoords = ['g'+c for c in coords]
     if approx_grad is not None:
         app_grad = approx_grad(sheet, geom, model)

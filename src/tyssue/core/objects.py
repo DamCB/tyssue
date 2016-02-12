@@ -111,7 +111,6 @@ class Epithelium:
         if specs is None:
             specs = {name:{} for name in self.data_names}
         self.specs = specs
-        self.settings = {}
         self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
                                                    names=self.element_names)
         ## Topology (geometry independant)
@@ -123,6 +122,14 @@ class Epithelium:
         # TODO
         raise NotImplementedError
 
+
+    @property
+    def settings(self):
+        return self.specs['settings']
+
+    @settings.setter
+    def settings(self, key, value):
+        self.specs['settings'][key] = value
 
 
     @classmethod
@@ -153,8 +160,6 @@ class Epithelium:
     def update_specs(self, new, reset=False):
 
         spec_updater(self.specs, new)
-        if 'settings' in new:
-            self.settings.update(new['settings'])
         set_data_columns(self.datasets, new, reset)
 
     def set_specs(self, domain, base,
@@ -305,6 +310,30 @@ class Epithelium:
         return self._lvl_sum(df, 'cell')
 
     def get_orbits(self, center, periph):
+        """Returns a dataframe with a `(center, je)` MultiIndex with `periph`
+        elements.
+
+        Parmeters
+        ---------
+        center: str,
+            the name of the center element for example 'face', 'srce'
+        periph: str,
+            the name of the periphery elements, for example 'trgt', 'cell'
+
+        Example
+        -------
+        >>> cell_jvs = sheet.get_orbits('face', 'srce')
+        >>> cell_jvs.loc[45]
+        je
+        218    75
+        219    78
+        220    76
+        221    81
+        222    90
+        223    87
+        Name: srce, dtype: int64
+
+        """
         orbits = self.je_df.groupby(center).apply(
             lambda df: df[periph])
         return orbits
