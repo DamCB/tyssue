@@ -47,7 +47,7 @@ def draw_tyssue(sheet, coords=None, **draw_specs_kw):
                                        columns=['R', 'G', 'B', 'A'][:colors.shape[1]])
             face_colors = sheet.upcast_face(face_colors)
 
-        elif colors.shape in [(3, sheet.Ne), (4, sheet.Ne)]:
+        elif colors.shape in [(sheet.Ne, 3), (sheet.Ne, 4)]:
             face_colors = pd.DataFrame(index=sheet.face_df.index, data=colors,
                                        columns=['R', 'G', 'B', 'A'][:colors.shape[1]])
 
@@ -63,28 +63,50 @@ def draw_tyssue(sheet, coords=None, **draw_specs_kw):
         if isinstance(draw_specs['je']['color'], str):
             color = draw_specs['je']['color']
 
-        colors = np.asarray(draw_specs['je']['color'])
-        if colors.shape == (3,):
-            color = pd.DataFrame(index=sheet.je_df.index,
-                                 columns=['R', 'G', 'B', 'A'])
-            for channel, val in zip('RGB', colors):
-                color[channel] = val
-            color['A'] = 1.
+        else:
+            colors = np.asarray(draw_specs['je']['color'])
+            if colors.shape == (3,):
+                color = pd.DataFrame(index=sheet.jv_df.index,
+                                     columns=['R', 'G', 'B', 'A'])
+                for channel, val in zip('RGB', colors):
+                    color[channel] = val
+                color['A'] = draw_specs['je'].get('alpha', 1.)
 
-        elif colors.shape == (4,):
-            color = pd.DataFrame(index=sheet.je_df.index,
-                                 columns=['R', 'G', 'B', 'A'])
-            for channel, val in zip('RGBA', color):
-                color[channel] = val
+            elif colors.shape == (4,):
+                color = pd.DataFrame(index=sheet.jv_df.index,
+                                     columns=['R', 'G', 'B', 'A'])
+                for channel, val in zip('RGBA', colors):
+                    color[channel] = val
 
-        elif colors.shape == (3, sheet.Ne):
-            color = pd.DataFrame(index=sheet.je_df.index, data=colors,
-                                 columns=['R', 'G', 'B'])
-            color['A'] = 1.
+            elif colors.shape == (sheet.Ne, 3):
+                color = pd.DataFrame(index=sheet.je_df.index, data=colors,
+                                     columns=['R', 'G', 'B'])
+                color['A'] = draw_specs['je'].get('alpha', 1.)
+                # Strangely, color spec is on a vertex, not segment, basis
+                color['srce'] = sheet.je_df['srce']
+                color = color.groupby('srce').mean()
 
-        elif colors.shape == (4, sheet.Ne):
-            color = pd.DataFrame(index=sheet.je_df.index, data=colors,
-                                 columns=['R', 'G', 'B', 'A'])
+            elif colors.shape == (sheet.Ne, 4):
+                color = pd.DataFrame(index=sheet.je_df.index, data=colors,
+                                     columns=['R', 'G', 'B', 'A'])
+                # Strangely, color spec is on a vertex, not segment, basis
+                color['srce'] = sheet.je_df['srce']
+                color = color.groupby('srce').mean()
+
+            elif colors.shape == (sheet.Nv, 3):
+                color = pd.DataFrame(index=sheet.jv_df.index, data=colors,
+                                     columns=['R', 'G', 'B'])
+                color['A'] = draw_specs['je'].get('alpha', 1.)
+
+            elif colors.shape == (sheet.Nv, 4):
+                color = pd.DataFrame(index=sheet.jv_df.index, data=colors,
+                                     columns=['R', 'G', 'B', 'A'])
+
+
+            else:
+                raise ValueError('''Shape of the color argument doesn't'''
+                                 ''' mach the number of edges ''')
+
 
 
         wire_pos = vertices[sheet.Nc:].copy()
