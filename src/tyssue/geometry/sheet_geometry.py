@@ -79,3 +79,45 @@ class SheetGeometry(PlanarGeometry):
 
             sheet.jv_df['rho'] = sheet.jv_df[w]
             sheet.jv_df['height'] = sheet.jv_df[w] - sheet.jv_df['basal_shift']
+
+    @staticmethod
+    def face_rotation(sheet, face, psi=0):
+
+        normal = sheet.je_df[sheet.je_df['face']==face][sheet.ncoords].mean()
+        normal = normal / np.linalg.norm(normal)
+        cos_psi = np.cos(psi)
+        sin_psi = np.sin(psi)
+
+        phi = np.arctan2(normal.ny, normal.nx)
+        cos_phi = np.cos(phi)
+        sin_phi = np.sin(phi)
+        cos_theta = normal.nz
+        sin_theta = (1 - cos_theta**2)**0.5
+
+        rotation = np.array([[ cos_psi*cos_phi - sin_psi*cos_theta*sin_phi,
+                              -cos_psi*sin_phi - sin_psi*cos_theta*cos_phi,
+                              sin_psi*sin_theta],
+                             [ sin_psi*cos_phi + cos_psi*cos_theta*sin_phi,
+                              -sin_psi*sin_phi + cos_psi*cos_theta*cos_phi,
+                              -cos_psi*sin_theta],
+                             [sin_theta*sin_phi,
+                              sin_theta*cos_phi,
+                              cos_theta]])
+
+        return rotation
+
+    @classmethod
+    def face_projected_pos(cls, sheet, face, psi=0):
+
+        face_orbit = sheet.je_df[sheet.je_df['face'] == face]['srce']
+        n_sides = face_orbit.shape[0]
+        face_pos =  np.repeat(
+            sheet.face_df.loc[face, sheet.coords].values,
+            n_sides).reshape(len(sheet.coords), n_sides).T
+        rel_pos = sheet.jv_df.loc[face_orbit.values, sheet.coords] - face_pos
+
+        rotation = cls.face_rotation(sheet, face, psi=psi)
+
+        rot_pos = rel_pos.copy()
+        rot_pos.loc[:] = np.dot(rotation, rel_pos.T).T
+        return rot_pos

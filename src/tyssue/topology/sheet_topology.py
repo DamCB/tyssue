@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def type1_transition(sheet, je01, epsilon=0.1):
     """Performs a type 1 transition around the edge je01
@@ -60,3 +60,72 @@ def type1_transition(sheet, je01, epsilon=0.1):
     sheet.jv_df.loc[jv1, sheet.coords] = (mean_pos -
                                           (mean_pos - cell_d_pos) * epsilon)
     sheet.reset_topo()
+
+
+def add_jv(sheet, je):
+
+    srce, trgt = sheet.je_df.loc[je, ['srce', 'trgt']]
+    opposite = sheet.je_df[(sheet.je_df['srce'] == trgt)
+                           & (sheet.je_df['trgt'] == srce)]
+    opp_je = opposite.index[0]
+
+    new_jv = sheet.jv_df.loc[[srce, trgt]].mean()
+    sheet.jv_df = sheet.jv_df.append(new_jv, ignore_index=True)
+    new_jv = sheet.jv_df.index[-1]
+    sheet.je_df.loc[je, 'trgt'] = new_jv
+    sheet.je_df.loc[opp_je, 'srce'] = new_jv
+
+    je_cols = sheet.je_df.loc[je]
+    sheet.je_df = sheet.je_df.append(je_cols, ignore_index=True)
+    new_je = sheet.je_df.index[-1]
+    sheet.je_df.loc[new_je, 'srce'] = new_jv
+    sheet.je_df.loc[new_je, 'trgt'] = trgt
+
+    je_cols = sheet.je_df.loc[opp_je]
+    sheet.je_df = sheet.je_df.append(je_cols, ignore_index=True)
+    new_opp_je = sheet.je_df.index[-1]
+    sheet.je_df.loc[new_opp_je, 'trgt'] = new_jv
+    sheet.je_df.loc[new_opp_je, 'srce'] = trgt
+    return new_jv, new_je, new_opp_je
+
+
+def cell_division(sheet, mother, geom, angle=None):
+
+    if angle is None:
+        angle = np.random.random() * np.pi
+
+    m_data = sheet.je_df[sheet.je_df['face'] == mother]
+    rot_pos = geom.face_projected_pos(sheet, mother, psi=angle)
+    srce_pos = rot_pos.loc[m_data['srce'], 'x']
+    srce_pos.index = m_data.index
+    trgt_pos = rot_pos.loc[m_data['trgt'], 'x']
+    trgt_pos.index = m_data.index
+
+    je_a = m_data[(srce_pos < 0) & (trgt_pos > 0)].index[0]
+    je_b = m_data[(srce_pos > 0) & (trgt_pos < 0)].index[0]
+
+
+    jv_a, new_je_a, new_opp_je_a = add_jv(sheet, je_a)
+    jv_b, new_je_b, new_opp_je_b = add_jv(sheet, je_b)
+
+    face_cols = sheet.face_df.loc[mother]
+    sheet.face_df = sheet.face_df.append(face_cols,
+                                         ignore_index=True)
+    daughter = int(sheet.face_df.index[-1])
+
+
+    je_cols = sheet.je_df.loc[new_je_b]
+    sheet.je_df = sheet.je_df.append(je_cols, ignore_index=True)
+    new_je_m = sheet.je_df.index[-1]
+    sheet.je_df.loc[new_je_m, 'srce'] = jv_b
+    sheet.je_df.loc[new_je_m, 'trgt'] = jv_a
+
+    sheet.je_df = sheet.je_df.append(je_cols, ignore_index=True)
+    new_je_d = sheet.je_df.index[-1]
+    sheet.je_df.loc[new_je_d, 'srce'] = jv_a
+    sheet.je_df.loc[new_je_d, 'trgt'] = jv_b
+
+    daughter_jes = list(m_data[srce_pos < 0].index) + [new_je_b, new_je_d]
+    sheet.je_df.loc[daughter_jes, 'face'] = daughter
+    sheet.reset_topo()
+    geom.update_all(sheet)
