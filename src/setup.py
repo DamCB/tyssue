@@ -16,7 +16,7 @@ VERSION = '0.1'
 
 
 files = ['*.so*', '*.a*', '*.lib*',
-         'config/*/*.json',]
+         'config/*/*.json','stores/*.*']
 
 
 if __name__ == "__main__":

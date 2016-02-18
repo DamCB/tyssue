@@ -1,4 +1,8 @@
 import numpy as np
+import logging
+
+logger = logging.getLogger(name=__name__)
+
 
 def type1_transition(sheet, je01, epsilon=0.1):
     """Performs a type 1 transition around the edge je01
@@ -90,6 +94,10 @@ def add_jv(sheet, je):
 
 
 def cell_division(sheet, mother, geom, angle=None):
+
+    if not sheet.face_df.loc[mother, 'is_alive']:
+        logger.warning('Cell {} is not alive and cannot devide'.format(mother))
+        return
 
     if angle is None:
         angle = np.random.random() * np.pi

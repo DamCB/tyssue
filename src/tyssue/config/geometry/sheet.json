@@ -4,8 +4,8 @@
     "y": 0.0,
     "z": 0.0,
     "num_sides": 6,
-    "area": 0.0,
-    "perimeter": 0.0,
+    "area": 1.0,
+    "perimeter": 1.0,
     "is_alive": true
     },
  "jv": {

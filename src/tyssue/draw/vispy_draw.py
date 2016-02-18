@@ -8,7 +8,7 @@ from ..config.json_parser import load_default
 from ..utils.utils import spec_updater
 
 
-def draw_tyssue(sheet, coords=None, **draw_specs_kw):
+def vp_view(sheet, coords=None, **draw_specs_kw):
 
     draw_specs = load_default('draw', 'sheet')
     spec_updater(draw_specs, draw_specs_kw)
@@ -116,6 +116,6 @@ def draw_tyssue(sheet, coords=None, **draw_specs_kw):
                                      width=draw_specs['je']['width'])
         view.add(wire)
 
-    view.camera.set_range()
     canvas.show()
+    view.camera.set_range()
     app.run()
