@@ -33,3 +33,16 @@ def test_solver():
     grad_err = solver.check_grad(sheet, geom, model)
     grad_err /= sheet.jv_df.size
     assert_almost_equal(grad_err, 0.0, DECIMAL)
+
+    settings = {
+        'minimize': {
+            'options': {
+                'disp':False,
+                'ftol':1e-4,
+                'gtol':1e-4},
+            }
+        }
+
+
+    res = solver.find_energy_min(sheet, geom, model, **settings)
+    assert res['success']
