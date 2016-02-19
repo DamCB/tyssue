@@ -15,7 +15,7 @@ log = logging.getLogger(name=__name__)
 The following data is an exemple of the `specs`.
 It is a nested dictionnary with two levels.
 
-The first key design obedgects names: ('face', 'edge', 'vert') They will
+The first key design objects names: ('face', 'edge', 'vert') They will
 correspond to the dataframes attributes of the Epithelium instance,
 (e.g eptm.face_df);
 
