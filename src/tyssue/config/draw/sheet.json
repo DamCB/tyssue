@@ -1,8 +1,8 @@
 {
     "edge": {
 	"visible": true,
-        "width": 0.01,
-        "head_width": 0.02,
+        "width": 0.5,
+        "head_width": 0.2,
         "length_includes_head": true,
         "shape": "right",
         "color": "#2b5d0a",

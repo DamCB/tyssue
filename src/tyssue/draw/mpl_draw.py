@@ -103,7 +103,7 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
                             **arrow_specs)
         patches.append(arrow)
 
-    ax.add_collection(PatchCollection(patches, True, **collections_specs))
+    ax.add_collection(PatchCollection(patches, False, **collections_specs))
     return ax
 
 

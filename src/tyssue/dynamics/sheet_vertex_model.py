@@ -113,9 +113,10 @@ class SheetModel(PlanarModel):
         area_ = sheet.edge_df['sub_area']
         area = _to_3d(area_)
         grad_a_srce, grad_a_trgt = area_grad(sheet)
+        grad_h = sheet.upcast_srce(height_grad(sheet))
 
         grad_v_srce = kv_v0 * (edge_h * grad_a_srce +
-                               area * height_grad(sheet))
+                               area * grad_h)
         grad_v_trgt = kv_v0 * (edge_h * grad_a_trgt)
 
         return grad_v_srce, grad_v_trgt
