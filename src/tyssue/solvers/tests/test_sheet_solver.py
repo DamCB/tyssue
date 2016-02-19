@@ -18,7 +18,7 @@ DECIMAL = 5
 def test_solver():
     h5store = 'small_hexagonal.hf5'
     datasets = load_datasets(h5store,
-                         data_names=['face', 'jv', 'je'])
+                         data_names=['face', 'vert', 'edge'])
     sheet = Sheet('emin', datasets)
     sheet.set_geom('sheet')
     nondim_specs = load_default('dynamics', 'sheet')
@@ -29,9 +29,9 @@ def test_solver():
     sheet.nrj_norm_factor = sheet.specs['settings']['nrj_norm_factor']
     geom.update_all(sheet)
     isotropic_relax(sheet, nondim_specs)
-    sheet.jv_df.is_active = 1
+    sheet.vert_df.is_active = 1
     grad_err = solver.check_grad(sheet, geom, model)
-    grad_err /= sheet.jv_df.size
+    grad_err /= sheet.vert_df.size
     assert_almost_equal(grad_err, 0.0, DECIMAL)
 
     settings = {

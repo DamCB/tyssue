@@ -1,5 +1,5 @@
 {
-"jv": {
+"vert": {
     "z": 0.0,
     "x": 0.0,
     "is_active": true,
@@ -22,7 +22,7 @@
     "is_alive": true,
     "y": 0.0
     },
-"je": {
+"edge": {
     "dz": 0.0,
     "ny": 0.0,
     "dx": 0.0,

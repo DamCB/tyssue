@@ -37,20 +37,20 @@ class SheetGeometry(PlanarGeometry):
         '''
         coords = sheet.coords
         face_pos = sheet.upcast_face(sheet.face_df[coords]).values
-        srce_pos = sheet.upcast_srce(sheet.jv_df[coords]).values
-        trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords]).values
+        srce_pos = sheet.upcast_srce(sheet.vert_df[coords]).values
+        trgt_pos = sheet.upcast_trgt(sheet.vert_df[coords]).values
 
         normals = np.cross(srce_pos - face_pos, trgt_pos - srce_pos)
-        sheet.je_df[sheet.ncoords] = normals
+        sheet.edge_df[sheet.ncoords] = normals
 
     @staticmethod
     def update_areas(sheet):
         '''
         Updates the normal coordniate of each (srce, trgt, face) face.
         '''
-        sheet.je_df['sub_area'] = np.linalg.norm(sheet.je_df[sheet.ncoords],
+        sheet.edge_df['sub_area'] = np.linalg.norm(sheet.edge_df[sheet.ncoords],
                                                  axis=1) / 2
-        sheet.face_df['area'] = sheet.sum_face(sheet.je_df['sub_area'])
+        sheet.face_df['area'] = sheet.sum_face(sheet.edge_df['sub_area'])
 
     @staticmethod
     def update_vol(sheet):
@@ -59,9 +59,9 @@ class SheetGeometry(PlanarGeometry):
         module.
 
         '''
-        sheet.je_df['sub_vol'] = (sheet.upcast_srce(sheet.jv_df['height']) *
-                                  sheet.je_df['sub_area'])
-        sheet.face_df['vol'] = sheet.sum_face(sheet.je_df['sub_vol'])
+        sheet.edge_df['sub_vol'] = (sheet.upcast_srce(sheet.vert_df['height']) *
+                                  sheet.edge_df['sub_area'])
+        sheet.face_df['vol'] = sheet.sum_face(sheet.edge_df['sub_vol'])
 
     @staticmethod
     def update_height(sheet):
@@ -70,20 +70,20 @@ class SheetGeometry(PlanarGeometry):
         u, v = (c for c in sheet.coords if c != w)
         if sheet.settings['geometry'] == 'cylindrical':
 
-            sheet.jv_df['rho'] = np.hypot(sheet.jv_df[v],
-                                          sheet.jv_df[u])
-            sheet.jv_df['height'] = (sheet.jv_df['rho'] -
-                                     sheet.jv_df['basal_shift'])
+            sheet.vert_df['rho'] = np.hypot(sheet.vert_df[v],
+                                          sheet.vert_df[u])
+            sheet.vert_df['height'] = (sheet.vert_df['rho'] -
+                                     sheet.vert_df['basal_shift'])
 
         elif sheet.settings['geometry'] == 'flat':
 
-            sheet.jv_df['rho'] = sheet.jv_df[w]
-            sheet.jv_df['height'] = sheet.jv_df[w] - sheet.jv_df['basal_shift']
+            sheet.vert_df['rho'] = sheet.vert_df[w]
+            sheet.vert_df['height'] = sheet.vert_df[w] - sheet.vert_df['basal_shift']
 
     @staticmethod
     def face_rotation(sheet, face, psi=0):
 
-        normal = sheet.je_df[sheet.je_df['face']==face][sheet.ncoords].mean()
+        normal = sheet.edge_df[sheet.edge_df['face']==face][sheet.ncoords].mean()
         normal = normal / np.linalg.norm(normal)
         cos_psi = np.cos(psi)
         sin_psi = np.sin(psi)
@@ -107,14 +107,14 @@ class SheetGeometry(PlanarGeometry):
         return rotation
 
     @classmethod
-    def face_projected_pos(cls, sheet, face, psi=0):
+    def face_proedgected_pos(cls, sheet, face, psi=0):
 
-        face_orbit = sheet.je_df[sheet.je_df['face'] == face]['srce']
+        face_orbit = sheet.edge_df[sheet.edge_df['face'] == face]['srce']
         n_sides = face_orbit.shape[0]
         face_pos =  np.repeat(
             sheet.face_df.loc[face, sheet.coords].values,
             n_sides).reshape(len(sheet.coords), n_sides).T
-        rel_pos = sheet.jv_df.loc[face_orbit.values, sheet.coords] - face_pos
+        rel_pos = sheet.vert_df.loc[face_orbit.values, sheet.coords] - face_pos
 
         rotation = cls.face_rotation(sheet, face, psi=psi)
 

@@ -108,17 +108,17 @@ def from_3d_voronoi(voro):
     el_idx = np.array(el_idx)
 
     coords = ['x', 'y', 'z']
-    je_idx = pd.Index(range(el_idx.shape[0]), name='je')
-    je_df = make_df(je_idx,
-                    specs3d['je'])
+    edge_idx = pd.Index(range(el_idx.shape[0]), name='edge')
+    edge_df = make_df(edge_idx,
+                    specs3d['edge'])
 
     for i, elem in enumerate(['srce', 'trgt', 'face', 'cell']):
-        je_df[elem] = el_idx[:, i]
+        edge_df[elem] = el_idx[:, i]
 
-    jv_idx = pd.Index(range(voro.vertices.shape[0]), name='jv')
-    jv_df = make_df(jv_idx,
-                    specs3d['jv'])
-    jv_df[coords] = voro.vertices
+    vert_idx = pd.Index(range(voro.vertices.shape[0]), name='vert')
+    vert_df = make_df(vert_idx,
+                    specs3d['vert'])
+    vert_df[coords] = voro.vertices
 
     cell_idx = pd.Index(range(voro.points.shape[0]), name='cell')
     cell_df = make_df(cell_idx,
@@ -128,11 +128,11 @@ def from_3d_voronoi(voro):
     nfaces = len(voro.ridge_vertices)
     face_idx = pd.Index(np.arange(nfaces), name='face')
     face_df = make_df(face_idx, specs3d['face'])
-    je_df.sort_values(by='cell', inplace=True)
+    edge_df.sort_values(by='cell', inplace=True)
 
     datasets= {
-        'jv': jv_df,
-        'je': je_df,
+        'vert': vert_df,
+        'edge': edge_df,
         'face': face_df,
         'cell': cell_df,
         }
@@ -166,24 +166,24 @@ def from_2d_voronoi(voro, specs=None):
 
     el_idx = np.array(el_idx)
     coords = ['x', 'y']
-    je_idx = pd.Index(range(el_idx.shape[0]), name='je')
-    je_df = make_df(je_idx, specs['je'])
+    edge_idx = pd.Index(range(el_idx.shape[0]), name='edge')
+    edge_df = make_df(edge_idx, specs['edge'])
 
     for i, elem in enumerate(['srce', 'trgt', 'face']):
-        je_df[elem] = el_idx[:, i]
+        edge_df[elem] = el_idx[:, i]
 
-    jv_idx = pd.Index(range(voro.vertices.shape[0]), name='jv')
-    jv_df = make_df(jv_idx, specs['jv'])
+    vert_idx = pd.Index(range(voro.vertices.shape[0]), name='vert')
+    vert_df = make_df(vert_idx, specs['vert'])
 
-    jv_df[coords] = voro.vertices
+    vert_df[coords] = voro.vertices
 
     face_idx = pd.Index(range(voro.points.shape[0]), name='face')
     face_df = make_df(face_idx, specs['face'])
     face_df[coords] = voro.points
 
     datasets= {
-        'jv': jv_df,
-        'je': je_df,
+        'vert': vert_df,
+        'edge': edge_df,
         'face': face_df,
         }
     return datasets
@@ -264,8 +264,8 @@ def three_faces_sheet(zaxis=False):
     -------
 
     face_df: the faces `DataFrame` indexed from 0 to 2
-    jv_df: the junction vertices `DataFrame`
-    je_df: the junction edges `DataFrame`
+    vert_df: the junction vertices `DataFrame`
+    edge_df: the junction edges `DataFrame`
 
     '''
     points, _, (Nc, Nv, Ne) = three_faces_sheet_array()
@@ -276,9 +276,9 @@ def three_faces_sheet(zaxis=False):
         coords = ['x', 'y']
 
     face_idx = pd.Index(range(Nc), name='face')
-    jv_idx = pd.Index(range(Nv), name='jv')
+    vert_idx = pd.Index(range(Nv), name='vert')
 
-    _je_e_idx = np.array([[0, 1, 0],
+    _edge_e_idx = np.array([[0, 1, 0],
                           [1, 2, 0],
                           [2, 3, 0],
                           [3, 4, 0],
@@ -297,7 +297,7 @@ def three_faces_sheet(zaxis=False):
                           [12, 1, 2],
                           [1, 0, 2]])
 
-    je_idx = pd.Index(range(_je_e_idx.shape[0]), name='je')
+    edge_idx = pd.Index(range(_edge_e_idx.shape[0]), name='edge')
 
     specifications = load_default('geometry', 'sheet')
     ### Face - face graph
@@ -309,17 +309,17 @@ def three_faces_sheet(zaxis=False):
                       spec=specifications['face'])
 
     ### Junction vertices and edges DataFrames
-    jv_df = make_df(index=jv_idx,
-                    spec=specifications['jv'])
-    je_df = make_df(index=je_idx,
-                    spec=specifications['je'])
-    je_df['srce'] = _je_e_idx[:, 0]
-    je_df['trgt'] = _je_e_idx[:, 1]
-    je_df['face'] = _je_e_idx[:, 2]
+    vert_df = make_df(index=vert_idx,
+                    spec=specifications['vert'])
+    edge_df = make_df(index=edge_idx,
+                    spec=specifications['edge'])
+    edge_df['srce'] = _edge_e_idx[:, 0]
+    edge_df['trgt'] = _edge_e_idx[:, 1]
+    edge_df['face'] = _edge_e_idx[:, 2]
 
-    jv_df.loc[:, coords[:2]] = points
+    vert_df.loc[:, coords[:2]] = points
     if zaxis:
-        jv_df.loc[:, coords[2:]] = 0.
+        vert_df.loc[:, coords[2:]] = 0.
 
-    datasets = {'face': face_df, 'jv': jv_df, 'je': je_df}
+    datasets = {'face': face_df, 'vert': vert_df, 'edge': edge_df}
     return datasets, specifications

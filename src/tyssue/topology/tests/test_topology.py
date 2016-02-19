@@ -15,7 +15,7 @@ def test_division():
 
     h5store = 'small_hexagonal.hf5'
     datasets = load_datasets(h5store,
-                         data_names=['face', 'jv', 'je'])
+                         data_names=['face', 'vert', 'edge'])
     sheet = Sheet('emin', datasets)
     sheet.set_geom('sheet')
     geom.update_all(sheet)
@@ -32,10 +32,10 @@ def test_t1_transition():
 
     h5store = 'small_hexagonal.hf5'
     datasets = load_datasets(h5store,
-                         data_names=['face', 'jv', 'je'])
+                         data_names=['face', 'vert', 'edge'])
     sheet = Sheet('emin', datasets)
     sheet.set_geom('sheet')
     geom.update_all(sheet)
-    face = sheet.je_df.loc[84, 'face']
+    face = sheet.edge_df.loc[84, 'face']
     type1_transition(sheet, 84)
-    assert sheet.je_df.loc[84, 'face'] != face
+    assert sheet.edge_df.loc[84, 'face'] != face

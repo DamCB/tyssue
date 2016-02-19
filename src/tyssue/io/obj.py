@@ -15,7 +15,7 @@ def save_triangulated(filename, eptm):
 def save_junction_mesh(filename, eptm):
     ## Assumes https://github.com/vispy/vispy/issues/1155 is closed and my PR passed, inch Allah
 
-    vertices, faces, normals = eptm.jverts_mesh(eptm.coords,
+    vertices, faces, normals = eptm.verterts_mesh(eptm.coords,
                                                 vertex_normals=True)
 
     write_mesh(filename,

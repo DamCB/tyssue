@@ -25,10 +25,10 @@ def test_adim():
             "prefered_area": 24.,
             "prefered_vol": 240.,
             },
-        "je": {
+        "edge": {
             "line_tension": 0.04,
             },
-        "jv": {
+        "vert": {
             "radial_tension": 0.,
             },
         "settings": {
@@ -38,16 +38,16 @@ def test_adim():
         }
     new_mod_specs = deepcopy(default_mod_specs)
     dim_mod_specs = model.dimentionalize(new_mod_specs)
-    new_mod_specs['je']['line_tension'] = 0.
-    assert new_mod_specs['je']['line_tension'] == 0.
-    assert default_mod_specs['je']['line_tension'] == 0.04
-    assert dim_mod_specs['je']['line_tension'] == 0.04 * 1 * 24**1.5 * 10**2
+    new_mod_specs['edge']['line_tension'] = 0.
+    assert new_mod_specs['edge']['line_tension'] == 0.
+    assert default_mod_specs['edge']['line_tension'] == 0.04
+    assert dim_mod_specs['edge']['line_tension'] == 0.04 * 1 * 24**1.5 * 10**2
 
 
 def test_compute_energy():
     h5store = 'small_hexagonal.hf5'
     datasets = load_datasets(h5store,
-                         data_names=['face', 'jv', 'je'])
+                         data_names=['face', 'vert', 'edge'])
     sheet = Sheet('emin', datasets)
     sheet.set_geom('sheet')
     nondim_specs = load_default('dynamics', 'sheet')
@@ -72,7 +72,7 @@ def test_compute_energy():
 def test_compute_gradient():
     h5store = 'small_hexagonal.hf5'
     datasets = load_datasets(h5store,
-                         data_names=['face', 'jv', 'je'])
+                         data_names=['face', 'vert', 'edge'])
     sheet = Sheet('emin', datasets)
     sheet.set_geom('sheet')
     nondim_specs = load_default('dynamics', 'sheet')

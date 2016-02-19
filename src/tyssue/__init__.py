@@ -1,1 +1,1 @@
-from .core import objects
+from .core import obedgects

@@ -2,12 +2,12 @@
     'face': {
         'is_alive': true,
          },
-    'je': {
+    'edge': {
         'face': 0,
         'srce': 0,
         'trgt': 0
          },
-    'jv': {
+    'vert': {
         'is_active': true,
          }
 }

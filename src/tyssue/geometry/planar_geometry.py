@@ -29,23 +29,23 @@ class PlanarGeometry(BaseGeometry):
         '''
         Updates the perimeter of each face.
         '''
-        sheet.face_df['perimeter'] = sheet.sum_face(sheet.je_df['length'])
+        sheet.face_df['perimeter'] = sheet.sum_face(sheet.edge_df['length'])
 
     @staticmethod
     def update_normals(sheet):
 
         coords = sheet.coords
         face_pos = sheet.upcast_face(sheet.face_df[coords]).values
-        srce_pos = sheet.upcast_srce(sheet.jv_df[coords]).values
-        trgt_pos = sheet.upcast_trgt(sheet.jv_df[coords]).values
+        srce_pos = sheet.upcast_srce(sheet.vert_df[coords]).values
+        trgt_pos = sheet.upcast_trgt(sheet.vert_df[coords]).values
 
         normals = np.cross(srce_pos - face_pos, trgt_pos - srce_pos)
-        sheet.je_df["nz"] = normals
+        sheet.edge_df["nz"] = normals
 
     @staticmethod
     def update_areas(sheet):
         '''
         Updates the normal coordniate of each (srce, trgt, face) face.
         '''
-        sheet.je_df['sub_area'] = np.abs(sheet.je_df['nz']) / 2
-        sheet.face_df['area'] = sheet.sum_face(sheet.je_df['sub_area'])
+        sheet.edge_df['sub_area'] = np.abs(sheet.edge_df['nz']) / 2
+        sheet.face_df['area'] = sheet.sum_face(sheet.edge_df['sub_area'])

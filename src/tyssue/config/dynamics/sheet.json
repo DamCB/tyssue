@@ -6,10 +6,10 @@
     "prefered_area": 24.0,
     "prefered_vol": 0.0
     },
-"jv": {
+"vert": {
      "radial_tension": 0.0
      },
-"je": {
+"edge": {
      "line_tension": 0.12
      },
 "settings": {

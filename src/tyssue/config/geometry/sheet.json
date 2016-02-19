@@ -8,7 +8,7 @@
     "perimeter": 1.0,
     "is_alive": true
     },
- "jv": {
+ "vert": {
      "x": 0.0,
      "y": 0.0,
      "z": 0.0,
@@ -16,7 +16,7 @@
      "rho": 0.0,
      "basal_shift": 4.0
      },
-"je": {
+"edge": {
     "srce": 0,
     "trgt": 0,
     "face": 0,

@@ -17,7 +17,7 @@ A dynamical model derived from Fahradifar et al. 2007 is provided in
 
 
 import numpy as np
-from .objects import Epithelium
+from .obedgects import Epithelium
 from ..config.json_parser import load_default
 
 

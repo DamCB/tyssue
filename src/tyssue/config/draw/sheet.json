@@ -1,5 +1,5 @@
 {
-    "je": {
+    "edge": {
 	"visible": true,
         "width": 0.01,
         "head_width": 0.02,
@@ -9,7 +9,7 @@
         "alpha": 0.8,
         "zorder": 1
 	},
-    "jv": {
+    "vert": {
         "visible": true,
         "s": 100,
         "color": "#000a4b",

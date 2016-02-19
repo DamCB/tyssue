@@ -28,8 +28,8 @@ class PlanarModel():
 
         dim_mod_specs['face']['prefered_area'] = A0
 
-        lbda = dim_mod_specs['je']['line_tension']
-        dim_mod_specs['je']['line_tension'] = lbda * Kv * A0**1.5
+        lbda = dim_mod_specs['edge']['line_tension']
+        dim_mod_specs['edge']['line_tension'] = lbda * Kv * A0**1.5
 
         dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5
         dim_mod_specs['settings']['nrj_norm_factor'] = Kv * A0**2
@@ -43,15 +43,15 @@ class PlanarModel():
 
         Parameters
         ----------
-        * sheet: a 2D :class:`tyssue.object.sheet.Sheet` instance
+        * sheet: a 2D :class:`tyssue.obedgect.sheet.Sheet` instance
         * full_output: if True, returns the enery components
         '''
         # consider only live faces:
         live_face_df = sheet.face_df[sheet.face_df.is_alive == 1]
         upcast_alive = sheet.upcast_face(sheet.face_df.is_alive)
-        live_je_df = sheet.je_df[upcast_alive == 1]
+        live_edge_df = sheet.edge_df[upcast_alive == 1]
 
-        E_t = live_je_df.eval('line_tension * length / 2')
+        E_t = live_edge_df.eval('line_tension * length / 2')
         E_a = elastic_energy(live_face_df,
                              var='area',
                              elasticity='area_elasticity',
@@ -85,13 +85,13 @@ class PlanarModel():
     @staticmethod
     def tension_grad(sheet, grad_lij):
 
-        live_je = sheet.upcast_face(sheet.face_df['is_alive'])
+        live_edge = sheet.upcast_face(sheet.face_df['is_alive'])
         if len(sheet.coords) == 2:
             grad_t = (grad_lij
-                      * _to_2d(sheet.je_df['line_tension'] * live_je))
+                      * _to_2d(sheet.edge_df['line_tension'] * live_edge))
         elif len(sheet.coords) == 3:
             grad_t = (grad_lij
-                      * _to_3d(sheet.je_df['line_tension'] * live_je))
+                      * _to_3d(sheet.edge_df['line_tension'] * live_edge))
 
         return grad_t
 

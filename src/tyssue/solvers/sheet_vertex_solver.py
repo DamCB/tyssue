@@ -17,12 +17,12 @@ class Solver:
 
         coords = sheet.coords
         if pos_idx is None:
-            pos0 = sheet.jv_df[coords].values.ravel()
-            pos_idx = sheet.jv_df.index
+            pos0 = sheet.vert_df[coords].values.ravel()
+            pos_idx = sheet.vert_df.index
         else:
-            pos0 = sheet.jv_df.loc[pos_idx, coords].values.ravel()
+            pos0 = sheet.vert_df.loc[pos_idx, coords].values.ravel()
 
-        max_length = 2 * sheet.je_df['length'].max()
+        max_length = 2 * sheet.edge_df['length'].max()
         bounds = np.vstack([pos0 - max_length,
                             pos0 + max_length]).T
         res = optimize.minimize(cls.opt_energy, pos0,
@@ -35,7 +35,7 @@ class Solver:
     def set_pos(pos, pos_idx, sheet):
         ndims = len(sheet.coords)
         pos_ = pos.reshape((pos.size//ndims, ndims))
-        sheet.jv_df.loc[pos_idx, sheet.coords] = pos_
+        sheet.vert_df.loc[pos_idx, sheet.coords] = pos_
 
     @classmethod
     def opt_energy(cls, pos, pos_idx, sheet, geom, model):
@@ -52,8 +52,8 @@ class Solver:
 
     @classmethod
     def approx_grad(cls, sheet, geom, model):
-        pos0 = sheet.jv_df[sheet.coords].values.ravel()
-        pos_idx = sheet.jv_idx
+        pos0 = sheet.vert_df[sheet.coords].values.ravel()
+        pos_idx = sheet.vert_idx
         grad = optimize.approx_fprime(pos0,
                                       cls.opt_energy,
                                       1e-9, pos_idx,
@@ -64,8 +64,8 @@ class Solver:
     @classmethod
     def check_grad(cls, sheet, geom, model):
 
-        pos0 = sheet.jv_df[sheet.coords].values.ravel()
-        pos_idx = sheet.jv_idx
+        pos0 = sheet.vert_df[sheet.coords].values.ravel()
+        pos_idx = sheet.vert_idx
         grad_err = optimize.check_grad(cls.opt_energy,
                                        cls.opt_grad,
                                        pos0.flatten(),

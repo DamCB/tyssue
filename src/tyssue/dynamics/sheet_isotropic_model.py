@@ -20,7 +20,7 @@ def isotropic_energies(sheet, model, geom,
 
     ### Faces only area and height
     area_avg = sheet.face_df[sheet.face_df['is_alive'] == 1].area.mean()
-    rho_avg = sheet.jv_df.rho.mean()
+    rho_avg = sheet.vert_df.rho.mean()
     area0 = sheet.specs['face']['prefered_area']
     h_0 = sheet.specs['face']['prefered_height']
 
@@ -59,13 +59,13 @@ def isotropic_relax(sheet, nondim_specs, geom=sgeom):
     live_faces = sheet.face_df[sheet.face_df.is_alive==1]
 
     area_avg = live_faces.area.mean()
-    rho_avg = sheet.jv_df.rho.mean()
+    rho_avg = sheet.vert_df.rho.mean()
 
     ### Set height and area to height0 and area0
     delta = (area0 / area_avg)**0.5
     geom.scale(sheet, delta, coords=sheet.coords)
     sheet.face_df['basal_shift'] = rho_avg * delta - h_0
-    sheet.jv_df['basal_shift'] = rho_avg * delta - h_0
+    sheet.vert_df['basal_shift'] = rho_avg * delta - h_0
     geom.update_all(sheet)
 
     ### Optimal value for delta
@@ -82,7 +82,7 @@ def isotropic_energy(delta, mod_specs):
     Computes the theoritical energy per face for the given
     parameters.
     """
-    lbda = mod_specs['je']['line_tension']
+    lbda = mod_specs['edge']['line_tension']
     gamma = mod_specs['face']['contractility']
     elasticity_ = (delta**3 - 1 )**2 / 2.
     contractility_ = gamma * mu**2 * delta**2 / 2.
@@ -91,7 +91,7 @@ def isotropic_energy(delta, mod_specs):
     return energy
 
 def isotropic_grad_poly(mod_specs):
-    lbda = mod_specs['je']['line_tension']
+    lbda = mod_specs['edge']['line_tension']
     gamma = mod_specs['face']['contractility']
     grad_poly = [3, 0, 0, -3,
                  mu**2 * gamma,

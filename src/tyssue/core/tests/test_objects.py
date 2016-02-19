@@ -10,17 +10,17 @@ def test_3faces():
     assert (eptm.Nc, eptm.Nv, eptm.Ne) == (3, 13, 18)
 
     face = Face(eptm, 0)
-    assert len(face.jv_orbit()) == 6
+    assert len(face.vert_orbit()) == 6
 
-    jv = JunctionVertex(eptm, 0)
-    assert len(jv.face_orbit()) == 3
-    assert len(jv.jv_orbit()) == 3
+    vert = JunctionVertex(eptm, 0)
+    assert len(vert.face_orbit()) == 3
+    assert len(vert.vert_orbit()) == 3
 
 
-    je = JunctionEdge(eptm, 5)
-    assert je.source_idx == 5
-    assert je.target_idx == 0
-    assert je.face_idx == 0
+    edge = JunctionEdge(eptm, 5)
+    assert edge.source_idx == 5
+    assert edge.target_idx == 0
+    assert edge.face_idx == 0
 
 
 def test_triangular_mesh():

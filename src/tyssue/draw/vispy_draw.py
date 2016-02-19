@@ -31,13 +31,13 @@ def vp_view(sheet, coords=None, **draw_specs_kw):
 
         colors = np.asarray(draw_specs['face']['color'])
         if colors.shape == (3,):
-            face_colors = pd.DataFrame(index=sheet.je_df.index,
+            face_colors = pd.DataFrame(index=sheet.edge_df.index,
                                        columns=['R', 'G', 'B'])
             for channel, val in zip('RGB', colors):
                 face_colors[channel] = val
 
         elif colors.shape == (4,):
-            face_colors = pd.DataFrame(index=sheet.je_df.index,
+            face_colors = pd.DataFrame(index=sheet.edge_df.index,
                                        columns=['R', 'G', 'B', 'A'])
             for channel, val in zip('RGBA', colors):
                 face_colors[channel] = val
@@ -57,49 +57,49 @@ def vp_view(sheet, coords=None, **draw_specs_kw):
                                   color=color)
         view.add(mesh)
 
-    if draw_specs['je']['visible']:
+    if draw_specs['edge']['visible']:
 
         color = None
-        if isinstance(draw_specs['je']['color'], str):
-            color = draw_specs['je']['color']
+        if isinstance(draw_specs['edge']['color'], str):
+            color = draw_specs['edge']['color']
 
         else:
-            colors = np.asarray(draw_specs['je']['color'])
+            colors = np.asarray(draw_specs['edge']['color'])
             if colors.shape == (3,):
-                color = pd.DataFrame(index=sheet.jv_df.index,
+                color = pd.DataFrame(index=sheet.vert_df.index,
                                      columns=['R', 'G', 'B', 'A'])
                 for channel, val in zip('RGB', colors):
                     color[channel] = val
-                color['A'] = draw_specs['je'].get('alpha', 1.)
+                color['A'] = draw_specs['edge'].get('alpha', 1.)
 
             elif colors.shape == (4,):
-                color = pd.DataFrame(index=sheet.jv_df.index,
+                color = pd.DataFrame(index=sheet.vert_df.index,
                                      columns=['R', 'G', 'B', 'A'])
                 for channel, val in zip('RGBA', colors):
                     color[channel] = val
 
             elif colors.shape == (sheet.Ne, 3):
-                color = pd.DataFrame(index=sheet.je_df.index, data=colors,
+                color = pd.DataFrame(index=sheet.edge_df.index, data=colors,
                                      columns=['R', 'G', 'B'])
-                color['A'] = draw_specs['je'].get('alpha', 1.)
+                color['A'] = draw_specs['edge'].get('alpha', 1.)
                 # Strangely, color spec is on a vertex, not segment, basis
-                color['srce'] = sheet.je_df['srce']
+                color['srce'] = sheet.edge_df['srce']
                 color = color.groupby('srce').mean()
 
             elif colors.shape == (sheet.Ne, 4):
-                color = pd.DataFrame(index=sheet.je_df.index, data=colors,
+                color = pd.DataFrame(index=sheet.edge_df.index, data=colors,
                                      columns=['R', 'G', 'B', 'A'])
                 # Strangely, color spec is on a vertex, not segment, basis
-                color['srce'] = sheet.je_df['srce']
+                color['srce'] = sheet.edge_df['srce']
                 color = color.groupby('srce').mean()
 
             elif colors.shape == (sheet.Nv, 3):
-                color = pd.DataFrame(index=sheet.jv_df.index, data=colors,
+                color = pd.DataFrame(index=sheet.vert_df.index, data=colors,
                                      columns=['R', 'G', 'B'])
-                color['A'] = draw_specs['je'].get('alpha', 1.)
+                color['A'] = draw_specs['edge'].get('alpha', 1.)
 
             elif colors.shape == (sheet.Nv, 4):
-                color = pd.DataFrame(index=sheet.jv_df.index, data=colors,
+                color = pd.DataFrame(index=sheet.vert_df.index, data=colors,
                                      columns=['R', 'G', 'B', 'A'])
 
 
@@ -113,7 +113,7 @@ def vp_view(sheet, coords=None, **draw_specs_kw):
         wire = vp.scene.visuals.Line(pos=wire_pos,
                                      connect=faces[:, :2] - sheet.Nc,
                                      color=color,
-                                     width=draw_specs['je']['width'])
+                                     width=draw_specs['edge']['width'])
         view.add(wire)
 
     canvas.show()

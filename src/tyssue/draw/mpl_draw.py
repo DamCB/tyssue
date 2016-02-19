@@ -21,13 +21,13 @@ def sheet_view(sheet, coords=COORDS, **draw_specs_kw):
     spec_updater(draw_specs, draw_specs_kw)
 
     fig, ax = plt.subplots()
-    jv_spec = draw_specs['jv']
-    if jv_spec['visible']:
-        ax = draw_jv(sheet, coords, ax, **jv_spec)
+    vert_spec = draw_specs['vert']
+    if vert_spec['visible']:
+        ax = draw_vert(sheet, coords, ax, **vert_spec)
 
-    je_spec = draw_specs['je']
-    if je_spec['visible']:
-        ax = draw_je(sheet, coords, ax, **je_spec)
+    edge_spec = draw_specs['edge']
+    if edge_spec['visible']:
+        ax = draw_edge(sheet, coords, ax, **edge_spec)
 
     face_spec = draw_specs['face']
     if face_spec['visible']:
@@ -71,35 +71,35 @@ def parse_face_specs(face_draw_specs):
     return collection_specs
 
 
-def draw_jv(sheet, coords, ax, **draw_spec_kw):
+def draw_vert(sheet, coords, ax, **draw_spec_kw):
     """Draw junction vertices in matplotlib
     """
-    draw_spec = load_default('draw', 'sheet')['jv']
+    draw_spec = load_default('draw', 'sheet')['vert']
     draw_spec.update(**draw_spec_kw)
 
     x, y = coords
-    ax.scatter(sheet.jv_df[x], sheet.jv_df[y], **draw_spec_kw)
+    ax.scatter(sheet.vert_df[x], sheet.vert_df[y], **draw_spec_kw)
     return ax
 
-def draw_je(sheet, coords, ax, **draw_spec_kw):
+def draw_edge(sheet, coords, ax, **draw_spec_kw):
     """
     """
-    draw_spec = load_default('draw', 'sheet')['je']
+    draw_spec = load_default('draw', 'sheet')['edge']
     draw_spec.update(**draw_spec_kw)
 
     x, y = coords
     dx, dy = ('d'+c for c in coords)
-    app_length = np.hypot(sheet.je_df[dx],
-                          sheet.je_df[dy])
+    app_length = np.hypot(sheet.edge_df[dx],
+                          sheet.edge_df[dy])
 
     patches = []
-    arrow_specs, collections_specs = parse_je_specs(draw_spec)
-    for idx, je in sheet.je_df[app_length > 1e-6].iterrows():
-        srce  = int(je['srce'])
-        arrow = FancyArrow(sheet.jv_df[x].loc[srce],
-                           sheet.jv_df[y].loc[srce],
-                           sheet.je_df[dx].loc[idx],
-                           sheet.je_df[dy].loc[idx],
+    arrow_specs, collections_specs = parse_edge_specs(draw_spec)
+    for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows():
+        srce  = int(edge['srce'])
+        arrow = FancyArrow(sheet.vert_df[x].loc[srce],
+                           sheet.vert_df[y].loc[srce],
+                           sheet.edge_df[dx].loc[idx],
+                           sheet.edge_df[dy].loc[idx],
                             **arrow_specs)
         patches.append(arrow)
 
@@ -107,20 +107,20 @@ def draw_je(sheet, coords, ax, **draw_spec_kw):
     return ax
 
 
-def parse_je_specs(je_draw_specs):
+def parse_edge_specs(edge_draw_specs):
 
     arrow_keys = ['head_width',
                   'length_includes_head',
                   'shape']
-    arrow_specs = {key: val for key, val in je_draw_specs.items()
+    arrow_specs = {key: val for key, val in edge_draw_specs.items()
                    if key in arrow_keys}
     collection_specs = {}
-    if "color" in je_draw_specs:
-        collection_specs['edgecolors'] = je_draw_specs['color']
-    if "width" in je_draw_specs:
-        collection_specs['linewidths'] = je_draw_specs['width']
-    if "alpha" in je_draw_specs:
-        collection_specs['alpha'] = je_draw_specs['alpha']
+    if "color" in edge_draw_specs:
+        collection_specs['edgecolors'] = edge_draw_specs['color']
+    if "width" in edge_draw_specs:
+        collection_specs['linewidths'] = edge_draw_specs['width']
+    if "alpha" in edge_draw_specs:
+        collection_specs['alpha'] = edge_draw_specs['alpha']
     return arrow_specs, collection_specs
 
 
@@ -137,7 +137,7 @@ def plot_forces(sheet, geom, model,
     gcoords = ['g'+c for c in coords]
     if approx_grad is not None:
         app_grad = approx_grad(sheet, geom, model)
-        grad_i = pd.DataFrame(index=sheet.jv_idx,
+        grad_i = pd.DataFrame(index=sheet.vert_idx,
                               data=app_grad.reshape((-1, len(sheet.coords))),
                               columns=sheet.coords) * scaling
 
@@ -145,8 +145,8 @@ def plot_forces(sheet, geom, model,
         grad_i = model.compute_gradient(sheet, components=False) * scaling
 
     arrows = pd.DataFrame(columns=coords + gcoords,
-                          index=sheet.jv_df.index)
-    arrows[coords] = sheet.jv_df[coords]
+                          index=sheet.vert_df.index)
+    arrows[coords] = sheet.vert_df[coords]
     arrows[gcoords] = - grad_i[coords] # F = -grad E
 
     if ax is None:
@@ -168,7 +168,7 @@ def plot_analytical_to_numeric_comp(sheet, model, geom,
 
     deltas = np.linspace(0.1, 1.8, 50)
 
-    lbda = nondim_specs['je']['line_tension']
+    lbda = nondim_specs['edge']['line_tension']
     gamma = nondim_specs['face']['contractility']
 
     ax.plot(deltas, iso.isotropic_energy(deltas, nondim_specs), 'k-',

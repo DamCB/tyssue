@@ -36,8 +36,8 @@ class SheetModel(PlanarModel):
         dim_mod_specs['face']['contractility'] = gamma * Kv* A0 * h0**2
         dim_mod_specs['face']['prefered_vol'] = A0 * h0
 
-        lbda = dim_mod_specs['je']['line_tension']
-        dim_mod_specs['je']['line_tension'] = lbda * Kv * A0**1.5 * h0**2
+        lbda = dim_mod_specs['edge']['line_tension']
+        dim_mod_specs['edge']['line_tension'] = lbda * Kv * A0**1.5 * h0**2
 
         dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5 * h0**2
         dim_mod_specs['settings']['nrj_norm_factor'] = Kv * (A0*h0)**2
@@ -51,15 +51,15 @@ class SheetModel(PlanarModel):
 
         Parameters
         ----------
-        * mesh: a :class:`tyssue.object.sheet.Sheet` instance
+        * mesh: a :class:`tyssue.obedgect.sheet.Sheet` instance
         * full_output: if True, returns the enery components
         '''
         # consider only live faces:
         live_face_df = sheet.face_df[sheet.face_df.is_alive == 1]
         upcast_alive = sheet.upcast_face(sheet.face_df.is_alive)
-        live_je_df = sheet.je_df[upcast_alive == 1]
+        live_edge_df = sheet.edge_df[upcast_alive == 1]
 
-        E_t = live_je_df.eval('line_tension * length / 2')
+        E_t = live_edge_df.eval('line_tension * length / 2')
         E_v = elastic_energy(live_face_df,
                              var='vol',
                              elasticity='vol_elasticity',
@@ -91,7 +91,7 @@ class SheetModel(PlanarModel):
             (sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
             sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
             sheet.sum_srce(grad_v_srce) + sheet.sum_trgt(grad_v_trgt)
-            ) * _to_3d(sheet.jv_df.is_active)
+            ) * _to_3d(sheet.vert_df.is_active)
         return grad_i / norm_factor
 
     @staticmethod
@@ -109,13 +109,13 @@ class SheetModel(PlanarModel):
         kv_v0_ = kv_v0_ * sheet.face_df['is_alive']
         kv_v0 = _to_3d(sheet.upcast_face(kv_v0_))
 
-        je_h = _to_3d(sheet.upcast_srce(sheet.jv_df['height']))
-        area_ = sheet.je_df['sub_area']
+        edge_h = _to_3d(sheet.upcast_srce(sheet.vert_df['height']))
+        area_ = sheet.edge_df['sub_area']
         area = _to_3d(area_)
         grad_a_srce, grad_a_trgt = area_grad(sheet)
 
-        grad_v_srce = kv_v0 * (je_h * grad_a_srce +
+        grad_v_srce = kv_v0 * (edge_h * grad_a_srce +
                                area * height_grad(sheet))
-        grad_v_trgt = kv_v0 * (je_h * grad_a_trgt)
+        grad_v_trgt = kv_v0 * (edge_h * grad_a_trgt)
 
         return grad_v_srce, grad_v_trgt

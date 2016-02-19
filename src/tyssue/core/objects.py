@@ -15,7 +15,7 @@ log = logging.getLogger(name=__name__)
 The following data is an exemple of the `specs`.
 It is a nested dictionnary with two levels.
 
-The first key design objects names: ('face', 'je', 'jv') They will
+The first key design obedgects names: ('face', 'edge', 'vert') They will
 correspond to the dataframes attributes of the Epithelium instance,
 (e.g eptm.face_df);
 
@@ -36,14 +36,14 @@ default values is allways infered from the python parsed type. Thus
             'num_sides': 6,
             ## Masks
             'is_alive': True},
-        'jv': {
+        'vert': {
             ## Coordinates
             'x': 0.,
             'y': 0.,
             'z': 0.,
             ## Masks
             'is_active': True},
-        'je': {
+        'edge': {
             ## Coordinates
             'dx': 0.,
             'dy': 0.,
@@ -89,12 +89,12 @@ class Epithelium:
 
         # each of those has a separate dataframe, as well as entries in
         # the settings files
-        frame_types =  {'je', 'jv', 'face',
+        frame_types =  {'edge', 'vert', 'face',
                         'cell', 'cc'}
 
         # Really just to ensure the debugger is silent
-        [   self.je_df,
-            self.jv_df,
+        [   self.edge_df,
+            self.vert_df,
             self.face_df,
             self.cell_df,
             self.cc_df    ] = [None,] * 5
@@ -111,7 +111,7 @@ class Epithelium:
         if specs is None:
             specs = {name:{} for name in self.data_names}
         self.specs = specs
-        self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
+        self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
                                                    names=self.element_names)
         ## Topology (geometry independant)
         self.reset_topo()
@@ -135,7 +135,7 @@ class Epithelium:
     @classmethod
     def from_points(cls, identifier, points,
                     indices_dict, specs,
-                    points_dataset='jv'):
+                    points_dataset='vert'):
         '''
         TODO: not sure this works as expected with the new indexing
         '''
@@ -184,15 +184,15 @@ class Epithelium:
                        default_base='core', reset=reset)
 
     def update_num_sides(self):
-        self.face_df['num_sides'] = self.je_df.face.value_counts().loc[
+        self.face_df['num_sides'] = self.edge_df.face.value_counts().loc[
             self.face_df.index]
 
     def update_num_faces(self):
-        self.cell_df['num_faces'] = self.je_df.cell.value_counts().loc[
+        self.cell_df['num_faces'] = self.edge_df.cell.value_counts().loc[
             self.cell_df.index]
 
     def update_mindex(self):
-        self.je_mindex = pd.MultiIndex.from_arrays(self.je_idx.values.T,
+        self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
                                                    names=self.element_names)
     def reset_topo(self):
         self.update_num_sides()
@@ -223,12 +223,12 @@ class Epithelium:
         return self.cell_df.index
 
     @property
-    def jv_idx(self):
-        return self.jv_df.index
+    def vert_idx(self):
+        return self.vert_df.index
 
     @property
-    def je_idx(self):
-        return self.je_df[self.element_names]
+    def edge_idx(self):
+        return self.edge_df[self.element_names]
 
     @property
     def Nc(self):
@@ -239,7 +239,7 @@ class Epithelium:
 
     @property
     def Nv(self):
-        return self.jv_df.shape[0]
+        return self.vert_df.shape[0]
 
     @property
     def Nf(self):
@@ -247,26 +247,26 @@ class Epithelium:
 
     @property
     def Ne(self):
-        return self.je_df.shape[0]
+        return self.edge_df.shape[0]
 
     @property
     def e_srce_idx(self):
-        return self.je_df['srce']
+        return self.edge_df['srce']
 
     @property
     def e_trgt_idx(self):
-        return self.je_df['trgt']
+        return self.edge_df['trgt']
 
     @property
     def e_face_idx(self):
-        return self.je_df['face']
+        return self.edge_df['face']
 
     @property
     def e_cell_idx(self):
-        return self.je_df['cell']
+        return self.edge_df['cell']
 
     @property
-    def je_idx_array(self):
+    def edge_idx_array(self):
         return np.vstack((self.e_srce_idx,
                           self.e_trgt_idx,
                           self.e_face_idx)).T
@@ -274,11 +274,11 @@ class Epithelium:
     def _upcast(self, idx, df):
 
         upcast = df.loc[idx]
-        upcast.index = self.je_df.index
+        upcast.index = self.edge_df.index
         return upcast
 
     def upcast_srce(self, df):
-        ''' Reindexes input data to self.je_idx
+        ''' Reindexes input data to self.edge_idx
         by repeating the values for each source entry
         '''
         return self._upcast(self.e_srce_idx, df)
@@ -294,7 +294,7 @@ class Epithelium:
 
     def _lvl_sum(self, df, lvl):
         df_ = df.copy()
-        df_.index = self.je_mindex
+        df_.index = self.edge_mindex
         return df_.sum(level=lvl)
 
     def sum_srce(self, df):
@@ -310,7 +310,7 @@ class Epithelium:
         return self._lvl_sum(df, 'cell')
 
     def get_orbits(self, center, periph):
-        """Returns a dataframe with a `(center, je)` MultiIndex with `periph`
+        """Returns a dataframe with a `(center, edge)` MultiIndex with `periph`
         elements.
 
         Parmeters
@@ -322,9 +322,9 @@ class Epithelium:
 
         Example
         -------
-        >>> cell_jvs = sheet.get_orbits('face', 'srce')
-        >>> cell_jvs.loc[45]
-        je
+        >>> cell_verts = sheet.get_orbits('face', 'srce')
+        >>> cell_verts.loc[45]
+        edge
         218    75
         219    78
         220    76
@@ -334,20 +334,20 @@ class Epithelium:
         Name: srce, dtype: int64
 
         """
-        orbits = self.je_df.groupby(center).apply(
+        orbits = self.edge_df.groupby(center).apply(
             lambda df: df[periph])
         return orbits
 
     def face_polygons(self, coords):
-        def _get_jvs_pos(face):
+        def _get_verts_pos(face):
             try:
-                jes = _ordered_jes(face)
+                edges = _ordered_edges(face)
             except IndexError:
                 log.warning('Face is not closed')
                 return np.nan
-            return np.array([self.jv_df.loc[idx[0], coords]
-                             for idx in jes])
-        polys = self.je_df.groupby('face').apply(_get_jvs_pos).dropna()
+            return np.array([self.vert_df.loc[idx[0], coords]
+                             for idx in edges])
+        polys = self.edge_df.groupby('face').apply(_get_verts_pos).dropna()
         return polys
 
     def _build_face_face_indexes(self):
@@ -356,8 +356,8 @@ class Epithelium:
         should be provided by CGAL
         '''
         cc_idx = []
-        for srce0, trgt0, face0 in self.je_idx:
-            for srce1, trgt1, face1 in self.je_idx:
+        for srce0, trgt0, face0 in self.edge_idx:
+            for srce1, trgt1, face1 in self.edge_idx:
                 if (face0 != face1 and trgt0 == srce1 and
                     trgt1 == srce0 and not (face1, face0) in cc_idx):
                     cc_idx.append((face0, face1))
@@ -367,26 +367,26 @@ class Epithelium:
     def get_valid(self):
         """Set true if the face is a closed polygon
         """
-        is_valid = self.je_df.groupby('face').apply(_test_valid)
-        self.je_df['is_valid'] = self.upcast_face(is_valid)
+        is_valid = self.edge_df.groupby('face').apply(_test_valid)
+        self.edge_df['is_valid'] = self.upcast_face(is_valid)
 
     def get_invalid(self):
-        """Returns a mask over je for invalid faces
+        """Returns a mask over edge for invalid faces
         """
-        is_invalid = self.je_df.groupby('face').apply(_test_invalid)
+        is_invalid = self.edge_df.groupby('face').apply(_test_invalid)
         return self.upcast_face(is_invalid)
 
     def sanitize(self):
         """Removes invalid faces and associated vertices
         """
-        invalid_jes = self.get_invalid()
-        self.remove(invalid_jes)
+        invalid_edges = self.get_invalid()
+        self.remove(invalid_edges)
 
-    def remove(self, je_out):
+    def remove(self, edge_out):
 
         top_level = self.element_names[-1]
         log.info('Removing cells at the {} level'.format(top_level))
-        fto_rm = self.je_df[je_out][top_level].unique()
+        fto_rm = self.edge_df[edge_out][top_level].unique()
         if not len(fto_rm):
             log.info('Nothing to remove')
             return
@@ -394,19 +394,19 @@ class Epithelium:
         log.info('{} {} level elements will be removed'.format(len(fto_rm),
                                                                top_level))
 
-        je_df_ = self.je_df.set_index(top_level,
+        edge_df_ = self.edge_df.set_index(top_level,
                                       append=True).swaplevel(0, 1).sort_index()
-        to_rm = np.concatenate([je_df_.loc[c].index.values
+        to_rm = np.concatenate([edge_df_.loc[c].index.values
                                 for c in fto_rm])
         to_rm.sort()
-        self.je_df = self.je_df.drop(to_rm)
+        self.edge_df = self.edge_df.drop(to_rm)
 
-        remaining_jvs = np.unique(self.je_df[['srce', 'trgt']])
-        self.jv_df = self.jv_df.loc[remaining_jvs]
+        remaining_verts = np.unique(self.edge_df[['srce', 'trgt']])
+        self.vert_df = self.vert_df.loc[remaining_verts]
         if top_level == 'face':
             self.face_df = self.face_df.drop(fto_rm)
         elif top_level == 'cell':
-            remaining_faces = np.unique(self.je_df['face'])
+            remaining_faces = np.unique(self.edge_df['face'])
             self.face_df = self.face_df.loc[remaining_faces]
             self.cell_df = self.cell_df.drop(fto_rm)
         self.reset_index()
@@ -426,37 +426,37 @@ class Epithelium:
         """
         if coords is None:
             coords = self.coords
-        outs = pd.DataFrame(index=self.je_df.index,
+        outs = pd.DataFrame(index=self.edge_df.index,
                             columns=coords)
         for c, bounds in zip(coords, bbox):
-            out_jv_ = ((self.jv_df[c] < bounds[0]) |
-                       (self.jv_df[c] > bounds[1]))
-            outs[c] = (self.upcast_srce(out_jv_) |
-                       self.upcast_trgt(out_jv_))
+            out_vert_ = ((self.vert_df[c] < bounds[0]) |
+                       (self.vert_df[c] > bounds[1]))
+            outs[c] = (self.upcast_srce(out_vert_) |
+                       self.upcast_trgt(out_vert_))
 
-        je_out = outs.sum(axis=1).astype(np.bool)
-        return je_out
+        edge_out = outs.sum(axis=1).astype(np.bool)
+        return edge_out
 
     def set_bbox(self, margin=1.):
         '''Sets the attribute `bbox` with pairs of values bellow
-        and above the min and max of the jv coords, with a margin.
+        and above the min and max of the vert coords, with a margin.
         '''
-        self.bbox = np.array([[self.jv_df[c].min() - margin,
-                               self.jv_df[c].max() + margin]
+        self.bbox = np.array([[self.vert_df[c].min() - margin,
+                               self.vert_df[c].max() + margin]
                               for c in self.coords])
 
     def reset_index(self):
 
-        new_jvidx = pd.Series(np.arange(self.jv_df.shape[0]),
-                              index=self.jv_df.index)
-        self.je_df['srce'] = self.upcast_srce(new_jvidx)
-        self.je_df['trgt'] = self.upcast_trgt(new_jvidx)
+        new_vertidx = pd.Series(np.arange(self.vert_df.shape[0]),
+                              index=self.vert_df.index)
+        self.edge_df['srce'] = self.upcast_srce(new_vertidx)
+        self.edge_df['trgt'] = self.upcast_trgt(new_vertidx)
         new_fidx = pd.Series(np.arange(self.face_df.shape[0]),
                              index=self.face_df.index)
-        self.je_df['face'] = self.upcast_face(new_fidx)
+        self.edge_df['face'] = self.upcast_face(new_fidx)
 
-        self.jv_df.reset_index(drop=True, inplace=True)
-        self.jv_df.index.name = 'jv'
+        self.vert_df.reset_index(drop=True, inplace=True)
+        self.vert_df.index.name = 'vert'
 
         self.face_df.reset_index(drop=True, inplace=True)
         self.face_df.index.name = 'face'
@@ -464,12 +464,12 @@ class Epithelium:
         if 'cell' in self.data_names:
             new_cidx = pd.Series(np.arange(self.cell_df.shape[0]),
                                  index=self.cell_df.index)
-            self.je_df['cell'] = self.upcast_cell(new_cidx)
+            self.edge_df['cell'] = self.upcast_cell(new_cidx)
             self.cell_df.reset_index(drop=True, inplace=True)
             self.cell_df.index.name = 'cell'
 
-        self.je_df.reset_index(drop=True, inplace=True)
-        self.je_df.index.name = 'je'
+        self.edge_df.reset_index(drop=True, inplace=True)
+        self.edge_df.index.name = 'edge'
 
 
     def triangular_mesh(self, coords):
@@ -481,7 +481,7 @@ class Epithelium:
         ----------
         coords: list of str:
           pair of coordinates corresponding to column names
-          for self.face_df and self.jv_df
+          for self.face_df and self.vert_df
 
         Returns
         -------
@@ -496,49 +496,49 @@ class Epithelium:
         '''
 
         vertices = np.concatenate((self.face_df[coords],
-                                   self.jv_df[coords]), axis=0)
+                                   self.vert_df[coords]), axis=0)
 
         # edge indices as (Nf + Nv) * 3 array
-        triangles = self.je_df[['srce', 'trgt', 'face']].values
+        triangles = self.edge_df[['srce', 'trgt', 'face']].values
         # The src, trgt, face triangle is correctly oriented
-        # both jv_idx cols are shifted by Nf
+        # both vert_idx cols are shifted by Nf
         triangles[:, :2] += self.Nf
 
         face_mask = np.arange(self.Nf + self.Nv) < self.Nf
         return vertices, triangles, face_mask
 
-    def jverts_mesh(self, coords, vertex_normals=True):
+    def verterts_mesh(self, coords, vertex_normals=True):
         ''' Returns the vertex coordinates and a list of vertex indices
         for each face of the tissue.
         If `vertex_normals` is True, also returns the normals of each vertex
         (set as the average of the vertex' edges), suitable for .OBJ export
         '''
-        vertices = self.jv_df[coords]
-        faces = self.je_df.groupby('face').apply(ordered_jv_idxs)
+        vertices = self.vert_df[coords]
+        faces = self.edge_df.groupby('face').apply(ordered_vert_idxs)
         faces = faces.dropna()
         if vertex_normals:
-            normals = (self.je_df.groupby('srce')[self.ncoords].mean() +
-                       self.je_df.groupby('trgt')[self.ncoords].mean()) / 2.
+            normals = (self.edge_df.groupby('srce')[self.ncoords].mean() +
+                       self.edge_df.groupby('trgt')[self.ncoords].mean()) / 2.
             return vertices, faces, normals
         return vertices, faces
 
 
-def _ordered_jes(face):
+def _ordered_edges(face):
     """Returns the junction edges vertices of the faces
     organized clockwise
     """
     srces, trgts, faces = face[['srce', 'trgt', 'face']].values.T
     srce, trgt, face_ = srces[0], trgts[0], faces[0]
-    jes = [[srce, trgt, face_]]
+    edges = [[srce, trgt, face_]]
     for face_ in faces[1:]:
         srce, trgt = trgt, trgts[srces == trgt][0]
-        jes.append([srce, trgt, face_])
-    return jes
+        edges.append([srce, trgt, face_])
+    return edges
 
 
-def ordered_jv_idxs(face):
+def ordered_vert_idxs(face):
     try:
-        return [idxs[0] for idxs in _ordered_jes(face)]
+        return [idxs[0] for idxs in _ordered_edges(face)]
     except IndexError:
         return np.nan
 
@@ -575,26 +575,26 @@ class Face:
         self.__index = index
 
     # This should be implemented in CGAL
-    def je_orbit(self):
+    def edge_orbit(self):
         '''
         Indexes of the face's junction halfedges.
 
         '''
-        sub_idx = self.__eptm.je_idx[
-            self.__eptm.je_idx['face'] == self.__index].index
+        sub_idx = self.__eptm.edge_idx[
+            self.__eptm.edge_idx['face'] == self.__index].index
         return sub_idx
 
-    def jv_orbit(self):
+    def vert_orbit(self):
         '''
         Index of the face's junction vertices.
 
         '''
-        je_orbit = self.je_orbit()
-        return self.__eptm.je_df.loc[je_orbit, 'srce']
+        edge_orbit = self.edge_orbit()
+        return self.__eptm.edge_df.loc[edge_orbit, 'srce']
 
     @property
     def num_sides(self):
-        return len(self.je_orbit())
+        return len(self.edge_orbit())
 
 
 class JunctionVertex:
@@ -604,14 +604,14 @@ class JunctionVertex:
         self.__index = index  # from CGAL
         self.__eptm = eptm  # from CGAL
 
-    def je_orbit(self):
+    def edge_orbit(self):
         '''
         Indexes of the neighboring junction edges, returned
         as the indexes of the **outgoing** halfedges.
         '''
 
-        sub_idx = self.__eptm.je_idx[
-            self.__eptm.je_idx['srce'] == self.__index].index
+        sub_idx = self.__eptm.edge_idx[
+            self.__eptm.edge_idx['srce'] == self.__index].index
         return sub_idx
 
     def face_orbit(self):
@@ -619,16 +619,16 @@ class JunctionVertex:
         Index of the junction's faces.
 
         '''
-        je_orbit = self.je_orbit()
-        return self.__eptm.je_df.loc[je_orbit, 'face']
+        edge_orbit = self.edge_orbit()
+        return self.__eptm.edge_df.loc[edge_orbit, 'face']
 
-    def jv_orbit(self):
+    def vert_orbit(self):
         '''
         Index of the junction's neighbor junction vertices.
 
         '''
-        je_orbit = self.je_orbit()
-        return self.__eptm.je_df.loc[je_orbit, 'trgt']
+        edge_orbit = self.edge_orbit()
+        return self.__eptm.edge_df.loc[edge_orbit, 'trgt']
 
 
 class JunctionEdge():
@@ -643,15 +643,15 @@ class JunctionEdge():
 
     @property
     def source_idx(self):
-        return self.__eptm.je_df.loc[self.__index, 'srce']
+        return self.__eptm.edge_df.loc[self.__index, 'srce']
 
     @property
     def target_idx(self):
-        return self.__eptm.je_df.loc[self.__index, 'trgt']
+        return self.__eptm.edge_df.loc[self.__index, 'trgt']
 
     @property
     def face_idx(self):
-        return self.__eptm.je_df.loc[self.__index, 'face']
+        return self.__eptm.edge_df.loc[self.__index, 'face']
 
 
 class CellCellMesh():

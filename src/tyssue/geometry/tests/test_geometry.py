@@ -13,7 +13,7 @@ def test_3faces():
 
     sgeom.update_dcoords(sheet)
     sgeom.update_length(sheet)
-    np.testing.assert_allclose(sheet.je_df['length'], 1,
+    np.testing.assert_allclose(sheet.edge_df['length'], 1,
                                rtol=1e-3)
 
     sgeom.update_centroid(sheet)
@@ -22,7 +22,7 @@ def test_3faces():
                                          decimal=3)
 
     sgeom.update_normals(sheet)
-    norms = np.linalg.norm(sheet.je_df[['nx', 'ny', 'nz']], axis=1)
+    norms = np.linalg.norm(sheet.edge_df[['nx', 'ny', 'nz']], axis=1)
     np.testing.assert_allclose(norms, 0.866, rtol=1e-3)
 
     sgeom.update_areas(sheet)

@@ -34,16 +34,16 @@ class BulkGeometry(SheetGeometry):
         face_pos = eptm.upcast_face(eptm.face_df[eptm.coords])
         cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords])
 
-        eptm.je_df['sub_vol'] = np.sum(
+        eptm.edge_df['sub_vol'] = np.sum(
             (face_pos - cell_pos) *
-            eptm.je_df[eptm.ncoords].values, axis=1) / 6
+            eptm.edge_df[eptm.ncoords].values, axis=1) / 6
 
-        eptm.cell_df['vol'] = eptm.sum_cell(eptm.je_df['sub_vol'])
+        eptm.cell_df['vol'] = eptm.sum_cell(eptm.edge_df['sub_vol'])
 
     @staticmethod
     def update_centroid(eptm):
 
-        upcast_pos = eptm.upcast_srce(eptm.jv_df[eptm.coords])
-        upcast_pos = upcast_pos.set_index(eptm.je_mindex)
+        upcast_pos = eptm.upcast_srce(eptm.vert_df[eptm.coords])
+        upcast_pos = upcast_pos.set_index(eptm.edge_mindex)
         eptm.face_df[eptm.coords] = upcast_pos.mean(level='face')
         eptm.cell_df[eptm.coords] = upcast_pos.mean(level='cell')

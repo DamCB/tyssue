@@ -1,6 +1,6 @@
 import pandas as pd
 
-def load_datasets(h5store, data_names=['face', 'jv', 'je']):
+def load_datasets(h5store, data_names=['face', 'vert', 'edge']):
     with pd.get_store(h5store) as store:
         data = {name: store[name] for name in data_names}
     return data
