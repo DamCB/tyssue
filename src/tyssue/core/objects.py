@@ -11,11 +11,14 @@ import logging
 log = logging.getLogger(name=__name__)
 
 '''
+Core definitions
+
+
 
 The following data is an exemple of the `specs`.
 It is a nested dictionnary with two levels.
 
-The first key design objects names: ('face', 'edge', 'vert') They will
+The first key designs the object name: ('face', 'edge', 'vert') They will
 correspond to the dataframes attributes of the Epithelium instance,
 (e.g eptm.face_df);
 
@@ -93,11 +96,10 @@ class Epithelium:
                         'cell', 'cc'}
 
         # Really just to ensure the debugger is silent
-        [   self.edge_df,
-            self.vert_df,
-            self.face_df,
-            self.cell_df,
-            self.cc_df    ] = [None,] * 5
+        [self.edge_df,
+         self.vert_df,
+         self.face_df,
+         self.cell_df] = [None,] * 4
 
         self.identifier = identifier
         if not set(datasets).issubset(frame_types):
@@ -182,6 +184,9 @@ class Epithelium:
 
         self.set_specs('dynamics', base, new_specs,
                        default_base='core', reset=reset)
+        self.grad_norm_factor = self.specs['settings']['grad_norm_factor']
+        self.nrj_norm_factor = self.specs['settings']['nrj_norm_factor']
+
 
     def update_num_sides(self):
         self.face_df['num_sides'] = self.edge_df.face.value_counts().loc[
@@ -558,252 +563,3 @@ def _test_valid(face):
     s1 = set(face['srce'])
     s2 = set(face['trgt'])
     return s1 == s2
-
-
-
-class Face:
-    '''
-    Doesn't hold any data, just methods.
-
-    I think it should be instanciated on demand, not systematically
-    for the whole epithelium
-
-    '''
-    def __init__(self, eptm, index):
-
-        self.__eptm = eptm
-        self.__index = index
-
-    # This should be implemented in CGAL
-    def edge_orbit(self):
-        '''
-        Indexes of the face's junction halfedges.
-
-        '''
-        sub_idx = self.__eptm.edge_idx[
-            self.__eptm.edge_idx['face'] == self.__index].index
-        return sub_idx
-
-    def vert_orbit(self):
-        '''
-        Index of the face's junction vertices.
-
-        '''
-        edge_orbit = self.edge_orbit()
-        return self.__eptm.edge_df.loc[edge_orbit, 'srce']
-
-    @property
-    def num_sides(self):
-        return len(self.edge_orbit())
-
-
-class JunctionVertex:
-
-    def __init__(self, eptm, index):
-
-        self.__index = index  # from CGAL
-        self.__eptm = eptm  # from CGAL
-
-    def edge_orbit(self):
-        '''
-        Indexes of the neighboring junction edges, returned
-        as the indexes of the **outgoing** halfedges.
-        '''
-
-        sub_idx = self.__eptm.edge_idx[
-            self.__eptm.edge_idx['srce'] == self.__index].index
-        return sub_idx
-
-    def face_orbit(self):
-        '''
-        Index of the junction's faces.
-
-        '''
-        edge_orbit = self.edge_orbit()
-        return self.__eptm.edge_df.loc[edge_orbit, 'face']
-
-    def vert_orbit(self):
-        '''
-        Index of the junction's neighbor junction vertices.
-
-        '''
-        edge_orbit = self.edge_orbit()
-        return self.__eptm.edge_df.loc[edge_orbit, 'trgt']
-
-
-class JunctionEdge():
-    '''
-    Really a HalfEdge ...
-    '''
-
-    def __init__(self, eptm, index):
-
-        self.__index = index  # from CGAL
-        self.__eptm = eptm  # from CGAL
-
-    @property
-    def source_idx(self):
-        return self.__eptm.edge_df.loc[self.__index, 'srce']
-
-    @property
-    def target_idx(self):
-        return self.__eptm.edge_df.loc[self.__index, 'trgt']
-
-    @property
-    def face_idx(self):
-        return self.__eptm.edge_df.loc[self.__index, 'face']
-
-
-class CellCellMesh():
-    """
-    Class to manipulate cell centric models
-    """
-
-    def __init__(self, identifier, datasets,
-                 specs=None, coords=None):
-        '''
-        Creates an epithelium
-
-        Parameters:
-        -----------
-        identifier: string
-        datasets: dictionary of dataframes
-        the datasets dict specifies the names, data columns
-        and value types of the modeled tyssue
-
-        '''
-        if coords is  None:
-            coords = ['x', 'y', 'z']
-        self.coords = coords
-        # edge's dx, dy, dz
-        self.dcoords = ['d'+c for c in self.coords]
-        self.dim = len(self.coords)
-        self.cell_df, self.cc_df = None, None
-        self.identifier = identifier
-        if not {'cell', 'cc'}.issubset(datasets):
-            raise ValueError('''The `datasets` dictionnary should
-            contain at least the 'cell' and 'cc' keys ''')
-        self.data_names = list(datasets.keys())
-        self.element_names = ['srce', 'trgt']
-        for name, data in datasets.items():
-            setattr(self, '{}_df'.format(name), data)
-        if specs is None:
-            specs = {name:{} for name in self.data_names}
-        self.specs = specs
-        self.cc_mindex = pd.MultiIndex.from_arrays(
-            self.cc_df[['srce', 'trgt']].values.T,
-            names=['srce', 'trgt'])
-        self.settings = {}
-
-    def copy(self):
-        # TODO
-        raise NotImplementedError
-
-    def update_specs(self, new):
-        for key, datadict in self.specs.items():
-            if new.get(key) is not None:
-                datadict.update(new[key])
-        if 'settings' in new:
-            self.settings.update(new['settings'])
-
-    def set_geom(self, geom, **geom_specs):
-
-        specs = geom.get_default_geom_specs()
-        specs.update(**geom_specs)
-        self.update_specs(specs)
-        return specs
-
-    def set_model(self, model, **mod_specs):
-
-        specs = model.get_default_mod_specs()
-        specs.update(**mod_specs)
-        dim_specs = model.dimentionalize(specs)
-        self.update_specs(dim_specs)
-        self.nrj_norm_factor = dim_specs['settings']['nrj_norm_factor']
-        return specs, dim_specs
-
-
-    @property
-    def datasets(self):
-        datasets = {
-            'cc': self.cc_df,
-            'cell': self.cell_df,
-            }
-        return datasets
-
-    @datasets.getter
-    def datasets(self, level):
-        return getattr(self, '{}_df'.format(level))
-
-    @property
-    def cell_idx(self):
-        return self.cell_df.index
-
-    @property
-    def cc_idx(self):
-        return self.cc_df[self.element_names]
-
-    @property
-    def e_srce_idx(self):
-        return self.cc_df['srce']
-
-    @property
-    def e_trgt_idx(self):
-        return self.cc_df['trgt']
-
-
-    @property
-    def Nc(self):
-        return self.cell_df.shape[0]
-
-    @property
-    def Ne(self):
-        return self.cc_df.shape[0]
-
-    def _upcast(self, idx, df):
-
-        upcast = df.loc[idx]
-        upcast.index = self.cc_df.index
-        return upcast
-
-    def upcast_srce(self, df):
-        ''' Reindexes input data to self.cc_idx
-        by repeating the values for each source entry
-        '''
-        return self._upcast(self.e_srce_idx, df)
-
-    def upcast_trgt(self, df):
-        return self._upcast(self.e_trgt_idx, df)
-
-    def reset_topo(self):
-        self.cc_mindex = pd.MultiIndex.from_arrays(self.cc_df['srce', 'trgt'].values,
-                                                   names=['srce', 'trgt'])
-
-    def _lvl_sum(self, df, lvl):
-        df_ = df.copy()
-        df_.index = self.cc_mindex
-        return df_.sum(level=lvl)
-
-    def sum_srce(self, df):
-        return self._lvl_sum(df, 'srce')
-
-    def sum_trgt(self, df):
-        return self._lvl_sum(df, 'trgt')
-
-    def set_bbox(self, margin=1.):
-        '''Sets the attribute `bbox` with pairs of values bellow
-        and above the min and max of the cell coords, with a margin.
-        '''
-        self.bbox = np.array([[self.cell_df[c].min() - margin,
-                               self.cell_df[c].max() + margin]
-                              for c in self.coords])
-    def reset_index(self):
-
-        new_cellidx = pd.Series(np.arange(self.cell_df.shape[0]),
-                                index=self.cell_df.index)
-        self.cc_df['srce'] = self.upcast_srce(new_cellidx)
-        self.cc_df['trgt'] = self.upcast_trgt(new_cellidx)
-        self.cell_df.reset_index(drop=True, inplace=True)
-        self.cell_df.index.name = 'cell'
-        self.cc_df.reset_index(drop=True, inplace=True)
-        self.cc_df.index.name = 'cc'
