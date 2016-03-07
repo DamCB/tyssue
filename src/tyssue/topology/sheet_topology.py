@@ -137,3 +137,27 @@ def cell_division(sheet, mother, geom, angle=None):
     sheet.edge_df.loc[daughter_edges, 'face'] = daughter
     sheet.reset_topo()
     geom.update_all(sheet)
+
+
+def remove_face(sheet, face):
+    edges = sheet.edge_df[sheet.edge_df['face'] == face]
+    verts = edges['srce'].values
+
+    out_orbits = sheet.get_orbits('srce', 'trgt')
+    in_orbits = sheet.get_orbits('trgt', 'srce')
+
+    new_vert_data = sheet.vert_df.loc[verts].mean()
+    sheet.vert_df = sheet.vert_df.append(new_vert_data, ignore_index=True)
+    new_vert = sheet.vert_df.index[-1]
+    for v in verts:
+        out_jes = out_orbits.loc[v].index
+        sheet.edge_df.loc[out_jes, 'srce'] = new_vert
+
+        in_jes = in_orbits.loc[v].index
+        sheet.edge_df.loc[in_jes, 'trgt'] = new_vert
+
+    sheet.edge_df = sheet.edge_df[sheet.edge_df['face'] != face]
+    sheet.face_df.loc[face, 'is_alive'] = 0
+    sheet.vert_df.loc[verts, 'is_active'] = 0
+    sheet.reset_topo()
+    return new_vert
