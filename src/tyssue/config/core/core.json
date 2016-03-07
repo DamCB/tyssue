@@ -1,0 +1,13 @@
+{
+    'face': {
+        'is_alive': true,
+         },
+    'edge': {
+        'face': 0,
+        'srce': 0,
+        'trgt': 0
+         },
+    'vert': {
+        'is_active': true,
+         }
+}

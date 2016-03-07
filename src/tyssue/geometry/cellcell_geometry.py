@@ -3,7 +3,7 @@ import numpy as np
 def get_default_geom_specs():
     default_geom_specs = {
         "cc": {
-            "nz": (0., np.float),
+            "nz": 0.,
             },
         }
     return default_geom_specs
@@ -11,7 +11,7 @@ def get_default_geom_specs():
 
 
 def scale(ccmesh, delta, coords):
-    ccmesh.cell_df[coords] = ccmesh.ccmesh.cell_df[coords] * coords
+    ccmesh.cell_df[coords] = ccmesh.ccmesh.cell_df[coords] * delta
 
 def update_dcoords(ccmesh):
 

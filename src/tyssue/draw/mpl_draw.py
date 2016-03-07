@@ -3,62 +3,31 @@ Matplotlib based plotting
 """
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon
+from matplotlib.patches import Polygon, FancyArrow
+from matplotlib.collections import PatchCollection
 import pandas as pd
 import numpy as np
-
-
-def get_default_draw_specs():
-    default_draw_specs = {
-        "je": {
-            'visible': True,
-            'width': 0.01,
-            'head_width': 0.02,
-            'length_includes_head': True,
-            'shape': 'right',
-            'color': '#2b5d0a',
-            'alpha': 0.8,
-            'zorder': 1
-            },
-        "jv": {
-            'visible': True,
-            's': 100,
-            'c': '#000a4b',
-            'alpha': 0.3,
-            'zorder': 2,
-            },
-        'grad': {
-            'color':'b',
-            'alpha':0.5,
-            'width':0.04,
-            },
-        "face": {
-            'visible': False,
-            'color':'#8aa678',
-            'alpha': 1,
-            'zorder': -1,
-            }
-        }
-    return default_draw_specs
-
+from ..config.json_parser import load_default
+from ..utils.utils import spec_updater
 
 COORDS = ['x', 'y']
+
 
 def sheet_view(sheet, coords=COORDS, **draw_specs_kw):
     """ Base view function, parametrizable
     through draw_secs
     """
-    draw_specs = get_default_draw_specs()
-    draw_specs.update(**draw_specs_kw)
+    draw_specs = load_default('draw', 'sheet')
+    spec_updater(draw_specs, draw_specs_kw)
 
     fig, ax = plt.subplots()
-    jv_spec = draw_specs['jv']
-    if jv_spec['visible']:
-        ax = draw_jv(sheet, coords, ax, **jv_spec)
+    vert_spec = draw_specs['vert']
+    if vert_spec['visible']:
+        ax = draw_vert(sheet, coords, ax, **vert_spec)
 
-    je_spec = draw_specs['je']
-    if je_spec['visible']:
-        ax = draw_je(sheet, coords, ax, **je_spec)
+    edge_spec = draw_specs['edge']
+    if edge_spec['visible']:
+        ax = draw_edge(sheet, coords, ax, **edge_spec)
 
     face_spec = draw_specs['face']
     if face_spec['visible']:
@@ -73,72 +42,102 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
     Keyword values can be specified at the element
     level as columns of the sheet.face_df
     """
-    draw_spec = get_default_draw_specs()['face']
+
+    draw_spec = load_default('draw', 'sheet')['face']
     draw_spec.update(**draw_spec_kw)
-    per_element_kw = set(draw_spec.keys()).intersection(sheet.face_df.columns)
 
     polys = sheet.face_polygons(coords)
+    patches = []
     for idx, poly in polys.items():
-        draw_spec.update({kw: sheet.face_df.loc[idx, kw]
-                          for kw in per_element_kw})
         patch = Polygon(poly,
                         fill=True,
-                        closed=True,
-                        **draw_spec)
-        ax.add_patch(patch)
+                        closed=True)
+        patches.append(patch)
+    collection_specs = parse_face_specs(draw_spec)
+    ax.add_collection(PatchCollection(patches, False,
+                                      **collection_specs))
     return ax
 
+def parse_face_specs(face_draw_specs):
 
-def draw_jv(sheet, coords, ax, **draw_spec_kw):
+    collection_specs = {}
+    if "color" in face_draw_specs:
+        collection_specs['facecolors'] = face_draw_specs['color']
+    if "alpha" in face_draw_specs:
+        collection_specs['alpha'] = face_draw_specs['alpha']
+    if "zorder" in face_draw_specs:
+        collection_specs['zorder'] = face_draw_specs['zorder']
+
+    return collection_specs
+
+
+def draw_vert(sheet, coords, ax, **draw_spec_kw):
     """Draw junction vertices in matplotlib
     """
-    draw_spec = get_default_draw_specs()['jv']
-
+    draw_spec = load_default('draw', 'sheet')['vert']
     draw_spec.update(**draw_spec_kw)
-    per_element_kw = set(draw_spec.keys()).intersection(sheet.jv_df.columns)
-    draw_spec.update({key: sheet.jv_df[key]
-                      for key in per_element_kw})
 
     x, y = coords
-    ax.scatter(sheet.jv_df[x], sheet.jv_df[y], **draw_spec_kw)
+    ax.scatter(sheet.vert_df[x], sheet.vert_df[y], **draw_spec_kw)
     return ax
 
-def draw_je(sheet, coords, ax, **draw_spec_kw):
+def draw_edge(sheet, coords, ax, **draw_spec_kw):
     """
     """
-    draw_spec = get_default_draw_specs()['je']
+    draw_spec = load_default('draw', 'sheet')['edge']
     draw_spec.update(**draw_spec_kw)
-    per_element_kw = set(draw_spec.keys()).intersection(sheet.je_df.columns)
 
     x, y = coords
     dx, dy = ('d'+c for c in coords)
-    app_length = np.hypot(sheet.je_df[dx],
-                          sheet.je_df[dy])
+    app_length = np.hypot(sheet.edge_df[dx],
+                          sheet.edge_df[dy])
 
-    for idx, je in sheet.je_df[app_length > 1e-6].iterrows():
-        srce  = int(je['srce'])
-        draw_spec.update({key: sheet.je_df.loc[idx, key]
-                          for key in per_element_kw})
-        ax.arrow(sheet.jv_df[x].loc[srce], sheet.jv_df[y].loc[srce],
-                 sheet.je_df[dx].loc[idx], sheet.je_df[dy].loc[idx],
-                 **draw_spec)
+    patches = []
+    arrow_specs, collections_specs = parse_edge_specs(draw_spec)
+    for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows():
+        srce  = int(edge['srce'])
+        arrow = FancyArrow(sheet.vert_df[x].loc[srce],
+                           sheet.vert_df[y].loc[srce],
+                           sheet.edge_df[dx].loc[idx],
+                           sheet.edge_df[dy].loc[idx],
+                            **arrow_specs)
+        patches.append(arrow)
+
+    ax.add_collection(PatchCollection(patches, False, **collections_specs))
     return ax
+
+
+def parse_edge_specs(edge_draw_specs):
+
+    arrow_keys = ['head_width',
+                  'length_includes_head',
+                  'shape']
+    arrow_specs = {key: val for key, val in edge_draw_specs.items()
+                   if key in arrow_keys}
+    collection_specs = {}
+    if "color" in edge_draw_specs:
+        collection_specs['edgecolors'] = edge_draw_specs['color']
+    if "width" in edge_draw_specs:
+        collection_specs['linewidths'] = edge_draw_specs['width']
+    if "alpha" in edge_draw_specs:
+        collection_specs['alpha'] = edge_draw_specs['alpha']
+    return arrow_specs, collection_specs
 
 
 def plot_forces(sheet, geom, model,
                 coords, scaling,
                 ax=None,
                 approx_grad=None,
-                **draw_spec_kws):
+                **draw_specs_kw):
     """Plot the net forces at each vertex, with their amplitudes multiplied
     by `scaling`
     """
-    draw_specs = get_default_draw_specs()
-    draw_specs.update(**draw_spec_kws)
+    draw_specs = load_default('draw', 'sheet')
+    spec_updater(draw_specs, draw_specs_kw)
     gcoords = ['g'+c for c in coords]
     if approx_grad is not None:
         app_grad = approx_grad(sheet, geom, model)
-        grad_i = pd.DataFrame(index=sheet.jv_idx,
+        grad_i = pd.DataFrame(index=sheet.vert_idx,
                               data=app_grad.reshape((-1, len(sheet.coords))),
                               columns=sheet.coords) * scaling
 
@@ -146,8 +145,8 @@ def plot_forces(sheet, geom, model,
         grad_i = model.compute_gradient(sheet, components=False) * scaling
 
     arrows = pd.DataFrame(columns=coords + gcoords,
-                          index=sheet.jv_df.index)
-    arrows[coords] = sheet.jv_df[coords]
+                          index=sheet.vert_df.index)
+    arrows[coords] = sheet.vert_df[coords]
     arrows[gcoords] = - grad_i[coords] # F = -grad E
 
     if ax is None:
@@ -162,18 +161,19 @@ def plot_forces(sheet, geom, model,
 
 
 def plot_analytical_to_numeric_comp(sheet, model, geom,
-                                    dim_mod_specs, mod_specs):
-    import tyssue.dynamics.sheet_isotropic_model as iso
+                                    isotropic_model, nondim_specs):
 
+    iso = isotropic_model
     fig, ax = plt.subplots(figsize=(8, 8))
+
     deltas = np.linspace(0.1, 1.8, 50)
 
-    lbda = mod_specs['je']['line_tension'][0]
-    gamma = mod_specs['face']['contractility'][0]
+    lbda = nondim_specs['edge']['line_tension']
+    gamma = nondim_specs['face']['contractility']
 
-    ax.plot(deltas, iso.isotropic_energy(deltas, mod_specs), 'k-',
+    ax.plot(deltas, iso.isotropic_energy(deltas, nondim_specs), 'k-',
             label='Analytical total')
-    ax.plot(sheet.delta_o, iso.isotropic_energy(sheet.delta_o, mod_specs), 'ro')
+    ax.plot(sheet.delta_o, iso.isotropic_energy(sheet.delta_o, nondim_specs), 'ro')
     ax.plot(deltas, iso.elasticity(deltas), 'b-',
             label='Analytical volume elasticity')
     ax.plot(deltas, iso.contractility(deltas, gamma), color='orange', ls='-',
@@ -185,7 +185,7 @@ def plot_analytical_to_numeric_comp(sheet, model, geom,
     ax.set_ylabel(r'Isotropic energie $\bar E$')
 
     energies = iso.isotropic_energies(sheet, model, geom,
-                                      deltas, dim_mod_specs)
+                                      deltas, nondim_specs)
     # energies = energies / norm
     ax.plot(deltas, energies[:, 2], 'bo:', lw=2, alpha=0.8,
             label='Computed volume elasticity')

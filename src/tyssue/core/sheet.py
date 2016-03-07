@@ -18,6 +18,8 @@ A dynamical model derived from Fahradifar et al. 2007 is provided in
 
 import numpy as np
 from .objects import Epithelium
+from ..config.json_parser import load_default
+
 
 class Sheet(Epithelium):
     '''
@@ -32,7 +34,7 @@ class Sheet(Epithelium):
     '''
 
     def __init__(self, identifier, datasets,
-                 datadicts=None, coords=None):
+                 specs=None, coords=None):
         '''
         Creates an epithelium sheet, such as the apical junction network.
 
@@ -43,5 +45,7 @@ class Sheet(Epithelium):
             this df holds the vertices associated with
 
         '''
+        if specs is None:
+            specs = load_default('geometry', 'sheet')
         super().__init__(identifier, datasets,
-                         datadicts, coords)
+                         specs, coords)
