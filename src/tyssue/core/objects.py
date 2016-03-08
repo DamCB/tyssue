@@ -124,7 +124,6 @@ class Epithelium:
         # TODO
         raise NotImplementedError
 
-
     @property
     def settings(self):
         return self.specs['settings']
