@@ -20,6 +20,7 @@ requirements:
     - matplotlib
     - pandas
     - vispy
+    - pytables
 
 about:
   home: https://github.com/CellModels/tyssue
