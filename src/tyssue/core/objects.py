@@ -112,7 +112,9 @@ class Epithelium:
                               'face', 'cell'][:len(self.data_names)]
         if specs is None:
             specs = {name:{} for name in self.data_names}
+
         self.specs = specs
+        self.update_specs(specs, reset=False)
         self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
                                                    names=self.element_names)
         ## Topology (geometry independant)
