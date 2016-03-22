@@ -564,3 +564,15 @@ def _test_valid(face):
     s1 = set(face['srce'])
     s2 = set(face['trgt'])
     return s1 == s2
+
+
+def get_opposite(edge_df):
+    """
+    Returns the indices opposite to the edges in `edge_df`
+    """
+    st_indexed = edge_df[['srce', 'trgt']].reset_index().set_index(
+        ['srce', 'trgt'], drop=False)
+    flipped = st_indexed.index.swaplevel(0, 1)
+    flipped.names = ['srce', 'trgt']
+    opposite = st_indexed.loc[flipped, 'edge'].values
+    return opposite
