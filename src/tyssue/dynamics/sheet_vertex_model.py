@@ -51,7 +51,7 @@ class SheetModel(PlanarModel):
 
         Parameters
         ----------
-        * mesh: a :class:`tyssue.obedgect.sheet.Sheet` instance
+        * mesh: a :class:`tyssue.object.sheet.Sheet` instance
         * full_output: if True, returns the enery components
         '''
         # consider only live faces:
