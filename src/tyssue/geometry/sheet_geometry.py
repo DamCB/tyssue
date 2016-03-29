@@ -107,7 +107,7 @@ class SheetGeometry(PlanarGeometry):
         return rotation
 
     @classmethod
-    def face_proedgected_pos(cls, sheet, face, psi=0):
+    def face_projected_pos(cls, sheet, face, psi=0):
 
         face_orbit = sheet.edge_df[sheet.edge_df['face'] == face]['srce']
         n_sides = face_orbit.shape[0]
