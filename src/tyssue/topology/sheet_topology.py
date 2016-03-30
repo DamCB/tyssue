@@ -67,10 +67,14 @@ def type1_transition(sheet, edge01, epsilon=0.1):
 
 
 def add_vert(sheet, edge):
+    """
+    Adds a vertex in the middle of the edge,
+    which is split as is its opposite
+    """
 
     srce, trgt = sheet.edge_df.loc[edge, ['srce', 'trgt']]
-    opposite = sheet.edge_df[(sheet.edge_df['srce'] == trgt)
-                           & (sheet.edge_df['trgt'] == srce)]
+    opposite = sheet.edge_df[(sheet.edge_df['srce'] == trgt) &
+                             (sheet.edge_df['trgt'] == srce)]
     opp_edge = opposite.index[0]
 
     new_vert = sheet.vert_df.loc[[srce, trgt]].mean()
@@ -103,7 +107,7 @@ def cell_division(sheet, mother, geom, angle=None):
         angle = np.random.random() * np.pi
 
     m_data = sheet.edge_df[sheet.edge_df['face'] == mother]
-    rot_pos = geom.face_proedgected_pos(sheet, mother, psi=angle)
+    rot_pos = geom.face_projected_pos(sheet, mother, psi=angle)
     srce_pos = rot_pos.loc[m_data['srce'], 'x']
     srce_pos.index = m_data.index
     trgt_pos = rot_pos.loc[m_data['trgt'], 'x']
