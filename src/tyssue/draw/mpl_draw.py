@@ -65,8 +65,6 @@ def parse_face_specs(face_draw_specs):
         collection_specs['facecolors'] = face_draw_specs['color']
     if "alpha" in face_draw_specs:
         collection_specs['alpha'] = face_draw_specs['alpha']
-    if "zorder" in face_draw_specs:
-        collection_specs['zorder'] = face_draw_specs['zorder']
 
     return collection_specs
 
@@ -78,7 +76,11 @@ def draw_vert(sheet, coords, ax, **draw_spec_kw):
     draw_spec.update(**draw_spec_kw)
 
     x, y = coords
-    ax.scatter(sheet.vert_df[x], sheet.vert_df[y], **draw_spec_kw)
+    if z_coord in sheet.vert_df.columns:
+        pos = sheet.vert_df.sort_values(z_coord)[coords]
+    else:
+        pos = sheet.vert_df[coords]
+    ax.scatter(pos.x, pos.y, **draw_spec_kw)
     return ax
 
 def draw_edge(sheet, coords, ax, **draw_spec_kw):
@@ -94,17 +96,21 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
 
     patches = []
     arrow_specs, collections_specs = parse_edge_specs(draw_spec)
+
+
     for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows():
         srce  = int(edge['srce'])
-        arrow = FancyArrow(sheet.vert_df[x].loc[srce],
-                           sheet.vert_df[y].loc[srce],
-                           sheet.edge_df[dx].loc[idx],
-                           sheet.edge_df[dy].loc[idx],
-                            **arrow_specs)
+        arrow = FancyArrow(sheet.vert_df.loc[srce, x],
+                           sheet.vert_df.loc[srce, y],
+                           sheet.edge_df.loc[idx, dx],
+                           sheet.edge_df.loc[idx, dy],
+                           **arrow_specs)
         patches.append(arrow)
 
-    ax.add_collection(PatchCollection(patches, False, **collections_specs))
+    ax.add_collection(PatchCollection(patches, False,
+                                      **collections_specs))
     return ax
+
 
 
 def parse_edge_specs(edge_draw_specs):
@@ -121,9 +127,6 @@ def parse_edge_specs(edge_draw_specs):
         collection_specs['linewidths'] = edge_draw_specs['width']
     if "alpha" in edge_draw_specs:
         collection_specs['alpha'] = edge_draw_specs['alpha']
-    if "zorder" in edge_draw_specs:
-        collection_specs['zorder'] = edge_draw_specs['zorder']
-
     return arrow_specs, collection_specs
 
 

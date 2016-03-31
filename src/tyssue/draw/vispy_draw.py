@@ -17,8 +17,8 @@ def vp_view(sheet, coords=None, **draw_specs_kw):
         coords = ['x', 'y', 'z']
     vertices, faces, _ = sheet.triangular_mesh(coords)
     canvas = scene.SceneCanvas(keys='interactive', show=True)
-    grid = canvas.central_widget.add_grid()
-    view = grid.add_view(0, 1)
+    #grid = canvas.central_widget.add_grid()
+    view = canvas.central_widget.add_view()
     view.camera =  'turntable'
     view.camera.aspect = 1
     view.bgcolor = vp.color.Color('#aaaaaa')
@@ -43,13 +43,17 @@ def vp_view(sheet, coords=None, **draw_specs_kw):
                 face_colors[channel] = val
 
         elif colors.shape in [(sheet.Nf, 3), (sheet.Nf, 4)]:
-            face_colors = pd.DataFrame(index=sheet.face_df.index, data=colors,
-                                       columns=['R', 'G', 'B', 'A'][:colors.shape[1]])
+            face_colors = pd.DataFrame(index=sheet.face_df.index,
+                                       data=colors,
+                                       columns=['R', 'G',
+                                                'B', 'A'][:colors.shape[1]])
             face_colors = sheet.upcast_face(face_colors)
 
         elif colors.shape in [(sheet.Ne, 3), (sheet.Ne, 4)]:
-            face_colors = pd.DataFrame(index=sheet.face_df.index, data=colors,
-                                       columns=['R', 'G', 'B', 'A'][:colors.shape[1]])
+            face_colors = pd.DataFrame(index=sheet.face_df.index,
+                                       data=colors,
+                                       columns=['R', 'G',
+                                                'B', 'A'][:colors.shape[1]])
 
         mesh = scene.visuals.Mesh(vertices=vertices,
                                   faces=faces,
