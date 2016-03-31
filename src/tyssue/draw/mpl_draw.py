@@ -121,6 +121,9 @@ def parse_edge_specs(edge_draw_specs):
         collection_specs['linewidths'] = edge_draw_specs['width']
     if "alpha" in edge_draw_specs:
         collection_specs['alpha'] = edge_draw_specs['alpha']
+    if "zorder" in edge_draw_specs:
+        collection_specs['zorder'] = edge_draw_specs['zorder']
+
     return arrow_specs, collection_specs
 
 
