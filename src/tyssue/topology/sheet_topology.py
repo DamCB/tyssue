@@ -144,6 +144,9 @@ def cell_division(sheet, mother, geom, angle=None):
 
 
 def remove_face(sheet, face):
+
+    sheet.face_df.loc[face, 'is_alive'] = 0
+
     edges = sheet.edge_df[sheet.edge_df['face'] == face]
     verts = edges['srce'].values
 
@@ -151,7 +154,8 @@ def remove_face(sheet, face):
     in_orbits = sheet.get_orbits('trgt', 'srce')
 
     new_vert_data = sheet.vert_df.loc[verts].mean()
-    sheet.vert_df = sheet.vert_df.append(new_vert_data, ignore_index=True)
+    sheet.vert_df = sheet.vert_df.append(new_vert_data,
+                                         ignore_index=True)
     new_vert = sheet.vert_df.index[-1]
     for v in verts:
         out_jes = out_orbits.loc[v].index
@@ -160,9 +164,10 @@ def remove_face(sheet, face):
         in_jes = in_orbits.loc[v].index
         sheet.edge_df.loc[in_jes, 'trgt'] = new_vert
 
+
     sheet.edge_df = sheet.edge_df[sheet.edge_df['face'] != face].copy()
-    fidx = sheet.face_df.index.delete(face)
-    sheet.face_df = sheet.face_df.loc[fidx].copy()
+    # fidx = sheet.face_df.index.delete(face)
+    # sheet.face_df = sheet.face_df.loc[fidx].copy()
     vidx = sheet.vert_df.index.delete(verts)
     sheet.vert_df = sheet.vert_df.loc[vidx].copy()
     sheet.reset_index()

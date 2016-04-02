@@ -15,11 +15,13 @@ A dynamical model derived from Fahradifar et al. 2007 is provided in
 '''
 
 
-
 import numpy as np
-from .objects import Epithelium
+import pandas as pd
+
+from .objects import Epithelium, get_opposite
 from ..config.json_parser import load_default
 
+test = 0
 
 class Sheet(Epithelium):
     '''
@@ -49,3 +51,41 @@ class Sheet(Epithelium):
             specs = load_default('geometry', 'sheet')
         super().__init__(identifier, datasets,
                          specs, coords)
+
+    def get_neighbors(self, face):
+        """Returns the faces adjacent to `face`
+        """
+        if 'opposite' not in self.edge_df.columns:
+            self.edge_df['opposite'] = get_opposite(self.edge_df)
+
+        face_edges = self.edge_df[self.edge_df['face'] == face]
+        op_edges = face_edges['opposite'].dropna().astype(np.int)
+        return self.edge_df.loc[op_edges, 'face'].values
+
+    def get_neighborhood(self, face, order):
+        """Returns `face` neighborhood up to a degree of `order`
+
+        For example, if `order` is 2, it wil return the adjacent, faces
+        and theses faces neighbors.
+
+        Returns
+        -------
+        neighbors : pd.DataFrame with two colums, the index
+            of the neighboring face, and it's neighboring order
+
+        """
+        # Start with the face so that it's not gathered later
+        neighbors = pd.DataFrame.from_dict({'face': [face],
+                                            'order': [0]})
+        for k in range(order+1):
+            for neigh in neighbors[neighbors['order'] == k-1]['face']:
+                new_neighs = self.get_neighbors(neigh)
+                new_neighs = set(new_neighs).difference(neighbors['face'])
+
+                orders = np.ones(len(new_neighs), dtype=np.int) * k
+                new_neighs = pd.DataFrame.from_dict({'face': list(new_neighs),
+                                                     'order': orders},
+                                                    dtype=np.int)
+                neighbors = pd.concat([neighbors, new_neighs])
+
+        return neighbors.reset_index(drop=True).loc[1:]
