@@ -29,29 +29,29 @@ def apoptosis_time_table(sheet,
         names=['t', 'face'])
 
     time_table = pd.DataFrame(index=cell_time_idx,
-                              columns=events['face'].keys())
+                              columns=events.keys())
 
     pref_vols = np.linspace(1., 0., shrink_steps)
     time_table.loc[start_t: end_shrink-1, 'shrink'] = pref_vols
 
     rad_tensions = np.linspace(0, rad_tension, shrink_steps)
-    time_table.loc[start_t: end_shrink-1, 'shrink'] = rad_tensions
+    time_table.loc[start_t: end_shrink-1, 'ab_pull'] = rad_tensions
 
     time_table.loc[end_shrink: end_t-1, 'type1_at_shorter'] = 1
     time_table.loc[end_t, 'type3'] = 1
 
-    neighbors = sheet.get_neighbors(apoptotic_cell, contract_span)
+    neighbors = sheet.get_neighborhood(apoptotic_cell, contract_span)
     nb_t_idx = pd.MultiIndex.from_product([shrink_times, neighbors['face']],
                                           names=['t', 'face'])
 
-    contracts = np.linspace(0, contractile_increase,
+    contracts = np.linspace(1, contractile_increase,
                             shrink_steps).repeat(neighbors.shape[0])
     contracts = contracts.reshape((shrink_steps,
                                    neighbors.shape[0]))
     contracts = contracts / np.atleast_2d(neighbors.order.values)
     time_table = pd.concat([time_table,
-                            pd.Series(contracts.ravel(),
-                                      index=nb_t_idx,
-                                      name='contract')])
+                            pd.DataFrame(contracts.ravel(),
+                                         index=nb_t_idx,
+                                         columns=['contract', ])])
 
-    return times, time_table
+    return times, time_table.sort_index()

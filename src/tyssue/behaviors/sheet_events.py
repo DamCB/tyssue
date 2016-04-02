@@ -14,17 +14,13 @@ class SheetEvents():
     @property
     def events(self):
         events = {
-            'face': {
-                'shrink': self.shrink,
-                'grow': self.grow,
-                'contract': self.contract,
-                'type1_at_shorter': self.type1_at_shorter,
-                'type3': self.type3,
-                'divide': self.type3,
-                },
-            'vert': {
-                'ab_pull': self.ab_pull,
-                }
+            'shrink': self.shrink,
+            'grow': self.grow,
+            'contract': self.contract,
+            'type1_at_shorter': self.type1_at_shorter,
+            'type3': self.type3,
+            'divide': self.type3,
+            'ab_pull': self.ab_pull,
             }
         return events
 
@@ -53,7 +49,7 @@ class SheetEvents():
 
     def type3(self, face, *args):
 
-        remove_face(sheet, face)
+        remove_face(self.sheet, face)
         self.geom.update_all(self.sheet)
 
     def ab_pull(self, face, *args):
