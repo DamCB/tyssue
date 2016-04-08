@@ -21,7 +21,7 @@ def apoptosis_time_table(sheet,
     end_shrink = start_t + shrink_steps
     end_t = start_t + shrink_steps + n_type1
 
-    times = range(start_t, end_t)
+    times = range(start_t, end_t+1)
     shrink_times = range(start_t, end_shrink)
 
     cell_time_idx = pd.MultiIndex.from_tuples(
@@ -34,7 +34,7 @@ def apoptosis_time_table(sheet,
     pref_vols = np.linspace(1., 0., shrink_steps)
     time_table.loc[start_t: end_shrink-1, 'shrink'] = pref_vols
 
-    rad_tensions = np.linspace(0, rad_tension, shrink_steps)
+    rad_tensions = np.ones(shrink_steps) * rad_tension / shrink_steps
     time_table.loc[start_t: end_shrink-1, 'ab_pull'] = rad_tensions
 
     time_table.loc[end_shrink: end_t-1, 'type1_at_shorter'] = 1
@@ -44,8 +44,9 @@ def apoptosis_time_table(sheet,
     nb_t_idx = pd.MultiIndex.from_product([shrink_times, neighbors['face']],
                                           names=['t', 'face'])
 
-    contracts = np.linspace(1, contractile_increase,
-                            shrink_steps).repeat(neighbors.shape[0])
+    contracts = (np.ones(shrink_steps).repeat(neighbors.shape[0]) *
+                 contractile_increase / shrink_steps)
+
     contracts = contracts.reshape((shrink_steps,
                                    neighbors.shape[0]))
     contracts = contracts / np.atleast_2d(neighbors.order.values)

@@ -19,7 +19,7 @@ class SheetApoptosisModel(SheetModel):
             return E_t, E_c, E_v, E_r / sheet.nrj_norm_factor
         else:
             E_base = SheetModel.compute_energy(sheet, full_output=False)
-            return E_base + E_r.sum()/ sheet.nrj_norm_factor
+            return E_base + E_r.sum() / sheet.nrj_norm_factor
 
     @staticmethod
     def compute_gradient(sheet, components=False):

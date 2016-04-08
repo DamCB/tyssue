@@ -33,7 +33,7 @@ class SheetModel(PlanarModel):
         h0 = dim_mod_specs['face']['prefered_height']
         gamma = dim_mod_specs['face']['contractility']
 
-        dim_mod_specs['face']['contractility'] = gamma * Kv* A0 * h0**2
+        dim_mod_specs['face']['contractility'] = gamma * Kv * A0 * h0**2
         dim_mod_specs['face']['prefered_vol'] = A0 * h0
 
         lbda = dim_mod_specs['edge']['line_tension']

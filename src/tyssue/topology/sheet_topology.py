@@ -13,34 +13,43 @@ def type1_transition(sheet, edge01, epsilon=0.1):
     # Grab the neighbours
     vert0, vert1, cell_b = sheet.edge_df.loc[
         edge01, ['srce', 'trgt', 'face']].astype(int)
+    if sheet.face_df.loc[cell_b, 'num_sides'] < 4:
+        logger.warning('''Face %s has 3 sides,
+        type 1 transition is not allowed''' % cell_b)
+        return
 
     edge10_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
-                        (sheet.edge_df['trgt'] == vert0)]
+                            (sheet.edge_df['trgt'] == vert0)]
     edge10 = edge10_.index[0]
+
     cell_d = int(edge10_.loc[edge10, 'face'])
+    if sheet.face_df.loc[cell_d, 'num_sides'] < 4:
+        logger.warning('''Face %s has 3 sides,
+        type 1 transition is not allowed''' % cell_b)
+        return
 
     edge05_ = sheet.edge_df[(sheet.edge_df['srce'] == vert0) &
-                        (sheet.edge_df['face'] == cell_d)]
+                            (sheet.edge_df['face'] == cell_d)]
     edge05 = edge05_.index[0]
     vert5 = int(edge05_.loc[edge05, 'trgt'])
 
     edge50_ = sheet.edge_df[(sheet.edge_df['srce'] == vert5) &
-                        (sheet.edge_df['trgt'] == vert0)]
+                            (sheet.edge_df['trgt'] == vert0)]
     edge50 = edge50_.index[0]
     cell_a = int(edge50_.loc[edge50, 'face'])
 
     edge13_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
-                        (sheet.edge_df['face'] == cell_b)]
+                            (sheet.edge_df['face'] == cell_b)]
     edge13 = edge13_.index[0]
     vert3 = int(edge13_.loc[edge13, 'trgt'])
 
     edge31_ = sheet.edge_df[(sheet.edge_df['srce'] == vert3) &
-                        (sheet.edge_df['trgt'] == vert1)]
+                            (sheet.edge_df['trgt'] == vert1)]
     edge31 = edge31_.index[0]
     cell_c = int(edge31_.loc[edge31, 'face'])
 
     edge13_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
-                        (sheet.edge_df['face'] == cell_b)]
+                            (sheet.edge_df['face'] == cell_b)]
     edge13 = edge13_.index[0]
     vert3 = int(edge13_.loc[edge13, 'trgt'])
 
@@ -59,10 +68,12 @@ def type1_transition(sheet, edge01, epsilon=0.1):
                 sheet.vert_df.loc[vert1, sheet.coords]) / 2
     cell_b_pos = sheet.face_df.loc[cell_b, sheet.coords]
     sheet.vert_df.loc[vert0, sheet.coords] = (mean_pos -
-                                          (mean_pos - cell_b_pos) * epsilon)
+                                              (mean_pos - cell_b_pos) *
+                                              epsilon)
     cell_d_pos = sheet.face_df.loc[cell_d, sheet.coords]
     sheet.vert_df.loc[vert1, sheet.coords] = (mean_pos -
-                                          (mean_pos - cell_d_pos) * epsilon)
+                                              (mean_pos - cell_d_pos) *
+                                              epsilon)
     sheet.reset_topo()
 
 
@@ -116,7 +127,6 @@ def cell_division(sheet, mother, geom, angle=None):
     edge_a = m_data[(srce_pos < 0) & (trgt_pos > 0)].index[0]
     edge_b = m_data[(srce_pos > 0) & (trgt_pos < 0)].index[0]
 
-
     vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet, edge_a)
     vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet, edge_b)
 
@@ -124,7 +134,6 @@ def cell_division(sheet, mother, geom, angle=None):
     sheet.face_df = sheet.face_df.append(face_cols,
                                          ignore_index=True)
     daughter = int(sheet.face_df.index[-1])
-
 
     edge_cols = sheet.edge_df.loc[new_edge_b]
     sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
@@ -137,7 +146,8 @@ def cell_division(sheet, mother, geom, angle=None):
     sheet.edge_df.loc[new_edge_d, 'srce'] = vert_a
     sheet.edge_df.loc[new_edge_d, 'trgt'] = vert_b
 
-    daughter_edges = list(m_data[srce_pos < 0].index) + [new_edge_b, new_edge_d]
+    daughter_edges = list(m_data[srce_pos < 0].index) + [new_edge_b,
+                                                         new_edge_d]
     sheet.edge_df.loc[daughter_edges, 'face'] = daughter
     sheet.reset_topo()
     geom.update_all(sheet)
@@ -164,10 +174,12 @@ def remove_face(sheet, face):
         in_jes = in_orbits.loc[v].index
         sheet.edge_df.loc[in_jes, 'trgt'] = new_vert
 
+    sheet.edge_df = sheet.edge_df[sheet.edge_df['srce'] !=
+                                  sheet.edge_df['trgt']]
 
     sheet.edge_df = sheet.edge_df[sheet.edge_df['face'] != face].copy()
     # fidx = sheet.face_df.index.delete(face)
-    # sheet.face_df = sheet.face_df.loc[fidx].copy()
+    sheet.face_df.loc[face] = np.nan
     vidx = sheet.vert_df.index.delete(verts)
     sheet.vert_df = sheet.vert_df.loc[vidx].copy()
     sheet.reset_index()
