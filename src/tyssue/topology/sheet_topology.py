@@ -75,6 +75,9 @@ def type1_transition(sheet, edge01, epsilon=0.1):
                                               (mean_pos - cell_d_pos) *
                                               epsilon)
     sheet.reset_topo()
+    # Type 1 transitions might create 3 sided cells, we remove those
+    for tri_face in sheet.face_df[sheet.face_df['num_sides'] == 3].index:
+        remove_face(sheet, tri_face)
 
 
 def add_vert(sheet, edge):
