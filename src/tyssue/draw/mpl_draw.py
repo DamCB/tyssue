@@ -76,11 +76,11 @@ def draw_vert(sheet, coords, ax, **draw_spec_kw):
     draw_spec.update(**draw_spec_kw)
 
     x, y = coords
-    if z_coord in sheet.vert_df.columns:
-        pos = sheet.vert_df.sort_values(z_coord)[coords]
+    if 'z_coord' in sheet.vert_df.columns:
+        pos = sheet.vert_df.sort_values('z_coord')[coords]
     else:
         pos = sheet.vert_df[coords]
-    ax.scatter(pos.x, pos.y, **draw_spec_kw)
+    ax.scatter(pos[x], pos[y], **draw_spec_kw)
     return ax
 
 def draw_edge(sheet, coords, ax, **draw_spec_kw):
