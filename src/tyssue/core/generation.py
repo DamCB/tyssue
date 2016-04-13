@@ -5,6 +5,7 @@ from ..config.json_parser import load_default
 import logging
 log = logging.getLogger(name=__name__)
 
+
 def make_df(index, spec):
     '''
 
@@ -23,8 +24,8 @@ def make_df(index, spec):
 
 Hexagonal grids
 ---------------
-
 """
+
 
 def hexa_grid2d(nx, ny, distx, disty, noise=None):
     """Creates an hexagonal grid of points
@@ -73,6 +74,7 @@ From Voronoi tessalations
 -------------------------
 """
 
+
 def from_3d_voronoi(voro):
     """
     """
@@ -110,14 +112,14 @@ def from_3d_voronoi(voro):
     coords = ['x', 'y', 'z']
     edge_idx = pd.Index(range(el_idx.shape[0]), name='edge')
     edge_df = make_df(edge_idx,
-                    specs3d['edge'])
+                      specs3d['edge'])
 
     for i, elem in enumerate(['srce', 'trgt', 'face', 'cell']):
         edge_df[elem] = el_idx[:, i]
 
     vert_idx = pd.Index(range(voro.vertices.shape[0]), name='vert')
     vert_df = make_df(vert_idx,
-                    specs3d['vert'])
+                      specs3d['vert'])
     vert_df[coords] = voro.vertices
 
     cell_idx = pd.Index(range(voro.points.shape[0]), name='cell')
@@ -130,7 +132,7 @@ def from_3d_voronoi(voro):
     face_df = make_df(face_idx, specs3d['face'])
     edge_df.sort_values(by='cell', inplace=True)
 
-    datasets= {
+    datasets = {
         'vert': vert_df,
         'edge': edge_df,
         'face': face_df,
@@ -181,7 +183,7 @@ def from_2d_voronoi(voro, specs=None):
     face_df = make_df(face_idx, specs['face'])
     face_df[coords] = voro.points
 
-    datasets= {
+    datasets = {
         'vert': vert_df,
         'edge': edge_df,
         'face': face_df,
@@ -192,8 +194,8 @@ def from_2d_voronoi(voro, specs=None):
 
 Three cells sheet generations
 -----------------------------
-
 """
+
 
 def three_faces_sheet_array():
     '''
@@ -279,40 +281,38 @@ def three_faces_sheet(zaxis=False):
     vert_idx = pd.Index(range(Nv), name='vert')
 
     _edge_e_idx = np.array([[0, 1, 0],
-                          [1, 2, 0],
-                          [2, 3, 0],
-                          [3, 4, 0],
-                          [4, 5, 0],
-                          [5, 0, 0],
-                          [0, 5, 1],
-                          [5, 6, 1],
-                          [6, 7, 1],
-                          [7, 8, 1],
-                          [8, 9, 1],
-                          [9, 0, 1],
-                          [0, 9, 2],
-                          [9, 10, 2],
-                          [10, 11, 2],
-                          [11, 12, 2],
-                          [12, 1, 2],
-                          [1, 0, 2]])
+                            [1, 2, 0],
+                            [2, 3, 0],
+                            [3, 4, 0],
+                            [4, 5, 0],
+                            [5, 0, 0],
+                            [0, 5, 1],
+                            [5, 6, 1],
+                            [6, 7, 1],
+                            [7, 8, 1],
+                            [8, 9, 1],
+                            [9, 0, 1],
+                            [0, 9, 2],
+                            [9, 10, 2],
+                            [10, 11, 2],
+                            [11, 12, 2],
+                            [12, 1, 2],
+                            [1, 0, 2]])
 
     edge_idx = pd.Index(range(_edge_e_idx.shape[0]), name='edge')
 
     specifications = load_default('geometry', 'sheet')
-    ### Face - face graph
-    cc_idx = [(0, 1), (1, 2), (0, 2)]
-    cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['facea', 'faceb'])
-    ### Faces DataFrame
 
+    # ## Faces DataFrame
     face_df = make_df(index=face_idx,
                       spec=specifications['face'])
 
-    ### Junction vertices and edges DataFrames
+    # ## Junction vertices and edges DataFrames
     vert_df = make_df(index=vert_idx,
-                    spec=specifications['vert'])
+                      spec=specifications['vert'])
     edge_df = make_df(index=edge_idx,
-                    spec=specifications['edge'])
+                      spec=specifications['edge'])
+
     edge_df['srce'] = _edge_e_idx[:, 0]
     edge_df['trgt'] = _edge_e_idx[:, 1]
     edge_df['face'] = _edge_e_idx[:, 2]
@@ -323,3 +323,83 @@ def three_faces_sheet(zaxis=False):
 
     datasets = {'face': face_df, 'vert': vert_df, 'edge': edge_df}
     return datasets, specifications
+
+
+def extrude(apical_datasets):
+    """
+    Extrude a sheet to form a single layer epithelium
+
+    The basal layer is scaled down from the apical one homoteticaly
+    w/r to the center of the coordinate system.
+
+    """
+    apical_vert = apical_datasets['vert']
+    apical_face = apical_datasets['face']
+    apical_edge = apical_datasets['edge']
+
+    apical_vert['segment'] = 'apical'
+    apical_face['segment'] = 'apical'
+    apical_edge['segment'] = 'apical'
+
+    coords = list('xyz')
+    datasets = {}
+
+    Nv = apical_vert.index.max() + 1
+    Ne = apical_edge.index.max() + 1
+    Nf = apical_face.index.max() + 1
+
+    basal_vert = apical_vert.copy()
+    basal_vert[coords] = basal_vert[coords] * 1/3.
+
+    basal_vert.index = basal_vert.index + Nv
+    basal_vert['segment'] = 'basal'
+
+    cell_df = apical_face.copy()
+    cell_df.index.name = 'cell'
+    cell_df[coords] = cell_df[coords] * 2/3.
+    datasets['cell'] = cell_df
+
+    basal_face = apical_face.copy()
+    basal_face.index = basal_face.index + Nf
+    basal_face[coords] = basal_face[coords] * 1/3.
+    basal_face['segment'] = 'basal'
+
+    apical_edge['cell'] = apical_edge['face']
+    basal_edge = apical_edge.copy()
+    # ## Flip edge so that normals are outward
+    basal_edge[['srce', 'trgt']] = basal_edge[['trgt', 'srce']] + Nv
+    basal_edge['face'] = basal_edge['face'] + Nf
+    basal_edge.index = basal_edge.index + Ne
+
+    sagital_face = pd.DataFrame(index=apical_edge.index + 2*Nf,
+                                columns=apical_face.columns)
+
+    sagital_edge = pd.DataFrame(index=np.arange(2*Ne, 6*Ne),
+                                columns=apical_edge.columns)
+
+    sagital_edge['cell'] = np.repeat(apical_edge['cell'].values, 4)
+    sagital_edge['face'] = np.repeat(sagital_face.index.values, 4)
+
+    sagital_edge.loc[2*Ne: 3*Ne - 1,
+                     ['srce', 'trgt']] = apical_edge[['trgt', 'srce']].values
+
+    sagital_edge.loc[3*Ne: 4*Ne - 1, 'srce'] = apical_edge['srce'].values
+    sagital_edge.loc[3*Ne: 4*Ne - 1, 'trgt'] = basal_edge['trgt'].values
+
+    sagital_edge.loc[4*Ne: 5*Ne - 1,
+                     ['srce', 'trgt']] = basal_edge[['trgt', 'srce']].values
+
+    sagital_edge.loc[5*Ne: 6*Ne - 1, 'srce'] = basal_edge['srce'].values
+    sagital_edge.loc[5*Ne: 6*Ne - 1, 'trgt'] = apical_edge['trgt'].values
+
+    datasets['vert'] = pd.concat([apical_vert,
+                                  basal_vert])
+
+    datasets['edge'] = pd.concat([apical_edge,
+                                  basal_edge,
+                                  sagital_edge])
+
+    datasets['face'] = pd.concat([apical_face,
+                                  basal_face,
+                                  sagital_face])
+    return datasets

@@ -2,6 +2,24 @@ import numpy as np
 import pandas as pd
 
 
+def division_time_table(sheet, mother,
+                        events, start_t=0):
+
+    n_steps = sheet.settings['growth_steps']
+    times = range(start_t,
+                  start_t+n_steps+1)
+
+    cell_time_idx = pd.MultiIndex.from_tuples(
+        [(t, mother) for t in times],
+        names=['t', 'face'])
+
+    time_table = pd.DataFrame(index=cell_time_idx,
+                              columns=events.keys())
+    pref_vols = np.linspace(1., 2., n_steps)
+    time_table.loc[start_t: start_t+n_steps-1, 'grow'] = pref_vols
+    time_table.loc[start_t+n_steps, 'divide'] = np.random.random() * np.pi
+    return times, time_table.sort_index()
+
 def apoptosis_time_table(sheet,
                          apoptotic_cell,
                          events,

@@ -97,9 +97,8 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
     patches = []
     arrow_specs, collections_specs = parse_edge_specs(draw_spec)
 
-
     for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows():
-        srce  = int(edge['srce'])
+        srce = int(edge['srce'])
         arrow = FancyArrow(sheet.vert_df.loc[srce, x],
                            sheet.vert_df.loc[srce, y],
                            sheet.edge_df.loc[idx, dx],
@@ -110,7 +109,6 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
     ax.add_collection(PatchCollection(patches, False,
                                       **collections_specs))
     return ax
-
 
 
 def parse_edge_specs(edge_draw_specs):
@@ -153,10 +151,11 @@ def plot_forces(sheet, geom, model,
     arrows = pd.DataFrame(columns=coords + gcoords,
                           index=sheet.vert_df.index)
     arrows[coords] = sheet.vert_df[coords]
-    arrows[gcoords] = - grad_i[coords] # F = -grad E
+    arrows[gcoords] = -grad_i[coords]  # F = -grad E
 
     if ax is None:
-        fig, ax = sheet_view(sheet, coords, **draw_specs)
+        fig, ax = sheet_view(sheet, coords,
+                             **draw_specs)
     else:
         fig = ax.get_figure()
 
@@ -179,7 +178,8 @@ def plot_analytical_to_numeric_comp(sheet, model, geom,
 
     ax.plot(deltas, iso.isotropic_energy(deltas, nondim_specs), 'k-',
             label='Analytical total')
-    ax.plot(sheet.delta_o, iso.isotropic_energy(sheet.delta_o, nondim_specs), 'ro')
+    ax.plot(sheet.delta_o, iso.isotropic_energy(sheet.delta_o,
+                                                nondim_specs), 'ro')
     ax.plot(deltas, iso.elasticity(deltas), 'b-',
             label='Analytical volume elasticity')
     ax.plot(deltas, iso.contractility(deltas, gamma), color='orange', ls='-',
