@@ -1,7 +1,4 @@
-import numpy as np
-
 from numpy.testing import assert_almost_equal
-from copy import deepcopy
 
 from tyssue.core.sheet import Sheet
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom
@@ -38,12 +35,11 @@ def test_solver():
     settings = {
         'minimize': {
             'options': {
-                'disp':False,
-                'ftol':1e-4,
-                'gtol':1e-4},
+                'disp': False,
+                'ftol': 1e-4,
+                'gtol': 1e-4},
             }
         }
-
 
     res = solver.find_energy_min(sheet, geom, model, **settings)
     assert res['success']

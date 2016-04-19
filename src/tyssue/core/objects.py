@@ -188,7 +188,6 @@ class Epithelium:
         self.grad_norm_factor = self.specs['settings']['grad_norm_factor']
         self.nrj_norm_factor = self.specs['settings']['nrj_norm_factor']
 
-
     def update_num_sides(self):
         self.face_df['num_sides'] = self.edge_df.face.value_counts().loc[
             self.face_df.index]

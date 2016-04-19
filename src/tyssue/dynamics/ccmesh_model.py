@@ -18,28 +18,6 @@ def length_grad(ccmesh):
     grad_lij.columns = ccmesh.coords
     return grad_lij
 
-def get_default_mod_specs():
-    """
-    Loads the default model specifications
-
-    Returns
-    -------
-    defautl_mod_spec: dict, the default values for the model
-      specifications
-    """
-    default_mod_specs = {
-        "cell": {
-            },
-        "cc": {
-            "elasticity": 1.,
-            "prefered_length": 1.,
-            },
-        "settings": {
-            'grad_norm_factor': 1.,
-            'nrj_norm_factor': 1.,
-            }
-        }
-    return default_mod_specs
 
 def dimentionalize(mod_specs, **kwargs):
     """
@@ -59,6 +37,8 @@ def dimentionalize(mod_specs, **kwargs):
 
 def compute_energy(ccmesh, full_output=False):
 
+    nrj_norm_factor = ccmesh.specs['settings']['nrj_norm_factor']
+
     upcast_alive = ccmesh.upcast_srce(ccmesh.cell_df.is_alive)
     live_cc_df = ccmesh.cc_df[upcast_alive == 1]
     energy = elastic_energy(live_cc_df, var='length', elasticity='elasticity',
@@ -66,10 +46,11 @@ def compute_energy(ccmesh, full_output=False):
     if full_output:
         return energy
 
-    return energy.sum() / ccmesh.nrj_norm_factor
+    return energy.sum() / nrj_norm_factor
 
 def compute_gradient(ccmesh, components=False):
 
+    nrj_norm_factor = ccmesh.specs['settings']['nrj_norm_factor']
     upcast_alive = ccmesh.upcast_srce(ccmesh.cell_df.is_alive)
     grad_lij = length_grad(ccmesh)
     kl_l0 = elastic_force(ccmesh.cc_df, var='length',
@@ -79,4 +60,4 @@ def compute_gradient(ccmesh, components=False):
     grad = _to_3d(kl_l0 * upcast_alive) * grad_lij
     if components:
         return grad
-    return ccmesh.sum_srce(grad) / ccmesh.nrj_norm_factor
+    return ccmesh.sum_srce(grad) / nrj_norm_factor

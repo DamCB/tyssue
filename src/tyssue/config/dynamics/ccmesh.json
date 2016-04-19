@@ -1,0 +1,12 @@
+{
+    "cell": {
+    },
+    "edge": {
+        "elasticity": 1.0,
+        "prefered_length": 1.0,
+    },
+    "settings": {
+        "grad_norm_factor": 1.0,
+        "nrj_norm_factor": 1.0,
+    }
+}

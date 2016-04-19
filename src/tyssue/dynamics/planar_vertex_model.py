@@ -57,10 +57,12 @@ class PlanarModel():
                              elasticity='area_elasticity',
                              prefered='prefered_area')
         E_c = live_face_df.eval('0.5 * contractility * perimeter ** 2')
+        nrj_norm_factor = sheet.specs['settings']['nrj_norm_factor']
+
         if full_output:
-            return (E / sheet.nrj_norm_factor for E in (E_t, E_c, E_a))
+            return (E / nrj_norm_factor for E in (E_t, E_c, E_a))
         else:
-            return (E_t.sum() + (E_c + E_a).sum()) / sheet.nrj_norm_factor
+            return (E_t.sum() + (E_c + E_a).sum()) / nrj_norm_factor
 
     @classmethod
     def compute_gradient(cls, sheet, components=False):
@@ -68,8 +70,7 @@ class PlanarModel():
         If components is True, returns the individual terms
         (grad_t, grad_c, grad_v)
         '''
-
-        norm_factor = sheet.nrj_norm_factor
+        norm_factor = sheet.specs['settings']['nrj_norm_factor']
         grad_lij = length_grad(sheet)
 
         grad_t = cls.tension_grad(sheet, grad_lij)

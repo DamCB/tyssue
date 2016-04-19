@@ -17,3 +17,17 @@
     "nrj_norm_factor": 1.0
     }
 }
+{
+        "cell": {
+            },
+        "edge": {
+            "elasticity": 1.,
+            "prefered_length": 1.,
+            },
+        "settings": {
+            'grad_norm_factor': 1.,
+            'nrj_norm_factor': 1.,
+            }
+        }
+
+}
