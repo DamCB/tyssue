@@ -65,9 +65,8 @@ class SheetModel(PlanarModel):
                              elasticity='vol_elasticity',
                              prefered='prefered_vol')
         E_c = live_face_df.eval('0.5 * contractility * perimeter ** 2')
+        nrj_norm_factor = sheet.specs['settings']['nrj_norm_factor']
         if full_output:
-            nrj_norm_factor = sheet.specs['settings']['nrj_norm_factor']
-
             return (E / nrj_norm_factor for E in (E_t, E_c, E_v))
         else:
             return (E_t.sum() + (E_c+E_v).sum()) / nrj_norm_factor

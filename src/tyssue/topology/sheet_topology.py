@@ -158,7 +158,9 @@ def cell_division(sheet, mother, geom, angle=None):
 
 def remove_face(sheet, face):
 
-    sheet.face_df.loc[face, 'is_alive'] = 0
+    if np.isnan(sheet.face_df.loc[face, 'num_sides']):
+        logger.info('Face %i is not valid, aborting')
+        return
 
     edges = sheet.edge_df[sheet.edge_df['face'] == face]
     verts = edges['srce'].values
@@ -183,8 +185,14 @@ def remove_face(sheet, face):
     sheet.edge_df = sheet.edge_df[sheet.edge_df['face'] != face].copy()
     # fidx = sheet.face_df.index.delete(face)
     sheet.face_df.loc[face] = np.nan
+    sheet.face_df.loc[face, 'is_alive'] = 0
+
+    print('removed {} of {} vertices '
+          .format(len(verts), sheet.vert_df.shape[0]))
+
     vidx = sheet.vert_df.index.delete(verts)
     sheet.vert_df = sheet.vert_df.loc[vidx].copy()
+    print('There are {} vertices left'.format(sheet.vert_df.shape[0]))
     sheet.reset_index()
     sheet.reset_topo()
     return new_vert
