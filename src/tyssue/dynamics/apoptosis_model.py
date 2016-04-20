@@ -3,10 +3,8 @@ Specific functions for apoptosis vertex model
 """
 
 from ..utils.utils import _to_3d
-import numpy as np
 from .sheet_vertex_model import SheetModel
 from .sheet_gradients import height_grad
-from copy import deepcopy
 
 
 class SheetApoptosisModel(SheetModel):

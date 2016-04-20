@@ -88,14 +88,13 @@ class PlanarModel():
 
         live_edge = sheet.upcast_face(sheet.face_df['is_alive'])
         if len(sheet.coords) == 2:
-            grad_t = (grad_lij
-                      * _to_2d(sheet.edge_df['line_tension'] * live_edge))
+            grad_t = (grad_lij *
+                      _to_2d(sheet.edge_df['line_tension'] * live_edge))
         elif len(sheet.coords) == 3:
-            grad_t = (grad_lij
-                      * _to_3d(sheet.edge_df['line_tension'] * live_edge))
+            grad_t = (grad_lij *
+                      _to_3d(sheet.edge_df['line_tension'] * live_edge))
 
         return grad_t
-
 
     @staticmethod
     def contractile_grad(sheet, grad_lij):
@@ -108,7 +107,6 @@ class PlanarModel():
             grad_c = grad_lij * _to_3d(gamma)
 
         return grad_c
-
 
     @staticmethod
     def elastic_grad(sheet):

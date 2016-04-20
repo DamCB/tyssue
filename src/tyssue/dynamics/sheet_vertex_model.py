@@ -4,8 +4,6 @@ Vertex model for an Epithelial sheet (see definitions).
 Depends on the sheet vertex geometry functions.
 """
 
-import numpy as np
-
 from copy import deepcopy
 
 from .base_gradients import length_grad

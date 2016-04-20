@@ -4,7 +4,6 @@ import logging
 logger = logging.getLogger(name=__name__)
 
 def _to_2d(df):
-    # TODO test at_least_2d
     df_2d = np.asarray(df).repeat(2).reshape((df.size, 2))
     return df_2d
 

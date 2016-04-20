@@ -198,7 +198,8 @@ class Epithelium:
 
     def update_mindex(self):
         self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
-                                                   names=self.element_names)
+                                                     names=self.element_names)
+
     def reset_topo(self):
         self.update_num_sides()
         self.update_mindex()

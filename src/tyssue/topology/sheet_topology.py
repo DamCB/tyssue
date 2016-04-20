@@ -187,12 +187,13 @@ def remove_face(sheet, face):
     sheet.face_df.loc[face] = np.nan
     sheet.face_df.loc[face, 'is_alive'] = 0
 
-    print('removed {} of {} vertices '
-          .format(len(verts), sheet.vert_df.shape[0]))
+    logger.info('removed {} of {} vertices '
+                .format(len(verts), sheet.vert_df.shape[0]))
+    logger.info('face {} is now dead '
+                .format(face))
 
     vidx = sheet.vert_df.index.delete(verts)
     sheet.vert_df = sheet.vert_df.loc[vidx].copy()
-    print('There are {} vertices left'.format(sheet.vert_df.shape[0]))
     sheet.reset_index()
     sheet.reset_topo()
     return new_vert
