@@ -40,6 +40,10 @@ class SheetModel(PlanarModel):
         dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5 * h0**2
         dim_mod_specs['settings']['nrj_norm_factor'] = Kv * (A0*h0)**2
 
+        if 'anchor_elasticity' in dim_mod_specs['edge']:
+            ka = dim_mod_specs['edge']['anchor_elasticity']
+            dim_mod_specs['edge']['anchor_elasticity'] = ka * Kv * A0 * h0**2
+
         return dim_mod_specs
 
     @staticmethod
@@ -63,11 +67,19 @@ class SheetModel(PlanarModel):
                              elasticity='vol_elasticity',
                              prefered='prefered_vol')
         E_c = live_face_df.eval('0.5 * contractility * perimeter ** 2')
+
+        energies = (E_t, E_v, E_c)
+        if 'is_anchor' in sheet.edge_df.columns:
+            E_a = sheet.edge_df.eval(
+                'anchor_elasticity * length**2 * is_anchor / 2'
+                )
+            energies = energies + (E_a,)
+
         nrj_norm_factor = sheet.specs['settings']['nrj_norm_factor']
         if full_output:
-            return (E / nrj_norm_factor for E in (E_t, E_c, E_v))
+            return (E / nrj_norm_factor for E in energies)
         else:
-            return (E_t.sum() + (E_c+E_v).sum()) / nrj_norm_factor
+            return sum(E.sum() for E in energies) / nrj_norm_factor
 
     @classmethod
     def compute_gradient(cls, sheet, components=False):
@@ -82,15 +94,24 @@ class SheetModel(PlanarModel):
         grad_t = cls.tension_grad(sheet, grad_lij)
         grad_c = cls.contractile_grad(sheet, grad_lij)
         grad_v_srce, grad_v_trgt = cls.elastic_grad(sheet)
+        grads = (grad_t, grad_c, grad_v_srce, grad_v_trgt)
+
+        if 'is_anchor' in sheet.edge_df.columns:
+            grad_a = cls.anchor_grad(sheet, grad_lij)
+            grads = grads + (grad_a,)
+
         if components:
-            return grad_t, grad_c, grad_v_srce, grad_v_trgt
+            return grads
 
         grad_i = (
             (sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
             sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
             sheet.sum_srce(grad_v_srce) + sheet.sum_trgt(grad_v_trgt)
-            ) * _to_3d(sheet.vert_df.is_active)
-        return grad_i / norm_factor
+            )
+        if 'is_anchor' in sheet.edge_df.columns:
+            grad_i = grad_i + sheet.sum_srce(grad_a)
+
+        return grad_i * _to_3d(sheet.vert_df.is_active) / norm_factor
 
     @staticmethod
     def elastic_grad(sheet):
@@ -118,3 +139,21 @@ class SheetModel(PlanarModel):
         grad_v_trgt = kv_v0 * (edge_h * grad_a_trgt)
 
         return grad_v_srce, grad_v_trgt
+
+    @staticmethod
+    def relax_anchors(sheet):
+        '''reset the anchor positions of the border vertices
+        to the positions of said vertices.
+
+        '''
+        at_border = sheet.vert_df[sheet.vert_df['at_border'] == 1].index
+        anchors = sheet.vert_df[sheet.vert_df['is_anchor'] == 1].index
+        sheet.vert_df.loc[
+            anchors, sheet.cords] = sheet.vert_df.loc[at_border,
+                                                      sheet.coords]
+
+    @staticmethod
+    def anchor_grad(sheet, grad_lij):
+
+        ka = sheet.edge_df.eval('anchor_elasticity * length * is_anchor')
+        return grad_lij * _to_3d(ka)
