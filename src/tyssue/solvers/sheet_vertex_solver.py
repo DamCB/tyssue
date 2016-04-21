@@ -2,8 +2,9 @@
 Energy minimization solvers for the sheet vertex model
 '''
 from scipy import optimize
-from ..config.json_parser import load_default
+from .. import config
 import numpy as np
+
 
 class Solver:
 
@@ -11,16 +12,16 @@ class Solver:
     def find_energy_min(cls, sheet, geom, model,
                         pos_idx=None,
                         **settings_kw):
-        # Loads 'tyssue/config/solvers/sheet.json
-        settings = load_default('solvers', 'sheet')
+        # Loads 'tyssue/config/solvers/minimize.json
+        settings = config.solvers.minimize_spec()
         settings.update(**settings_kw)
 
         coords = sheet.coords
         if pos_idx is None:
-            pos0 = sheet.vert_df[coords].values.ravel()
-            pos_idx = sheet.vert_df.index
-        else:
-            pos0 = sheet.vert_df.loc[pos_idx, coords].values.ravel()
+            pos_idx = sheet.vert_df[
+                sheet.vert_df['is_active'] == 1].index
+
+        pos0 = sheet.vert_df.loc[pos_idx, coords].values.ravel()
 
         max_length = 2 * sheet.edge_df['length'].max()
         bounds = np.vstack([pos0 - max_length,
@@ -53,19 +54,22 @@ class Solver:
     @classmethod
     def approx_grad(cls, sheet, geom, model):
         pos0 = sheet.vert_df[sheet.coords].values.ravel()
-        pos_idx = sheet.vert_idx
+        pos_idx = sheet.vert_df[
+            sheet.vert_df['is_active'] == 1].index
+
         grad = optimize.approx_fprime(pos0,
                                       cls.opt_energy,
                                       1e-9, pos_idx,
                                       sheet, geom, model)
         return grad
 
-
     @classmethod
     def check_grad(cls, sheet, geom, model):
 
-        pos0 = sheet.vert_df[sheet.coords].values.ravel()
-        pos_idx = sheet.vert_idx
+        pos_idx = sheet.vert_df[
+            sheet.vert_df['is_active'] == 1].index
+        pos0 = sheet.vert_df.loc[pos_idx, sheet.coords].values.ravel()
+
         grad_err = optimize.check_grad(cls.opt_energy,
                                        cls.opt_grad,
                                        pos0.flatten(),
