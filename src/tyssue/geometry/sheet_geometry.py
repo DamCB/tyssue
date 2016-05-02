@@ -48,8 +48,9 @@ class SheetGeometry(PlanarGeometry):
         '''
         Updates the normal coordniate of each (srce, trgt, face) face.
         '''
-        sheet.edge_df['sub_area'] = np.linalg.norm(sheet.edge_df[sheet.ncoords],
-                                                 axis=1) / 2
+        sheet.edge_df['sub_area'] = np.linalg.norm(
+            sheet.edge_df[sheet.ncoords],
+            axis=1) / 2
         sheet.face_df['area'] = sheet.sum_face(sheet.edge_df['sub_area'])
 
     @staticmethod
@@ -59,31 +60,72 @@ class SheetGeometry(PlanarGeometry):
         module.
 
         '''
-        sheet.edge_df['sub_vol'] = (sheet.upcast_srce(sheet.vert_df['height']) *
-                                  sheet.edge_df['sub_area'])
+        sheet.edge_df['sub_vol'] = (
+            sheet.upcast_srce(sheet.vert_df['height']) *
+            sheet.edge_df['sub_area'])
         sheet.face_df['vol'] = sheet.sum_face(sheet.edge_df['sub_vol'])
 
     @staticmethod
     def update_height(sheet):
+        """
+        Update the height of the sheet vertices, based on the geometry
+        specified in the sheet settings:
 
+        `sheet.settings['geometry']` can be set to
+
+          - `cylindrical`: the vertex height is
+             measured with respect to the distance to the the axis
+             specified in sheet.settings['height_axis'] (e.g `z`)
+          - `flat`: the vertex height is
+             measured with respect to the position on the axis
+             specified in sheet.settings['height_axis']
+          - 'spherical': the vertex height is measured with respect to its
+             distance to the coordinate system centers
+
+        In all the cases, this distance is shifted by an amount of
+        `sheet.vert_df['basal_shift']`
+        """
         w = sheet.settings['height_axis']
         u, v = (c for c in sheet.coords if c != w)
         if sheet.settings['geometry'] == 'cylindrical':
-
             sheet.vert_df['rho'] = np.hypot(sheet.vert_df[v],
-                                          sheet.vert_df[u])
+                                            sheet.vert_df[u])
             sheet.vert_df['height'] = (sheet.vert_df['rho'] -
-                                     sheet.vert_df['basal_shift'])
+                                       sheet.vert_df['basal_shift'])
 
         elif sheet.settings['geometry'] == 'flat':
-
             sheet.vert_df['rho'] = sheet.vert_df[w]
-            sheet.vert_df['height'] = sheet.vert_df[w] - sheet.vert_df['basal_shift']
+            sheet.vert_df['height'] = (sheet.vert_df[w] -
+                                       sheet.vert_df['basal_shift'])
+
+        elif sheet.settings['geometry'] == 'spherical':
+            sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[sheet.coords],
+                                                  axis=1)
+            sheet.vert_df['height'] = (sheet.vert_df['rho'] -
+                                       sheet.vert_df['basal_shift'])
+
 
     @staticmethod
     def face_rotation(sheet, face, psi=0):
+        """Returns a 3D rotation matrix such that the face normal points
+        in the z axis
 
-        normal = sheet.edge_df[sheet.edge_df['face']==face][sheet.ncoords].mean()
+        Parameters
+        ----------
+        sheet: a :class:Sheet object
+        face: int,
+          the index of the face on which to rotate the sheet
+        psi: float,
+          Optional angle giving the rotation along the `z` axis
+
+        Returns
+        -------
+        rotation: (3, 3) np.ndarray
+          The rotation matrix
+
+        """
+        normal = sheet.edge_df[
+            sheet.edge_df['face'] == face][sheet.ncoords].mean()
         normal = normal / np.linalg.norm(normal)
         cos_psi = np.cos(psi)
         sin_psi = np.sin(psi)
@@ -94,10 +136,10 @@ class SheetGeometry(PlanarGeometry):
         cos_theta = normal.nz
         sin_theta = (1 - cos_theta**2)**0.5
 
-        rotation = np.array([[ cos_psi*cos_phi - sin_psi*cos_theta*sin_phi,
+        rotation = np.array([[cos_psi*cos_phi - sin_psi*cos_theta*sin_phi,
                               -cos_psi*sin_phi - sin_psi*cos_theta*cos_phi,
                               sin_psi*sin_theta],
-                             [ sin_psi*cos_phi + cos_psi*cos_theta*sin_phi,
+                             [sin_psi*cos_phi + cos_psi*cos_theta*sin_phi,
                               -sin_psi*sin_phi + cos_psi*cos_theta*cos_phi,
                               -cos_psi*sin_theta],
                              [sin_theta*sin_phi,
@@ -108,10 +150,28 @@ class SheetGeometry(PlanarGeometry):
 
     @classmethod
     def face_projected_pos(cls, sheet, face, psi=0):
+        """Returns the position of a face vertices projected on a plane
+        perpendicular to the face normal, and translated so that the face
+        center is at the center of the coordinate system
+
+
+        Parameters
+        ----------
+        sheet: a :class:Sheet object
+        face: int,
+          the index of the face on which to rotate the sheet
+        psi: float,
+          Optional angle giving the rotation along the `z` axis
+
+        Returns
+        -------
+        rot_pos: pd.DataFrame
+           The rotated, relative positions of the face's vertices
+        """
 
         face_orbit = sheet.edge_df[sheet.edge_df['face'] == face]['srce']
         n_sides = face_orbit.shape[0]
-        face_pos =  np.repeat(
+        face_pos = np.repeat(
             sheet.face_df.loc[face, sheet.coords].values,
             n_sides).reshape(len(sheet.coords), n_sides).T
         rel_pos = sheet.vert_df.loc[face_orbit.values, sheet.coords] - face_pos

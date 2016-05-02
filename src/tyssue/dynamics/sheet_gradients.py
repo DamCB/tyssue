@@ -20,6 +20,9 @@ def height_grad(sheet):
         r_to_rho[['x', 'y']] = 0.
         r_to_rho[['z']] = 1.
 
+    elif sheet.settings['geometry'] == 'spherical':
+        r_to_rho = sheet.vert_df[coords] / _to_3d(sheet.vert_df['rho'])
+
     return r_to_rho
 
 
