@@ -34,6 +34,10 @@ class PlanarModel():
         dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5
         dim_mod_specs['settings']['nrj_norm_factor'] = Kv * A0**2
 
+        if 'anchor_tension' in dim_mod_specs['edge']:
+            t_a = dim_mod_specs['edge']['anchor_tension']
+            dim_mod_specs['edge']['anchor_tension'] = t_a * Kv * A0**1.5
+
         return dim_mod_specs
 
     @staticmethod
@@ -132,3 +136,21 @@ class PlanarModel():
         grad_a_trgt = ka_a0 * grad_a_trgt
 
         return grad_a_srce, grad_a_trgt
+
+    @staticmethod
+    def relax_anchors(sheet):
+        '''reset the anchor positions of the border vertices
+        to the positions of said vertices.
+
+        '''
+        at_border = sheet.vert_df[sheet.vert_df['at_border'] == 1].index
+        anchors = sheet.vert_df[sheet.vert_df['is_anchor'] == 1].index
+        sheet.vert_df.loc[
+            anchors, sheet.cords] = sheet.vert_df.loc[at_border,
+                                                      sheet.coords]
+
+    @staticmethod
+    def anchor_grad(sheet, grad_lij):
+
+        ka = sheet.edge_df.eval('anchor_tension * is_anchor')
+        return grad_lij * _to_3d(ka)

@@ -40,9 +40,9 @@ class SheetModel(PlanarModel):
         dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5 * h0**2
         dim_mod_specs['settings']['nrj_norm_factor'] = Kv * (A0*h0)**2
 
-        if 'anchor_elasticity' in dim_mod_specs['edge']:
-            ka = dim_mod_specs['edge']['anchor_elasticity']
-            dim_mod_specs['edge']['anchor_elasticity'] = ka * Kv * A0 * h0**2
+        if 'anchor_tension' in dim_mod_specs['edge']:
+            t_a = dim_mod_specs['edge']['anchor_tension']
+            dim_mod_specs['edge']['anchor_tension'] = t_a * Kv * A0**1.5 * h0**2
 
         return dim_mod_specs
 
@@ -62,16 +62,16 @@ class SheetModel(PlanarModel):
         live_edge_df = sheet.edge_df[upcast_alive == 1]
 
         E_t = live_edge_df.eval('line_tension * length / 2')
+        E_c = live_face_df.eval('0.5 * contractility * perimeter**2')
         E_v = elastic_energy(live_face_df,
                              var='vol',
                              elasticity='vol_elasticity',
                              prefered='prefered_vol')
-        E_c = live_face_df.eval('0.5 * contractility * perimeter ** 2')
 
-        energies = (E_t, E_v, E_c)
+        energies = (E_t, E_c, E_v)
         if 'is_anchor' in sheet.edge_df.columns:
             E_a = sheet.edge_df.eval(
-                'anchor_elasticity * length**2 * is_anchor / 2'
+                'anchor_tension * length * is_anchor'
                 )
             energies = energies + (E_a,)
 
@@ -139,21 +139,3 @@ class SheetModel(PlanarModel):
         grad_v_trgt = kv_v0 * (edge_h * grad_a_trgt)
 
         return grad_v_srce, grad_v_trgt
-
-    @staticmethod
-    def relax_anchors(sheet):
-        '''reset the anchor positions of the border vertices
-        to the positions of said vertices.
-
-        '''
-        at_border = sheet.vert_df[sheet.vert_df['at_border'] == 1].index
-        anchors = sheet.vert_df[sheet.vert_df['is_anchor'] == 1].index
-        sheet.vert_df.loc[
-            anchors, sheet.cords] = sheet.vert_df.loc[at_border,
-                                                      sheet.coords]
-
-    @staticmethod
-    def anchor_grad(sheet, grad_lij):
-
-        ka = sheet.edge_df.eval('anchor_elasticity * length * is_anchor')
-        return grad_lij * _to_3d(ka)

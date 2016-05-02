@@ -403,3 +403,58 @@ def extrude(apical_datasets):
                                   basal_face,
                                   sagital_face])
     return datasets
+
+
+def create_anchors(sheet):
+    '''Adds an edge linked to every vertices at the boundary
+    and create anchor vertices
+    '''
+    anchor_specs = {
+        "face": {
+            "at_border": 0
+            },
+        "vert": {
+            "at_border": 0,
+            "is_anchor": 0
+             },
+        "edge": {
+            "at_border": 0,
+            "is_anchor": 0
+             },
+        }
+
+    sheet.update_specs(anchor_specs)
+    # ## Edges with no opposites denote the boundary
+
+    free_edge = sheet.edge_df[sheet.edge_df['opposite'] == -1]
+    free_vert = sheet.vert_df.loc[free_edge['srce']]
+    free_face = sheet.face_df.loc[free_edge['face']]
+
+    sheet.edge_df.loc[free_edge.index, 'at_border'] = 1
+    sheet.vert_df.loc[free_vert.index, 'at_border'] = 1
+    sheet.face_df.loc[free_face.index, 'at_border'] = 1
+
+    # ## Make a copy of the boundary vertices
+    anchor_vert_df = free_vert.reset_index(drop=True)
+    anchor_vert_df[sheet.coords] = anchor_vert_df[sheet.coords] * 1.01
+    anchor_vert_df.index = anchor_vert_df.index+sheet.Nv
+    anchor_vert_df['is_anchor'] = 1
+    anchor_vert_df['at_border'] = 0
+    anchor_vert_df['is_active'] = 0
+
+    sheet.vert_df = pd.concat([sheet.vert_df,
+                               anchor_vert_df])
+    anchor_edge_df = pd.DataFrame(
+        index=np.arange(sheet.Ne, sheet.Ne + free_vert.shape[0]),
+        columns=sheet.edge_df.columns
+        )
+
+    anchor_edge_df['srce'] = free_vert.index
+    anchor_edge_df['trgt'] = anchor_vert_df.index
+    anchor_edge_df['line_tension'] = 0
+    anchor_edge_df['is_anchor'] = 1
+    anchor_edge_df['face'] = 0
+    anchor_edge_df['at_border'] = 0
+    sheet.edge_df = pd.concat([sheet.edge_df,
+                               anchor_edge_df])
+    sheet.reset_topo()
