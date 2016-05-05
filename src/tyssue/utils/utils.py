@@ -1,5 +1,6 @@
 import numpy as np
 import logging
+import pandas as pd
 
 logger = logging.getLogger(name=__name__)
 
@@ -34,3 +35,23 @@ def set_data_columns(datasets, specs, reset=False):
         for col, default in spec.items():
             if not col in df.columns or reset:
                 df[col] = default
+
+
+def data_at_opposite(sheet, edge_data, free_value=None):
+    """
+    Returns a pd.DataFrame with the values of the input edge_data
+    at the opposite edges. For free edges, optionaly replaces Nan values
+    with free_value
+    """
+    if isinstance(edge_data, pd.Series):
+        opposite = pd.Series(
+            edge_data.loc[sheet.edge_df['opposite']].values,
+            index=edge_data.index)
+    else:
+        opposite = pd.DataFrame(
+            edge_data.loc[sheet.edge_df['opposite']].values,
+            index=edge_data.index)
+    if free_value is not None:
+        opposite = opposite.replace(np.nan, free_value)
+
+    return opposite
