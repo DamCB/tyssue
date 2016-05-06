@@ -578,4 +578,5 @@ def get_opposite(edge_df):
     flipped.names = ['srce', 'trgt']
     opposite = st_indexed.loc[flipped, 'edge'].values
     opposite[np.isnan(opposite)] = -1
-    return opposite
+
+    return opposite.astype(np.int)
