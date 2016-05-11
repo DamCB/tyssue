@@ -372,30 +372,30 @@ class Epithelium:
     def get_extra_indices(self):
         """Computes extra indices:
 
-        - `self.free_edges`: half-edges at the epithelium boundary
-        - `self.dble_edges`: half-edges inside the epithelium,
-           with an opposite
-        - `self.east_edges`: half of the `dble_edges`, pointing east
-           (figuratively)
-        - `self.west_edges`: half of the `dble_edges`, pointing west
+        - `sheet.free_edges`: half-edges at the epithelium boundary
+        - `sheet.dble_edges`: half-edges inside the epithelium,
+          with an opposite
+        - `sheet.east_edges`: half of the `dble_edges`, pointing east
+          (figuratively)
+        - `sheet.west_edges`: half of the `dble_edges`, pointing west
            (the order of the east and west edges is conserved, so that
            the ith west half-edge is the opposite of the ith east half-edge)
-        - `self.sgle_edges`: joint index over east and free edges, spanning
+        - `sheet.sgle_edges`: joint index over free and east edges, spanning
            the entire graph without double edges
-        - `self.wrpd_edges`: joint index over east, free, and east edges,
-           such that a vector over the whole half-edge dataframe is
-           wrapped over the single edges
-        - `self.srtd_edges`: index over the whole half-edge sorted such that
-           the east edges come first, then the free, then the west
+        - `sheet.wrpd_edges`: joint index over free edges followed by the
+           east edges twice, such that a vector over the whole half-edge
+            dataframe is wrapped over the single edges
+        - `sheet.srtd_edges`: index over the whole half-edge sorted such that
+           the free edges come first, then the east, then the west
 
         Also computes:
-        - `self.Ni`: the number of inside full edges
-          (i.e. `len(self.east_edges)`)
-        - `self.No`: the number of outside full edges
-          (i.e. `len(self.free_edges)`)
-        - `self.Nd`: the number of double half edges
-          (i.e. `len(self.dble_edges)`)
-        - `self.anti_sym`: `pd.Series` with shape `(self.Ne,)`
+        - `sheet.Ni`: the number of inside full edges
+          (i.e. `len(sheet.east_edges)`)
+        - `sheet.No`: the number of outside full edges
+          (i.e. `len(sheet.free_edges)`)
+        - `sheet.Nd`: the number of double half edges
+          (i.e. `len(sheet.dble_edges)`)
+        - `sheet.anti_sym`: `pd.Series` with shape `(sheet.Ne,)`
           with 1 at the free and east half-edges and -1
           at the opposite half-edges.
 
@@ -424,7 +424,7 @@ class Epithelium:
             self.east_edges, 'opposite'].astype(np.int), name='edge')
 
         self.free_edges = self.edge_df[self.edge_df['opposite'] == -1].index
-        self.sgle_edges = self.east_edges.append(self.free_edges)
+        self.sgle_edges = self.free_edges.append(self.east_edges)
         self.srtd_edges = self.sgle_edges.append(self.west_edges)
 
         # Index over the east and free edges, then the opposite indexed

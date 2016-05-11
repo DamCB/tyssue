@@ -3,7 +3,7 @@ Matplotlib based plotting
 """
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon, FancyArrow
+from matplotlib.patches import Polygon, FancyArrow, Arc
 from matplotlib.collections import PatchCollection
 import pandas as pd
 import numpy as np
@@ -204,8 +204,61 @@ def plot_analytical_to_numeric_comp(sheet, model, geom,
 
     ax.legend(loc='upper left', fontsize=10)
     ax.set_ylim(0, 1.2)
-
-
     print(sheet.delta_o, deltas[energies.sum(axis=1).argmin()])
 
+    return fig, ax
+
+
+def get_arc_data(sheet):
+
+    srce_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
+    trgt_pos = sheet.upcast_trgt(sheet.vert_df[sheet.coords])
+
+    radius = 1 / sheet.edge_df['curvature']
+
+    e_x = sheet.edge_df['dx'] / sheet.edge_df['length']
+    e_y = sheet.edge_df['dy'] / sheet.edge_df['length']
+
+    center_x = ((srce_pos.x + trgt_pos.x)/2
+                - e_y * (radius - sheet.edge_df['sagitta']))
+
+    center_y = ((srce_pos.y + trgt_pos.y)/2
+                + e_x  * (radius - sheet.edge_df['sagitta']))
+
+    alpha = sheet.edge_df['arc_chord_angle']
+    beta = sheet.edge_df['chord_orient']
+
+    # Ok, I admit a fair amount of trial and
+    # error to get to the stuff below :-p
+    rot = beta - np.sign(alpha)*np.pi/2
+    theta1 = (- alpha + rot) * np.sign(alpha)
+    theta2 = (alpha + rot) * np.sign(alpha)
+
+    center_data = pd.DataFrame.from_dict({
+            'radius': np.abs(radius),
+            'x': center_x,
+            'y': center_y,
+            'theta1': theta1,
+            'theta2': theta2
+            })
+    return center_data
+
+
+def curved_view(sheet):
+
+    center_data = get_arc_data(sheet)
+    fig, ax = sheet_view(sheet, **{'edge': {'visible':
+                                            False}})
+
+    curves = []
+    for idx, edge in center_data.iterrows():
+        patch = Arc(edge[['x', 'y']],
+                    2*edge['radius'],
+                    2*edge['radius'],
+                    theta1=edge['theta1']*180/np.pi,
+                    theta2=edge['theta2']*180/np.pi)
+        curves.append(patch)
+    ax.add_collection(PatchCollection(curves, False,
+                                      **{'facecolors': 'none'}))
+    ax.autoscale()
     return fig, ax

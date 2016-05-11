@@ -124,9 +124,9 @@ def test_sort_eastwest():
     PlanarGeometry.update_all(eptm)
     eptm.edge_df['opposite'] = get_opposite(eptm.edge_df)
     eptm.sort_edges_eastwest()
-    assert_array_equal(np.asarray(eptm.east_edges),
-                       [0, 1, 2])
     assert_array_equal(np.asarray(eptm.free_edges),
+                       [0, 1, 2])
+    assert_array_equal(np.asarray(eptm.east_edges),
                        [3, 4, 5])
     assert_array_equal(np.asarray(eptm.west_edges),
                        [6, 7, 8])
