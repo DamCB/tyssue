@@ -48,3 +48,32 @@ def sheet_spec():
     """
     sheet_json = os.path.join(CURRENT_DIR, 'sheet.json')
     return load_spec(sheet_json)
+
+def planar_spec():
+    """
+    {"face": {
+        "num_sides": 6,
+        "x": 0.0,
+        "area": 0.0,
+        "perimeter": 0.0,
+        "is_alive": true,
+        "y": 0.0
+        },
+    "vert": {
+        "x": 0.0,
+        "is_active": true,
+        "y": 0.0
+        },
+    "edge": {
+        "dy": 0.0,
+        "dx": 0.0,
+        "srce": 0,
+        "face": 0,
+        "length": 0.0,
+        "nz": 0.0,
+        "trgt": 0
+        }
+    }
+    """
+    planar_json = os.path.join(CURRENT_DIR, 'planar.json')
+    return load_spec(planar_json)

@@ -60,7 +60,6 @@ default values is allways infered from the python parsed type. Thus
 '''
 
 
-
 class Epithelium:
     '''
     The whole tissue.
@@ -80,7 +79,7 @@ class Epithelium:
         and value types of the modeled tyssue
 
         '''
-        if coords is  None:
+        if coords is None:
             coords = ['x', 'y', 'z']
         self.coords = coords
         # edge's dx, dy, dz
@@ -92,14 +91,14 @@ class Epithelium:
 
         # each of those has a separate dataframe, as well as entries in
         # the settings files
-        frame_types =  {'edge', 'vert', 'face',
-                        'cell', 'cc'}
+        frame_types = {'edge', 'vert', 'face',
+                       'cell', 'cc'}
 
         # Really just to ensure the debugger is silent
         [self.edge_df,
          self.vert_df,
          self.face_df,
-         self.cell_df] = [None,] * 4
+         self.cell_df] = [None, ] * 4
 
         self.identifier = identifier
         if not set(datasets).issubset(frame_types):
@@ -111,13 +110,13 @@ class Epithelium:
         self.element_names = ['srce', 'trgt',
                               'face', 'cell'][:len(self.data_names)]
         if specs is None:
-            specs = {name:{} for name in self.data_names}
+            specs = {name: {} for name in self.data_names}
 
         self.specs = specs
         self.update_specs(specs, reset=False)
         self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
-                                                   names=self.element_names)
-        ## Topology (geometry independant)
+                                                     names=self.element_names)
+        # # Topology (geometry independant)
         self.reset_topo()
         self.bbox = None
         self.set_bbox()
@@ -133,7 +132,6 @@ class Epithelium:
     @settings.setter
     def settings(self, key, value):
         self.specs['settings'][key] = value
-
 
     @classmethod
     def from_points(cls, identifier, points,
@@ -158,7 +156,6 @@ class Epithelium:
         datasets[points_dataset][coords] = points
 
         return cls.__init__(identifier, datasets, coords)
-
 
     def update_specs(self, new, reset=False):
 
@@ -372,6 +369,100 @@ class Epithelium:
         cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['facea', 'faceb'])
         return cc_idx
 
+    def get_extra_indices(self):
+        """Computes extra indices:
+
+        - `self.free_edges`: half-edges at the epithelium boundary
+        - `self.dble_edges`: half-edges inside the epithelium,
+           with an opposite
+        - `self.east_edges`: half of the `dble_edges`, pointing east
+           (figuratively)
+        - `self.west_edges`: half of the `dble_edges`, pointing west
+           (the order of the east and west edges is conserved, so that
+           the ith west half-edge is the opposite of the ith east half-edge)
+        - `self.sgle_edges`: joint index over east and free edges, spanning
+           the entire graph without double edges
+        - `self.wrpd_edges`: joint index over east, free, and east edges,
+           such that a vector over the whole half-edge dataframe is
+           wrapped over the single edges
+        - `self.srtd_edges`: index over the whole half-edge sorted such that
+           the east edges come first, then the free, then the west
+
+        Also computes:
+        - `self.Ni`: the number of inside full edges
+          (i.e. `len(self.east_edges)`)
+        - `self.No`: the number of outside full edges
+          (i.e. `len(self.free_edges)`)
+        - `self.Nd`: the number of double half edges
+          (i.e. `len(self.dble_edges)`)
+        - `self.anti_sym`: `pd.Series` with shape `(self.Ne,)`
+          with 1 at the free and east half-edges and -1
+          at the opposite half-edges.
+
+        Notes
+        -----
+
+        - East and west is resepctive to some orientation at the
+          moment the indices are computed the partition stays valid as
+          long as there are no changes in the topology, so due to vertex
+          displacement, 'east' and 'west' might not stay valid. This is
+          just a practical naming convention.
+
+        - As the name suggest, this method is not working for edges in
+          3D pointing *exactly* north or south, ie iff `edge['dx'] ==
+          edge['dy'] == 0`. Until we need or find a better solution,
+          we'll just assert it worked.
+        """
+
+        self.dble_edges = self.edge_df[self.edge_df['opposite'] >= 0].index
+        theta = np.arctan2(self.edge_df.loc[self.dble_edges, 'dy'],
+                           self.edge_df.loc[self.dble_edges, 'dx'])
+
+        self.east_edges = self.edge_df.loc[self.dble_edges][
+            (theta >= 0) & (theta < np.pi)].index
+        self.west_edges = pd.Index(self.edge_df.loc[
+            self.east_edges, 'opposite'].astype(np.int), name='edge')
+
+        self.free_edges = self.edge_df[self.edge_df['opposite'] == -1].index
+        self.sgle_edges = self.east_edges.append(self.free_edges)
+        self.srtd_edges = self.sgle_edges.append(self.west_edges)
+
+        # Index over the east and free edges, then the opposite indexed
+        # by their east counterpart
+        self.wrpd_edges = self.sgle_edges.append(self.east_edges)
+
+        self.Ni = self.east_edges.size  # number of inside (east) edges
+        self.Nd = self.dble_edges.size  # number of non free half edges
+        self.No = self.free_edges.size  # number of free halfedges
+        try:
+            assert (2*self.Ni + self.No) == self.Ne
+            assert self.west_edges.size == self.Ni
+            assert self.Nd == 2*self.Ni
+        except AssertionError:
+            raise AssertionError('''
+            Inconsistent partition:
+            total half-edges: %s
+            number of free: %s
+            number of east: %s
+            number of west: %s''' % (self.Ne, self.No, self.Ni,
+                                     self.west_edges.size))
+
+        # Anti symetric vector (1 at east and free edges, -1 at opposite)
+        self.anti_sym = pd.Series(np.ones(self.Ne),
+                                  index=self.edge_df.index)
+        self.anti_sym.loc[self.west_edges] = -1
+
+    def sort_edges_eastwest(self):
+        """ reorder edges such that half the double edges are first,
+        then the free edges, the the other half of the double edges,
+        this way, each subset of the edges dataframe are contiguous.
+        """
+        self.get_extra_indices()
+        self.edge_df = self.edge_df.loc[self.srtd_edges]
+        self.reset_index()
+        self.reset_topo()
+        self.get_extra_indices()
+
     def get_valid(self):
         """Set true if the face is a closed polygon
         """
@@ -402,8 +493,9 @@ class Epithelium:
         log.info('{} {} level elements will be removed'.format(len(fto_rm),
                                                                top_level))
 
-        edge_df_ = self.edge_df.set_index(top_level,
-                                      append=True).swaplevel(0, 1).sort_index()
+        edge_df_ = self.edge_df.set_index(
+            top_level,
+            append=True).swaplevel(0, 1).sort_index()
         to_rm = np.concatenate([edge_df_.loc[c].index.values
                                 for c in fto_rm])
         to_rm.sort()
@@ -438,7 +530,7 @@ class Epithelium:
                             columns=coords)
         for c, bounds in zip(coords, bbox):
             out_vert_ = ((self.vert_df[c] < bounds[0]) |
-                       (self.vert_df[c] > bounds[1]))
+                         (self.vert_df[c] > bounds[1]))
             outs[c] = (self.upcast_srce(out_vert_) |
                        self.upcast_trgt(out_vert_))
 
@@ -456,7 +548,7 @@ class Epithelium:
     def reset_index(self):
 
         new_vertidx = pd.Series(np.arange(self.vert_df.shape[0]),
-                              index=self.vert_df.index)
+                                index=self.vert_df.index)
         self.edge_df['srce'] = self.upcast_srce(new_vertidx)
         self.edge_df['trgt'] = self.upcast_trgt(new_vertidx)
         new_fidx = pd.Series(np.arange(self.face_df.shape[0]),
@@ -478,7 +570,6 @@ class Epithelium:
 
         self.edge_df.reset_index(drop=True, inplace=True)
         self.edge_df.index.name = 'edge'
-
 
     def triangular_mesh(self, coords):
         '''
