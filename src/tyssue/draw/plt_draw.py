@@ -3,7 +3,8 @@ Matplotlib based plotting
 """
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon, FancyArrow, Arc
+from matplotlib.path import Path
+from matplotlib.patches import Polygon, FancyArrow, Arc, PathPatch
 from matplotlib.collections import PatchCollection
 import pandas as pd
 import numpy as np
@@ -244,7 +245,7 @@ def get_arc_data(sheet):
     return center_data
 
 
-def curved_view(sheet):
+def curved_view(sheet, radius_cutoff=1e3):
 
     center_data = get_arc_data(sheet)
     fig, ax = sheet_view(sheet, **{'edge': {'visible':
@@ -252,11 +253,16 @@ def curved_view(sheet):
 
     curves = []
     for idx, edge in center_data.iterrows():
-        patch = Arc(edge[['x', 'y']],
-                    2*edge['radius'],
-                    2*edge['radius'],
-                    theta1=edge['theta1']*180/np.pi,
-                    theta2=edge['theta2']*180/np.pi)
+        if edge['radius'] > radius_cutoff:
+            st = sheet.edge_df.loc[idx, ['srce', 'trgt']]
+            xy = sheet.vert_df.loc[st, sheet.coords]
+            patch = PathPatch(Path(xy))
+        else:
+            patch = Arc(edge[['x', 'y']],
+                        2*edge['radius'],
+                        2*edge['radius'],
+                        theta1=edge['theta1']*180/np.pi,
+                        theta2=edge['theta2']*180/np.pi)
         curves.append(patch)
     ax.add_collection(PatchCollection(curves, False,
                                       **{'facecolors': 'none'}))
