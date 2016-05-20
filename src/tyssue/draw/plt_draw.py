@@ -47,7 +47,7 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
     level as columns of the sheet.face_df
     """
 
-    draw_spec = load_default('draw', 'sheet')['face']
+    draw_spec = sheet_spec()['face']
     draw_spec.update(**draw_spec_kw)
 
     polys = sheet.face_polygons(coords)
@@ -76,7 +76,7 @@ def parse_face_specs(face_draw_specs):
 def draw_vert(sheet, coords, ax, **draw_spec_kw):
     """Draw junction vertices in matplotlib
     """
-    draw_spec = load_default('draw', 'sheet')['vert']
+    draw_spec = sheet_spec()['vert']
     draw_spec.update(**draw_spec_kw)
 
     x, y = coords
@@ -87,10 +87,11 @@ def draw_vert(sheet, coords, ax, **draw_spec_kw):
     ax.scatter(pos[x], pos[y], **draw_spec_kw)
     return ax
 
+
 def draw_edge(sheet, coords, ax, **draw_spec_kw):
     """
     """
-    draw_spec = load_default('draw', 'sheet')['edge']
+    draw_spec = sheet_spec()['edge']
     draw_spec.update(**draw_spec_kw)
 
     x, y = coords
@@ -140,7 +141,7 @@ def plot_forces(sheet, geom, model,
     """Plot the net forces at each vertex, with their amplitudes multiplied
     by `scaling`
     """
-    draw_specs = load_default('draw', 'sheet')
+    draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
     gcoords = ['g'+c for c in coords]
     if approx_grad is not None:
