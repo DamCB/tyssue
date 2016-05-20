@@ -34,6 +34,7 @@ def quasistatic_sheet_spec():
     specfile = os.path.join(CURRENT_DIR, 'sheet_qs.json')
     return load_spec(specfile)
 
+
 def quasistatic_sheet_spec_anchors():
     """Default specification for the dynamics
     of a sheet vertex model with anchor vertices

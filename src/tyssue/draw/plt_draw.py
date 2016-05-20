@@ -8,20 +8,23 @@ from matplotlib.patches import Polygon, FancyArrow, Arc, PathPatch
 from matplotlib.collections import PatchCollection
 import pandas as pd
 import numpy as np
-from ..config.json_parser import load_default
+from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater
 
 COORDS = ['x', 'y']
 
 
-def sheet_view(sheet, coords=COORDS, **draw_specs_kw):
+def sheet_view(sheet, coords=COORDS, ax=None,  **draw_specs_kw):
     """ Base view function, parametrizable
     through draw_secs
     """
-    draw_specs = load_default('draw', 'sheet')
+    draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.get_figure()
 
-    fig, ax = plt.subplots()
     vert_spec = draw_specs['vert']
     if vert_spec['visible']:
         ax = draw_vert(sheet, coords, ax, **vert_spec)
