@@ -104,7 +104,6 @@ class SheetGeometry(PlanarGeometry):
             sheet.vert_df['height'] = (sheet.vert_df['rho'] -
                                        sheet.vert_df['basal_shift'])
 
-
     @staticmethod
     def face_rotation(sheet, face, psi=0):
         """Returns a 3D rotation matrix such that the face normal points

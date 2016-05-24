@@ -42,7 +42,8 @@ class SheetModel(PlanarModel):
 
         if 'anchor_tension' in dim_mod_specs['edge']:
             t_a = dim_mod_specs['edge']['anchor_tension']
-            dim_mod_specs['edge']['anchor_tension'] = t_a * Kv * A0**1.5 * h0**2
+            dim_mod_specs['edge']['anchor_tension'] = (t_a * Kv *
+                                                       A0**1.5 * h0**2)
 
         return dim_mod_specs
 
