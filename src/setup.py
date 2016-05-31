@@ -8,15 +8,15 @@ LONG_DESCRIPTION = ('tyssue uses the scientific python ecosystem and CGAL'
                     ' cellular level')
 MAINTAINER = 'Guillaume Gay'
 MAINTAINER_EMAIL = 'guillaume@damcb.com'
-URL = 'https://github.com/CellModels/tyssue'
+URL = 'https://github.com/DamCB/tyssue'
 LICENSE = 'MPL'
-DOWNLOAD_URL = 'https://github.com/CellModels/tyssue.git'
+DOWNLOAD_URL = 'https://github.com/DamCB/tyssue.git'
 # VERSION = '${Tyssue_VERSION}'
 VERSION = '0.1'
 
 
 files = ['*.so*', '*.a*', '*.lib*',
-         'config/*/*.json','stores/*.*']
+         'config/*/*.json', 'stores/*.*']
 
 
 if __name__ == "__main__":
