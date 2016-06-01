@@ -92,3 +92,5 @@ class MultiSheet():
                                  sheet.vert_df['y'],
                                  sheet.vert_df['z'])
                              for sheet in self]
+        for interp in self.interpolants:
+            interp.nodes = interp.nodes.clip(-1e2, 1e2)
