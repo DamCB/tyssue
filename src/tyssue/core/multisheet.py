@@ -1,4 +1,3 @@
-import seaborn as sns
 import numpy as np
 import pandas as pd
 from scipy.interpolate import Rbf
@@ -18,9 +17,6 @@ class MultiSheet():
         for i, layer in enumerate(self):
             for dset in layer.datasets.values():
                 dset['layer'] = i
-        self.colors = [color for color in
-                       sns.color_palette("deep",
-                                         len(self.layers))]
 
     def __iter__(self):
         for layer in self.layers:
