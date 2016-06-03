@@ -25,6 +25,11 @@ class MultiSheetGeometry():
             msheet[0].vert_df['z'] -
             msheet[0].vert_df['basal_shift'])
 
+        #  Here we use basal_shift to impose apical constrains
+        msheet[-1].vert_df['depth'] = (
+            msheet[-1].vert_df['basal_shift'])
+
+
         for lower, upper in zip(msheet.interpolants[:-1],
                                 msheet[1:]):
             upper.vert_df['height'] = (upper.vert_df['z']

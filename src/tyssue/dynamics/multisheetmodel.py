@@ -101,22 +101,17 @@ class MultiSheetModel(SheetModel):
     @staticmethod
     def desmosome_gradient(msheet, grads):
 
-        base_sheet = msheet[0]
-        grads[0]['z'] += base_sheet.vert_df.eval(
-            'd_elasticity * ((z - basal_shift) - prefered_height)')
-
-        for i, sheet in enumerate(msheet[1:]):
+        for i, sheet in enumerate(msheet):
             norm_factor = sheet.specs['settings']['nrj_norm_factor']
             upward = sheet.vert_df.eval(
                 'd_elasticity * (height - prefered_height)')
-            grads[i+1]['z'] += upward/norm_factor
+            grads[i]['z'] += upward/norm_factor
 
-        for i, sheet in enumerate(msheet[:-1]):
+        for i, sheet in enumerate(msheet):
             norm_factor = sheet.specs['settings']['nrj_norm_factor']
             downward = sheet.vert_df.eval(
                 'd_elasticity * (prefered_height - depth)')
             grads[i]['z'] += downward/norm_factor
-        # return grads
 
     @staticmethod
     def elastic_grad(sheet):
