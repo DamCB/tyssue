@@ -17,9 +17,8 @@ def vp_view(sheet, coords=None, **draw_specs_kw):
         coords = ['x', 'y', 'z']
     vertices, faces, _ = sheet.triangular_mesh(coords)
     canvas = scene.SceneCanvas(keys='interactive', show=True)
-    #grid = canvas.central_widget.add_grid()
     view = canvas.central_widget.add_view()
-    view.camera =  'turntable'
+    view.camera = 'turntable'
     view.camera.aspect = 1
     view.bgcolor = vp.color.Color('#aaaaaa')
 

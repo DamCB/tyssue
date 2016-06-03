@@ -23,7 +23,6 @@ import pandas as pd
 from .objects import Epithelium, get_opposite
 from ..config.json_parser import load_default
 
-test = 0
 
 class Sheet(Epithelium):
     '''

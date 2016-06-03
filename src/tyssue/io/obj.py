@@ -6,7 +6,9 @@ import logging
 
 logger = logging.getLogger(name=__name__)
 
+
 def save_triangulated(filename, eptm):
+
     vertices, faces, _ = eptm.triangular_mesh(eptm.coords)
     write_mesh(filename,
                vertices=vertices,
@@ -14,21 +16,22 @@ def save_triangulated(filename, eptm):
                texcoords=None, overwrite=True)
     logger.info('Saved %s as a trianglulated .OBJ file', eptm.identifier)
 
+
 def save_junction_mesh(filename, eptm):
-    ## Assumes https://github.com/vispy/vispy/issues/1155 is closed and my PR passed, inch Allah
 
     vertices, faces, normals = eptm.verterts_mesh(eptm.coords,
-                                                vertex_normals=True)
-
+                                                  vertex_normals=True)
     write_mesh(filename,
                vertices=vertices.values,
                faces=faces.values,
                normals=normals.values,
-               texcoords=None, overwrite=True)
+               texcoords=None, overwrite=True,
+               reshape_faces=False)  # GH 1155
     logger.info('Saved %s as a junction mesh .OBJ file', eptm.identifier)
 
 
 def write_splitted_cells(sheet, fname, epsilon=0.1):
+
     coords = sheet.coords
     up_srce = sheet.upcast_srce(sheet.vert_df[coords])
     up_trgt = sheet.upcast_trgt(sheet.vert_df[coords])

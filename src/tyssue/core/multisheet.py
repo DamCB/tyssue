@@ -88,9 +88,11 @@ class MultiSheet():
         return datasets
 
     def update_interpolants(self):
+
         self.interpolants = [Rbf(sheet.vert_df['x'],
                                  sheet.vert_df['y'],
-                                 sheet.vert_df['z'])
+                                 sheet.vert_df['z'],
+                                 **sheet.specs['settings']['interpolate'])
                              for sheet in self]
-        for interp in self.interpolants:
-            interp.nodes = interp.nodes.clip(-1e2, 1e2)
+        # for interp in self.interpolants:
+        #     interp.nodes = interp.nodes.clip(-1e2, 1e2)

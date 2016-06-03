@@ -17,6 +17,9 @@ def test_multisheet():
     specs['vert']['depth'] = 0.0
     specs['edge']['layer'] = 0
     specs['settings']['geometry'] = 'flat'
+    specs['settings']['interpolate'] = {
+        'function': 'multiquadric',
+        'smooth': 0}
     layer_args = [(24, 24, 1, 1, 0.4),
                   (16, 16, 2, 2, 1),
                   (24, 24, 1, 1, 0.4),
