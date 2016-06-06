@@ -54,19 +54,15 @@ class MultiSheetModel(SheetModel):
     @staticmethod
     def desmosome_energy(msheet):
 
-        base_sheet = msheet[0]
-        norm_factor = base_sheet.specs['settings']['nrj_norm_factor']
-        basal = base_sheet.vert_df.eval(
-            '0.5 * d_elasticity * ((z - basal_shift) - prefered_height)**2')
-        E_d = basal.sum()/norm_factor
+        E_d = 0
 
-        for sheet in msheet[1:]:
+        for sheet in msheet:
             norm_factor = sheet.specs['settings']['nrj_norm_factor']
             upward = sheet.vert_df.eval(
                 '0.5 * d_elasticity * (height - prefered_height)**2')
             E_d += upward.sum()/norm_factor
 
-        for sheet in msheet[:-1]:
+        for sheet in msheet:
             norm_factor = sheet.specs['settings']['nrj_norm_factor']
             downward = sheet.vert_df.eval(
                 '0.5 * d_elasticity * (depth - prefered_height)**2')

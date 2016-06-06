@@ -325,12 +325,29 @@ def three_faces_sheet(zaxis=False):
     return datasets, specifications
 
 
-def extrude(apical_datasets):
-    """
-    Extrude a sheet to form a single layer epithelium
+def extrude(apical_datasets, method='homotecy',
+            scale=1/3.,
+            vector=[0, 0, -1]):
+    """Extrude a sheet to form a single layer epithelium
 
-    The basal layer is scaled down from the apical one homoteticaly
-    w/r to the center of the coordinate system.
+    Parameters
+    ----------
+    * apical_datasets: dictionnary of three DataFrames,
+    'vert', 'edge', 'face'
+    * method: str, optional {'homotecy'|'translation'}
+    default 'homotecy'
+    * scale: float, optional
+    the scale factor for homotetic scaling, default 1/3.
+    * vector: sequence of three floats, optional, used for
+
+    default [0, 0, -1]
+
+    if `method == 'homotecy'`, the basal layer is scaled down from the
+    apical one homoteticaly w/r to the center of the coordinate
+    system, by a factor given by `scale`
+
+    if `method == 'translation'`, the basal vertices are translated from
+    the apical ones by the vector `vect`
 
     """
     apical_vert = apical_datasets['vert']
@@ -349,15 +366,12 @@ def extrude(apical_datasets):
     Nf = apical_face.index.max() + 1
 
     basal_vert = apical_vert.copy()
-    basal_vert[coords] = basal_vert[coords] * 1/3.
 
     basal_vert.index = basal_vert.index + Nv
     basal_vert['segment'] = 'basal'
 
     cell_df = apical_face.copy()
     cell_df.index.name = 'cell'
-    cell_df[coords] = cell_df[coords] * 2/3.
-    datasets['cell'] = cell_df
 
     basal_face = apical_face.copy()
     basal_face.index = basal_face.index + Nf
@@ -392,6 +406,13 @@ def extrude(apical_datasets):
     sagital_edge.loc[5*Ne: 6*Ne - 1, 'srce'] = basal_edge['srce'].values
     sagital_edge.loc[5*Ne: 6*Ne - 1, 'trgt'] = apical_edge['trgt'].values
 
+    if method == 'homotecy':
+        basal_vert[coords] = basal_vert[coords] * scale
+    elif method == 'translation':
+        for c, u in zip(coords, vector):
+            basal_vert[c] = basal_vert[c] + u
+
+    datasets['cell'] = cell_df
     datasets['vert'] = pd.concat([apical_vert,
                                   basal_vert])
 

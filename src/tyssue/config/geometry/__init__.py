@@ -77,3 +77,48 @@ def planar_spec():
     """
     planar_json = os.path.join(CURRENT_DIR, 'planar.json')
     return load_spec(planar_json)
+
+
+def bulk_spec():
+    """{
+        "vert": {
+            "z": 0.0,
+            "x": 0.0,
+            "is_active": true,
+            "y": 0.0
+            },
+        "face": {
+            "z": 0.0,
+            "x": 0.0,
+            "num_sides": 6,
+            "area": 0.0,
+            "perimeter": 0.0,
+            "is_alive": true,
+            "y": 0.0
+            },
+        "cell": {
+            "z": 0.0,
+            "x": 0.0,
+            "vol": 0.0,
+            "num_faces": 6,
+            "is_alive": true,
+            "y": 0.0
+            },
+        "edge": {
+            "dz": 0.0,
+            "ny": 0.0,
+            "dx": 0.0,
+            "nx": 0.0,
+            "length": 0.0,
+            "srce": 0,
+            "face": 0,
+            "cell": 0,
+            "dy": 0.0,
+            "trgt": 0,
+            "nz": 0.0
+            }
+        }
+
+    """
+    bulk_json = os.path.join(CURRENT_DIR, 'bulk.json')
+    return load_spec(bulk_json)
