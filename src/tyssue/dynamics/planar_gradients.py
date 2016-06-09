@@ -1,5 +1,3 @@
-
-import numpy as np
 import pandas as pd
 
 from ..utils.utils import _to_2d, _to_3d

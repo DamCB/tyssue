@@ -190,8 +190,8 @@ class Epithelium:
             self.face_df.index]
 
     def update_num_faces(self):
-        self.cell_df['num_faces'] = self.edge_df.cell.value_counts().loc[
-            self.cell_df.index]
+        self.cell_df['num_faces'] = self.edge_df.groupby('cell').apply(
+            lambda df: df['face'].unique().size)
 
     def update_mindex(self):
         self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,

@@ -370,13 +370,15 @@ def extrude(apical_datasets, method='homotecy',
     basal_vert.index = basal_vert.index + Nv
     basal_vert['segment'] = 'basal'
 
-    cell_df = apical_face.copy()
+    cell_df = apical_face[coords].copy()
     cell_df.index.name = 'cell'
+    cell_df['is_alive'] = True
 
     basal_face = apical_face.copy()
     basal_face.index = basal_face.index + Nf
     basal_face[coords] = basal_face[coords] * 1/3.
     basal_face['segment'] = 'basal'
+    basal_face['is_alive'] = True
 
     apical_edge['cell'] = apical_edge['face']
     basal_edge = apical_edge.copy()
@@ -384,38 +386,51 @@ def extrude(apical_datasets, method='homotecy',
     basal_edge[['srce', 'trgt']] = basal_edge[['trgt', 'srce']] + Nv
     basal_edge['face'] = basal_edge['face'] + Nf
     basal_edge.index = basal_edge.index + Ne
+    basal_edge['segment'] = 'basal'
 
     sagital_face = pd.DataFrame(index=apical_edge.index + 2*Nf,
                                 columns=apical_face.columns)
+    sagital_face['segment'] = 'sagital'
+    sagital_face['is_alive'] = True
 
     sagital_edge = pd.DataFrame(index=np.arange(2*Ne, 6*Ne),
                                 columns=apical_edge.columns)
 
     sagital_edge['cell'] = np.repeat(apical_edge['cell'].values, 4)
     sagital_edge['face'] = np.repeat(sagital_face.index.values, 4)
+    sagital_edge['segment'] = 'sagital'
 
-    sagital_edge.loc[2*Ne: 3*Ne - 1,
+    sagital_edge.loc[np.arange(2*Ne, 6*Ne, 4),
                      ['srce', 'trgt']] = apical_edge[['trgt', 'srce']].values
 
-    sagital_edge.loc[3*Ne: 4*Ne - 1, 'srce'] = apical_edge['srce'].values
-    sagital_edge.loc[3*Ne: 4*Ne - 1, 'trgt'] = basal_edge['trgt'].values
+    sagital_edge.loc[np.arange(2*Ne+1, 6*Ne, 4),
+                     'srce'] = apical_edge['srce'].values
+    sagital_edge.loc[np.arange(2*Ne+1, 6*Ne, 4),
+                     'trgt'] = basal_edge['trgt'].values
 
-    sagital_edge.loc[4*Ne: 5*Ne - 1,
+    sagital_edge.loc[np.arange(2*Ne+2, 6*Ne, 4),
                      ['srce', 'trgt']] = basal_edge[['trgt', 'srce']].values
 
-    sagital_edge.loc[5*Ne: 6*Ne - 1, 'srce'] = basal_edge['srce'].values
-    sagital_edge.loc[5*Ne: 6*Ne - 1, 'trgt'] = apical_edge['trgt'].values
+    sagital_edge.loc[np.arange(2*Ne+3, 6*Ne, 4),
+                     'srce'] = basal_edge['srce'].values
+    sagital_edge.loc[np.arange(2*Ne+3, 6*Ne, 4),
+                     'trgt'] = apical_edge['trgt'].values
 
     if method == 'homotecy':
         basal_vert[coords] = basal_vert[coords] * scale
     elif method == 'translation':
         for c, u in zip(coords, vector):
             basal_vert[c] = basal_vert[c] + u
+    else:
+        raise ValueError("""
+        `method` argument not understood, supported values are 'homotecy'
+        or 'translation'
+        """)
 
     datasets['cell'] = cell_df
     datasets['vert'] = pd.concat([apical_vert,
                                   basal_vert])
-
+    datasets['vert']['is_active'] = 1
     datasets['edge'] = pd.concat([apical_edge,
                                   basal_edge,
                                   sagital_edge])

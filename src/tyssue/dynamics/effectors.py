@@ -15,5 +15,6 @@ def elastic_energy(element_df, var, elasticity, prefered):
     params = {'x': var,
               'K': elasticity,
               'x0': prefered}
-    energy = element_df.eval('0.5 * {K} * ({x} - {x0}) ** 2'.format(**params))
+    energy = element_df.eval(
+        '0.5 * {K} * ({x} - {x0}) ** 2'.format(**params))
     return energy
