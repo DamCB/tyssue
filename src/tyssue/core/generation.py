@@ -388,33 +388,33 @@ def extrude(apical_datasets, method='homotecy',
     basal_edge.index = basal_edge.index + Ne
     basal_edge['segment'] = 'basal'
 
-    sagital_face = pd.DataFrame(index=apical_edge.index + 2*Nf,
-                                columns=apical_face.columns)
-    sagital_face['segment'] = 'sagital'
-    sagital_face['is_alive'] = True
+    sagittal_face = pd.DataFrame(index=apical_edge.index + 2*Nf,
+                                 columns=apical_face.columns)
+    sagittal_face['segment'] = 'sagittal'
+    sagittal_face['is_alive'] = True
 
-    sagital_edge = pd.DataFrame(index=np.arange(2*Ne, 6*Ne),
-                                columns=apical_edge.columns)
+    sagittal_edge = pd.DataFrame(index=np.arange(2*Ne, 6*Ne),
+                                 columns=apical_edge.columns)
 
-    sagital_edge['cell'] = np.repeat(apical_edge['cell'].values, 4)
-    sagital_edge['face'] = np.repeat(sagital_face.index.values, 4)
-    sagital_edge['segment'] = 'sagital'
+    sagittal_edge['cell'] = np.repeat(apical_edge['cell'].values, 4)
+    sagittal_edge['face'] = np.repeat(sagittal_face.index.values, 4)
+    sagittal_edge['segment'] = 'sagittal'
 
-    sagital_edge.loc[np.arange(2*Ne, 6*Ne, 4),
-                     ['srce', 'trgt']] = apical_edge[['trgt', 'srce']].values
+    sagittal_edge.loc[np.arange(2*Ne, 6*Ne, 4),
+                      ['srce', 'trgt']] = apical_edge[['trgt', 'srce']].values
 
-    sagital_edge.loc[np.arange(2*Ne+1, 6*Ne, 4),
-                     'srce'] = apical_edge['srce'].values
-    sagital_edge.loc[np.arange(2*Ne+1, 6*Ne, 4),
-                     'trgt'] = basal_edge['trgt'].values
+    sagittal_edge.loc[np.arange(2*Ne+1, 6*Ne, 4),
+                      'srce'] = apical_edge['srce'].values
+    sagittal_edge.loc[np.arange(2*Ne+1, 6*Ne, 4),
+                      'trgt'] = basal_edge['trgt'].values
 
-    sagital_edge.loc[np.arange(2*Ne+2, 6*Ne, 4),
-                     ['srce', 'trgt']] = basal_edge[['trgt', 'srce']].values
+    sagittal_edge.loc[np.arange(2*Ne+2, 6*Ne, 4),
+                      ['srce', 'trgt']] = basal_edge[['trgt', 'srce']].values
 
-    sagital_edge.loc[np.arange(2*Ne+3, 6*Ne, 4),
-                     'srce'] = basal_edge['srce'].values
-    sagital_edge.loc[np.arange(2*Ne+3, 6*Ne, 4),
-                     'trgt'] = apical_edge['trgt'].values
+    sagittal_edge.loc[np.arange(2*Ne+3, 6*Ne, 4),
+                      'srce'] = basal_edge['srce'].values
+    sagittal_edge.loc[np.arange(2*Ne+3, 6*Ne, 4),
+                      'trgt'] = apical_edge['trgt'].values
 
     if method == 'homotecy':
         basal_vert[coords] = basal_vert[coords] * scale
@@ -433,11 +433,11 @@ def extrude(apical_datasets, method='homotecy',
     datasets['vert']['is_active'] = 1
     datasets['edge'] = pd.concat([apical_edge,
                                   basal_edge,
-                                  sagital_edge])
+                                  sagittal_edge])
 
     datasets['face'] = pd.concat([apical_face,
                                   basal_face,
-                                  sagital_face])
+                                  sagittal_face])
     return datasets
 
 
@@ -494,3 +494,81 @@ def create_anchors(sheet):
     sheet.edge_df = pd.concat([sheet.edge_df,
                                anchor_edge_df])
     sheet.reset_topo()
+
+def subdivide_faces(eptm, faces):
+    """Adds a vertex at the center of each face, and returns a
+    new dataset
+
+    Parameters
+    ----------
+    eptm: a :class:`Epithelium` instance
+    faces: list,
+     indices of the faces to be subdivided
+    coords:
+
+    Returns
+    -------
+    new_dset: dict
+      a dataset with the new faces devided
+
+    """
+
+    face_df = eptm.face_df.loc[faces]
+
+    remaining = eptm.face_df.index.delete(faces)
+    untouched_faces = eptm.face_df.loc[remaining]
+    edge_df = pd.concat([eptm.edge_df[eptm.edge_df['face'] == face]
+                         for face in faces])
+    verts = set(edge_df['srce'])
+    vert_df = eptm.vert_df.loc[verts]
+
+    Nsf = face_df.shape[0]
+    Nse = edge_df.shape[0]
+
+    eptm.vert_df['subdiv'] = 0
+    eptm.face_df['subdiv'] = 0
+    eptm.edge_df['subdiv'] = 0
+
+    new_vs_idx = pd.Series(np.arange(eptm.Nv, eptm.Nv + Nsf),
+                           index=face_df.index)
+    upcast_new_vs = new_vs_idx.loc[edge_df['face']].values
+
+    new_vs = pd.DataFrame(
+        index=pd.Index(np.arange(eptm.Nv, eptm.Nv + Nsf),
+                       name='vert'),
+        columns=vert_df.columns)
+
+    new_fs = pd.DataFrame(
+        index=pd.Index(np.arange(eptm.Nf, eptm.Nf + Nse),
+                       name='face'),
+        columns=face_df.columns)
+
+    new_es = pd.DataFrame(
+        index=pd.Index(np.arange(eptm.Ne, eptm.Ne + 2*Nse),
+                       name='edge'),
+        columns=edge_df.columns)
+
+    new_vs['subdiv'] = 1
+    new_fs['subdiv'] = 1
+    new_es['subdiv'] = 1
+
+    new_vs[eptm.coords] = face_df[eptm.coords].values
+    edge_df['face'] = new_fs.index
+
+    new_es['face'] = np.concatenate([new_fs.index,
+                                     new_fs.index])
+    new_es['srce'] = np.concatenate([edge_df['trgt'].values,
+                                     upcast_new_vs])
+    new_es['trgt'] = np.concatenate([upcast_new_vs,
+                                     edge_df['srce'].values])
+    new_dset = {
+        'edge': pd.concat([eptm.edge_df, new_es]),
+        'face': pd.concat([untouched_faces, new_fs]),
+        'vert': pd.concat([eptm.vert_df, new_vs])
+        }
+    if 'cell' in edge_df.columns:
+        new_es['cell'] = np.concatenate([edge_df['cell'].values,
+                                         edge_df['cell'].values])
+        new_dset['cell'] = eptm.cell_df
+
+    return new_dset
