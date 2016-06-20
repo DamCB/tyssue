@@ -6,25 +6,29 @@ from ..geometry.sheet_geometry import SheetGeometry as sgeom
 
 mu = 6 * np.sqrt(2. / (3 * np.sqrt(3)))
 
+
 def elasticity(delta):
-    return (delta**3 - 1 )**2 / 2.
+    return (delta**3 - 1)**2 / 2.
+
 
 def contractility(delta, gamma):
     return gamma * mu**2 * delta**2 / 2.
 
+
 def tension(delta, lbda):
     return lbda * mu * delta / 2.
+
 
 def isotropic_energies(sheet, model, geom,
                        deltas, nondim_specs):
 
-    ### Faces only area and height
+    # ## Faces only area and height
     area_avg = sheet.face_df[sheet.face_df['is_alive'] == 1].area.mean()
     rho_avg = sheet.vert_df.rho.mean()
     area0 = sheet.specs['face']['prefered_area']
     h_0 = sheet.specs['face']['prefered_height']
 
-    ### Set height and area to height0 and area0
+    # ## Set height and area to height0 and area0
     delta_0 = (area0 / area_avg)**0.5
     geom.scale(sheet, delta_0, sheet.coords)
     sheet.face_df['basal_height'] = rho_avg * delta_0 - h_0
@@ -56,26 +60,27 @@ def isotropic_relax(sheet, nondim_specs, geom=sgeom):
     area0 = sheet.face_df['prefered_area'].mean()
     h_0 = sheet.face_df['prefered_height'].mean()
 
-    live_faces = sheet.face_df[sheet.face_df.is_alive==1]
+    live_faces = sheet.face_df[sheet.face_df.is_alive == 1]
 
     area_avg = live_faces.area.mean()
     rho_avg = sheet.vert_df.rho.mean()
 
-    ### Set height and area to height0 and area0
+    # ## Set height and area to height0 and area0
     delta = (area0 / area_avg)**0.5
     geom.scale(sheet, delta, coords=sheet.coords)
     sheet.face_df['basal_shift'] = rho_avg * delta - h_0
     sheet.vert_df['basal_shift'] = rho_avg * delta - h_0
     geom.update_all(sheet)
 
-    ### Optimal value for delta
+    # ## Optimal value for delta
     delta_o = find_grad_roots(nondim_specs)
     if not np.isfinite(delta_o):
         raise ValueError('invalid parameters values')
     sheet.delta_o = delta_o
-    ### Scaling
-    geom.scale(sheet, delta_o, coords=sheet.coords+['basal_shift',])
+    # ## Scaling
+    geom.scale(sheet, delta_o, coords=sheet.coords+['basal_shift', ])
     geom.update_all(sheet)
+
 
 def isotropic_energy(delta, mod_specs):
     """
@@ -84,11 +89,12 @@ def isotropic_energy(delta, mod_specs):
     """
     lbda = mod_specs['edge']['line_tension']
     gamma = mod_specs['face']['contractility']
-    elasticity_ = (delta**3 - 1 )**2 / 2.
+    elasticity_ = (delta**3 - 1)**2 / 2.
     contractility_ = gamma * mu**2 * delta**2 / 2.
     tension_ = lbda * mu * delta / 2.
     energy = elasticity_ + contractility_ + tension_
     return energy
+
 
 def isotropic_grad_poly(mod_specs):
     lbda = mod_specs['edge']['line_tension']
@@ -103,6 +109,7 @@ def isotropic_grad(mod_specs, delta):
     grad_poly = isotropic_grad_poly(mod_specs)
     return np.polyval(grad_poly, delta)
 
+
 def find_grad_roots(mod_specs):
     poly = isotropic_grad_poly(mod_specs)
     roots = np.roots(poly)
@@ -111,7 +118,6 @@ def find_grad_roots(mod_specs):
     if len(good_roots) == 1:
         return good_roots
     elif len(good_roots) > 1:
-        print('multiple roots')
         return good_roots[0]
     else:
         return np.nan

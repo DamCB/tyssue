@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from ..config.json_parser import load_default
+from ..config.geometry import sheet_spec
+
 
 import logging
 log = logging.getLogger(name=__name__)
@@ -216,10 +218,7 @@ def three_faces_sheet_array():
       number of faces, vertices and edges (3, 13, 15)
 
     '''
-
-
-    Nc = 3 # Number of faces
-
+    Nc = 3  # Number of faces
     points = np.array([[0., 0.],
                        [1.0, 0.0],
                        [1.5, 0.866],
@@ -301,7 +300,7 @@ def three_faces_sheet(zaxis=False):
 
     edge_idx = pd.Index(range(_edge_e_idx.shape[0]), name='edge')
 
-    specifications = load_default('geometry', 'sheet')
+    specifications = sheet_spec()
 
     # ## Faces DataFrame
     face_df = make_df(index=face_idx,
@@ -480,6 +479,7 @@ def create_anchors(sheet):
 
     sheet.vert_df = pd.concat([sheet.vert_df,
                                anchor_vert_df])
+    sheet.vert_df.index.name = ['vert']
     anchor_edge_df = pd.DataFrame(
         index=np.arange(sheet.Ne, sheet.Ne + free_vert.shape[0]),
         columns=sheet.edge_df.columns
@@ -493,7 +493,9 @@ def create_anchors(sheet):
     anchor_edge_df['at_border'] = 0
     sheet.edge_df = pd.concat([sheet.edge_df,
                                anchor_edge_df])
+    sheet.edge_df.name = 'edge'
     sheet.reset_topo()
+
 
 def subdivide_faces(eptm, faces):
     """Adds a vertex at the center of each face, and returns a
@@ -526,7 +528,7 @@ def subdivide_faces(eptm, faces):
     Nse = edge_df.shape[0]
 
     eptm.vert_df['subdiv'] = 0
-    eptm.face_df['subdiv'] = 0
+    untouched_faces['subdiv'] = 0
     eptm.edge_df['subdiv'] = 0
 
     new_vs_idx = pd.Series(np.arange(eptm.Nv, eptm.Nv + Nsf),
@@ -551,10 +553,11 @@ def subdivide_faces(eptm, faces):
     new_vs['subdiv'] = 1
     new_fs['subdiv'] = 1
     new_es['subdiv'] = 1
-
+    if 'cell' in edge_df.columns:
+        new_es['cell'] = np.concatenate([edge_df['cell'],
+                                         edge_df['cell']])
     new_vs[eptm.coords] = face_df[eptm.coords].values
-    edge_df['face'] = new_fs.index
-
+    eptm.edge_df.loc[edge_df.index, 'face'] = new_fs.index
     new_es['face'] = np.concatenate([new_fs.index,
                                      new_fs.index])
     new_es['srce'] = np.concatenate([edge_df['trgt'].values,
@@ -566,6 +569,7 @@ def subdivide_faces(eptm, faces):
         'face': pd.concat([untouched_faces, new_fs]),
         'vert': pd.concat([eptm.vert_df, new_vs])
         }
+
     if 'cell' in edge_df.columns:
         new_es['cell'] = np.concatenate([edge_df['cell'].values,
                                          edge_df['cell'].values])

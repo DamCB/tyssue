@@ -89,13 +89,15 @@ def add_vert(sheet, edge):
     srce, trgt = sheet.edge_df.loc[edge, ['srce', 'trgt']]
     opposite = sheet.edge_df[(sheet.edge_df['srce'] == trgt) &
                              (sheet.edge_df['trgt'] == srce)]
-    opp_edge = opposite.index[0]
+    if len(opposite):
+        opp_edge = opposite.index[0]
+    else:
+        opp_edge = None
 
     new_vert = sheet.vert_df.loc[[srce, trgt]].mean()
     sheet.vert_df = sheet.vert_df.append(new_vert, ignore_index=True)
     new_vert = sheet.vert_df.index[-1]
     sheet.edge_df.loc[edge, 'trgt'] = new_vert
-    sheet.edge_df.loc[opp_edge, 'srce'] = new_vert
 
     edge_cols = sheet.edge_df.loc[edge]
     sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
@@ -103,11 +105,16 @@ def add_vert(sheet, edge):
     sheet.edge_df.loc[new_edge, 'srce'] = new_vert
     sheet.edge_df.loc[new_edge, 'trgt'] = trgt
 
-    edge_cols = sheet.edge_df.loc[opp_edge]
-    sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
-    new_opp_edge = sheet.edge_df.index[-1]
-    sheet.edge_df.loc[new_opp_edge, 'trgt'] = new_vert
-    sheet.edge_df.loc[new_opp_edge, 'srce'] = trgt
+    if opp_edge is not None:
+        sheet.edge_df.loc[opp_edge, 'srce'] = new_vert
+        edge_cols = sheet.edge_df.loc[opp_edge]
+        sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
+        new_opp_edge = sheet.edge_df.index[-1]
+        sheet.edge_df.loc[new_opp_edge, 'trgt'] = new_vert
+        sheet.edge_df.loc[new_opp_edge, 'srce'] = trgt
+    else:
+        new_opp_edge = None
+
     return new_vert, new_edge, new_opp_edge
 
 
@@ -126,9 +133,12 @@ def cell_division(sheet, mother, geom, angle=None):
     srce_pos.index = m_data.index
     trgt_pos = rot_pos.loc[m_data['trgt'], 'x']
     trgt_pos.index = m_data.index
-
-    edge_a = m_data[(srce_pos < 0) & (trgt_pos > 0)].index[0]
-    edge_b = m_data[(srce_pos > 0) & (trgt_pos < 0)].index[0]
+    try:
+        edge_a = m_data[(srce_pos < 0) & (trgt_pos >= 0)].index[0]
+        edge_b = m_data[(srce_pos >= 0) & (trgt_pos < 0)].index[0]
+    except IndexError:
+        logger.warning('Division of Cell {} failed'.format(mother))
+        return
 
     vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet, edge_a)
     vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet, edge_b)
@@ -145,6 +155,7 @@ def cell_division(sheet, mother, geom, angle=None):
     sheet.edge_df.loc[new_edge_m, 'trgt'] = vert_a
 
     sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
+    sheet.edge_df.index.name = 'edge'
     new_edge_d = sheet.edge_df.index[-1]
     sheet.edge_df.loc[new_edge_d, 'srce'] = vert_a
     sheet.edge_df.loc[new_edge_d, 'trgt'] = vert_b
@@ -154,6 +165,7 @@ def cell_division(sheet, mother, geom, angle=None):
     sheet.edge_df.loc[daughter_edges, 'face'] = daughter
     sheet.reset_topo()
     geom.update_all(sheet)
+    return daughter
 
 
 def remove_face(sheet, face):

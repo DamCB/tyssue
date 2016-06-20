@@ -17,7 +17,8 @@ class BaseGeometry():
     def update_dcoords(sheet):
         '''
         Update the edge vector coordinates  on the
-        `coords` basis (`default_coords` by default). Modifies the corresponding
+        `coords` basis (`default_coords` by default).
+        Modifies the corresponding
         columns (i.e `['dx', 'dy', 'dz']`) in sheet.edge_df.
         '''
         data = sheet.vert_df[sheet.coords]
@@ -32,7 +33,7 @@ class BaseGeometry():
         Updates the edge_df `length` column on the `coords` basis
         '''
         sheet.edge_df['length'] = np.linalg.norm(sheet.edge_df[sheet.dcoords],
-                                               axis=1)
+                                                 axis=1)
 
     @staticmethod
     def update_centroid(sheet):
