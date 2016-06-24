@@ -47,3 +47,15 @@ class BulkGeometry(SheetGeometry):
         upcast_pos = upcast_pos.set_index(eptm.edge_mindex)
         eptm.face_df[eptm.coords] = upcast_pos.mean(level='face')
         eptm.cell_df[eptm.coords] = upcast_pos.mean(level='cell')
+
+
+class MonoLayerGeometry(BulkGeometry):
+
+    @staticmethod
+    def update_perimeters(eptm):
+        '''
+        Updates the perimeter of each face, removing length terms from
+        the subdivision vertices
+        '''
+        eptm.face_df['perimeter'] = eptm.sum_face(
+            eptm.edge_df['length'] * (1 - eptm.edge_df['subdiv']))

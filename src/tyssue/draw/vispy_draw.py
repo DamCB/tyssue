@@ -4,13 +4,12 @@ import pandas as pd
 
 import vispy as vp
 from vispy import app, scene
-from ..config.json_parser import load_default
+from ..config.draw import draw_specs
 from ..utils.utils import spec_updater
 
 
 def vp_view(sheet, coords=None, **draw_specs_kw):
 
-    draw_specs = load_default('draw', 'sheet')
     spec_updater(draw_specs, draw_specs_kw)
 
     if coords is None:
@@ -104,17 +103,13 @@ def vp_view(sheet, coords=None, **draw_specs_kw):
             elif colors.shape == (sheet.Nv, 4):
                 color = pd.DataFrame(index=sheet.vert_df.index, data=colors,
                                      columns=['R', 'G', 'B', 'A'])
-
-
             else:
                 raise ValueError('''Shape of the color argument doesn't'''
                                  ''' mach the number of edges ''')
 
-
-
-        wire_pos = vertices[sheet.Nc:].copy()
+        wire_pos = vertices[sheet.Nf:].copy()
         wire = vp.scene.visuals.Line(pos=wire_pos,
-                                     connect=faces[:, :2] - sheet.Nc,
+                                     connect=faces[:, :2] - sheet.Nf,
                                      color=color,
                                      width=draw_specs['edge']['width'])
         view.add(wire)

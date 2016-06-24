@@ -540,10 +540,10 @@ def subdivide_faces(eptm, faces):
                        name='vert'),
         columns=vert_df.columns)
 
-    new_fs = pd.DataFrame(
-        index=pd.Index(np.arange(eptm.Nf, eptm.Nf + Nse),
-                       name='face'),
-        columns=face_df.columns)
+    # new_fs = pd.DataFrame(
+    #     index=pd.Index(np.arange(eptm.Nf, eptm.Nf + Nse),
+    #                    name='face'),
+    #     columns=face_df.columns)
 
     new_es = pd.DataFrame(
         index=pd.Index(np.arange(eptm.Ne, eptm.Ne + 2*Nse),
@@ -551,28 +551,28 @@ def subdivide_faces(eptm, faces):
         columns=edge_df.columns)
 
     new_vs['subdiv'] = 1
-    new_fs['subdiv'] = 1
+    # new_fs['subdiv'] = 1
     new_es['subdiv'] = 1
     if 'cell' in edge_df.columns:
         new_es['cell'] = np.concatenate([edge_df['cell'],
                                          edge_df['cell']])
     new_vs[eptm.coords] = face_df[eptm.coords].values
-    eptm.edge_df.loc[edge_df.index, 'face'] = new_fs.index
-    new_es['face'] = np.concatenate([new_fs.index,
-                                     new_fs.index])
+    # eptm.edge_df.loc[edge_df.index, 'face'] = new_fs.index
+    # new_es['face'] = np.concatenate([new_fs.index,
+    #                                  new_fs.index])
+    new_es['face'] = np.concatenate([edge_df['face'],
+                                     edge_df['face']])
     new_es['srce'] = np.concatenate([edge_df['trgt'].values,
                                      upcast_new_vs])
     new_es['trgt'] = np.concatenate([upcast_new_vs,
                                      edge_df['srce'].values])
     new_dset = {
         'edge': pd.concat([eptm.edge_df, new_es]),
-        'face': pd.concat([untouched_faces, new_fs]),
+        'face': eptm.face_df,  # pd.concat([untouched_faces, new_fs]),
         'vert': pd.concat([eptm.vert_df, new_vs])
         }
 
     if 'cell' in edge_df.columns:
-        new_es['cell'] = np.concatenate([edge_df['cell'].values,
-                                         edge_df['cell'].values])
         new_dset['cell'] = eptm.cell_df
 
     return new_dset

@@ -53,26 +53,23 @@ class BulkModel(SheetModel):
 
         Parameters
         ----------
-        * mesh: a :class:`tyssue.object.sheet.Sheet` instance
+        * eptm: a :class:`tyssue.object.Epithelium` instance
         * full_output: if True, returns the enery components
         '''
-        # consider only live faces:
-        live_cell_df = eptm.cell_df[eptm.cell_df.is_alive == 1]
-        upcast_alive = eptm.upcast_cell(eptm.cell_df.is_alive)
-        live_edge_df = eptm.edge_df[upcast_alive == 1]
 
-        E_t = live_edge_df.eval('line_tension * length / 2')
+        E_t = eptm.edge_df.eval('line_tension * length / 2')
         E_c = eptm.face_df.eval(
             '0.5 * is_alive * contractility * perimeter**2')
-        E_a = elastic_energy(eptm.face_df[eptm.face_df.is_alive == 1],
+        E_a = elastic_energy(eptm.face_df,
                              var='area',
                              elasticity='area_elasticity',
                              prefered='prefered_area')
-        E_v = elastic_energy(live_cell_df,
+        E_v = elastic_energy(eptm.cell_df,
                              var='vol',
                              elasticity='vol_elasticity',
                              prefered='prefered_vol')
-
+        E_v *= eptm.cell_df['is_alive']
+        E_a *= eptm.face_df['is_alive']
         energies = (E_t, E_c, E_a, E_v)
         if 'is_anchor' in eptm.edge_df.columns:
             E_anc = eptm.edge_df.eval(
@@ -160,3 +157,10 @@ class BulkModel(SheetModel):
         grad_a_trgt = kv_a0 * grad_a_trgt
 
         return grad_a_srce, grad_a_trgt
+
+
+class MonolayerWithLaminaModel(BulkModel):
+
+    @classmethod
+    def compute_energy(eptm):
+        pass

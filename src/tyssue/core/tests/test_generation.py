@@ -53,6 +53,6 @@ def test_subdivide():
     datasets, specs = generation.three_faces_sheet()
     sheet = Sheet('test', datasets, specs)
     subdivided = subdivide_faces(sheet, [0, ])
-    assert subdivided['face'].shape[0] == 8
+    assert subdivided['face'].shape[0] == 3
     assert subdivided['edge'].shape[0] == 30
     assert subdivided['vert'].shape[0] == 14

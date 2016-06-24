@@ -31,6 +31,9 @@ def area_grad(sheet):
     coords = sheet.coords
     ncoords = sheet.ncoords
     inv_area = sheet.edge_df.eval('1 / (4 * sub_area)')
+    # Some segmentations create null areas
+    inv_area.replace(np.inf, 0, inplace=True)
+    inv_area.replace(-np.inf, 0, inplace=True)
 
     face_pos = sheet.upcast_face(sheet.face_df[coords])
     srce_pos = sheet.upcast_srce(sheet.vert_df[coords])

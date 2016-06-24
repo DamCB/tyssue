@@ -90,9 +90,9 @@ class Epithelium:
             self.ncoords = ['n'+c for c in self.coords]
 
         # each of those has a separate dataframe, as well as entries in
-        # the settings files
+        # the specification files
         frame_types = {'edge', 'vert', 'face',
-                       'cell', 'cc'}
+                       'cell'}
 
         # Really just to ensure the debugger is silent
         [self.edge_df,
@@ -111,6 +111,8 @@ class Epithelium:
                               'face', 'cell'][:len(self.data_names)]
         if specs is None:
             specs = {name: {} for name in self.data_names}
+        if 'settings' not in specs:
+            specs['settings'] = {}
 
         self.specs = specs
         self.update_specs(specs, reset=False)
@@ -155,7 +157,7 @@ class Epithelium:
                                     spec=spec)
         datasets[points_dataset][coords] = points
 
-        return cls.__init__(identifier, datasets, coords)
+        return cls.__init__(identifier, datasets, specs, coords=coords)
 
     def update_specs(self, new, reset=False):
 
@@ -207,8 +209,8 @@ class Epithelium:
 
     @property
     def datasets(self):
-        datasets = {level: getattr(self, '{}_df'.format(level))
-                    for level in self.data_names}
+        datasets = {element: getattr(self, '{}_df'.format(element))
+                    for element in self.data_names}
         return datasets
 
     # @datasets.getter

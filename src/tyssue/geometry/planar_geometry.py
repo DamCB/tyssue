@@ -2,6 +2,7 @@ import numpy as np
 
 from .base_geometry import BaseGeometry
 
+
 class PlanarGeometry(BaseGeometry):
     """Geomtetry methods for 2D planar cell arangements
     """
@@ -22,7 +23,6 @@ class PlanarGeometry(BaseGeometry):
         cls.update_normals(sheet)
         cls.update_areas(sheet)
         cls.update_perimeters(sheet)
-
 
     @staticmethod
     def update_perimeters(sheet):
