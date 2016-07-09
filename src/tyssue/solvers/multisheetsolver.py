@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import optimize
 
-from tyssue.solvers.sheet_vertex_solver import Solver
+from .sheet_vertex_solver import Solver
 
 from ..config.solvers import minimize_spec
 

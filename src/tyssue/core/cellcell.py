@@ -1,6 +1,8 @@
 import pandas as pd
+from .objects import Epithelium
 
-class CellCellMesh():
+
+class CellCellMesh(Epithelium):
     """
     Class to manipulate cell centric models
     """
@@ -8,7 +10,6 @@ class CellCellMesh():
     def __init__(self, identifier, datasets,
                  specs=None, coords=None):
         '''
-        Creates an epithelium
 
         Parameters:
         -----------

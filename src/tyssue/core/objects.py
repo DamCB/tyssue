@@ -487,7 +487,7 @@ class Epithelium:
 
         top_level = self.element_names[-1]
         log.info('Removing cells at the {} level'.format(top_level))
-        fto_rm = self.edge_df[edge_out][top_level].unique()
+        fto_rm = self.edge_df.loc[edge_out, top_level].unique()
         if not len(fto_rm):
             log.info('Nothing to remove')
             return
@@ -515,8 +515,9 @@ class Epithelium:
         self.reset_topo()
 
     def cut_out(self, bbox, coords=None):
-        """Removes faces with vertices outside the
-        region defined by the bbox
+        """Returns the index of edges with
+        at least one vertex outside of the
+        bounding box
 
         Parameters
         ----------
@@ -537,7 +538,7 @@ class Epithelium:
                        self.upcast_trgt(out_vert_))
 
         edge_out = outs.sum(axis=1).astype(np.bool)
-        return edge_out
+        return self.edge_df[edge_out].index
 
     def set_bbox(self, margin=1.):
         '''Sets the attribute `bbox` with pairs of values bellow

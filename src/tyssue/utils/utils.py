@@ -20,8 +20,6 @@ def spec_updater(specs, new):
         if new.get(key) is not None:
             spec.update(new[key])
 
-
-
 def set_data_columns(datasets, specs, reset=False):
 
     if reset:
@@ -54,3 +52,27 @@ def data_at_opposite(sheet, edge_data, free_value=None):
         opposite = opposite.replace(np.nan, free_value)
 
     return opposite
+
+
+def get_sub_eptm(eptm, edges):
+    from ..objects.core import Epithelium
+
+    edge_df = eptm.edge_df.loc[edges]
+    vert_df = eptm.vert_df.loc[set(edge_df['srce'])].copy()
+    face_df = eptm.face_df.loc[set(edge_df['face'])].copy()
+    cell_df = eptm.cell_df.loc[set(edge_df['cell'])].copy()
+
+    datasets = {'edge': edge_df,
+                'face': face_df,
+                'vert': vert_df,
+                'cell': cell_df}
+
+    sub_eptm = Epithelium('sub', datasets, eptm.specs)
+    sub_eptm.reset_index()
+    sub_eptm.reset_topo()
+    return sub_eptm
+
+
+def single_cell(eptm, cell):
+    edges = eptm.edge_df[eptm.edge_df['cell'] == cell].index
+    return get_sub_eptm(eptm, edges)

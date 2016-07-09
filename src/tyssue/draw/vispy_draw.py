@@ -4,12 +4,13 @@ import pandas as pd
 
 import vispy as vp
 from vispy import app, scene
-from ..config.draw import draw_specs
+from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater
 
 
 def vp_view(sheet, coords=None, **draw_specs_kw):
 
+    draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
 
     if coords is None:
