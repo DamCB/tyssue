@@ -118,3 +118,4 @@ def vp_view(sheet, coords=None, **draw_specs_kw):
     canvas.show()
     view.camera.set_range()
     app.run()
+    return scene, canvas

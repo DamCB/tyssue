@@ -164,3 +164,17 @@ class MonolayerWithLaminaModel(BulkModel):
     @classmethod
     def compute_energy(eptm):
         pass
+
+
+def set_model(eptm, model, apical_spec, modifiers):
+
+    apical_spec = model.dimentionalize(apical_spec)
+    eptm.update_specs(apical_spec, reset=True)
+
+    for segment, spec in modifiers.items():
+        for element, parameters in spec.items():
+            idx = eptm.segment_index(segment, element)
+            for param_name, param_value in parameters.items():
+                eptm.datasets[element].loc[idx,
+                                           param_name] = \
+                    param_value * eptm.specs[element][param_name]

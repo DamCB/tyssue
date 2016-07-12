@@ -11,11 +11,12 @@ class Monolayer(Epithelium):
     """
     3D monolayer epithelium
     """
-    def __init__(self, name, apical_sheet, specs):
+    def __init__(self, name, apical_sheet, specs,
+                 thickness=1):
 
         datasets = extrude(apical_sheet.datasets,
                            method='translation',
-                           vector=[0, 0, -1])
+                           vector=[0, 0, -thickness])
 
         super().__init__(name, datasets, specs)
         self.vert_df['is_active'] = 1
@@ -57,9 +58,9 @@ class MonolayerWithLamina(Monolayer):
     """
     3D monolayer epithelium with a lamina meshing
     """
-    def __init__(self, name, apical_sheet, specs):
+    def __init__(self, name, apical_sheet, specs, thickness=1):
 
-        super().__init__(name, apical_sheet, specs)
+        super().__init__(name, apical_sheet, specs, thickness)
 
         BulkGeometry.update_all(self)
         self.reset_index()
@@ -102,6 +103,7 @@ class MonolayerWithLamina(Monolayer):
 
         lamina_edges.index += self.edge_df.index.max()+1
         lamina_edges['segment'] = 'lamina'
+        lamina_edges['subdiv'] = 0
         self.edge_df = pd.concat([self.edge_df, lamina_edges])
         self.reset_topo()
         BulkGeometry.update_all(self)
@@ -109,3 +111,17 @@ class MonolayerWithLamina(Monolayer):
     @property
     def lamina_edges(self):
         return self.segment_index('lamina', 'edge')
+
+
+def set_model(basale, model, specs, modifiers):
+
+    apical_spec = model.dimentionalize(specs)
+    basale.update_specs(apical_spec, reset=True)
+
+    for segment, spec in modifiers.items():
+        for element, parameters in spec.items():
+            idx = basale.segment_index(segment, element)
+            for param_name, param_value in parameters.items():
+                basale.datasets[element].loc[idx,
+                                             param_name] = \
+                    param_value * basale.specs[element][param_name]
