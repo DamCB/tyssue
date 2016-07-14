@@ -15,6 +15,17 @@ def _to_3d(df):
     return df_3d
 
 
+def combine_specs(*specs):
+
+    combined = {}
+    for spec in specs:
+        for key in spec:
+            if key in combined:
+                combined[key].update(spec[key])
+            else:
+                combined[key] = spec[key]
+    return combined
+
 def spec_updater(specs, new):
     for key, spec in specs.items():
         if new.get(key) is not None:

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from scipy.spatial import Delaunay
+from scipy.spatial import Delaunay, cKDTree
 from .objects import Epithelium
 from .generation import extrude, subdivide_faces
 from ..geometry.bulk_geometry import BulkGeometry
@@ -81,13 +81,14 @@ class MonolayerWithLamina(Monolayer):
 
         subdiv_verts = self.vert_df[self.vert_df['subdiv'] == 1].index
         focal_adhesions = self.vert_df.loc[subdiv_verts]
-        lamina_d = Delaunay(focal_adhesions[['x', 'y']],
-                            furthest_site=False)
-        lamina_edges = pd.DataFrame(
-            np.concatenate([lamina_d.simplices[:, :2],
-                            lamina_d.simplices[:, 1:],
-                            lamina_d.simplices[:, [0, 2]]]),
-            columns=['srce', 'trgt'])
+
+        max_dist = self.edge_df.length.dropna().median() * 1.7
+        lamina_tree = cKDTree(focal_adhesions[self.coords].values)
+        lamina_edges = pd.DataFrame([[i, j] for i, j in
+                                    lamina_tree.query_pairs(max_dist,
+                                                            eps=1e-3)],
+                                    columns=['srce', 'trgt'])
+        lamina_edges.index.name = 'edge'
         lamina_edges['srce'] = focal_adhesions.index[lamina_edges['srce']]
         lamina_edges['trgt'] = focal_adhesions.index[lamina_edges['trgt']]
         # place holder face and cell
