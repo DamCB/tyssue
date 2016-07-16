@@ -53,6 +53,14 @@ class Monolayer(Epithelium):
     def basal_edges(self):
         return self.segment_index('basal', 'edge')
 
+    @property
+    def apical_verts(self):
+        return self.segment_index('apical', 'vert')
+
+    @property
+    def basal_verts(self):
+        return self.segment_index('basal', 'vert')
+
 
 class MonolayerWithLamina(Monolayer):
     """

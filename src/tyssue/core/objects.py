@@ -94,18 +94,19 @@ class Epithelium:
         frame_types = {'edge', 'vert', 'face',
                        'cell'}
 
-        # Really just to ensure the debugger is silent
-        [self.edge_df,
-         self.vert_df,
-         self.face_df,
-         self.cell_df] = [None, ] * 4
+        # # Really just to ensure the debugger is silent
+        # [self.edge_df,
+        #  self.vert_df,
+        #  self.face_df,
+        #  self.cell_df] = [None, ] * 4
 
         self.identifier = identifier
         if not set(datasets).issubset(frame_types):
-            raise ValueError('''The `datasets` dictionnary should
-            contain keys in {}'''.format(frame_types))
-        for name, data in datasets.items():
-            setattr(self, '{}_df'.format(name), data)
+            raise ValueError('The `datasets` dictionnary should'
+                             ' contain keys in {}'.format(frame_types))
+        self.datasets = datasets
+        # for name, data in datasets.items():
+        #     setattr(self, '{}_df'.format(name), data)
         self.data_names = list(datasets.keys())
         self.element_names = ['srce', 'trgt',
                               'face', 'cell'][:len(self.data_names)]
@@ -122,6 +123,52 @@ class Epithelium:
         self.reset_topo()
         self.bbox = None
         self.set_bbox()
+
+    @property
+    def face_df(self):
+        return self.datasets['face']
+
+    @face_df.setter
+    def face_df(self, value):
+        self.datasets['face'] = value
+
+    @property
+    def edge_df(self):
+        return self.datasets['edge']
+
+    @edge_df.setter
+    def edge_df(self, value):
+        self.datasets['edge'] = value
+
+    @property
+    def cell_df(self):
+        return self.datasets['cell']
+
+    @cell_df.setter
+    def cell_df(self, value):
+        self.datasets['cell'] = value
+
+    @property
+    def vert_df(self):
+        return self.datasets['vert']
+
+    @vert_df.setter
+    def vert_df(self, value):
+        self.datasets['vert'] = value
+
+    # @property
+    # def datasets(self):
+    #     datasets = {element: getattr(self, '{}_df'.format(element))
+    #                 for element in self.data_names}
+    #     return datasets
+
+    # # @datasets.getter
+    # # def datasets(self, level):
+    # #     return getattr(self, '{}_df'.format(level))
+
+    # @datasets.setter
+    # def datasets(self, level, new_df):
+    #     setattr(self, '{}_df'.format(level), new_df)
 
     def copy(self):
         # TODO
@@ -206,20 +253,6 @@ class Epithelium:
             self.update_num_faces()
         if 'opposite' in self.edge_df.columns:
             self.edge_df['opposite'] = get_opposite(self.edge_df)
-
-    @property
-    def datasets(self):
-        datasets = {element: getattr(self, '{}_df'.format(element))
-                    for element in self.data_names}
-        return datasets
-
-    # @datasets.getter
-    # def datasets(self, level):
-    #     return getattr(self, '{}_df'.format(level))
-
-    @datasets.setter
-    def datasets(self, level, new_df):
-        setattr(self, '{}_df'.format(level), new_df)
 
     @property
     def face_idx(self):
