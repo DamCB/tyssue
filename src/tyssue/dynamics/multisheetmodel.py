@@ -134,7 +134,7 @@ class MultiSheetModel(SheetModel):
 def set_model(msheet, specs):
 
     for sheet in msheet:
-        sheet.update_specs(MultiSheetModel.dimentionalize(specs),
+        sheet.update_specs(specs,  # MultiSheetModel.dimentionalize(specs),
                            reset=True)
     msheet[-1].vert_df['basal_shift'] = msheet[-1].vert_df.eval(
         'z + prefered_height')

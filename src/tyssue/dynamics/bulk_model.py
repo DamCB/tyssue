@@ -168,7 +168,7 @@ class MonolayerWithLaminaModel(BulkModel):
 
 def set_model(eptm, model, apical_spec, modifiers):
 
-    apical_spec = model.dimentionalize(apical_spec)
+    # apical_spec = model.dimentionalize(apical_spec)
     eptm.update_specs(apical_spec, reset=True)
 
     for segment, spec in modifiers.items():
