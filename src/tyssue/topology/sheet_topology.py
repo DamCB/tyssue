@@ -118,7 +118,8 @@ def add_vert(sheet, edge):
     return new_vert, new_edge, new_opp_edge
 
 
-def cell_division(sheet, mother, geom, angle=None):
+def cell_division(sheet, mother, geom,
+                  angle=None, axis='x'):
 
     if not sheet.face_df.loc[mother, 'is_alive']:
         logger.warning('Cell {} is not alive and cannot devide'.format(mother))
@@ -128,10 +129,17 @@ def cell_division(sheet, mother, geom, angle=None):
         angle = np.random.random() * np.pi
 
     m_data = sheet.edge_df[sheet.edge_df['face'] == mother]
-    rot_pos = geom.face_projected_pos(sheet, mother, psi=angle)
-    srce_pos = rot_pos.loc[m_data['srce'], 'x']
+    if angle == 0:
+        face_pos = sheet.face_df.loc[mother, sheet.coords]
+        rot_pos = sheet.vert_df[sheet.coords]
+        for c in sheet.coords:
+            rot_pos.loc[:, c] = rot_pos[c] - face_pos[c]
+    else:
+        rot_pos = geom.face_projected_pos(sheet, mother, psi=angle)
+
+    srce_pos = rot_pos.loc[m_data['srce'], axis]
     srce_pos.index = m_data.index
-    trgt_pos = rot_pos.loc[m_data['trgt'], 'x']
+    trgt_pos = rot_pos.loc[m_data['trgt'], axis]
     trgt_pos.index = m_data.index
     try:
         edge_a = m_data[(srce_pos < 0) & (trgt_pos >= 0)].index[0]
@@ -155,7 +163,6 @@ def cell_division(sheet, mother, geom, angle=None):
     sheet.edge_df.loc[new_edge_m, 'trgt'] = vert_a
 
     sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
-    sheet.edge_df.index.name = 'edge'
     new_edge_d = sheet.edge_df.index[-1]
     sheet.edge_df.loc[new_edge_d, 'srce'] = vert_a
     sheet.edge_df.loc[new_edge_d, 'trgt'] = vert_b
