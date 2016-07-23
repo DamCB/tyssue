@@ -59,13 +59,14 @@ def cell_division(monolayer, mother,
     monolayer.cell_df = monolayer.cell_df.append(cell_cols,
                                                  ignore_index=True)
     daughter = monolayer.cell_df.index[-1]
-
+    #  mother cell's edges
     m_data = monolayer.edge_df[monolayer.edge_df['cell'] == mother]
 
     sagittal_faces = list(m_data[m_data['segment'] ==
                                  'sagittal']['face'].unique())
     face_orbit = monolayer.get_orbits('face', 'srce').groupby(
         level='face').apply(lambda df: set(df))
+    # grab opposite faces
     opp_faces = {}
     for face in sagittal_faces:
         pair = face_orbit[face_orbit == face_orbit.loc[face]].index
@@ -74,6 +75,7 @@ def cell_division(monolayer, mother,
             opp_faces[face] = opposite[0]
         else:
             opp_faces[face] = -1
+    # divide the sagittal faces & their opposites
     new_faces = {}
     for face, opp_face in opp_faces.items():
         if opp_face > 0:
@@ -88,6 +90,7 @@ def cell_division(monolayer, mother,
                                                          ignore_index=True)
             new_faces[face] = monolayer.face_df.index[-1]
 
+    # grab the sagittal edges oriented upward
     srce_segment = monolayer.upcast_srce(
         monolayer.vert_df['segment']).loc[m_data.index]
     trgt_segment = monolayer.upcast_trgt(
@@ -99,6 +102,7 @@ def cell_division(monolayer, mother,
     sagittal_edges = m_data[(m_data['segment'] == 'sagittal') &
                             (srce_segment == 'basal') &
                             (trgt_segment == 'apical')]
+    # split the sagittal edges
     new_verts = {}
     face_verts = defaultdict(set)
     for edge, edge_data in sagittal_edges.iterrows():
@@ -116,6 +120,21 @@ def cell_division(monolayer, mother,
     for vs in face_verts.values():
         assert len(vs) == 2
 
+    # add the new horizontal faces
+
+    apical_edges = m_data[(m_data['segment'] == 'apical')]
+    mother_apical_face = apical_edges['face'].iloc[0]
+    apical_face_cols = monolayer.face_df.loc[mother_apical_face]
+    monolayer.face_df.append(apical_face_cols, ignore_index=True)
+    new_apical = monolayer.face_df.index[-1]
+
+    basal_edges = m_data[(m_data['segment'] == 'basal')]
+    mother_basal_face = basal_edges['face'].iloc[0]
+    basal_face_cols = monolayer.face_df.loc[mother_basal_face]
+    monolayer.face_df.append(basal_face_cols, ignore_index=True)
+    new_basal = monolayer.face_df.index[-1]
+
+    # add the horizontal edges
     for edge, edge_data in sagittal_edges.iterrows():
         old_face = edge_data['face']
         new_face = new_faces[old_face]
@@ -132,6 +151,22 @@ def cell_division(monolayer, mother,
         edge_cols['srce'] = vert_b
         edge_cols['trgt'] = vert_a
         edge_cols['face'] = new_face
+        edge_cols['cell'] = daughter
+        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
+                                                     ignore_index=False)
+
+        edge_cols = apical_edges.iloc[0]
+        edge_cols['srce'] = vert_a
+        edge_cols['trgt'] = vert_b
+        edge_cols['face'] = new_apical
+        edge_cols['cell'] = mother
+        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
+                                                     ignore_index=False)
+
+        edge_cols = basal_edges.iloc[0]
+        edge_cols['srce'] = vert_b
+        edge_cols['trgt'] = vert_a
+        edge_cols['face'] = new_basal
         edge_cols['cell'] = daughter
         monolayer.edge_df = monolayer.edge_df.append(edge_cols,
                                                      ignore_index=False)
