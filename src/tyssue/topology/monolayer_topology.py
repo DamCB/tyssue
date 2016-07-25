@@ -155,18 +155,19 @@ def cell_division(monolayer, mother,
         monolayer.edge_df = monolayer.edge_df.append(edge_cols,
                                                      ignore_index=False)
 
-        edge_cols = apical_edges.iloc[0]
-        edge_cols['srce'] = vert_a
-        edge_cols['trgt'] = vert_b
+        edge_cols = apical_edges.iloc[0].copy()
+        edge_cols['srce'] = vert_b
+        edge_cols['trgt'] = vert_a
         edge_cols['face'] = new_apical
         edge_cols['cell'] = mother
         monolayer.edge_df = monolayer.edge_df.append(edge_cols,
                                                      ignore_index=False)
 
-        edge_cols = basal_edges.iloc[0]
-        edge_cols['srce'] = vert_b
-        edge_cols['trgt'] = vert_a
+        edge_cols = basal_edges.iloc[0].copy()
+        edge_cols['srce'] = vert_a
+        edge_cols['trgt'] = vert_b
         edge_cols['face'] = new_basal
         edge_cols['cell'] = daughter
         monolayer.edge_df = monolayer.edge_df.append(edge_cols,
                                                      ignore_index=False)
+    return daughter
