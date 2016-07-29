@@ -19,18 +19,24 @@ def save_triangulated(filename, eptm):
 
 def save_junction_mesh(filename, eptm):
 
-    vertices, faces, normals = eptm.verterts_mesh(eptm.coords,
-                                                  vertex_normals=True)
+    vertices, faces, normals = eptm.vertex_mesh(eptm.coords,
+                                                vertex_normals=True)
+
     write_mesh(filename,
-               vertices=vertices.values,
-               faces=faces.values,
-               normals=normals.values,
+               vertices=vertices,
+               faces=faces,
+               normals=normals,
                texcoords=None, overwrite=True,
                reshape_faces=False)  # GH 1155
     logger.info('Saved %s as a junction mesh .OBJ file', eptm.identifier)
 
 
-def write_splitted_cells(sheet, fname, epsilon=0.1):
+def write_splitted_cells(*args, **kwargs):
+    logger.warning('Deprecated, use `save_splitted_cells` instead')
+    save_splitted_cells(*args, **kwargs)
+
+
+def save_splitted_cells(sheet, fname, epsilon=0.1):
 
     coords = sheet.coords
     up_srce = sheet.upcast_srce(sheet.vert_df[coords])

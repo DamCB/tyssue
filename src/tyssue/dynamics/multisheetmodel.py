@@ -25,7 +25,10 @@ class MultiSheetModel(SheetModel):
         Kv = dim_mod_specs['face']['area_elasticity']
         A0 = dim_mod_specs['face']['prefered_area']
         gamma = dim_mod_specs['face']['contractility']
+        #  elastic modulus btw the layer and its lower neighbour
         kappa_d = dim_mod_specs['vert']['d_elasticity']
+        #  elastic modulus btw the layer and its upper neighbour
+        kappa_u = dim_mod_specs['vert']['u_elasticity']
 
         dim_mod_specs['face']['contractility'] = gamma * Kv * A0
 
@@ -36,6 +39,7 @@ class MultiSheetModel(SheetModel):
         dim_mod_specs['settings']['nrj_norm_factor'] = Kv * A0**2
 
         dim_mod_specs['vert']['d_elasticity'] = kappa_d * Kv * A0
+        dim_mod_specs['vert']['u_elasticity'] = kappa_u * Kv * A0
 
         if 'anchor_tension' in dim_mod_specs['edge']:
             t_a = dim_mod_specs['edge']['anchor_tension']
@@ -65,7 +69,7 @@ class MultiSheetModel(SheetModel):
         for sheet in msheet:
             norm_factor = sheet.specs['settings']['nrj_norm_factor']
             downward = sheet.vert_df.eval(
-                '0.5 * d_elasticity * (depth - prefered_height)**2')
+                '0.5 * u_elasticity * (depth - prefered_depth)**2')
             E_d += downward.sum()/norm_factor
 
         return E_d
@@ -106,7 +110,7 @@ class MultiSheetModel(SheetModel):
         for i, sheet in enumerate(msheet):
             norm_factor = sheet.specs['settings']['nrj_norm_factor']
             downward = sheet.vert_df.eval(
-                'd_elasticity * (prefered_height - depth)')
+                'u_elasticity * (prefered_depth - depth)')
             grads[i]['z'] += downward/norm_factor
 
     @staticmethod
@@ -137,6 +141,6 @@ def set_model(msheet, specs):
         sheet.update_specs(specs,  # MultiSheetModel.dimentionalize(specs),
                            reset=True)
     msheet[-1].vert_df['basal_shift'] = msheet[-1].vert_df.eval(
-        'z + prefered_height')
+        'z + prefered_depth')
     msheet[0].vert_df['basal_shift'] = msheet[0].vert_df.eval(
         'z - prefered_height')

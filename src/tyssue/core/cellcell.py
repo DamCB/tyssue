@@ -1,4 +1,5 @@
 import pandas as pd
+from scipy.spatial import ConvexHull
 from .objects import Epithelium
 
 
@@ -21,3 +22,16 @@ class CellCellMesh(Epithelium):
         '''
         super().__init__(identifier, datasets,
                          specs, coords)
+
+    def vertex_mesh(self, coords, vertex_normals=False):
+        '''
+        Subclassed version to acccount for the CellCellMesh specificity
+
+        For now uses the Convex Hull as triangulation. a Better solution should
+        be implemented.
+        '''
+
+        vertices = self.vert_df[coords].values
+        qhull = ConvexHull(vertices)
+        faces = qhull.simplices
+        return vertices, faces, None

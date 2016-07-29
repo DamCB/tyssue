@@ -642,7 +642,7 @@ class Epithelium:
         face_mask = np.arange(self.Nf + self.Nv) < self.Nf
         return vertices, triangles, face_mask
 
-    def verterts_mesh(self, coords, vertex_normals=True):
+    def vertex_mesh(self, coords, vertex_normals=True):
         ''' Returns the vertex coordinates and a list of vertex indices
         for each face of the tissue.
         If `vertex_normals` is True, also returns the normals of each vertex
@@ -654,8 +654,8 @@ class Epithelium:
         if vertex_normals:
             normals = (self.edge_df.groupby('srce')[self.ncoords].mean() +
                        self.edge_df.groupby('trgt')[self.ncoords].mean()) / 2.
-            return vertices, faces, normals
-        return vertices, faces
+            return vertices.values, faces.values, normals.values
+        return vertices.values, faces.values
 
 
 def _ordered_edges(face):
