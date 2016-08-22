@@ -1,6 +1,3 @@
-import numpy as np
-import pandas as pd
-
 from scipy.spatial import Voronoi
 from tyssue.core import generation
 from tyssue.core.sheet import Sheet

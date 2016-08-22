@@ -1,7 +1,7 @@
 .PHONY: flake8 test coverage
 
 flake8:
-	flake8 --max-line-length=100 --count --statistics --exit-zero src/py-tyssue/tyssue/
+	flake8 --max-line-length=100 --count --statistics --exit-zero src/tyssue/
 
 test:
 	nosetests tyssue -v

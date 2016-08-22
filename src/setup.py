@@ -41,7 +41,6 @@ if __name__ == "__main__":
                      "Operating System :: POSIX :: Linux",
                      "Programming Language :: Python :: 3.4",
                      "Programming Language :: Python :: Implementation :: CPython",
-                     "Topic :: Scientific/Engineering :: Artificial Intelligence",
                      "Topic :: Scientific/Engineering :: Bio-Informatics",
                      "Topic :: Scientific/Engineering :: Medical Science Apps",
                      ],

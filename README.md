@@ -113,10 +113,6 @@ python 2.x version, because it's time to move on...
 - vispy >= 0.4
 - pandas >= 0.16
 
-### C++
-- Boost >= 1.54
-- CGAL >= 4.6
-
 
 ## Install
 

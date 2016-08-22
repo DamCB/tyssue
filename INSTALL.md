@@ -15,7 +15,6 @@ source .bashrc # update your PATH
 ### Install package dependencies
 
 ```bash
-sudo apt-get install build-essential
 sudo apt-get install git
 ```
 
@@ -27,10 +26,9 @@ conda create -n tyssue python=3.4 numpy scipy vispy matplotlib nose coverage
 source activate tyssue
 ## install some friends
 conda install -c https://conda.anaconda.org/osgeo cgal
-pip install vispy
 ```
 
-### Download and complie `tyssue`
+### Download and complie `tyssue`
 
 ```bash
 git clone https://github.com/CellModels/tyssue.git

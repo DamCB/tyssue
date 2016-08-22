@@ -23,5 +23,5 @@ requirements:
     - pytables
 
 about:
-  home: https://github.com/CellModels/tyssue
+  home: https://github.com/DamCB/tyssue
   license: MPLv2.0

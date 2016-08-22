@@ -2,13 +2,12 @@ import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_equal
 
-
 from tyssue.core import Epithelium
-from tyssue.core.sheet import Sheet
 from tyssue.core.generation import three_faces_sheet
 from tyssue.core.objects import get_opposite
 from tyssue import config
 from tyssue.geometry.planar_geometry import PlanarGeometry
+
 
 def test_3faces():
 

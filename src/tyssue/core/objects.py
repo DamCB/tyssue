@@ -18,7 +18,7 @@ Core definitions
 The following data is an exemple of the `specs`.
 It is a nested dictionnary with two levels.
 
-The first key designs the object name: ('face', 'edge', 'vert') They will
+The first key designs the element name: ('face', 'edge', 'vert') They will
 correspond to the dataframes attributes of the Epithelium instance,
 (e.g eptm.face_df);
 
@@ -170,9 +170,30 @@ class Epithelium:
     # def datasets(self, level, new_df):
     #     setattr(self, '{}_df'.format(level), new_df)
 
-    def copy(self):
-        # TODO
-        raise NotImplementedError
+    def copy(self, deep_copy=True):
+        """
+        Returns a copy of the epithelium
+
+        Parameters
+        ----------
+        deep_copy: bool, default True
+            if True, use a copy of the original object's datasets
+            to create the new object. If False, datasets are not copied
+        """
+        if deep_copy:
+            datasets = {element: df.copy()
+                        for element, df in self.datasets.items()}
+        else:
+            log.info(
+                "New epithelium object from {}"
+                " without deep copy".format(
+                    self.identifier))
+            datasets = self.datasets
+
+        identifier = self.identifier+'_copy'
+        new = Epithelium(identifier, datasets,
+                         specs=self.specs, coords=None)
+        return new
 
     @property
     def settings(self):
@@ -221,18 +242,6 @@ class Epithelium:
             self.update_specs(load_default(domain, base), reset)
         if new_specs is not None:
             self.update_specs(new_specs, reset)
-
-    def set_geom(self, base=None, new_specs=None, ):
-
-        self.set_specs('geometry', base, new_specs,
-                       default_base='core', reset=False)
-
-    def set_model(self, base=None, new_specs=None, reset=True):
-
-        self.set_specs('dynamics', base, new_specs,
-                       default_base='core', reset=reset)
-        self.grad_norm_factor = self.specs['settings']['grad_norm_factor']
-        self.nrj_norm_factor = self.specs['settings']['nrj_norm_factor']
 
     def update_num_sides(self):
         self.face_df['num_sides'] = self.edge_df.face.value_counts().loc[
@@ -398,8 +407,8 @@ class Epithelium:
         cc_idx = []
         for srce0, trgt0, face0 in self.edge_idx:
             for srce1, trgt1, face1 in self.edge_idx:
-                if (face0 != face1 and trgt0 == srce1 and
-                    trgt1 == srce0 and not (face1, face0) in cc_idx):
+                if face0 != face1 and trgt0 == srce1 and \
+                  trgt1 == srce0 and not (face1, face0) in cc_idx:
                     cc_idx.append((face0, face1))
         cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['facea', 'faceb'])
         return cc_idx
@@ -488,9 +497,10 @@ class Epithelium:
         self.anti_sym.loc[self.west_edges] = -1
 
     def sort_edges_eastwest(self):
-        """ reorder edges such that half the double edges are first,
-        then the free edges, the the other half of the double edges,
-        this way, each subset of the edges dataframe are contiguous.
+        """reorder edges such the free edges are first,
+        then the first half of the double edges, then the other half of
+        the double edges, this way, each subset of the edges dataframe
+        are contiguous.
         """
         self.get_extra_indices()
         self.edge_df = self.edge_df.loc[self.srtd_edges]
@@ -517,7 +527,9 @@ class Epithelium:
         self.remove(invalid_edges)
 
     def remove(self, edge_out):
-
+        """Remove the edges indexed by `edge_out` associated with all
+        the cells and faces containing those edges
+        """
         top_level = self.element_names[-1]
         log.info('Removing cells at the {} level'.format(top_level))
         fto_rm = self.edge_df.loc[edge_out, top_level].unique()
@@ -658,11 +670,21 @@ class Epithelium:
         return vertices.values, faces.values
 
 
-def _ordered_edges(face):
-    """Returns the junction edges vertices of the faces
-    organized clockwise
+def _ordered_edges(face_edges):
+    """Returns "srce", "trgt" and "face" indices
+    organized clockwise for each edge.
+
+    Parameters
+    ----------
+    face_edges: `pd.DataFrame`
+        exerpt of an edge_df for a single face
+
+    Returns
+    -------
+    edges: list of 3 ints
+        srce, trgt, face indices, ordered
     """
-    srces, trgts, faces = face[['srce', 'trgt', 'face']].values.T
+    srces, trgts, faces = face_edges[['srce', 'trgt', 'face']].values.T
     srce, trgt, face_ = srces[0], trgts[0], faces[0]
     edges = [[srce, trgt, face_]]
     for face_ in faces[1:]:

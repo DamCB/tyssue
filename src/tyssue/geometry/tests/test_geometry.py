@@ -5,12 +5,10 @@ from tyssue.core.generation import three_faces_sheet
 
 from tyssue.geometry.sheet_geometry import SheetGeometry as sgeom
 
+
 def test_3faces():
     datasets, specs = three_faces_sheet()
     sheet = Sheet('3faces_2D', datasets, specs)
-    sheet.set_geom('sheet')
-
-
     sgeom.update_dcoords(sheet)
     sgeom.update_length(sheet)
     np.testing.assert_allclose(sheet.edge_df['length'], 1,

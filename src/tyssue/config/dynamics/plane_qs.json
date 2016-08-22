@@ -1,0 +1,14 @@
+{
+"face": {
+    "contractility": 0.04,
+    "area_elasticity": 1.0,
+    "prefered_area": 1.0
+    },
+"edge": {
+     "line_tension": 0.12
+     },
+"settings": {
+    "grad_norm_factor": 1.0,
+    "nrj_norm_factor": 1.0
+    }
+}
