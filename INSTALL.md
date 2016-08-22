@@ -1,6 +1,9 @@
 ## Installing tyssue
 
-Those are the instructions to install the package from source on a debian-like linux distribution.
+Those are the instructions to install the package from source on a
+debian-like linux distribution. If you allready have a basic
+scientific python stack, use it, don't install anaconda.
+
 
 ### Get Anaconda
 Go to http://continuum.io/downloads and grab anaconda for your architecture.
@@ -54,4 +57,17 @@ You can build a conda binary :
 
 ```sh
 conda build conda-recipe/
+```
+
+### Building the documentation
+
+The documentation uses
+[nbsphinx](http://nbsphinx.readthedocs.io/en/0.2.9/index.html) to
+convert the jupyter notebooks in doc/notebooks to html with sphinx.
+
+
+```sh
+pip install sphinx nbsphinx sphinx-autobuild
+cd tyssue/doc
+make html
 ```

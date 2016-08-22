@@ -42,51 +42,30 @@ methods to manipulate indexing of the dataframes to ease calculations.
 #### Creating an Epithelium
 
 ```python
-from scipy.spatial import Voronoi
-from tyssue.core.generation import hexa_grid2d, from_2d_voronoi
-from tyssue.core.objects import Epithelium
-from tyssue.config.geometry import planar_spec
+## Core object
+from tyssue.core.sheet import Sheet
+## Simple 2D geometry
+from tyssue.geometry.planar_geometry import PlanarGeometry
+## Visualisation (matplotlib based)
+from tyssue.draw.plt_draw import sheet_view
 
-from tyssue.core.generation import hexa_grid2d, from_2d_voronoi
-grid = hexa_grid2d(nx=6, ny=4,
-	               distx=1, disty=1)
-datasets = from_2d_voronoi(Voronoi(grid))
-
-eptm = Epithelium('2D_example', datasets,
-                  specs=planar_spec(),
-                  coords=['x', 'y'])
+sheet = Sheet.planar_sheet_2d('basic2D', nx=6, ny=7,
+                              distx=1, disty=1)
+PlanarGeometry.update_all(sheet)
+sheet.sanitize()
 ```
 
-#### Datasets
+### Features
 
-Geometries and models are defined independently (or as independently
-as possible) from the data. They are implemented as classes that are
-not holding any data but rather define static and class methods that
-act on the data hold by the epithelium objects.
+* Easy data manipulation
+* Multiple geometries (Sheets in 2D and 3D, monolayers, bulk, cell
+centered models...)
+* Easy to extend
+* 2D (matplotlib) and 3D (vispy) customisable visualisation
 
-```python
-for key, df in eptm.datasets.items():
-    print(key, df.shape)
+### Documentation
 
->>> face (24, 6)
->>> edge (82, 7)
->>> vert (32, 3)
-```
-
-In 2D, we have 3 datasets, `'face'`, `'edge` and `'vert'`. They hold
-the information for the cell faces (counfounded with the whole cell
-here), edges and vertices, respectively.
-
-Each of those can be accessed
-as an attribute of the `Epithelium` object directly with a `_df`
-suffix  to the element, e.g `eptm.face_df`.
-
-#### Upcasting
-
-Geometry are physics computations often require to access for example
-the cell related data on each of the cell's edges. The `Epithelium`
-class defines utilities to make this, i.e copying the values of a cell
-associated data to each edges of the cell.
+Several notebooks are available [here](doc/notebooks).
 
 
 ### Authors
