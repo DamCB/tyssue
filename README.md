@@ -5,7 +5,7 @@
 [![Coverage Status](https://coveralls.io/repos/CellModels/tyssue/badge.svg)](https://coveralls.io/r/CellModels/tyssue)
 
 
-[![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](https://readthedocs.org/projects/tyssue/badge/?version=latest)
+[![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/)
 
 
 The `tyssue` library seeks to provide a unified interface to implement
@@ -69,8 +69,8 @@ centered models...)
 
 ### Documentation
 
-Several notebooks are available [here](doc/notebooks).
-
+* The documentation is browsable online [here](http://tyssue.readthedocs.io/en/latest/)
+* Introduction notebooks are available [here](doc/notebooks).
 
 ### Authors
 
@@ -80,11 +80,12 @@ Several notebooks are available [here](doc/notebooks).
 * François Molino
 * Magali Suzanne
 
+## Install
 
 ## Dependencies
 
-As all the dependencies are already completely supported in python 3.x, we won't be maintaining a
-python 2.x version, because it's time to move on...
+As all the dependencies are already completely supported in python 3.x, **we won't be maintaining a
+python 2.x version**, because it's time to move on...
 
 ### Python
 
@@ -99,12 +100,28 @@ python 2.x version, because it's time to move on...
 
 ## Install
 
-See [INSTALL.md](INSTALL.md)
+See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary python environment.
+
+In a nutshell, install from github goes like that:
+
+```bash
+git clone https://github.com/CellModels/tyssue.git
+cd tyssue/
+python setup.py install
+```
+
 
 
 ## Similar softwares
 
-* See [this publication](http://bioinformatics.oxfordjournals.org.gate1.inist.fr/content/32/2/219/F2.expansion.html) by Jereky's lab, softawre available [here](http://www.biocenter.helsinki.fi/salazar/software.html)
+* See
+  [this publication](http://bioinformatics.oxfordjournals.org.gate1.inist.fr/content/32/2/219/F2.expansion.html)
+  by Jereky's lab, software available
+  [here](http://www.biocenter.helsinki.fi/salazar/software.html)
+
+* Chaste is a quite generic and well maintained simulation software for biological tissues:
+  http://www.cs.ox.ac.uk/chaste/
+
 
 
 ## Licence

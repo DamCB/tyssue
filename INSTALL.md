@@ -36,9 +36,7 @@ conda install -c https://conda.anaconda.org/osgeo cgal
 ```bash
 git clone https://github.com/CellModels/tyssue.git
 cd tyssue/
-mkdir build/ && cd build/
-cmake ..
-make && make install
+python setup.py install
 ```
 
 If all went well, you have successfully installed tyssue.
