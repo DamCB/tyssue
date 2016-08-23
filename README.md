@@ -4,6 +4,10 @@
 
 [![Coverage Status](https://coveralls.io/repos/CellModels/tyssue/badge.svg)](https://coveralls.io/r/CellModels/tyssue)
 
+
+[![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](https://readthedocs.org/projects/tyssue/badge/?version=latest)
+
+
 The `tyssue` library seeks to provide a unified interface to implement
 bio-mechanical models of living tissues, with a focus on **epithelium** modeling.
 It's main focus is on **vertex** based models.

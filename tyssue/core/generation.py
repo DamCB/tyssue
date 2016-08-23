@@ -3,7 +3,6 @@ import numpy as np
 from ..config.json_parser import load_default
 from ..config.geometry import flat_sheet
 
-
 import logging
 log = logging.getLogger(name=__name__)
 
