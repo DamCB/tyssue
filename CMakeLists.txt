@@ -1,5 +1,5 @@
 ##############################################################################
-# Use of cmake to install - might be good if you need to compile cython modules
+# Use of cmake to install - good if you need to compile cython modules
 
 cmake_minimum_required(VERSION 2.8)
 project(Tyssue)
@@ -71,7 +71,7 @@ message(STATUS "Install prefix: ${INSTALL_PREFIX}")
 
 ##############################################################################
 
-add_subdirectory("${CMAKE_SOURCE_DIR}/src")
+# add_subdirectory("${CMAKE_SOURCE_DIR}/src")
 
 ##############################################################################
 
@@ -89,6 +89,9 @@ message(STATUS "Tyssue will be installed to ${INSTALL_PREFIX}")
 
 # Install Python module
 find_program(PYTHON "python" REQUIRED)
+
+message(STATUS "Looking in  ${CMAKE_CURRENT_BINARY_DIR} for setup.py")
+
 
 set(SETUP_PY "${CMAKE_CURRENT_BINARY_DIR}/setup.py")
 set(DEPS     "${CMAKE_CURRENT_SOURCE_DIR}/tyssue/__init__.py")

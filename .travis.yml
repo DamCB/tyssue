@@ -16,13 +16,9 @@ before_install:
   - pip install coveralls
 
 install:
-  - mkdir build/
-  - cd build/
-  - cmake ..
-  - make install
+  - python setup.py install
 
 script:
-  - cd ../
   - make coverage
 
 after_success:
