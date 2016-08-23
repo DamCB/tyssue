@@ -150,10 +150,12 @@ def cell_division(sheet, mother, geom,
 
     vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet, edge_a)
     vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet, edge_b)
+    sheet.vert_df.index.name = 'vert'
 
     face_cols = sheet.face_df.loc[mother]
     sheet.face_df = sheet.face_df.append(face_cols,
                                          ignore_index=True)
+    sheet.face_df.index.name = 'face'
     daughter = int(sheet.face_df.index[-1])
 
     edge_cols = sheet.edge_df.loc[new_edge_b]
@@ -170,6 +172,8 @@ def cell_division(sheet, mother, geom,
     daughter_edges = list(m_data[srce_pos < 0].index) + [new_edge_b,
                                                          new_edge_d]
     sheet.edge_df.loc[daughter_edges, 'face'] = daughter
+    sheet.edge_df.index.name = 'edge'
+
     sheet.reset_topo()
     geom.update_all(sheet)
     return daughter

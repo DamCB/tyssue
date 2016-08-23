@@ -3,7 +3,7 @@ scipy
 pandas
 matplotlib
 vispy
-pytables
+tables
 sphinx>=1.4
 nbsphinx
 ipykernel

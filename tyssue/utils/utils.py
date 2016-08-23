@@ -26,10 +26,12 @@ def combine_specs(*specs):
                 combined[key] = spec[key]
     return combined
 
+
 def spec_updater(specs, new):
     for key, spec in specs.items():
         if new.get(key) is not None:
             spec.update(new[key])
+
 
 def set_data_columns(datasets, specs, reset=False):
 
@@ -41,7 +43,7 @@ def set_data_columns(datasets, specs, reset=False):
             continue
         df = datasets[name]
         for col, default in spec.items():
-            if not col in df.columns or reset:
+            if col not in df.columns or reset:
                 df[col] = default
 
 
