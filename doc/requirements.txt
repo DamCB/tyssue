@@ -1,9 +1,11 @@
 numpy
 scipy
-pandas
 matplotlib
 vispy
+h5py
+numexpr
 tables
+pandas
 sphinx>=1.4
 nbsphinx
 ipykernel
