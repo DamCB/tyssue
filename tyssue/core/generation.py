@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from ..config.json_parser import load_default
-from ..config.geometry import planar_spec
+from ..config.geometry import flat_sheet
 
 
 import logging
@@ -300,7 +300,7 @@ def three_faces_sheet(zaxis=False):
 
     edge_idx = pd.Index(range(_edge_e_idx.shape[0]), name='edge')
 
-    specifications = planar_spec()
+    specifications = flat_sheet()
 
     # ## Faces DataFrame
     face_df = make_df(index=face_idx,
