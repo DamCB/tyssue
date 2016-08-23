@@ -2,9 +2,6 @@ numpy
 scipy
 matplotlib
 vispy
-h5py
-numexpr
-tables
 pandas
 sphinx>=1.4
 nbsphinx
