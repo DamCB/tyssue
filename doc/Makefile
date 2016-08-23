@@ -46,13 +46,19 @@ help:
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 	@echo "  coverage   to run coverage check of the documentation (if enabled)"
+	@echo "  apidoc     to generate the API documentation"
 
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
 
+.PHONY: apidoc
+apidoc:
+	sphinx-apidoc -o source/ ..
+	@echo "Regenerated the API documentation"
+
 .PHONY: html
-html:
+html: apidoc
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

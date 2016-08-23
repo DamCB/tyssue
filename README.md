@@ -4,7 +4,6 @@
 
 [![Coverage Status](https://coveralls.io/repos/CellModels/tyssue/badge.svg)](https://coveralls.io/r/CellModels/tyssue)
 
-
 [![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/)
 
 
@@ -19,11 +18,45 @@ It's main focus is on **vertex** based models.
 The first model implemented is the one described in
 Monier et al. [monier2015apico]. It is an example of a vertex model,
 where the interactions are only evaluated on the apical surface sheet
-of the epithelium. The second class of models are still at an
+of the epithelium. The second class of models is still at an
 stage. They implement a description of the tissue's rheology, within a
 dissipation function formalism.
 
 ![The two models considered](doc/illus/two_models.png)
+
+### General Structure of the modeling API
+
+#### Design principles
+
+> [APIs not apps](https://opensource.com/education/15/9/apis-not-apps)
+
+Each biological question, be it in morphogenesis or cancer studies is
+unique, and requires tweeking of the models developed by the
+physicists. Most of the modelling softwares follow an architecture
+based on a core C++ engine with a combinaison of markup or scripting
+capacities to run specific simulation.
+
+In `tyssue`, we rather try to expose an API that simplifies the
+building of tissue models and running simulations, while keeping the
+possibilities as open as possible.
+
+> Separate structure, geometry and models
+
+We seek to have a design as modular as possible, to allow the same
+epithlium mesh to be fed to different physical models.
+
+> Accessible, easy to use data structures
+
+The core of the tyssue library rests on two structures: a set of
+`pandas DataFrame` holding the tissue geometry and associated data,
+and nested dictionnaries holding the model parameters, variables and
+default values.
+
+![Tyssue data structure](doc/illus/tyssue_data_management.png)
+
+The API thus defines an `Epithelium` class. An instance of this class
+is a container for the datasets and the specifications, and implements
+methods to manipulate indexing of the dataframes to ease calculations.
 
 The mesh structure is heavily inspired by
 [CGAL Linear Cell Complexes](http://doc.cgal.org/latest/Linear_cell_complex/index.html),
@@ -31,17 +64,6 @@ most importantly, in the case of a 2D vertex sheet for example, each
 junction edge between the cells is "splitted" between two oriented **half
 edges**.
 
-### General Structure of the modeling API
-
-The core of the tyssue library rests on two structures: a set of
-`pandas DataFrame` holding the tissue geometry and associated data,
-and nested dictionnaries holding the model parameters, variables and default values.
-
-![Tyssue data structure](doc/illus/tyssue_data_management.png)
-
-The API thus defines an `Epithelium` class. An instance of this class
-is a container for the datasets and the specifications, and implements
-methods to manipulate indexing of the dataframes to ease calculations.
 
 #### Creating an Epithelium
 
@@ -61,11 +83,11 @@ sheet.sanitize()
 
 ### Features
 
-* Easy data manipulation
+* Easy data manipulation.
 * Multiple geometries (Sheets in 2D and 3D, monolayers, bulk, cell
-centered models...)
-* Easy to extend
-* 2D (matplotlib) and 3D (vispy) customisable visualisation
+centered models...).
+* Easy to extend.
+* 2D (matplotlib) and 3D (vispy) customisable visualisation.
 
 ### Documentation
 
@@ -80,7 +102,6 @@ centered models...)
 * François Molino
 * Magali Suzanne
 
-## Install
 
 ## Dependencies
 
@@ -110,7 +131,12 @@ cd tyssue/
 python setup.py install
 ```
 
+You can also install the library with the conda package manager
+(though it's only build for 64-bits linux atm):
 
+```bash conda install -c glyg tyssue ```
+
+This is kind of an early release though, so you're better off installing from source.
 
 ## Similar softwares
 

@@ -1,0 +1,46 @@
+tyssue.io package
+=================
+
+Submodules
+----------
+
+tyssue.io.ais module
+--------------------
+
+.. automodule:: tyssue.io.ais
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.io.hdf5 module
+---------------------
+
+.. automodule:: tyssue.io.hdf5
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.io.obj module
+--------------------
+
+.. automodule:: tyssue.io.obj
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.io.off module
+--------------------
+
+.. automodule:: tyssue.io.off
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: tyssue.io
+    :members:
+    :undoc-members:
+    :show-inheritance:
