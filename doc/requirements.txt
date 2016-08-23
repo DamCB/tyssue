@@ -1,3 +1,9 @@
+numpy
+scipy
+pandas
+matplotlib
+vispy
+pytables
 sphinx>=1.4
 nbsphinx
 ipykernel
