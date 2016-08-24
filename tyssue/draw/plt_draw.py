@@ -37,9 +37,11 @@ def sheet_view(sheet, coords=COORDS, ax=None,  **draw_specs_kw):
     if face_spec['visible']:
         ax = draw_face(sheet, coords, ax, **face_spec)
 
+    ax.autoscale()
     ax.set_aspect('equal')
     ax.grid()
     return fig, ax
+
 
 def draw_face(sheet, coords, ax, **draw_spec_kw):
     """Draws epithelial sheet polygonal faces in matplotlib
@@ -61,6 +63,7 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
     ax.add_collection(PatchCollection(patches, False,
                                       **collection_specs))
     return ax
+
 
 def parse_face_specs(face_draw_specs):
 
