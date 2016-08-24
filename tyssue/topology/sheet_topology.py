@@ -131,7 +131,7 @@ def cell_division(sheet, mother, geom,
     m_data = sheet.edge_df[sheet.edge_df['face'] == mother]
     if angle == 0:
         face_pos = sheet.face_df.loc[mother, sheet.coords]
-        rot_pos = sheet.vert_df[sheet.coords]
+        rot_pos = sheet.vert_df[sheet.coords].copy()
         for c in sheet.coords:
             rot_pos.loc[:, c] = rot_pos[c] - face_pos[c]
     else:
@@ -145,7 +145,8 @@ def cell_division(sheet, mother, geom,
         edge_a = m_data[(srce_pos < 0) & (trgt_pos >= 0)].index[0]
         edge_b = m_data[(srce_pos >= 0) & (trgt_pos < 0)].index[0]
     except IndexError:
-        logger.warning('Division of Cell {} failed'.format(mother))
+        print('Failed')
+        logger.error('Division of Cell {} failed'.format(mother))
         return
 
     vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet, edge_a)
@@ -173,7 +174,6 @@ def cell_division(sheet, mother, geom,
                                                          new_edge_d]
     sheet.edge_df.loc[daughter_edges, 'face'] = daughter
     sheet.edge_df.index.name = 'edge'
-
     sheet.reset_topo()
     geom.update_all(sheet)
     return daughter

@@ -478,7 +478,7 @@ def create_anchors(sheet):
 
     sheet.vert_df = pd.concat([sheet.vert_df,
                                anchor_vert_df])
-    sheet.vert_df.index.name = ['vert']
+    sheet.vert_df.index.name = 'vert'
     anchor_edge_df = pd.DataFrame(
         index=np.arange(sheet.Ne, sheet.Ne + free_vert.shape[0]),
         columns=sheet.edge_df.columns

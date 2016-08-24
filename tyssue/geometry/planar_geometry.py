@@ -49,3 +49,20 @@ class PlanarGeometry(BaseGeometry):
         '''
         sheet.edge_df['sub_area'] = np.abs(sheet.edge_df['nz']) / 2
         sheet.face_df['area'] = sheet.sum_face(sheet.edge_df['sub_area'])
+
+    @staticmethod
+    def face_projected_pos(sheet, face, psi):
+        """
+        returns the sheet vertices position translated to center the face
+        `face` at (0, 0) and rotated in the (x, y) plane
+        by and angle `psi` radians
+
+        """
+        rot_pos = sheet.vert_df[sheet.coords].copy()
+        face_x, face_y = sheet.face_df.loc[face, ['x', 'y']]
+        rot_pos.x = ((sheet.vert_df.x - face_x) * np.cos(psi) -
+                     (sheet.vert_df.y - face_y) * np.sin(psi))
+        rot_pos.y = ((sheet.vert_df.x - face_x) * np.sin(psi) +
+                     (sheet.vert_df.y - face_y) * np.cos(psi))
+
+        return rot_pos
