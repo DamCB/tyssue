@@ -1,10 +1,17 @@
+"""
+Event management module
+=======================
+
+
+"""
+
 import logging
 
 from ..topology.sheet_topology import (remove_face,
                                        type1_transition,
                                        cell_division)
-
 logger = logging.getLogger(__name__)
+
 
 class SheetEvents():
 

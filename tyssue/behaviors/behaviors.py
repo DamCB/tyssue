@@ -20,6 +20,7 @@ def division_time_table(sheet, mother,
     time_table.loc[start_t+n_steps, 'divide'] = np.random.random() * np.pi
     return times, time_table.sort_index()
 
+
 def apoptosis_time_table(sheet,
                          apoptotic_cell,
                          events,
