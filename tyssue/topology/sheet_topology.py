@@ -20,6 +20,10 @@ def type1_transition(sheet, edge01, epsilon=0.1):
 
     edge10_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
                             (sheet.edge_df['trgt'] == vert0)]
+    if len(edge10_.index) < 1:
+        raise ValueError('opposite edge to {} with '
+                         'source {} and target {} not found'.format(
+                             edge01, vert0, vert1))
     edge10 = edge10_.index[0]
 
     cell_d = int(edge10_.loc[edge10, 'face'])

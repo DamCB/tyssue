@@ -116,7 +116,8 @@ def edge_visual(sheet, coords=None, **draw_specs_kw):
     return wire
 
 
-def vp_view(sheet, coords=None, **draw_specs_kw):
+def vp_view(sheet, coords=None,
+            interactive=True, **draw_specs_kw):
 
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
@@ -140,5 +141,6 @@ def vp_view(sheet, coords=None, **draw_specs_kw):
 
     canvas.show()
     view.camera.set_range()
-    app.run()
+    if interactive:
+        app.run()
     return canvas, view
