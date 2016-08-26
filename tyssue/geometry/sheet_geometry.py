@@ -53,6 +53,8 @@ class SheetGeometry(PlanarGeometry):
             axis=1) / 2
         sheet.face_df['area'] = sheet.sum_face(sheet.edge_df['sub_area'])
 
+
+
     @staticmethod
     def update_vol(sheet):
         '''
@@ -61,7 +63,7 @@ class SheetGeometry(PlanarGeometry):
 
         '''
         sheet.edge_df['sub_vol'] = (
-            sheet.upcast_srce(sheet.vert_df['height']) *
+            sheet.upcast_face(sheet.face_df['height']) *
             sheet.edge_df['sub_area'])
         sheet.face_df['vol'] = sheet.sum_face(sheet.edge_df['sub_vol'])
 
@@ -103,6 +105,12 @@ class SheetGeometry(PlanarGeometry):
                                                   axis=1)
             sheet.vert_df['height'] = (sheet.vert_df['rho'] -
                                        sheet.vert_df['basal_shift'])
+
+        edge_height = sheet.upcast_srce(sheet.vert_df[['height', 'rho']])
+
+        edge_height.set_index(sheet.edge_df['face'],
+                              append=True, inplace=True)
+        sheet.face_df[['height', 'rho']] = edge_height.mean(level='face')
 
     @staticmethod
     def face_rotation(sheet, face, psi=0):

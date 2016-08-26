@@ -42,5 +42,6 @@ class BaseGeometry():
         center of mass.
         '''
         upcast_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
-        upcast_pos = upcast_pos.set_index(sheet.edge_df['face'], append=True)
+        upcast_pos.set_index(sheet.edge_df['face'],
+                             append=True, inplace=True)
         sheet.face_df[sheet.coords] = upcast_pos.mean(level='face')
