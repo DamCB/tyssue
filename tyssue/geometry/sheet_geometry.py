@@ -53,8 +53,6 @@ class SheetGeometry(PlanarGeometry):
             axis=1) / 2
         sheet.face_df['area'] = sheet.sum_face(sheet.edge_df['sub_area'])
 
-
-
     @staticmethod
     def update_vol(sheet):
         '''

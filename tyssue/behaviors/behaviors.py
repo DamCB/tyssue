@@ -50,7 +50,7 @@ def apoptosis_time_table(sheet,
     time_table = pd.DataFrame(index=cell_time_idx,
                               columns=events.keys())
 
-    pref_vols = np.linspace(1., 0., shrink_steps)
+    pref_vols = np.logspace(0., -4., shrink_steps)
     time_table.loc[start_t: end_shrink-1, 'shrink'] = pref_vols
 
     rad_tensions = np.ones(shrink_steps) * rad_tension / shrink_steps

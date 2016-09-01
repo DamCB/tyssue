@@ -488,7 +488,7 @@ def create_anchors(sheet):
     anchor_edge_df['trgt'] = anchor_vert_df.index
     anchor_edge_df['line_tension'] = 0
     anchor_edge_df['is_anchor'] = 1
-    anchor_edge_df['face'] = 0
+    anchor_edge_df['face'] = -1
     anchor_edge_df['at_border'] = 0
     sheet.edge_df = pd.concat([sheet.edge_df,
                                anchor_edge_df])
@@ -538,12 +538,6 @@ def subdivide_faces(eptm, faces):
         index=pd.Index(np.arange(eptm.Nv, eptm.Nv + Nsf),
                        name='vert'),
         columns=vert_df.columns)
-
-    # new_fs = pd.DataFrame(
-    #     index=pd.Index(np.arange(eptm.Nf, eptm.Nf + Nse),
-    #                    name='face'),
-    #     columns=face_df.columns)
-
     new_es = pd.DataFrame(
         index=pd.Index(np.arange(eptm.Ne, eptm.Ne + 2*Nse),
                        name='edge'),

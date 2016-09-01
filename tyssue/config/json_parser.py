@@ -4,7 +4,7 @@
 import json
 import logging
 import os
-
+import warnings
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,10 @@ def save_spec(spec, fname,
     with open(fname, 'w+') as config_file:
         json.dump(spec, config_file)
 
+
 def load_default(aspect='core', sub_aspect=''):
+
+    warnings.warn('Deprecated')
     cur_dir = os.path.abspath(os.path.dirname(__file__))
     # root = os.path.dirname(cur_dir)
 
