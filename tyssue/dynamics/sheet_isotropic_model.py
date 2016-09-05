@@ -31,7 +31,8 @@ def isotropic_energies(sheet, model, geom,
     # ## Set height and area to height0 and area0
     delta_0 = (area0 / area_avg)**0.5
     geom.scale(sheet, delta_0, sheet.coords)
-    sheet.face_df['basal_height'] = rho_avg * delta_0 - h_0
+    sheet.face_df['basal_shift'] = rho_avg * delta_0 - h_0
+    sheet.vert_df['basal_shift'] = rho_avg * delta_0 - h_0
     geom.update_all(sheet)
 
     energies = np.zeros((deltas.size, 3))

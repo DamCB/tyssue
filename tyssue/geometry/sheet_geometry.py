@@ -61,7 +61,7 @@ class SheetGeometry(PlanarGeometry):
 
         '''
         sheet.edge_df['sub_vol'] = (
-            sheet.upcast_face(sheet.face_df['height']) *
+            sheet.upcast_srce(sheet.vert_df['height']) *
             sheet.edge_df['sub_area'])
         sheet.face_df['vol'] = sheet.sum_face(sheet.edge_df['sub_vol'])
 
@@ -92,6 +92,10 @@ class SheetGeometry(PlanarGeometry):
                                             sheet.vert_df[u])
             sheet.vert_df['height'] = (sheet.vert_df['rho'] -
                                        sheet.vert_df['basal_shift'])
+            # sheet.face_df['rho'] = np.hypot(sheet.face_df[v],
+            #                                 sheet.face_df[u])
+            # sheet.face_df['height'] = (sheet.face_df['rho'] -
+            #                            sheet.face_df['basal_shift'])
 
         elif sheet.settings['geometry'] == 'flat':
             sheet.vert_df['rho'] = sheet.vert_df[w]
@@ -105,7 +109,6 @@ class SheetGeometry(PlanarGeometry):
                                        sheet.vert_df['basal_shift'])
 
         edge_height = sheet.upcast_srce(sheet.vert_df[['height', 'rho']])
-
         edge_height.set_index(sheet.edge_df['face'],
                               append=True, inplace=True)
         sheet.face_df[['height', 'rho']] = edge_height.mean(level='face')

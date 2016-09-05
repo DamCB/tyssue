@@ -48,7 +48,7 @@ def test_compute_energy():
     h5store = 'small_hexagonal.hf5'
     datasets = load_datasets(h5store,
                              data_names=['face', 'vert', 'edge'])
-    specs = config.geometry.sheet_spec()
+    specs = config.geometry.cylindrical_sheet()
 
     sheet = Sheet('emin', datasets, specs)
     nondim_specs = config.dynamics.quasistatic_sheet_spec()
@@ -59,14 +59,14 @@ def test_compute_energy():
     isotropic_relax(sheet, nondim_specs)
 
     Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
-    assert_almost_equal(Et.mean(), 0.03314790, decimal=DECIMAL)
-    assert_almost_equal(Ec.mean(), 0.21975665, decimal=DECIMAL)
-    assert_almost_equal(Ev.mean(), 0.04593385, decimal=DECIMAL)
+    assert_almost_equal(Et.mean(), 0.02301937, decimal=DECIMAL)
+    assert_almost_equal(Ec.mean(), 0.15260879, decimal=DECIMAL)
+    assert_almost_equal(Ev.mean(), 0.03189850, decimal=DECIMAL)
 
     energy = model.compute_energy(sheet, full_output=False)
-    assert_almost_equal(energy, 18.583115963, decimal=DECIMAL)
+    assert_almost_equal(energy, 12.9049416411, decimal=DECIMAL)
     assert_almost_equal(energy/sheet.face_df.is_alive.sum(),
-                        0.464, decimal=2)
+                        0.3226, decimal=2)
 
 def test_compute_gradient():
     h5store = 'small_hexagonal.hf5'
@@ -87,15 +87,15 @@ def test_compute_gradient():
      grad_v_srce, grad_v_trgt) = model.compute_gradient(sheet,
                                                         components=True)
     grad_t_norm = np.linalg.norm(grad_t, axis=0).sum() / nrj_norm_factor
-    assert_almost_equal(grad_t_norm, 0.647621287, decimal=DECIMAL)
+    assert_almost_equal(grad_t_norm, 0.4497370048, decimal=DECIMAL)
 
     grad_c_norm = np.linalg.norm(grad_c, axis=0).sum() / nrj_norm_factor
-    assert_almost_equal(grad_c_norm, 0.715576186, decimal=DECIMAL)
+    assert_almost_equal(grad_c_norm, 0.49692791, decimal=DECIMAL)
 
     grad_vs_norm = np.linalg.norm(grad_v_srce.dropna(),
                                   axis=0).sum() / nrj_norm_factor
-    assert_almost_equal(grad_vs_norm, 0.436051688, decimal=DECIMAL)
+    assert_almost_equal(grad_vs_norm, 0.3028136725, decimal=DECIMAL)
 
     grad_vt_norm = np.linalg.norm(grad_v_trgt.dropna(),
                                   axis=0).sum() / nrj_norm_factor
-    assert_almost_equal(grad_vt_norm, 0.399341306, decimal=DECIMAL)
+    assert_almost_equal(grad_vt_norm, 0.277320351, decimal=DECIMAL)
