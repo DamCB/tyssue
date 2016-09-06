@@ -59,8 +59,10 @@ default values is allways infered from the python parsed type. Thus
         }
 '''
 
-
-class Epithelium:
+#- BC -#
+# Classes must inherit from Object in order for setters
+# decorators to work properly
+class Epithelium():
     '''
     The whole tissue.
 
@@ -142,6 +144,11 @@ class Epithelium:
 
     @property
     def cell_df(self):
+        #- BC -#
+        # Recommends to test if the epithelium has a 'cell' df before returning,
+        # some epitheliums don't require this object (2D)
+        # Should it raise a warning/error if the user asks for
+        # a cell_df from an eptm that doesn't have one ?
         return self.datasets['cell']
 
     @cell_df.setter

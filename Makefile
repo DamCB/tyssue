@@ -7,7 +7,8 @@ test:
 	nosetests tyssue -v
 
 coverage:
-	nosetests tyssue --with-coverage --cover-package=tyssue -v
+	#nosetests tyssue --with-coverage --cover-package=tyssue -v
+	py.test
 
 full-test:
 	bash .full_test.sh
