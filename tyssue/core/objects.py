@@ -7,6 +7,8 @@ from ..utils.utils import set_data_columns, spec_updater
 from ..config.json_parser import load_default
 from .generation import make_df
 
+import warnings
+
 import logging
 log = logging.getLogger(name=__name__)
 
@@ -219,22 +221,24 @@ class Epithelium():
         '''
         TODO: not sure this works as expected with the new indexing
         '''
+        
+        raise NotImplementedError('Epithelium.from_points() is not implemented and should not be used.')
+    
+        # if points.shape[1] == 2:
+        #     coords = ['x', 'y']
+        # elif points.shape[1] == 3:
+        #     coords = ['x', 'y', 'z']
+        # else:
+        #     raise ValueError('the `points` argument must be'
+        #                      ' a (Nv, 2) or (Nv, 3) array')
 
-        if points.shape[1] == 2:
-            coords = ['x', 'y']
-        elif points.shape[1] == 3:
-            coords = ['x', 'y', 'z']
-        else:
-            raise ValueError('the `points` argument must be'
-                             ' a (Nv, 2) or (Nv, 3) array')
+        # datasets = {}
+        # for key, spec in specs.items():
+        #     datasets[key] = make_df(index=indices_dict[key],
+        #                             spec=spec)
+        # datasets[points_dataset][coords] = points
 
-        datasets = {}
-        for key, spec in specs.items():
-            datasets[key] = make_df(index=indices_dict[key],
-                                    spec=spec)
-        datasets[points_dataset][coords] = points
-
-        return cls.__init__(identifier, datasets, specs, coords=coords)
+        # return cls.__init__(identifier, datasets, specs, coords=coords)
 
     def update_specs(self, new, reset=False):
 
@@ -244,6 +248,7 @@ class Epithelium():
     def set_specs(self, domain, base,
                   new_specs=None,
                   default_base=None, reset=False):
+        warnings.warn('Deprecated, use update_specs() instead.')
 
         if base is None:
             self.update_specs(load_default(domain, default_base), reset)
