@@ -181,6 +181,11 @@ def test_settings_getter_setter():
     eptm = Epithelium('3faces_2D', datasets)
     
     eptm.settings['settings1'] = 154
+    # not validated in coverage
+    # (Actually the 'settings' getter is called
+    # and then the dictionary class setter
+    # instead of directly the 'settings' setter.)
+    # See http://stackoverflow.com/a/3137768
     assert 'settings1' in eptm.settings
     assert eptm.specs['settings']['settings1'] == 154
     assert eptm.settings['settings1'] == 154
@@ -188,43 +193,27 @@ def test_settings_getter_setter():
 
 #- BC -#
 
-# Not sure to get how from_points works ...
+# TO DO : find a way to test the logging facility #
 
-# def test_from_points():
-#     datasets = {}
-#     tri_verts = np.array([[0, 0],
-#                  [1, 0],
-#                  [-0.5, 3**0.5/2],
-#                  [-0.5, -3**0.5/2]])
-
-#     tri_edges = np.array([[0, 1, 0],
-#                  [1, 2, 0],
-#                  [2, 0, 0],
-#                  [0, 3, 1],
-#                  [3, 1, 1],
-#                  [1, 0, 1],
-#                  [0, 2, 2],
-#                  [2, 3, 2],
-#                  [3, 0, 2]])
-
-#     datasets['edge'] = pd.DataFrame(data=np.array(tri_edges),
-#                                     columns=['srce', 'trgt', 'face'])
-#     datasets['edge'].index.name = 'edge'
-#     datasets['face'] = pd.DataFrame(data=np.zeros((3, 2)),
-#                                     columns=['x', 'y'])
-#     datasets['face'].index.name = 'face'
-
-#     datasets['vert'] = pd.DataFrame(data=np.array(tri_verts),
-#                                     columns=['x', 'y'])
-#     datasets['vert'].index.name = 'vert'
-
-#     indices_dict = {'edge':datasets['edge'].index, 'face':datasets['face'].index, 'vert':datasets['vert'].index}
-#     specs = config.geometry.planar_spec()
-
-#     eptm = Epithelium('original',datasets,specs,coords=['x','y'])
-    
-#     eptm_from_points = Epithelium.from_points('from_points',tri_verts,indices_dict,specs)
+def test_idx_getters():
+    datasets_2d, specs = three_faces_sheet()
+    datasets = extrude(datasets_2d)
+    eptm = Epithelium('3faces_3D', datasets)
+    #assert len(eptm.edge_idx.difference(datasets['edge'].index)) == 0
+    assert len(eptm.face_idx.difference(datasets['face'].index)) == 0
+    assert len(eptm.vert_idx.difference(datasets['vert'].index)) == 0
+    assert len(eptm.cell_idx.difference(datasets['cell'].index)) == 0
 
 
     
+def test_number_getters():
+    datasets_2d, specs = three_faces_sheet()
+    datasets = extrude(datasets_2d)
+    eptm = Epithelium('3faces_3D', datasets, specs)
+    eptm_2d = Epithelium('3faces_2D',datasets_2d, specs)
+
+    assert eptm.Nc == datasets['cell'].shape[0]
+    assert eptm.Nv == datasets['vert'].shape[0]
+    assert eptm.Nf == datasets['face'].shape[0]
+    assert eptm.Ne == datasets['edge'].shape[0]
     

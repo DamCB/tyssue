@@ -212,6 +212,11 @@ class Epithelium():
 
     @settings.setter
     def settings(self, key, value):
+        # (Actually the 'settings' getter is called
+        # and then the dictionary class setter
+        # instead of directly the 'settings' setter.)
+        # See http://stackoverflow.com/a/3137768
+        # So this method is not actually called.
         self.specs['settings'][key] = value
 
     @classmethod
@@ -291,7 +296,10 @@ class Epithelium():
 
     @property
     def edge_idx(self):
+        # Should it return self.edge_df.index instead ?
         return self.edge_df[self.element_names]
+    
+    
 
     @property
     def Nc(self):
