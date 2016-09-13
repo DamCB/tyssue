@@ -13,6 +13,9 @@ from tyssue.config.geometry import spherical_sheet
 from pytest import raises
 
 
+
+
+
 def test_3faces():
 
     datasets, specs = three_faces_sheet()
@@ -193,7 +196,6 @@ def test_settings_getter_setter():
 
 #- BC -#
 
-# TO DO : find a way to test the logging facility #
 
 def test_idx_getters():
     datasets_2d, specs = three_faces_sheet()
@@ -203,7 +205,13 @@ def test_idx_getters():
     assert len(eptm.face_idx.difference(datasets['face'].index)) == 0
     assert len(eptm.vert_idx.difference(datasets['vert'].index)) == 0
     assert len(eptm.cell_idx.difference(datasets['cell'].index)) == 0
-
+    assert len(eptm.e_cell_idx.index.difference(datasets['edge']['cell'].index)) == 0
+    
+    edge_idx_array = np.vstack((datasets['edge']['srce'],\
+                                datasets['edge']['trgt'],\
+                                datasets['edge']['face'])).T
+    
+    assert_array_equal(eptm.edge_idx_array,edge_idx_array)
 
     
 def test_number_getters():
@@ -216,4 +224,13 @@ def test_number_getters():
     assert eptm.Nv == datasets['vert'].shape[0]
     assert eptm.Nf == datasets['face'].shape[0]
     assert eptm.Ne == datasets['edge'].shape[0]
+
     
+
+def test_upcast():
+    ### WIP ###
+    datasets_2d, specs = three_faces_sheet()
+    datasets = extrude(datasets_2d,method='translation')
+    eptm = Epithelium('3faces_3D', datasets, specs)
+    
+
