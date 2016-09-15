@@ -336,7 +336,8 @@ def extrude(apical_datasets, method='homotecy',
     default 'homotecy'
     * scale: float, optional
     the scale factor for homotetic scaling, default 1/3.
-    * vector: sequence of three floats, optional, used for
+    * vector: sequence of three floats, optional,
+    used for the translation
 
     default [0, 0, -1]
 

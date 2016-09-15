@@ -68,6 +68,7 @@ def test_compute_energy():
     assert_almost_equal(energy/sheet.face_df.is_alive.sum(),
                         0.3226, decimal=2)
 
+
 def test_compute_gradient():
     h5store = 'small_hexagonal.hf5'
     datasets = load_datasets(h5store,

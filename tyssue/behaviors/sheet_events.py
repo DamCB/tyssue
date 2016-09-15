@@ -28,7 +28,7 @@ class SheetEvents():
             'contract': self.contract,
             'type1_at_shorter': self.type1_at_shorter,
             'type3': self.type3,
-            'divide': self.type3,
+            'divide': self.divide,
             'ab_pull': self.ab_pull,
             }
         return events
@@ -40,8 +40,7 @@ class SheetEvents():
         self.sheet.face_df.loc[face, 'prefered_vol'] = new_vol
 
     def grow(self, face, *args):
-
-        return self.shrink(face, *args)
+        self.shrink(face, *args)
 
     def contract(self, face, *args):
 
