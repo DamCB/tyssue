@@ -194,7 +194,7 @@ class Epithelium():
         if deep_copy:
             datasets = {element: df.copy()
                         for element, df in self.datasets.items()}
-        else:
+        else: #pragma: no cover
             log.info(
                 "New epithelium object from {}"
                 " without deep copy".format(
@@ -211,7 +211,7 @@ class Epithelium():
         return self.specs['settings']
 
     @settings.setter
-    def settings(self, key, value):
+    def settings(self, key, value): #pragma: no cover
         # (Actually the 'settings' getter is called
         # and then the dictionary class setter
         # instead of directly the 'settings' setter.)
@@ -227,7 +227,7 @@ class Epithelium():
         TODO: not sure this works as expected with the new indexing
         '''
         
-        raise NotImplementedError('Epithelium.from_points() is not implemented and should not be used.')
+        raise NotImplementedError('Epithelium.from_points() is not implemented and should not be used.') #pragma: no cover
     
         # if points.shape[1] == 2:
         #     coords = ['x', 'y']
@@ -252,7 +252,7 @@ class Epithelium():
 
     def set_specs(self, domain, base,
                   new_specs=None,
-                  default_base=None, reset=False):
+                  default_base=None, reset=False): #pragma: no cover
         warnings.warn('Deprecated, use update_specs() instead.')
 
         if base is None:
@@ -360,7 +360,7 @@ class Epithelium():
     def upcast_face(self, df):
         return self._upcast(self.e_face_idx, df)
 
-    def upcast_cell(self, df):
+    def upcast_cell(self, df): 
         return self._upcast(self.e_cell_idx, df)
 
     def _lvl_sum(self, df, lvl):

@@ -7,7 +7,7 @@ from tyssue.core.generation import three_faces_sheet
 from tyssue.core.objects import get_opposite
 from tyssue import config
 from tyssue.geometry.planar_geometry import PlanarGeometry
-from tyssue.core.generation import extrude
+from tyssue.core.generation import extrude, hexa_grid3d, hexa_grid2d
 from tyssue.config.dynamics import quasistatic_sheet_spec
 from tyssue.config.geometry import spherical_sheet
 from pytest import raises
@@ -96,6 +96,7 @@ def test_extra_indices():
         opp = eptm.edge_df[(eptm.edge_df['srce'] == trgt) &
                            (eptm.edge_df['trgt'] == srce)].index
         assert opp[0] in eptm.east_edges
+
 
 
 def test_sort_eastwest():
@@ -194,8 +195,6 @@ def test_settings_getter_setter():
     assert eptm.settings['settings1'] == 154
 
 
-#- BC -#
-
 
 def test_idx_getters():
     datasets_2d, specs = three_faces_sheet()
@@ -215,7 +214,7 @@ def test_idx_getters():
 
     
 def test_number_getters():
-    datasets_2d, specs = three_faces_sheet()
+    datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)
     eptm = Epithelium('3faces_3D', datasets, specs)
     eptm_2d = Epithelium('3faces_2D',datasets_2d, specs)
@@ -228,9 +227,88 @@ def test_number_getters():
     
 
 def test_upcast():
-    ### WIP ###
-    datasets_2d, specs = three_faces_sheet()
-    datasets = extrude(datasets_2d,method='translation')
+    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets = extrude(datasets_2d)
     eptm = Epithelium('3faces_3D', datasets, specs)
+    eptm_2d = Epithelium('3faces_2D',datasets_2d, specs)
+
+    expected_res = datasets['vert'].loc[eptm.e_cell_idx]
+    expected_res.index = eptm.edge_df.index
     
+    assert_array_equal(expected_res, eptm.upcast_cell(datasets['vert']))
+                       
+
+def test_summation():
+    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets = extrude(datasets_2d)
+    eptm = Epithelium('3faces_3D', datasets, specs)
+    eptm_2d = Epithelium('3faces_2D',datasets_2d, specs)
+
+    edge_copy = datasets['edge'].copy()
+    edge_copy.index = eptm.edge_mindex
+    assert_array_equal(edge_copy.sum(level='cell'),eptm.sum_cell(eptm.edge_df))
+    
+def test_orbits():
+    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets = extrude(datasets_2d)
+    eptm = Epithelium('3faces_3D', datasets, specs)
+    eptm_2d = Epithelium('3faces_2D',datasets_2d, specs)
+
+    
+    expected_res_cell = datasets['edge'].groupby('srce').apply(
+        lambda df:df['cell'])
+
+    expected_res_face = datasets['edge'].groupby('face').apply(
+        lambda df:df['trgt'])
+    
+    assert_array_equal(expected_res_cell, eptm.get_orbits('srce','cell'))
+    assert_array_equal(expected_res_face, eptm.get_orbits('face','trgt'))
+    
+    
+  
+def test_polygons():
+    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets = extrude(datasets_2d)
+    eptm = Epithelium('3faces_3D', datasets, specs)
+    eptm_2d = Epithelium('3faces_2D',datasets_2d, specs)
+    
+    ## test standard on a 3d-epithelium
+    expected_10th_line = np.array([[0.0, 1.732, 0.0],
+                                   [1.0, 1.732, 0.0],
+                                   [1.0, 1.732, -1.0],
+                                   [0.0, 1.732, -1.0]], dtype=object)
+    
+    assert_array_equal(eptm.face_polygons(['x','y','z'])[9], expected_10th_line)
+    
+    
+    ## TODO : test with an open face
+    ## should raise an exception   
+    
+    
+def test_build_face_face_indexes():
+    pass
+
+def test_sanitize():
+    pass
+
+def test_remove():
+    pass
+
+def test_cut_out():
+    pass
+
+def test_reset_index():
+    pass
+
+def test_vertex_mesh():
+    pass
+
+def test_ordered_edges():
+    # test _ordered_edges
+    # also test orderd_vert_idxs line 718
+    pass
+
+def test_invalid_valid():
+    # get_invalid and get_valid
+    pass
 

@@ -8,7 +8,7 @@ test:
 
 coverage:
 	#nosetests tyssue --with-coverage --cover-package=tyssue -v
-	py.test
+	py.test --cov-config coveragerc
 
 full-test:
 	bash .full_test.sh
