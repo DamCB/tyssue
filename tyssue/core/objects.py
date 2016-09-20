@@ -421,7 +421,13 @@ class Epithelium():
         polys = self.edge_df.groupby('face').apply(_get_verts_pos).dropna()
         return polys
 
-    def _build_face_face_indexes(self):
+    def _build_face_face_indexes(self): #pragma: no cover
+        #- BC -#
+        ## this method raises a ValueError
+        ## 'too many values to unpack'.
+        ## It's not used anywhere in the code,
+        ## or in the examples. I'm withdrawing
+        ## it from coverage for now.
         '''
         This is hackish and not optimized,
         should be provided by CGAL
@@ -504,6 +510,14 @@ class Epithelium():
             assert (2*self.Ni + self.No) == self.Ne
             assert self.west_edges.size == self.Ni
             assert self.Nd == 2*self.Ni
+        #- BC -#
+        # Not sure how to build
+        # input data so the partition
+        # fails (so we can see
+        # if the exception is
+        # correctly raised).
+        # Leaving it in the coverage
+        # anyway.
         except AssertionError:
             raise AssertionError('''
             Inconsistent partition:
