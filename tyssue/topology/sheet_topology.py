@@ -164,12 +164,14 @@ def cell_division(sheet, mother, geom,
     daughter = int(sheet.face_df.index[-1])
 
     edge_cols = sheet.edge_df.loc[new_edge_b]
-    sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
+    sheet.edge_df = sheet.edge_df.append(edge_cols,
+                                         ignore_index=True)
     new_edge_m = sheet.edge_df.index[-1]
     sheet.edge_df.loc[new_edge_m, 'srce'] = vert_b
     sheet.edge_df.loc[new_edge_m, 'trgt'] = vert_a
 
-    sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
+    sheet.edge_df = sheet.edge_df.append(edge_cols,
+                                         ignore_index=True)
     new_edge_d = sheet.edge_df.index[-1]
     sheet.edge_df.loc[new_edge_d, 'srce'] = vert_a
     sheet.edge_df.loc[new_edge_d, 'trgt'] = vert_b
