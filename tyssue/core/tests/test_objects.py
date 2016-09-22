@@ -4,9 +4,10 @@ from numpy.testing import assert_array_equal
 
 from tyssue.core import Epithelium
 from tyssue.core.generation import three_faces_sheet
-from tyssue.core.objects import get_opposite
+from tyssue.core.objects import get_opposite, _ordered_edges, ordered_vert_idxs
 from tyssue import config
 from tyssue.geometry.planar_geometry import PlanarGeometry
+from tyssue.geometry.sheet_geometry import SheetGeometry
 from tyssue.core.generation import extrude, hexa_grid3d, hexa_grid2d
 from tyssue.config.dynamics import quasistatic_sheet_spec
 from tyssue.config.geometry import spherical_sheet
@@ -246,7 +247,26 @@ def test_summation():
 
     edge_copy = datasets['edge'].copy()
     edge_copy.index = eptm.edge_mindex
+    
     assert_array_equal(edge_copy.sum(level='cell'),eptm.sum_cell(eptm.edge_df))
+
+    eptm_2d.edge_df['test_sum'] = np.linspace(1,eptm_2d.Ne, eptm_2d.Ne)
+
+    res_sum_srce = eptm_2d.sum_srce(eptm_2d.edge_df['test_sum'])
+    expected_sum_srce = pd.Series([21.0, 20.0, 3.0, 4.0, 5.0, 14.0, 9.0, 10.0, 11.0, 26.0, 15.0, 16.0, 17.0])
+
+    res_sum_trgt = eptm_2d.sum_trgt(eptm_2d.edge_df['test_sum'])
+    expected_sum_trgt = pd.Series([36.0, 18.0, 2.0, 3.0, 4.0, 12.0, 8.0, 9.0, 10.0, 24.0, 14.0, 15.0, 16.0])
+
+    res_sum_face = eptm_2d.sum_face(eptm_2d.edge_df['test_sum'])
+    expected_sum_face = pd.Series([21.0, 57.0, 93.0])
+    
+    assert (expected_sum_srce == res_sum_srce).all()
+    assert (expected_sum_trgt == res_sum_trgt).all()
+    assert (expected_sum_face == res_sum_face).all()
+    
+    
+    
     
 def test_orbits():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
@@ -389,10 +409,54 @@ def test_polygons():
     
     res=eptm.face_polygons(['x','y','z'])
     assert all([(expected_res[i] ==  res[i]).all() for i in range(res.shape[0])])
-    
-    ## TODO : test with an open face
-    ## should raise an exception   
 
+def test_face_polygons_exception():
+
+    datasets = {}
+    tri_verts = [[0, 0],
+                 [1, 0],
+                 [-0.5, 3**0.5/2],
+                 [-0.5, -3**0.5/2]]
+    
+    tri_edges_valid = [[0, 1, 0],
+                       [1, 2, 0],
+                       [2, 0, 0],
+                       [0, 3, 1],
+                       [3, 1, 1],
+                       [1, 0, 1],
+                       [0, 2, 2],
+                       [2, 3, 2],
+                       [3, 0, 2]]
+    
+    tri_edges_invalid = [[0, 1, 0],
+                         [1, 2, 0],
+                         [2, 0, 0],
+                         [0, 3, 1],
+                         [3, 1, 1],
+                         [1, 0, 1],
+                         [0, 2, 2],
+                         [2, 3, 2],
+                         [3, 1, 2]] # changed 0 to 1 to create an invalid face
+
+
+    datasets['edge'] = pd.DataFrame(data=np.array(tri_edges_valid),
+                                    columns=['srce', 'trgt', 'face'])
+    datasets['edge'].index.name = 'edge'
+    
+    datasets['face'] = pd.DataFrame(data=np.zeros((3, 2)),
+                                    columns=['x', 'y'])
+    datasets['face'].index.name = 'face'
+    
+    datasets['vert'] = pd.DataFrame(data=np.array(tri_verts),
+                                    columns=['x', 'y'])
+    datasets['vert'].index.name = 'vert'
+    
+    specs = config.geometry.planar_spec()
+    eptm = Epithelium('valid', datasets, specs, coords=['x', 'y'])
+    PlanarGeometry.update_all(eptm)
+    
+    eptm.face_polygons(['x','y'])
+    
 def test_invalid_valid_sanitize():
     # get_invalid and get_valid
     
@@ -632,15 +696,81 @@ def test_cut_out():
    assert (res == expected_index_xy).all()
    
    
-def test_reset_index():
-    pass
 
 def test_vertex_mesh():
-    pass
+    datasets = {}
+    tri_verts = [[0, 0, 0],
+                 [1, 0, 0],
+                 [-0.5, 0.86, 1.],
+                 [-0.5, -0.86, 1.]]
+    
+    tri_edges = [[0, 1, 0, 0],
+                 [1, 2, 0, 0],
+                 [2, 0, 0, 0],
+                 [0, 3, 1, 0],
+                 [3, 1, 1, 0],
+                 [1, 0, 1, 0],
+                 [0, 2, 2, 0],
+                 [2, 3, 2, 0],
+                 [3, 0, 2, 0]]
+    
+    datasets['edge'] = pd.DataFrame(data=np.array(tri_edges),
+                                    columns=['srce', 'trgt', 'face','cell'])
+    datasets['edge'].index.name = 'edge'
+    
+    datasets['face'] = pd.DataFrame(data=np.zeros((3, 3)),
+                                    columns=['x', 'y', 'z'])
+    datasets['face'].index.name = 'face'
+    
+    datasets['vert'] = pd.DataFrame(data=np.array(tri_verts),
+                                    columns=['x', 'y', 'z'])
+    datasets['vert'].index.name = 'vert'
+    
+    specs = config.geometry.flat_sheet()
+    
+    eptm = Epithelium('vertex_mesh', datasets, specs, coords=['x', 'y', 'z'])
+    SheetGeometry.update_all(eptm)
+
+    ## tested method
+    res_verts, res_faces, res_normals = eptm.vertex_mesh(['x','y','z'])
+    res_xy_verts, res_xy_faces = eptm.vertex_mesh(['x','y','z'],vertex_normals=False)
+    res_faces = list(res_faces)
+
+        
+    expected_faces = [[0, 1, 2], [0, 3, 1], [0, 2, 3]]
+    
+
+    ## floating point precision might causes issues here
+    ## when comparing arrays ... there seems to be
+    ## a built-in 1e-10 tolerance in
+    ## the assert_array_equal function.
+    
+    expected_normals = np.array([[1.911111111e-01, 9.25185854e-18, 2.866666667e-01],
+                                 [-4.16333634e-17, 0.0, 2.866666667e-01],
+                                 [2.866666667e-01, -1.666666667e-01, 2.866666667e-01],
+                                 [2.866666667e-01, 1.666666667e-01, 2.866666667e-01]])
+    
+    assert_array_equal(res_verts, np.array(tri_verts))
+    assert all([res_faces[i] == expected_faces[i] for i in range(len(expected_faces))])
+    assert_array_equal(np.round(res_normals, decimals=6), np.round(expected_normals, decimals=6))
+    
+    
 
 def test_ordered_edges():
     # test _ordered_edges
-    # also test orderd_vert_idxs line 718
-    pass
+    # also test ordered_vert_idxs
+    datasets, specs = three_faces_sheet(zaxis=True)
+    eptm = Epithelium('ordered_index', datasets, specs)    
+    
+    res_edges_2d = _ordered_edges(eptm.edge_df.loc[eptm.edge_df['face'] == 0])
+    expected_edges_2d = [[0, 1, 0], [1, 2, 0], [2, 3, 0], [3, 4, 0], [4, 5, 0], [5, 0, 0]]
+    expected_vert_idxs = [idxs[0] for idxs in expected_edges_2d]
+    assert res_edges_2d == expected_edges_2d
+    assert expected_vert_idxs == ordered_vert_idxs(eptm.edge_df.loc[eptm.edge_df['face'] == 0])
+    res_invalid_face = ordered_vert_idxs(eptm.edge_df.loc[eptm.edge_df['face'] == 98765])
+    
+    ## testing the exception case in ordered_vert_idxs :
+    res_invalid_face = ordered_vert_idxs(eptm.edge_df.loc[eptm.edge_df['face'] == 98765])
+    assert np.isnan(res_invalid_face)
 
 

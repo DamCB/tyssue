@@ -414,6 +414,11 @@ class Epithelium():
             try:
                 edges = _ordered_edges(face)
             except IndexError:
+                #- BC -#
+                # I'm still trying to figure
+                # out a way to raise this exception
+                # with altered datasets but to no avail
+                # Leaving it included in coverage.
                 log.warning('Face is not closed')
                 return np.nan
             return np.array([self.vert_df.loc[idx[0], coords]
@@ -696,6 +701,8 @@ class Epithelium():
         If `vertex_normals` is True, also returns the normals of each vertex
         (set as the average of the vertex' edges), suitable for .OBJ export
         '''
+        #- BC -#
+        # This method only works on 3D-epithelium
         vertices = self.vert_df[coords]
         faces = self.edge_df.groupby('face').apply(ordered_vert_idxs)
         faces = faces.dropna()
