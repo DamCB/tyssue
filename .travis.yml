@@ -12,7 +12,7 @@ before_install:
   - conda info -a
   - conda create -q -n tyssue python=3.5
   - source activate tyssue
-  - conda install numpy scipy pandas matplotlib nose coverage vispy pip pytables
+  - conda install numpy scipy pandas matplotlib nose coverage vispy pip pytables pytest pytest-cov
   - pip install coveralls
 
 install:

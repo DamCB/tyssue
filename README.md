@@ -96,7 +96,8 @@ centered models...).
 
 ### Authors
 
-* Cyprien Gay @cypriengay
+* Bertrand Caré - @bcare
+* Cyprien Gay - @cypriengay
 * Guillaume Gay (maintainer) - @glyg
 * Hadrien Mary (build wizard) - @hadim
 * François Molino

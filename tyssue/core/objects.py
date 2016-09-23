@@ -7,6 +7,8 @@ from ..utils.utils import set_data_columns, spec_updater
 from ..config.json_parser import load_default
 from .generation import make_df
 
+import warnings
+
 import logging
 log = logging.getLogger(name=__name__)
 
@@ -59,8 +61,12 @@ default values is allways infered from the python parsed type. Thus
         }
 '''
 
-
-class Epithelium:
+#- BC -#
+# Classes must inherit from Object in order for setters
+# decorators to work properly according to some
+# stackoverflow post, but it seems to work properly as
+# it is right now.
+class Epithelium():
     '''
     The whole tissue.
 
@@ -142,6 +148,11 @@ class Epithelium:
 
     @property
     def cell_df(self):
+        #- BC -#
+        # Recommends to test if the epithelium has a 'cell' df before returning,
+        # some epitheliums don't require this object (2D)
+        # Should it raise a warning/error if the user asks for
+        # a cell_df from an eptm that doesn't have one ?
         return self.datasets['cell']
 
     @cell_df.setter
@@ -183,7 +194,7 @@ class Epithelium:
         if deep_copy:
             datasets = {element: df.copy()
                         for element, df in self.datasets.items()}
-        else:
+        else: #pragma: no cover
             log.info(
                 "New epithelium object from {}"
                 " without deep copy".format(
@@ -200,7 +211,12 @@ class Epithelium:
         return self.specs['settings']
 
     @settings.setter
-    def settings(self, key, value):
+    def settings(self, key, value): #pragma: no cover
+        # (Actually the 'settings' getter is called
+        # and then the dictionary class setter
+        # instead of directly the 'settings' setter.)
+        # See http://stackoverflow.com/a/3137768
+        # So this method is not actually called.
         self.specs['settings'][key] = value
 
     @classmethod
@@ -210,22 +226,24 @@ class Epithelium:
         '''
         TODO: not sure this works as expected with the new indexing
         '''
+        
+        raise NotImplementedError('Epithelium.from_points() is not implemented and should not be used.') #pragma: no cover
+    
+        # if points.shape[1] == 2:
+        #     coords = ['x', 'y']
+        # elif points.shape[1] == 3:
+        #     coords = ['x', 'y', 'z']
+        # else:
+        #     raise ValueError('the `points` argument must be'
+        #                      ' a (Nv, 2) or (Nv, 3) array')
 
-        if points.shape[1] == 2:
-            coords = ['x', 'y']
-        elif points.shape[1] == 3:
-            coords = ['x', 'y', 'z']
-        else:
-            raise ValueError('the `points` argument must be'
-                             ' a (Nv, 2) or (Nv, 3) array')
+        # datasets = {}
+        # for key, spec in specs.items():
+        #     datasets[key] = make_df(index=indices_dict[key],
+        #                             spec=spec)
+        # datasets[points_dataset][coords] = points
 
-        datasets = {}
-        for key, spec in specs.items():
-            datasets[key] = make_df(index=indices_dict[key],
-                                    spec=spec)
-        datasets[points_dataset][coords] = points
-
-        return cls.__init__(identifier, datasets, specs, coords=coords)
+        # return cls.__init__(identifier, datasets, specs, coords=coords)
 
     def update_specs(self, new, reset=False):
 
@@ -234,7 +252,8 @@ class Epithelium:
 
     def set_specs(self, domain, base,
                   new_specs=None,
-                  default_base=None, reset=False):
+                  default_base=None, reset=False): #pragma: no cover
+        warnings.warn('Deprecated, use update_specs() instead.')
 
         if base is None:
             self.update_specs(load_default(domain, default_base), reset)
@@ -277,7 +296,10 @@ class Epithelium:
 
     @property
     def edge_idx(self):
+        # Should it return self.edge_df.index instead ?
         return self.edge_df[self.element_names]
+    
+    
 
     @property
     def Nc(self):
@@ -338,7 +360,7 @@ class Epithelium:
     def upcast_face(self, df):
         return self._upcast(self.e_face_idx, df)
 
-    def upcast_cell(self, df):
+    def upcast_cell(self, df): 
         return self._upcast(self.e_cell_idx, df)
 
     def _lvl_sum(self, df, lvl):
@@ -392,6 +414,11 @@ class Epithelium:
             try:
                 edges = _ordered_edges(face)
             except IndexError:
+                #- BC -#
+                # I'm still trying to figure
+                # out a way to raise this exception
+                # with altered datasets but to no avail
+                # Leaving it included in coverage.
                 log.warning('Face is not closed')
                 return np.nan
             return np.array([self.vert_df.loc[idx[0], coords]
@@ -399,7 +426,13 @@ class Epithelium:
         polys = self.edge_df.groupby('face').apply(_get_verts_pos).dropna()
         return polys
 
-    def _build_face_face_indexes(self):
+    def _build_face_face_indexes(self): #pragma: no cover
+        #- BC -#
+        ## this method raises a ValueError
+        ## 'too many values to unpack'.
+        ## It's not used anywhere in the code,
+        ## or in the examples. I'm withdrawing
+        ## it from coverage for now.
         '''
         This is hackish and not optimized,
         should be provided by CGAL
@@ -482,6 +515,14 @@ class Epithelium:
             assert (2*self.Ni + self.No) == self.Ne
             assert self.west_edges.size == self.Ni
             assert self.Nd == 2*self.Ni
+        #- BC -#
+        # Not sure how to build
+        # input data so the partition
+        # fails (so we can see
+        # if the exception is
+        # correctly raised).
+        # Leaving it in the coverage
+        # anyway.
         except AssertionError:
             raise AssertionError('''
             Inconsistent partition:
@@ -660,6 +701,8 @@ class Epithelium:
         If `vertex_normals` is True, also returns the normals of each vertex
         (set as the average of the vertex' edges), suitable for .OBJ export
         '''
+        #- BC -#
+        # This method only works on 3D-epithelium
         vertices = self.vert_df[coords]
         faces = self.edge_df.groupby('face').apply(ordered_vert_idxs)
         faces = faces.dropna()
