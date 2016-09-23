@@ -323,7 +323,8 @@ def three_faces_sheet(zaxis=False):
     return datasets, specifications
 
 
-def extrude(apical_datasets, method='homotecy',
+def extrude(apical_datasets,
+            method='homotecy',
             scale=1/3.,
             vector=[0, 0, -1]):
     """Extrude a sheet to form a single layer epithelium

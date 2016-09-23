@@ -1,5 +1,7 @@
 from collections import defaultdict
 import logging
+from .sheet_topology import cell_division as face_division
+from ..geometry.bulk_geometry import BulkGeometry
 
 logger = logging.getLogger(name=__name__)
 
@@ -55,6 +57,11 @@ def cell_division(monolayer, mother,
     if orientation != 'horizontal':
         raise NotImplementedError('Only horizontal orientation'
                                   ' is supported at the moment')
+    return horizontal_division(monolayer, mother)
+
+
+def horizontal_division(monolayer, mother):
+
     cell_cols = monolayer.cell_df.loc[mother]
     monolayer.cell_df = monolayer.cell_df.append(cell_cols,
                                                  ignore_index=True)
@@ -171,3 +178,16 @@ def cell_division(monolayer, mother,
         monolayer.edge_df = monolayer.edge_df.append(edge_cols,
                                                      ignore_index=False)
     return daughter
+
+
+def vertical_division(monolayer, mother, *args, **kwargs):
+
+    mother_edges = monolayer.edge_df[
+        monolayer.edge_df['cell'] == mother]
+    mother_faces = set(mother_edges['face'])
+
+    apical_face, = mother_edges[
+        mother_edges['segment'] == 'apical']['face'].unique()
+    apical_daughter = face_division(monolayer,
+                                    apical_face,
+                                    BulkGeometry, *args, **kwargs)
