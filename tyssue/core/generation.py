@@ -323,7 +323,8 @@ def three_faces_sheet(zaxis=False):
     return datasets, specifications
 
 
-def extrude(apical_datasets, method='homotecy',
+def extrude(apical_datasets,
+            method='homotecy',
             scale=1/3.,
             vector=[0, 0, -1]):
     """Extrude a sheet to form a single layer epithelium
@@ -336,7 +337,8 @@ def extrude(apical_datasets, method='homotecy',
     default 'homotecy'
     * scale: float, optional
     the scale factor for homotetic scaling, default 1/3.
-    * vector: sequence of three floats, optional, used for
+    * vector: sequence of three floats, optional,
+    used for the translation
 
     default [0, 0, -1]
 

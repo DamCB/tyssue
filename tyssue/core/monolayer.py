@@ -11,12 +11,7 @@ class Monolayer(Epithelium):
     """
     3D monolayer epithelium
     """
-    def __init__(self, name, apical_sheet, specs,
-                 thickness=1):
-
-        datasets = extrude(apical_sheet.datasets,
-                           method='translation',
-                           vector=[0, 0, -thickness])
+    def __init__(self, name, datasets, specs):
 
         super().__init__(name, datasets, specs)
         self.vert_df['is_active'] = 1
@@ -24,6 +19,15 @@ class Monolayer(Epithelium):
         self.face_df['is_alive'] = 1
 
         BulkGeometry.update_all(self)
+
+    @classmethod
+    def from_flat_sheet(cls, name, apical_sheet, specs,
+                        thickness=1):
+        datasets = extrude(apical_sheet.datasets,
+                           method='translation',
+                           vector=[0, 0, -thickness])
+
+        return cls(name, datasets, specs)
 
     def segment_index(self, segment, element):
         df = getattr(self, '{}_df'.format(element))
@@ -66,9 +70,9 @@ class MonolayerWithLamina(Monolayer):
     """
     3D monolayer epithelium with a lamina meshing
     """
-    def __init__(self, name, apical_sheet, specs, thickness=1):
+    def __init__(self, name, datasets, specs):
 
-        super().__init__(name, apical_sheet, specs, thickness)
+        super().__init__(name, datasets, specs)
 
         BulkGeometry.update_all(self)
         self.reset_index()

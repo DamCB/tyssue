@@ -105,14 +105,16 @@ class Sheet(Epithelium):
 
     @classmethod
     def planar_sheet_3d(cls, identifier,
-                        nx, ny, nz,
-                        distx, disty, distz):
+                        nx, ny, distx, disty):
         from scipy.spatial import Voronoi
         from ..config.geometry import sheet_spec
-        from .generation import hexa_grid3d, from_3d_voronoi
-        grid = hexa_grid3d(nx, ny, nz,
-                           distx, disty, distz)
-        datasets = from_3d_voronoi(Voronoi(grid))
+        from .generation import hexa_grid2d, from_2d_voronoi
+        grid = hexa_grid2d(nx, ny,
+                           distx, disty)
+        datasets = from_2d_voronoi(Voronoi(grid))
+        datasets['vert']['z'] = 0
+        datasets['face']['z'] = 0
+
         return cls(identifier, datasets,
                    specs=sheet_spec(),
                    coords=['x', 'y', 'z'])

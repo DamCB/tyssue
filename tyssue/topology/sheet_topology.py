@@ -128,6 +128,16 @@ def cell_division(sheet, mother, geom,
     if not sheet.face_df.loc[mother, 'is_alive']:
         logger.warning('Cell {} is not alive and cannot devide'.format(mother))
         return
+    edge_a, edge_b = get_division_edges(sheet, mother, geom,
+                                        angle=None, axis='x')
+    if edge_a is None:
+        return
+    daughter = face_division(sheet, edge_a, edge_b)
+    return daughter
+
+
+def get_division_edges(sheet, mother, geom,
+                       angle=None, axis='x'):
 
     if angle is None:
         angle = np.random.random() * np.pi
@@ -151,10 +161,21 @@ def cell_division(sheet, mother, geom,
     except IndexError:
         print('Failed')
         logger.error('Division of Cell {} failed'.format(mother))
-        return
+        return None, None
+    return edge_a, edge_b
 
-    vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet, edge_a)
-    vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet, edge_b)
+
+def face_division(sheet, edge_a, edge_b):
+    """
+    Divides the face associated with edges
+    indexed by `edge_a` and `edge_b`, splitting it
+    in the middle of those edes.
+    """
+    mother = sheet.edge_df.loc[edge_a, 'face']
+    vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet,
+                                                  edge_a)
+    vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet,
+                                                  edge_b)
     sheet.vert_df.index.name = 'vert'
 
     face_cols = sheet.face_df.loc[mother]
@@ -164,22 +185,35 @@ def cell_division(sheet, mother, geom,
     daughter = int(sheet.face_df.index[-1])
 
     edge_cols = sheet.edge_df.loc[new_edge_b]
-    sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
+    sheet.edge_df = sheet.edge_df.append(edge_cols,
+                                         ignore_index=True)
     new_edge_m = sheet.edge_df.index[-1]
     sheet.edge_df.loc[new_edge_m, 'srce'] = vert_b
     sheet.edge_df.loc[new_edge_m, 'trgt'] = vert_a
 
-    sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
+    sheet.edge_df = sheet.edge_df.append(edge_cols,
+                                         ignore_index=True)
     new_edge_d = sheet.edge_df.index[-1]
     sheet.edge_df.loc[new_edge_d, 'srce'] = vert_a
     sheet.edge_df.loc[new_edge_d, 'trgt'] = vert_b
 
-    daughter_edges = list(m_data[srce_pos < 0].index) + [new_edge_b,
-                                                         new_edge_d]
+    # ## Discover daughter edges
+    m_data = sheet.edge_df[sheet.edge_df['face'] == mother]
+    daughter_edges = [new_edge_d]
+    vert_a, vert_b
+    srce, trgt = vert_a, vert_b
+    srces, trgts = m_data[['srce', 'trgt']].values.T
+
+    while trgt != vert_a:
+        srce, trgt = trgt, trgts[srces == trgt][0]
+        daughter_edges.append(m_data[(m_data['srce'] == srce) &
+                                     (m_data['trgt'] == trgt)].index[0])
+
+    # daughter_edges = list(m_data[srce_pos < 0].index) + [new_edge_b,
+    #                                                      new_edge_d]
     sheet.edge_df.loc[daughter_edges, 'face'] = daughter
     sheet.edge_df.index.name = 'edge'
     sheet.reset_topo()
-    geom.update_all(sheet)
     return daughter
 
 
