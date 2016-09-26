@@ -1,5 +1,5 @@
-import numpy as np
 import logging
+import numpy as np
 
 logger = logging.getLogger(name=__name__)
 
@@ -129,7 +129,7 @@ def cell_division(sheet, mother, geom,
         logger.warning('Cell {} is not alive and cannot devide'.format(mother))
         return
     edge_a, edge_b = get_division_edges(sheet, mother, geom,
-                                        angle=None, axis='x')
+                                        angle=angle, axis='x')
     if edge_a is None:
         return
     daughter = face_division(sheet, edge_a, edge_b)
@@ -200,7 +200,6 @@ def face_division(sheet, edge_a, edge_b):
     # ## Discover daughter edges
     m_data = sheet.edge_df[sheet.edge_df['face'] == mother]
     daughter_edges = [new_edge_d]
-    vert_a, vert_b
     srce, trgt = vert_a, vert_b
     srces, trgts = m_data[['srce', 'trgt']].values.T
 
