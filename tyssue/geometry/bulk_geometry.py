@@ -1,5 +1,6 @@
 import numpy as np
 from .sheet_geometry import SheetGeometry
+from .utils import rotation_matrix
 
 
 class BulkGeometry(SheetGeometry):
@@ -66,8 +67,29 @@ class MonoLayerGeometry(BulkGeometry):
         Returns a unit vector allong the apical-basal axis of the cell
         """
         edges = eptm.edge_df[eptm.edge_df['cell'] == cell]
-        srce_segments = eptm.vert_df.loc[edges['srce'], 'segment'].copy
-        trgt_segments = eptm.vert_df.loc[edges['trgt'], 'segment'].copy
+        srce_segments = eptm.vert_df.loc[edges['srce'], 'segment']
+        srce_segments.index = edges.index
+        trgt_segments = eptm.vert_df.loc[edges['trgt'], 'segment']
+        trgt_segments.index = edges.index
         ba_edges = edges[(srce_segments == 'apical') &
                          (trgt_segments == 'basal')]
         return ba_edges[eptm.dcoords].mean()
+
+    @classmethod
+    def cell_projected_pos(cls, eptm, cell, psi=0):
+        """Returns the positions of the cell vertices
+        transformed such that the cell center sits at the
+        coordinate system's origin and the basal-apical axis
+        is the new `z` axis.
+        """
+        ab_axis = cls.basal_apical_axis(eptm, cell)
+        n_xy = np.linalg.norm(ab_axis[['dx', 'dy']])
+        theta = -np.arctan2(n_xy, ab_axis.dz)
+        direction = [ab_axis.dy, -ab_axis.dx, 0]
+        rot = rotation_matrix(theta, direction, psi)
+        cell_verts = set(eptm.edge_df[eptm.edge_df['cell'] == cell]['srce'])
+        vert_pos = eptm.vert_df.loc[cell_verts, eptm.coords]
+        for c in eptm.coords:
+            vert_pos[c] -= eptm.cell_df.loc[cell, c]
+        vert_pos[:] = np.dot(vert_pos, rot)
+        return vert_pos

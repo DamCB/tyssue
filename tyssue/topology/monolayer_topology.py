@@ -1,63 +1,71 @@
 from collections import defaultdict
 import logging
-from .sheet_topology import cell_division as face_division
-from ..geometry.bulk_geometry import BulkGeometry
+import numpy as np
+import itertools
+
+from .sheet_topology import face_division
+from .base_topology import add_vert
+from ..geometry.bulk_geometry import BulkGeometry, MonoLayerGeometry
 
 logger = logging.getLogger(name=__name__)
 
 
-def add_vert(monolayer, edge):
-    """
-    Adds a vertex in the middle of the edge,
+def _get_division_edges(monolayer, mother, orientation, psi=0):
 
-    The edge and all its parallel and opposite
-    edges, i.e those who share the same vertices
-    are split as well.
-    """
+    rotated = MonoLayerGeometry.cell_projected_pos(monolayer,
+                                                   mother, psi)
+    mother_edges = monolayer.edge_df[monolayer.edge_df['cell'] == mother]
+    if orientation == 'vertical':
+        srce_x = rotated.loc[mother_edges['srce'], 'x']
+        srce_x.index = mother_edges.index
+        trgt_x = rotated.loc[mother_edges['trgt'], 'x']
+        trgt_x.index = mother_edges.index
+        division_edges = mother_edges[((srce_x >= 0) &
+                                       (trgt_x <= 0)) |
+                                      ((srce_x <= 0) &
+                                       (trgt_x >= 0))]
+        # remove duplicate sagittal edges
+        division_edges = division_edges[
+            division_edges['segment'] != 'sagittal']
+        seg_count = division_edges['segment'].value_counts()
+        assert(seg_count.loc['basal'] == 2)
+        assert(seg_count.loc['apical'] == 2)
 
-    srce, trgt = monolayer.edge_df.loc[edge, ['srce', 'trgt']]
-    parallels = monolayer.edge_df[(monolayer.edge_df['srce'] == srce) &
-                                  (monolayer.edge_df['trgt'] == trgt)].index
-    opposites = monolayer.edge_df[(monolayer.edge_df['srce'] == trgt) &
-                                  (monolayer.edge_df['trgt'] == srce)].index
-    new_vert = monolayer.vert_df.loc[[srce, trgt]].mean()
-    monolayer.vert_df = monolayer.vert_df.append(new_vert, ignore_index=True)
-    new_vert = monolayer.vert_df.index[-1]
+    elif orientation == 'horizontal':
+        srce_x = rotated.loc[mother_edges['srce'], 'z']
+        srce_x.index = mother_edges.index
+        trgt_x = rotated.loc[mother_edges['trgt'], 'z']
+        trgt_x.index = mother_edges.index
+        division_edges = mother_edges[((srce_x <= 0) &
+                                       (trgt_x >= 0))]
+        assert(np.all(division_edges['segment'] == 'sagittal'))
+    else:
+        raise ValueError('''Orientation not understood, should be
+either "horizontal" or "vertical''')
 
-    old_pll = list(parallels)
-    new_pll = []
-    for d_edge in parallels:  # includes the original edge
-        monolayer.edge_df.loc[d_edge, 'trgt'] = new_vert
-        edge_cols = monolayer.edge_df.loc[d_edge]
-        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
-                                                     ignore_index=True)
-        new_edge = monolayer.edge_df.index[-1]
-        monolayer.edge_df.loc[new_edge, 'srce'] = new_vert
-        monolayer.edge_df.loc[new_edge, 'trgt'] = trgt
-        new_pll.append(new_edge)
-
-    old_opp = list(opposites)
-    new_opp = []
-    for d_edge in opposites:
-        monolayer.edge_df.loc[d_edge, 'srce'] = new_vert
-        edge_cols = monolayer.edge_df.loc[d_edge]
-        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
-                                                     ignore_index=True)
-        new_edge = monolayer.edge_df.index[-1]
-        monolayer.edge_df.loc[new_edge, 'srce'] = trgt
-        monolayer.edge_df.loc[new_edge, 'trgt'] = new_vert
-        new_opp.append(new_edge)
-
-    return new_vert, old_pll, new_pll, old_opp, new_opp
+    # Order the returned edges so that their centers
+    # are oriented counterclockwize in the division plane
+    # in preparation for septum creation
+    srce_pos = rotated.loc[division_edges['srce'],
+                           monolayer.coords].values
+    trgt_pos = rotated.loc[division_edges['trgt'],
+                           monolayer.coords].values
+    centers = (srce_pos + trgt_pos)/2
+    theta = np.arctan2(centers[:, 2], centers[:, 1])
+    division_edges = division_edges.iloc[np.argsort(theta)]
+    return division_edges
 
 
 def cell_division(monolayer, mother,
-                  orientation='horizontal'):
+                  orientation='vertical'):
+    division_edges = _get_division_edges(monolayer, mother,
+                                         orientation)
+    vertices = []
+    for edge in division_edges.index:
+        vert_i, *new_edges = add_vert(monolayer, edge)
+        vertices.append(vert_i)
 
-    if orientation != 'horizontal':
-        raise NotImplementedError('Only horizontal orientation'
-                                  ' is supported at the moment')
-    return horizontal_division(monolayer, mother)
+
 
 
 def horizontal_division(monolayer, mother):
