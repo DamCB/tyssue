@@ -1,6 +1,8 @@
 import numpy as np
 
-def get_default_geom_specs():
+# excluding this function from tests
+# as it is pretty trivial.
+def get_default_geom_specs(): #pragma: no cover
     default_geom_specs = {
         "cc": {
             "nz": 0.,
@@ -11,10 +13,11 @@ def get_default_geom_specs():
 
 
 def scale(ccmesh, delta, coords):
-    ccmesh.cell_df[coords] = ccmesh.ccmesh.cell_df[coords] * delta
-
+    # original line (spurious 'ccmesh' on right hand side) :
+    #ccmesh.cell_df[coords] = ccmesh.ccmesh.cell_df[coords] * delta
+    ccmesh.cell_df[coords] = ccmesh.cell_df[coords] * delta
+    
 def update_dcoords(ccmesh):
-
     data = ccmesh.cell_df[ccmesh.coords]
     srce_pos = ccmesh.upcast_srce(data)
     trgt_pos = ccmesh.upcast_trgt(data)
