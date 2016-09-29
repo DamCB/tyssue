@@ -1,6 +1,7 @@
 import numpy as np
 
 from .planar_geometry import PlanarGeometry
+from .utils import rotation_matrix
 
 
 class SheetGeometry(PlanarGeometry):
@@ -124,7 +125,7 @@ class SheetGeometry(PlanarGeometry):
         face: int,
           the index of the face on which to rotate the sheet
         psi: float,
-          Optional angle giving the rotation along the `z` axis
+          Optional angle giving the rotation along the new `z` axis
 
         Returns
         -------
@@ -135,26 +136,16 @@ class SheetGeometry(PlanarGeometry):
         normal = sheet.edge_df[
             sheet.edge_df['face'] == face][sheet.ncoords].mean()
         normal = normal / np.linalg.norm(normal)
-        cos_psi = np.cos(psi)
-        sin_psi = np.sin(psi)
-
-        phi = np.arctan2(normal.ny, normal.nx)
-        cos_phi = np.cos(phi)
-        sin_phi = np.sin(phi)
-        cos_theta = normal.nz
-        sin_theta = (1 - cos_theta**2)**0.5
-
-        rotation = np.array([[cos_psi*cos_phi - sin_psi*cos_theta*sin_phi,
-                              -cos_psi*sin_phi - sin_psi*cos_theta*cos_phi,
-                              sin_psi*sin_theta],
-                             [sin_psi*cos_phi + cos_psi*cos_theta*sin_phi,
-                              -sin_psi*sin_phi + cos_psi*cos_theta*cos_phi,
-                              -cos_psi*sin_theta],
-                             [sin_theta*sin_phi,
-                              sin_theta*cos_phi,
-                              cos_theta]])
-
-        return rotation
+        n_xy = np.linalg.norm(normal[['nx', 'ny']])
+        theta = -np.arctan2(n_xy, normal.nz)
+        direction = [normal.ny,
+                     -normal.nx,
+                     0]
+        r1 = rotation_matrix(theta, direction)
+        if psi == 0:
+            return r1
+        else:
+            return np.dot(rotation_matrix(psi, [0, 0, 1]), r1)
 
     @classmethod
     def face_projected_pos(cls, sheet, face, psi=0):

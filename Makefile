@@ -4,7 +4,7 @@ flake8:
 	flake8 --max-line-length=100 --count --statistics --exit-zero tyssue/
 
 test:
-	nosetests tyssue -v
+	py.test
 
 coverage:
 	#nosetests tyssue --with-coverage --cover-package=tyssue -v

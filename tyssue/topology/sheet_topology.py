@@ -1,6 +1,8 @@
 import logging
 import numpy as np
 
+from .base_topology import add_vert
+
 logger = logging.getLogger(name=__name__)
 
 
@@ -84,44 +86,6 @@ def type1_transition(sheet, edge01, epsilon=0.1):
         remove_face(sheet, tri_face)
 
 
-def add_vert(sheet, edge):
-    """
-    Adds a vertex in the middle of the edge,
-    which is split as is its opposite
-    """
-
-    srce, trgt = sheet.edge_df.loc[edge, ['srce', 'trgt']]
-    opposite = sheet.edge_df[(sheet.edge_df['srce'] == trgt) &
-                             (sheet.edge_df['trgt'] == srce)]
-    if len(opposite):
-        opp_edge = opposite.index[0]
-    else:
-        opp_edge = None
-
-    new_vert = sheet.vert_df.loc[[srce, trgt]].mean()
-    sheet.vert_df = sheet.vert_df.append(new_vert, ignore_index=True)
-    new_vert = sheet.vert_df.index[-1]
-    sheet.edge_df.loc[edge, 'trgt'] = new_vert
-
-    edge_cols = sheet.edge_df.loc[edge]
-    sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
-    new_edge = sheet.edge_df.index[-1]
-    sheet.edge_df.loc[new_edge, 'srce'] = new_vert
-    sheet.edge_df.loc[new_edge, 'trgt'] = trgt
-
-    if opp_edge is not None:
-        sheet.edge_df.loc[opp_edge, 'srce'] = new_vert
-        edge_cols = sheet.edge_df.loc[opp_edge]
-        sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
-        new_opp_edge = sheet.edge_df.index[-1]
-        sheet.edge_df.loc[new_opp_edge, 'trgt'] = new_vert
-        sheet.edge_df.loc[new_opp_edge, 'srce'] = trgt
-    else:
-        new_opp_edge = None
-
-    return new_vert, new_edge, new_opp_edge
-
-
 def cell_division(sheet, mother, geom,
                   angle=None, axis='x'):
 
@@ -132,7 +96,13 @@ def cell_division(sheet, mother, geom,
                                         angle=angle, axis='x')
     if edge_a is None:
         return
-    daughter = face_division(sheet, edge_a, edge_b)
+
+    vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet,
+                                                  edge_a)
+    vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet,
+                                                  edge_b)
+    sheet.vert_df.index.name = 'vert'
+    daughter = face_division(sheet, mother, vert_a, vert_b)
     return daughter
 
 
@@ -165,18 +135,13 @@ def get_division_edges(sheet, mother, geom,
     return edge_a, edge_b
 
 
-def face_division(sheet, edge_a, edge_b):
+def face_division(sheet, mother, vert_a, vert_b):
     """
     Divides the face associated with edges
     indexed by `edge_a` and `edge_b`, splitting it
     in the middle of those edes.
     """
-    mother = sheet.edge_df.loc[edge_a, 'face']
-    vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet,
-                                                  edge_a)
-    vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet,
-                                                  edge_b)
-    sheet.vert_df.index.name = 'vert'
+    # mother = sheet.edge_df.loc[edge_a, 'face']
 
     face_cols = sheet.face_df.loc[mother]
     sheet.face_df = sheet.face_df.append(face_cols,
@@ -184,7 +149,7 @@ def face_division(sheet, edge_a, edge_b):
     sheet.face_df.index.name = 'face'
     daughter = int(sheet.face_df.index[-1])
 
-    edge_cols = sheet.edge_df.loc[new_edge_b]
+    edge_cols = sheet.edge_df[sheet.edge_df['face'] == mother].iloc[0]
     sheet.edge_df = sheet.edge_df.append(edge_cols,
                                          ignore_index=True)
     new_edge_m = sheet.edge_df.index[-1]
@@ -207,9 +172,6 @@ def face_division(sheet, edge_a, edge_b):
         srce, trgt = trgt, trgts[srces == trgt][0]
         daughter_edges.append(m_data[(m_data['srce'] == srce) &
                                      (m_data['trgt'] == trgt)].index[0])
-
-    # daughter_edges = list(m_data[srce_pos < 0].index) + [new_edge_b,
-    #                                                      new_edge_d]
     sheet.edge_df.loc[daughter_edges, 'face'] = daughter
     sheet.edge_df.index.name = 'edge'
     sheet.reset_topo()

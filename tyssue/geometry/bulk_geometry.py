@@ -59,3 +59,15 @@ class MonoLayerGeometry(BulkGeometry):
         '''
         eptm.face_df['perimeter'] = eptm.sum_face(
             eptm.edge_df['length'] * (1 - eptm.edge_df['subdiv']))
+
+    @staticmethod
+    def basal_apical_axis(eptm, cell):
+        """
+        Returns a unit vector allong the apical-basal axis of the cell
+        """
+        edges = eptm.edge_df[eptm.edge_df['cell'] == cell]
+        srce_segments = eptm.vert_df.loc[edges['srce'], 'segment'].copy
+        trgt_segments = eptm.vert_df.loc[edges['trgt'], 'segment'].copy
+        ba_edges = edges[(srce_segments == 'apical') &
+                         (trgt_segments == 'basal')]
+        return ba_edges[eptm.dcoords].mean()
