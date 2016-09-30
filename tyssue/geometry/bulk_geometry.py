@@ -49,6 +49,20 @@ class BulkGeometry(SheetGeometry):
         eptm.face_df[eptm.coords] = upcast_pos.mean(level='face')
         eptm.cell_df[eptm.coords] = upcast_pos.mean(level='cell')
 
+    @staticmethod
+    def validate_face_norms(eptm):
+        face_pos = eptm.upcast_face(eptm.face_df[eptm.coords])
+        cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords])
+
+        r_cf = (face_pos - cell_pos)
+        r_cf['face'] = eptm.edge_df['face']
+        r_cf = r_cf.groupby('face').mean()
+        face_norm = eptm.edge_df.groupby('face')[eptm.ncoords].mean()
+
+        proj = (face_norm * r_cf.values).sum(axis=1)
+        is_outward = proj >= 0
+        return is_outward
+
 
 class MonoLayerGeometry(BulkGeometry):
 
