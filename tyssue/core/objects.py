@@ -252,7 +252,7 @@ class Epithelium():
 
     def set_specs(self, domain, base,
                   new_specs=None,
-                  default_base=None, reset=False): #pragma: no cover
+                  default_base=None, reset=False):  # pragma: no cover
         warnings.warn('Deprecated, use update_specs() instead.')
 
         if base is None:
@@ -701,7 +701,7 @@ class Epithelium():
         If `vertex_normals` is True, also returns the normals of each vertex
         (set as the average of the vertex' edges), suitable for .OBJ export
         '''
-        #- BC -#
+        # - BC -#
         # This method only works on 3D-epithelium
         vertices = self.vert_df[coords]
         faces = self.edge_df.groupby('face').apply(ordered_vert_idxs)
@@ -714,6 +714,7 @@ class Epithelium():
 
     def validate_closed_cells(self):
         is_closed = self.edge_df.groupby('cell').apply(_is_closed_cell)
+        return is_closed
 
 
 def _ordered_edges(face_edges):

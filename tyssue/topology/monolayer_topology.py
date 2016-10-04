@@ -1,14 +1,11 @@
-from collections import defaultdict
 import logging
 import numpy as np
-import itertools
 
 from ..geometry.bulk_geometry import MonoLayerGeometry
 from .bulk_topology import get_division_vertices
 from .bulk_topology import cell_division as bulk_division
 
 logger = logging.getLogger(name=__name__)
-
 
 def cell_division(monolayer, mother,
                   orientation='vertical',
@@ -27,14 +24,19 @@ def cell_division(monolayer, mother,
     * psi: float, default 0
       extra rotation angle of the division plane
       around the basal-apical plane
+
+    Returns
+    -------
+    * daughter: int, the index of the daughter cell
     """
 
-    ab_axis = MonoLayerGeometry.basal_apical_axis(mother)
+    ab_axis = MonoLayerGeometry.basal_apical_axis(monolayer, mother)
+    plane_normal = np.asarray(ab_axis)
     if orientation == 'horizontal':
         plane_normal = ab_axis
     elif orientation == 'vertical':
         # put the normal along the x axis
-        plane_normal = ab_axis[[2, 1, 0]]
+        plane_normal = ab_axis[[0, 2, 1]] * np.array([0, 1, -1])
         if psi != 0:
             cp, sp = np.cos(psi), np.sin(psi)
             rot = np.array([[1,  0,  0],
@@ -56,6 +58,7 @@ should be either "horizontal" or "vertical", not {}'''.format(orientation))
     if orientation == 'vertical':
         monolayer.face_df.loc[septum, 'segment'] = 'sagittal'
         monolayer.edge_df.loc[septum_edges, 'segment'] = 'sagittal'
+        _assign_vert_segment(monolayer, mother, vertices)
 
     elif orientation == 'horizontal':
         monolayer.face_df.loc[septum[0], 'segment'] = 'apical'
@@ -64,15 +67,19 @@ should be either "horizontal" or "vertical", not {}'''.format(orientation))
                               'segment'] = 'apical'
         monolayer.edge_df.loc[septum_edges[len(vertices):],
                               'segment'] = 'basal'
+        monolayer.vert_df.loc[vertices, 'segment'] = 'apical'
 
     return daughter
 
 
 def _assign_vert_segment(monolayer, cell, vertices):
 
-    ab_axis = MonoLayerGeometry.basal_apical_axis(cell)
-    cell_edges = monolayer.edge_df[monolayer.edge_df["cell"] == cell]
-    vert_pos_ = monolayer.vert_df.loc[set(cell_edges['srce'])]
-    vert_pos = vert_pos_.loc[vertices]
-    for c in monolayer.coords:
-        vert_pos[c] -= monolayer.cell_df.loc[cell, c]
+    for v in vertices:
+        segs = set(monolayer.edge_df[
+            monolayer.edge_df['srce'] == v]['segment'])
+        if 'apical' in segs:
+            monolayer.vert_df.loc[v, 'segment'] = 'apical'
+        elif 'basal' in segs:
+            monolayer.vert_df.loc[v, 'segment'] = 'basal'
+        else:
+            monolayer.vert_df.loc[v, 'segment'] = 'sagittal'

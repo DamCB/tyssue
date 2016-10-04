@@ -12,7 +12,19 @@ def face_visual(sheet, coords=None, **draw_specs_kw):
 
     draw_specs = sheet_spec()['face']
     draw_specs.update(draw_specs_kw)
-    vertices, faces, _ = sheet.triangular_mesh(coords)
+    if 'visible' in sheet.face_df.columns:
+        vertices = np.concatenate((sheet.face_df[coords],
+                                   sheet.vert_df[coords]), axis=0)
+
+        upcast_visible = sheet.upcast_face(sheet.face_df['visible'])
+        visible_edges = sheet.edge_df[upcast_visible == 1]
+        # edge indices as (Nf + Nv) * 3 array
+        faces = visible_edges[['srce', 'trgt', 'face']].values
+        # The src, trgt, face triangle is correctly oriented
+        # both vert_idx cols are shifted by Nf
+        faces[:, :2] += sheet.Nf
+    else:
+        vertices, faces, _ = sheet.triangular_mesh(coords)
     if coords is None:
         coords = list('xyz')
 

@@ -1,5 +1,4 @@
 
-from collections import defaultdict
 import logging
 import itertools
 import numpy as np
@@ -10,16 +9,17 @@ from ..geometry.utils import rotation_matrix
 logger = logging.getLogger(name=__name__)
 
 
-def get_division_vertices(eptm, mother,
-                          plane_normal,
-                          plane_center=None):
+def get_division_edges(eptm, mother,
+                       plane_normal,
+                       plane_center=None):
 
+    plane_normal = np.asarray(plane_normal)
     if plane_center is None:
         plane_center = eptm.cell_df.loc[mother, eptm.coords]
 
-    n_xy = np.linalg.norm(plane_normal[['dx', 'dy']])
-    theta = -np.arctan2(n_xy, plane_normal.dz)
-    direction = [plane_normal.dy, -plane_normal.dx, 0]
+    n_xy = np.linalg.norm(plane_normal[:2])
+    theta = -np.arctan2(n_xy, plane_normal[2])
+    direction = [plane_normal[1], -plane_normal[0], 0]
     rot = rotation_matrix(theta, direction)
     cell_verts = set(eptm.edge_df[eptm.edge_df['cell'] == mother]['srce'])
     vert_pos = eptm.vert_df.loc[cell_verts, eptm.coords]
@@ -44,7 +44,16 @@ def get_division_vertices(eptm, mother,
                             eptm.coords].values
     centers = (srce_pos + trgt_pos)/2
     theta = np.arctan2(centers[:, 2], centers[:, 1])
-    division_edges = division_edges.iloc[np.argsort(theta)]
+    return division_edges.iloc[np.argsort(theta)]
+
+
+def get_division_vertices(eptm, mother,
+                          plane_normal,
+                          plane_center=None):
+
+    division_edges = get_division_edges(eptm, mother,
+                                        plane_normal,
+                                        plane_center)
     vertices = []
     for edge in division_edges.index:
         new_vert, *new_edges = add_vert(eptm, edge)
@@ -82,7 +91,8 @@ def cell_division(eptm, mother, geom, vertices):
     septum = eptm.face_df.index[-2:]
     daughter_faces.extend(list(septum))
 
-    num_new_edges = len(vertices)*2
+    num_v = len(vertices)
+    num_new_edges = num_v*2
 
     edge_cols = eptm.edge_df.iloc[-num_new_edges:]
     eptm.edge_df = eptm.edge_df.append(edge_cols,
@@ -91,11 +101,11 @@ def cell_division(eptm, mother, geom, vertices):
     new_edges = eptm.edge_df.index[-num_new_edges:]
 
     # To keep mother orientation, the first septum face
-    # belongs to it
+    # belongs to mother
     for v1, v2, edge, oppo in zip(vertices,
                                   np.roll(vertices, -1),
-                                  new_edges[:4],
-                                  new_edges[4:]):
+                                  new_edges[:num_v],
+                                  new_edges[num_v:]):
         # Mother septum
         eptm.edge_df.loc[edge,
                          ['srce', 'trgt',
@@ -107,13 +117,14 @@ def cell_division(eptm, mother, geom, vertices):
                           'face', 'cell']] = (v2, v1,
                                               septum[1], daughter)
 
+    eptm.reset_index()
+    eptm.reset_topo()
+    geom.update_all(eptm)
+
     m_septum_edges = eptm.edge_df[eptm.edge_df['face'] == septum[0]]
     m_septum_norm = m_septum_edges[eptm.ncoords].mean()
     m_septum_pos = eptm.face_df.loc[septum[0], eptm.coords]
 
-    eptm.reset_index()
-    eptm.reset_topo()
-    geom.update_all(eptm)
     # splitting the faces between mother and daughter
     # based on the orientation of the vector from septum
     # center to each face center w/r to the septum norm
