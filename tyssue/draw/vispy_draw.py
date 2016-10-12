@@ -140,7 +140,7 @@ def vp_view(sheet, coords=None,
     view = canvas.central_widget.add_view()
     view.camera = 'turntable'
     view.camera.aspect = 1
-    view.bgcolor = vp.color.Color('#aaaaaa')
+    view.bgcolor = vp.color.Color('#222222')
 
     if draw_specs['face']['visible']:
         mesh = face_visual(sheet, coords,

@@ -11,13 +11,20 @@ def type1_transition(sheet, edge01, epsilon=0.1):
 
     See ../../doc/illus/t1_transition.png for a sketch of the definition
     of the vertices and cells letterings
+
+    Parameters
+    ----------
+    sheet: a `Sheet` instance
+    edge_01: int, index of the edge around which the transition takes place
+    epsilon: float, initial length of the new edge.
+
     """
     # Grab the neighbours
-    vert0, vert1, cell_b = sheet.edge_df.loc[
+    vert0, vert1, face_b = sheet.edge_df.loc[
         edge01, ['srce', 'trgt', 'face']].astype(int)
-    if sheet.face_df.loc[cell_b, 'num_sides'] < 4:
+    if sheet.face_df.loc[face_b, 'num_sides'] < 4:
         logger.warning('''Face %s has 3 sides,
-        type 1 transition is not allowed''' % cell_b)
+        type 1 transition is not allowed''' % face_b)
         return
 
     edge10_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
@@ -28,62 +35,63 @@ def type1_transition(sheet, edge01, epsilon=0.1):
                              edge01, vert0, vert1))
     edge10 = edge10_.index[0]
 
-    cell_d = int(edge10_.loc[edge10, 'face'])
-    if sheet.face_df.loc[cell_d, 'num_sides'] < 4:
+    face_d = int(edge10_.loc[edge10, 'face'])
+    if sheet.face_df.loc[face_d, 'num_sides'] < 4:
         logger.warning('''Face %s has 3 sides,
-        type 1 transition is not allowed''' % cell_b)
+        type 1 transition is not allowed''' % face_b)
         return
 
     edge05_ = sheet.edge_df[(sheet.edge_df['srce'] == vert0) &
-                            (sheet.edge_df['face'] == cell_d)]
+                            (sheet.edge_df['face'] == face_d)]
     edge05 = edge05_.index[0]
-    vert5 = int(edge05_.loc[edge05, 'trgt'])
+    vert5 = int(edge05_['trgt'])
 
     edge50_ = sheet.edge_df[(sheet.edge_df['srce'] == vert5) &
                             (sheet.edge_df['trgt'] == vert0)]
     edge50 = edge50_.index[0]
-    cell_a = int(edge50_.loc[edge50, 'face'])
+    face_a = int(edge50_['face'])
 
     edge13_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
-                            (sheet.edge_df['face'] == cell_b)]
+                            (sheet.edge_df['face'] == face_b)]
     edge13 = edge13_.index[0]
-    vert3 = int(edge13_.loc[edge13, 'trgt'])
+    vert3 = int(edge13_['trgt'])
 
     edge31_ = sheet.edge_df[(sheet.edge_df['srce'] == vert3) &
                             (sheet.edge_df['trgt'] == vert1)]
     edge31 = edge31_.index[0]
-    cell_c = int(edge31_.loc[edge31, 'face'])
+    face_c = int(edge31_['face'])
 
     edge13_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
-                            (sheet.edge_df['face'] == cell_b)]
+                            (sheet.edge_df['face'] == face_b)]
     edge13 = edge13_.index[0]
-    vert3 = int(edge13_.loc[edge13, 'trgt'])
+    vert3 = int(edge13_['trgt'])
 
     # Perform the rearangements
 
-    sheet.edge_df.loc[edge01, 'face'] = int(cell_c)
-    sheet.edge_df.loc[edge10, 'face'] = int(cell_a)
-    sheet.edge_df.loc[edge13, ['srce', 'trgt', 'face']] = vert0, vert3, cell_b
-    sheet.edge_df.loc[edge31, ['srce', 'trgt', 'face']] = vert3, vert0, cell_c
+    sheet.edge_df.loc[edge01, 'face'] = int(face_c)
+    sheet.edge_df.loc[edge10, 'face'] = int(face_a)
+    sheet.edge_df.loc[edge13, ['srce', 'trgt', 'face']] = vert0, vert3, face_b
+    sheet.edge_df.loc[edge31, ['srce', 'trgt', 'face']] = vert3, vert0, face_c
 
-    sheet.edge_df.loc[edge50, ['srce', 'trgt', 'face']] = vert5, vert1, cell_a
-    sheet.edge_df.loc[edge05, ['srce', 'trgt', 'face']] = vert1, vert5, cell_d
+    sheet.edge_df.loc[edge50, ['srce', 'trgt', 'face']] = vert5, vert1, face_a
+    sheet.edge_df.loc[edge05, ['srce', 'trgt', 'face']] = vert1, vert5, face_d
 
     # Displace the vertices
     mean_pos = (sheet.vert_df.loc[vert0, sheet.coords] +
                 sheet.vert_df.loc[vert1, sheet.coords]) / 2
-    cell_b_pos = sheet.face_df.loc[cell_b, sheet.coords]
+    face_b_pos = sheet.face_df.loc[face_b, sheet.coords]
     sheet.vert_df.loc[vert0, sheet.coords] = (mean_pos -
-                                              (mean_pos - cell_b_pos) *
+                                              (mean_pos - face_b_pos) *
                                               epsilon)
-    cell_d_pos = sheet.face_df.loc[cell_d, sheet.coords]
+    face_d_pos = sheet.face_df.loc[face_d, sheet.coords]
     sheet.vert_df.loc[vert1, sheet.coords] = (mean_pos -
-                                              (mean_pos - cell_d_pos) *
+                                              (mean_pos - face_d_pos) *
                                               epsilon)
     sheet.reset_topo()
     # Type 1 transitions might create 3 sided cells, we remove those
     for tri_face in sheet.face_df[sheet.face_df['num_sides'] == 3].index:
         remove_face(sheet, tri_face)
+    return (face_a, face_b, face_c, face_d), ()
 
 
 def cell_division(sheet, mother, geom,

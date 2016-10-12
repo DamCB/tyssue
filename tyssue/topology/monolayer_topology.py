@@ -4,8 +4,10 @@ import numpy as np
 from ..geometry.bulk_geometry import MonoLayerGeometry
 from .bulk_topology import get_division_vertices
 from .bulk_topology import cell_division as bulk_division
+from .sheet_topology import type1_transition as sheet_t1
 
 logger = logging.getLogger(name=__name__)
+
 
 def cell_division(monolayer, mother,
                   orientation='vertical',
@@ -83,3 +85,44 @@ def _assign_vert_segment(monolayer, cell, vertices):
             monolayer.vert_df.loc[v, 'segment'] = 'basal'
         else:
             monolayer.vert_df.loc[v, 'segment'] = 'sagittal'
+
+
+def find_basal_edge(monolayer, apical_edge):
+    """Returns the basal edge parallel to the apical edge passed
+    in argument.
+
+    Parameters
+    ----------
+    monolayer: a :class:`Monolayer` instance
+
+    """
+    srce, trgt, cell = monolayer.edge_df.loc[apical_edge,
+                                             ['srce', 'trgt', 'cell']]
+    cell_edges = monolayer.edge_df[monolayer.edge_df['cell'] == cell]
+    srce_segment = monolayer.vert_df.loc[cell_edges['srce'].values,
+                                         'segment']
+    srce_segment.index = cell_edges.index
+    trgt_segment = monolayer.vert_df.loc[cell_edges['trgt'].values,
+                                         'segment']
+    trgt_segment.index = cell_edges.index
+    b_trgt, = cell_edges[(srce_segment == 'apical') &
+                         (trgt_segment == 'basal') &
+                         (cell_edges['srce'] == srce)]['trgt']
+    b_srce, = cell_edges[(srce_segment == 'basal') &
+                         (trgt_segment == 'apical') &
+                         (cell_edges['trgt'] == trgt)]['srce']
+    b_edge, = cell_edges[(cell_edges['srce'] == b_srce) &
+                         (cell_edges['trgt'] == b_trgt)].index
+    return b_edge
+
+
+def type1_transition(monolayer, apical_edge, epsilon=0.1):
+    """Performs a type 1 transition on the apical and basal meshes
+    """
+    srce, trgt, face, cell = monolayer.edge_df.loc[['srce', 'trgt',
+                                                    'face', 'cell']]
+    apical_sheet = monolayer.get_sub_sheet('apical')
+    sheet_t1(apical_sheet, apical_edge, epsilon)
+    basal_edge = find_basal_edge(monolayer, apical_edge)
+    basal_sheet = monolayer.get_sub_sheet('basal')
+    sheet_t1(basal_sheet, basal_edge, epsilon)
