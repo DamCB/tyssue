@@ -16,6 +16,7 @@ parts
 bin
 var
 sdist
+version.py
 develop-eggs
 .installed.cfg
 lib
