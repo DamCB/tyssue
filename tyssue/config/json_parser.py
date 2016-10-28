@@ -14,6 +14,7 @@ def load_spec(fname):
         spec = json.load(config_file)
     return spec
 
+
 def save_spec(spec, fname,
               overwrite=False):
     """Saves a specification file to json
@@ -31,17 +32,17 @@ def save_spec(spec, fname,
     """
     if not overwrite:
         if os.path.isfile(fname):
-            raise IOError(
-        '''%s exists and overwriting is prevented
-        Please set `overwrite` to True
-        ''' % fname)
+            raise IOError('''%s exists and overwriting is prevented
+Please set `overwrite` to True
+''' % fname)
     with open(fname, 'w+') as config_file:
         json.dump(spec, config_file)
 
 
 def load_default(aspect='core', sub_aspect=''):
 
-    warnings.warn('Deprecated')
+    warnings.warn('load_default is Deprecated,'
+                  ' use methods from config instead')
     cur_dir = os.path.abspath(os.path.dirname(__file__))
     # root = os.path.dirname(cur_dir)
 

@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 
-from scipy.spatial import Delaunay, cKDTree
+from scipy.spatial import cKDTree
 from .objects import Epithelium
+from .sheet import Sheet
 from .generation import extrude, subdivide_faces
 from ..geometry.bulk_geometry import BulkGeometry
 
@@ -64,6 +65,23 @@ class Monolayer(Epithelium):
     @property
     def basal_verts(self):
         return self.segment_index('basal', 'vert')
+
+    def get_sub_sheet(self, segment):
+        """ Returns a :class:`Sheet` object of the corresponding
+        segment
+
+        Parameters
+        ----------
+        segment: str, the corresponding segment, wether 'apical' or 'basal'
+
+        """
+        datasets = {element:
+                    self.datasets[element].loc[
+                        self.segment_index(segment, element)]
+                    for element in ['edge', 'face', 'vert']}
+        specs = {k: self.specs[k] for k in ['face', 'edge',
+                                            'vert', 'settings']}
+        return Sheet(self.identifier+'apical', datasets, specs)
 
 
 class MonolayerWithLamina(Monolayer):
@@ -135,6 +153,5 @@ def set_model(basale, model, specs, modifiers):
         for element, parameters in spec.items():
             idx = basale.segment_index(segment, element)
             for param_name, param_value in parameters.items():
-                basale.datasets[element].loc[idx,
-                                             param_name] = \
-                    param_value * basale.specs[element][param_name]
+                new_val = param_value * basale.specs[element][param_name]
+                basale.datasets[element].loc[idx, param_name] = new_val

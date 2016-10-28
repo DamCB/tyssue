@@ -1,193 +1,206 @@
-from collections import defaultdict
 import logging
-from .sheet_topology import cell_division as face_division
-from ..geometry.bulk_geometry import BulkGeometry
+import numpy as np
+
+from ..geometry.bulk_geometry import MonoLayerGeometry
+from .bulk_topology import get_division_vertices
+from .bulk_topology import cell_division as bulk_division
+from .sheet_topology import type1_transition as sheet_t1
 
 logger = logging.getLogger(name=__name__)
 
 
-def add_vert(monolayer, edge):
-    """
-    Adds a vertex in the middle of the edge,
-
-    The edge and all its parallel and opposite
-    edges, i.e those who share the same vertices
-    are split as well.
-    """
-
-    srce, trgt = monolayer.edge_df.loc[edge, ['srce', 'trgt']]
-    parallels = monolayer.edge_df[(monolayer.edge_df['srce'] == srce) &
-                                  (monolayer.edge_df['trgt'] == trgt)].index
-    opposites = monolayer.edge_df[(monolayer.edge_df['srce'] == trgt) &
-                                  (monolayer.edge_df['trgt'] == srce)].index
-    new_vert = monolayer.vert_df.loc[[srce, trgt]].mean()
-    monolayer.vert_df = monolayer.vert_df.append(new_vert, ignore_index=True)
-    new_vert = monolayer.vert_df.index[-1]
-
-    old_pll = list(parallels)
-    new_pll = []
-    for d_edge in parallels:  # includes the original edge
-        monolayer.edge_df.loc[d_edge, 'trgt'] = new_vert
-        edge_cols = monolayer.edge_df.loc[d_edge]
-        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
-                                                     ignore_index=True)
-        new_edge = monolayer.edge_df.index[-1]
-        monolayer.edge_df.loc[new_edge, 'srce'] = new_vert
-        monolayer.edge_df.loc[new_edge, 'trgt'] = trgt
-        new_pll.append(new_edge)
-
-    old_opp = list(opposites)
-    new_opp = []
-    for d_edge in opposites:
-        monolayer.edge_df.loc[d_edge, 'srce'] = new_vert
-        edge_cols = monolayer.edge_df.loc[d_edge]
-        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
-                                                     ignore_index=True)
-        new_edge = monolayer.edge_df.index[-1]
-        monolayer.edge_df.loc[new_edge, 'srce'] = trgt
-        monolayer.edge_df.loc[new_edge, 'trgt'] = new_vert
-        new_opp.append(new_edge)
-
-    return new_vert, old_pll, new_pll, old_opp, new_opp
-
-
 def cell_division(monolayer, mother,
-                  orientation='horizontal'):
+                  orientation='vertical',
+                  psi=0):
+    """
+    Divides the cell mother in the monolayer.
 
-    if orientation != 'horizontal':
-        raise NotImplementedError('Only horizontal orientation'
-                                  ' is supported at the moment')
-    return horizontal_division(monolayer, mother)
+    Parameters
+    ----------
+    * monolayer: a :class:`Monolayer` instance
+    * mother: int, the index of the cell to devide
+    * orientation: str, {"vertical" | "horizontal"}
+      if "horizontal", performs a division in the equatorial
+      plane of the cell. If "vertical" (the default), performs
+      a division along the basal-apical axis of the cell
+    * psi: float, default 0
+      extra rotation angle of the division plane
+      around the basal-apical plane
 
+    Returns
+    -------
+    * daughter: int, the index of the daughter cell
+    """
 
-def horizontal_division(monolayer, mother):
+    ab_axis = MonoLayerGeometry.basal_apical_axis(monolayer, mother)
+    plane_normal = np.asarray(ab_axis)
+    if orientation == 'horizontal':
+        plane_normal = ab_axis
+    elif orientation == 'vertical':
+        # put the normal along the x axis
+        plane_normal = ab_axis[[0, 2, 1]] * np.array([0, 1, -1])
+        if psi != 0:
+            cp, sp = np.cos(psi), np.sin(psi)
+            rot = np.array([[1,  0,  0],
+                            [0,  cp, sp],
+                            [0, -sp, cp]])
+            plane_normal = np.dot(rot, plane_normal)
+    else:
+        raise ValueError('''orientation argument not understood,
+should be either "horizontal" or "vertical", not {}'''.format(orientation))
 
-    cell_cols = monolayer.cell_df.loc[mother]
-    monolayer.cell_df = monolayer.cell_df.append(cell_cols,
-                                                 ignore_index=True)
-    daughter = monolayer.cell_df.index[-1]
-    #  mother cell's edges
-    m_data = monolayer.edge_df[monolayer.edge_df['cell'] == mother]
+    vertices = get_division_vertices(monolayer, mother,
+                                     plane_normal)
+    daughter = bulk_division(monolayer, mother,
+                             MonoLayerGeometry, vertices)
 
-    sagittal_faces = list(m_data[m_data['segment'] ==
-                                 'sagittal']['face'].unique())
-    face_orbit = monolayer.get_orbits('face', 'srce').groupby(
-        level='face').apply(lambda df: set(df))
-    # grab opposite faces
-    opp_faces = {}
-    for face in sagittal_faces:
-        pair = face_orbit[face_orbit == face_orbit.loc[face]].index
-        opposite = pair[pair != face]
-        if len(opposite) == 1:
-            opp_faces[face] = opposite[0]
-        else:
-            opp_faces[face] = -1
-    # divide the sagittal faces & their opposites
-    new_faces = {}
-    for face, opp_face in opp_faces.items():
-        if opp_face > 0:
-            face_cols = monolayer.face_df.loc[[face, opp_face]]
-            monolayer.face_df = monolayer.face_df.append(face_cols,
-                                                         ignore_index=True)
-            new_faces[face] = monolayer.face_df.index[-2]
-            new_faces[opp_face] = monolayer.face_df.index[-1]
-        else:
-            face_cols = monolayer.face_df.loc[face]
-            monolayer.face_df = monolayer.face_df.append(face_cols,
-                                                         ignore_index=True)
-            new_faces[face] = monolayer.face_df.index[-1]
+    # Correct segment assignations for the septum
+    septum = monolayer.face_df.index[-2:]
+    septum_edges = monolayer.edge_df.index[-2*len(vertices):]
+    if orientation == 'vertical':
+        monolayer.face_df.loc[septum, 'segment'] = 'sagittal'
+        monolayer.edge_df.loc[septum_edges, 'segment'] = 'sagittal'
+        _assign_vert_segment(monolayer, mother, vertices)
 
-    # grab the sagittal edges oriented upward
-    srce_segment = monolayer.upcast_srce(
-        monolayer.vert_df['segment']).loc[m_data.index]
-    trgt_segment = monolayer.upcast_trgt(
-        monolayer.vert_df['segment']).loc[m_data.index]
+    elif orientation == 'horizontal':
+        monolayer.face_df.loc[septum[0], 'segment'] = 'apical'
+        monolayer.face_df.loc[septum[1], 'segment'] = 'basal'
+        monolayer.edge_df.loc[septum_edges[:len(vertices)],
+                              'segment'] = 'apical'
+        monolayer.edge_df.loc[septum_edges[len(vertices):],
+                              'segment'] = 'basal'
+        monolayer.vert_df.loc[vertices, 'segment'] = 'apical'
 
-    apical_edges = m_data[m_data['segment'] == 'apical'].index
-    monolayer.edge_df.loc[apical_edges, 'cell'] = daughter
-
-    sagittal_edges = m_data[(m_data['segment'] == 'sagittal') &
-                            (srce_segment == 'basal') &
-                            (trgt_segment == 'apical')]
-    # split the sagittal edges
-    new_verts = {}
-    face_verts = defaultdict(set)
-    for edge, edge_data in sagittal_edges.iterrows():
-        new_vert, old_pll, new_pll, old_opp, new_opp = add_vert(monolayer,
-                                                                edge)
-        new_verts[edge] = new_vert
-        for old, new in zip(old_pll+old_opp, new_pll+new_opp):
-            old_face = monolayer.edge_df.loc[old, 'face']
-            if old_face not in new_faces:
-                continue
-            new_face = new_faces[old_face]
-            monolayer.edge_df.loc[new, 'face'] = new_face
-            monolayer.edge_df.loc[new, 'cell'] = daughter
-            face_verts[old_face].add(new_vert)
-    for vs in face_verts.values():
-        assert len(vs) == 2
-
-    # add the new horizontal faces
-
-    apical_edges = m_data[(m_data['segment'] == 'apical')]
-    mother_apical_face = apical_edges['face'].iloc[0]
-    apical_face_cols = monolayer.face_df.loc[mother_apical_face]
-    monolayer.face_df.append(apical_face_cols, ignore_index=True)
-    new_apical = monolayer.face_df.index[-1]
-
-    basal_edges = m_data[(m_data['segment'] == 'basal')]
-    mother_basal_face = basal_edges['face'].iloc[0]
-    basal_face_cols = monolayer.face_df.loc[mother_basal_face]
-    monolayer.face_df.append(basal_face_cols, ignore_index=True)
-    new_basal = monolayer.face_df.index[-1]
-
-    # add the horizontal edges
-    for edge, edge_data in sagittal_edges.iterrows():
-        old_face = edge_data['face']
-        new_face = new_faces[old_face]
-        vert_a = new_verts[edge]
-        vert_b = face_verts[old_face].difference({vert_a}).pop()
-        edge_cols = monolayer.edge_df.loc[edge].copy()
-        edge_cols['srce'] = vert_a
-        edge_cols['trgt'] = vert_b
-        edge_cols['face'] = old_face
-        edge_cols['cell'] = mother
-        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
-                                                     ignore_index=False)
-        edge_cols = monolayer.edge_df.loc[edge].copy()
-        edge_cols['srce'] = vert_b
-        edge_cols['trgt'] = vert_a
-        edge_cols['face'] = new_face
-        edge_cols['cell'] = daughter
-        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
-                                                     ignore_index=False)
-
-        edge_cols = apical_edges.iloc[0].copy()
-        edge_cols['srce'] = vert_b
-        edge_cols['trgt'] = vert_a
-        edge_cols['face'] = new_apical
-        edge_cols['cell'] = mother
-        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
-                                                     ignore_index=False)
-
-        edge_cols = basal_edges.iloc[0].copy()
-        edge_cols['srce'] = vert_a
-        edge_cols['trgt'] = vert_b
-        edge_cols['face'] = new_basal
-        edge_cols['cell'] = daughter
-        monolayer.edge_df = monolayer.edge_df.append(edge_cols,
-                                                     ignore_index=False)
     return daughter
 
 
-def vertical_division(monolayer, mother, *args, **kwargs):
+def _assign_vert_segment(monolayer, cell, vertices):
 
-    mother_edges = monolayer.edge_df[
-        monolayer.edge_df['cell'] == mother]
-    mother_faces = set(mother_edges['face'])
+    for v in vertices:
+        segs = set(monolayer.edge_df[
+            monolayer.edge_df['srce'] == v]['segment'])
+        if 'apical' in segs:
+            monolayer.vert_df.loc[v, 'segment'] = 'apical'
+        elif 'basal' in segs:
+            monolayer.vert_df.loc[v, 'segment'] = 'basal'
+        else:
+            monolayer.vert_df.loc[v, 'segment'] = 'sagittal'
 
-    apical_face, = mother_edges[
-        mother_edges['segment'] == 'apical']['face'].unique()
-    apical_daughter = face_division(monolayer,
-                                    apical_face,
-                                    BulkGeometry, *args, **kwargs)
+
+def find_basal_edge(monolayer, apical_edge):
+    """Returns the basal edge parallel to the apical edge passed
+    in argument.
+
+    Parameters
+    ----------
+    monolayer: a :class:`Monolayer` instance
+
+    """
+    srce, trgt, cell = monolayer.edge_df.loc[apical_edge,
+                                             ['srce', 'trgt', 'cell']]
+    cell_edges = monolayer.edge_df[monolayer.edge_df['cell'] == cell]
+    srce_segment = monolayer.vert_df.loc[cell_edges['srce'].values,
+                                         'segment']
+    srce_segment.index = cell_edges.index
+    trgt_segment = monolayer.vert_df.loc[cell_edges['trgt'].values,
+                                         'segment']
+    trgt_segment.index = cell_edges.index
+    b_trgt, = cell_edges[(srce_segment == 'apical') &
+                         (trgt_segment == 'basal') &
+                         (cell_edges['srce'] == srce)]['trgt']
+    b_srce, = cell_edges[(srce_segment == 'basal') &
+                         (trgt_segment == 'apical') &
+                         (cell_edges['trgt'] == trgt)]['srce']
+    b_edge, = cell_edges[(cell_edges['srce'] == b_srce) &
+                         (cell_edges['trgt'] == b_trgt)].index
+    return b_edge
+
+
+def type1_transition(monolayer, apical_edge, epsilon=0.1):
+    """Performs a type 1 transition on the apical and basal meshes
+    """
+    v0_a, v1_a, fb_a, cb_a = monolayer.edge_df.loc[
+        apical_edge, ['srce', 'trgt', 'face', 'cell']]
+    basal_edge = find_basal_edge(monolayer, apical_edge)
+    v0_b, v1_b, fb_b, cb_b = monolayer.edge_df.loc[
+        basal_edge, ['srce', 'trgt', 'face', 'cell']]
+    if monolayer.face_df.loc[fb_a, 'num_sides'] < 4:
+        logger.warning('''Face %s has 3 sides,
+type 1 transition is not allowed''' % fb_a)
+        return
+
+
+def layer_t1_transition(monolayer, edge01, epsilon=0.1):
+
+    vert0, vert1, face_ba, cell_b = monolayer.edge_df.loc[
+        edge01, ['srce', 'trgt', 'face', 'cell']].astype(int)
+    segment = monolayer.edge_df.loc[edge01, 'segment']
+    if monolayer.face_df.loc[face_ba, 'num_sides'] < 4:
+        logger.warning('''Face %s has 3 sides,
+type 1 transition is not allowed''' % face_ba)
+        return
+    edges01_ = monolayer.edge_df[(monolayer.edge_df['srce'] == vert0) &
+                                 (monolayer.edge_df['trgt'] == vert1)]
+    edges10_ = monolayer.edge_df[(monolayer.edge_df['srce'] == vert1) &
+                                 (monolayer.edge_df['trgt'] == vert0)]
+    if not len(edges10_.index):
+        raise ValueError('opposite edge to {} with '
+                         'source {} and target {} not found'.format(
+                             edge01, vert0, vert1))
+    edges10 = edges10_.index
+    edges01 = edges01_.index
+
+    face_da = edges10_[edges10_['segment'] == segment]['face']
+    face_ds = edges10_[edges10_['segment'] != segment]['face']
+    face_bs = edges01_[edges01_['segment'] != segment]['face']
+
+    if monolayer.face_df.loc[face_da, 'num_sides'] < 4:
+        logger.warning('''Face %s has 3 sides,
+        type 1 transition is not allowed''' % face_da)
+        return
+
+    vert5 = monolayer.edge_df[(monolayer.edge_df['srce'] == vert0) &
+                              (monolayer.edge_df['face'] == face_da)]['trgt']
+    edges05_ = monolayer.edge_df[(monolayer.edge_df['srce'] == vert0) &
+                                 (monolayer.edge_df['trgt'] == vert5)]
+    edges05 = edges05_.index
+
+    edges50_ = monolayer.edge_df[(monolayer.edge_df['srce'] == vert5) &
+                                 (monolayer.edge_df['trgt'] == vert0)]
+    edges50 = edges50_.index
+    faces_aa = edges50_[edges50_['segment'] == segment]['face']
+    face_as = edges50_[edges50_['segment'] != segment]['face']
+
+    vert3 = monolayer.edge_df[(monolayer.edge_df['srce'] == vert1) &
+                              (monolayer.edge_df['face'] == face_ba)]['trgt']
+
+    edges31_ = monolayer.edge_df[(monolayer.edge_df['srce'] == vert3) &
+                                 (monolayer.edge_df['trgt'] == vert1)]
+    edges31 = edges31_.index
+    faces_c = edges31_['face']
+
+    edges13_ = monolayer.edge_df[(monolayer.edge_df['srce'] == vert1) &
+                                 (monolayer.edge_df['trgt'] == vert3)]
+    edges13 = edges13_.index
+
+    # rearangements
+    monolayer.edge_df.loc[edge01, 'face'] = int(face_c)
+    monolayer.edge_df.loc[edge10, 'face'] = int(face_a)
+    monolayer.edge_df.loc[edges13, ['srce', 'trgt', 'face']] = vert0, vert3
+    monolayer.edge_df.loc[edges31, ['srce', 'trgt', 'face']] = vert3, vert0
+
+    monolayer.edge_df.loc[edges50, ['srce', 'trgt', 'face']] = vert5, vert1
+    monolayer.edge_df.loc[edges05, ['srce', 'trgt', 'face']] = vert1, vert5
+
+    # Displace the vertices
+    mean_pos = (monolayer.vert_df.loc[vert0, monolayer.coords] +
+                monolayer.vert_df.loc[vert1, monolayer.coords]) / 2
+    face_b_pos = monolayer.face_df.loc[face_b, monolayer.coords]
+    monolayer.vert_df.loc[vert0, monolayer.coords] = (mean_pos -
+                                                      (mean_pos - face_b_pos) *
+                                                      epsilon)
+    face_d_pos = monolayer.face_df.loc[face_d, monolayer.coords]
+    monolayer.vert_df.loc[vert1, monolayer.coords] = (mean_pos -
+                                                      (mean_pos - face_d_pos) *
+                                                      epsilon)
+    monolayer.reset_topo()

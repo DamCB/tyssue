@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-from ..config.json_parser import load_default
-from ..config.geometry import flat_sheet
+from ..config.geometry import planar_spec, bulk_spec, flat_sheet
 
 import logging
 log = logging.getLogger(name=__name__)
@@ -79,7 +78,7 @@ From Voronoi tessalations
 def from_3d_voronoi(voro):
     """
     """
-    specs3d = load_default('geometry', 'bulk')
+    specs3d = bulk_spec()
 
     el_idx = []
 
@@ -146,8 +145,7 @@ def from_2d_voronoi(voro, specs=None):
     """
     """
     if specs is None:
-        specs = load_default('geometry', 'planar')
-
+        specs = planar_spec()
     el_idx = []
 
     for rv, rp in zip(voro.ridge_vertices,

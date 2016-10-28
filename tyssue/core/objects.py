@@ -226,9 +226,9 @@ class Epithelium():
         '''
         TODO: not sure this works as expected with the new indexing
         '''
-        
+
         raise NotImplementedError('Epithelium.from_points() is not implemented and should not be used.') #pragma: no cover
-    
+
         # if points.shape[1] == 2:
         #     coords = ['x', 'y']
         # elif points.shape[1] == 3:
@@ -252,7 +252,7 @@ class Epithelium():
 
     def set_specs(self, domain, base,
                   new_specs=None,
-                  default_base=None, reset=False): #pragma: no cover
+                  default_base=None, reset=False):  # pragma: no cover
         warnings.warn('Deprecated, use update_specs() instead.')
 
         if base is None:
@@ -298,8 +298,8 @@ class Epithelium():
     def edge_idx(self):
         # Should it return self.edge_df.index instead ?
         return self.edge_df[self.element_names]
-    
-    
+
+
 
     @property
     def Nc(self):
@@ -360,7 +360,7 @@ class Epithelium():
     def upcast_face(self, df):
         return self._upcast(self.e_face_idx, df)
 
-    def upcast_cell(self, df): 
+    def upcast_cell(self, df):
         return self._upcast(self.e_cell_idx, df)
 
     def _lvl_sum(self, df, lvl):
@@ -701,7 +701,7 @@ class Epithelium():
         If `vertex_normals` is True, also returns the normals of each vertex
         (set as the average of the vertex' edges), suitable for .OBJ export
         '''
-        #- BC -#
+        # - BC -#
         # This method only works on 3D-epithelium
         vertices = self.vert_df[coords]
         faces = self.edge_df.groupby('face').apply(ordered_vert_idxs)
@@ -711,6 +711,10 @@ class Epithelium():
                        self.edge_df.groupby('trgt')[self.ncoords].mean()) / 2.
             return vertices.values, faces.values, normals.values
         return vertices.values, faces.values
+
+    def validate_closed_cells(self):
+        is_closed = self.edge_df.groupby('cell').apply(_is_closed_cell)
+        return is_closed
 
 
 def _ordered_edges(face_edges):
@@ -772,3 +776,12 @@ def get_opposite(edge_df):
     opposite[np.isnan(opposite)] = -1
 
     return opposite.astype(np.int)
+
+
+def _is_closed_cell(e_df):
+    edges = e_df[['srce', 'trgt']]
+    for e, (srce, trgt) in edges.iterrows():
+        if (edges[(edges['srce'] == trgt) &
+                  (edges['trgt'] == srce)].index.size != 1):
+            return False
+    return True
