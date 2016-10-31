@@ -168,7 +168,7 @@ type 1 transition is not allowed''' % face_ba)
     edges50_ = monolayer.edge_df[(monolayer.edge_df['srce'] == vert5) &
                                  (monolayer.edge_df['trgt'] == vert0)]
     edges50 = edges50_.index
-    faces_aa = edges50_[edges50_['segment'] == segment]['face']
+    face_aa = edges50_[edges50_['segment'] == segment]['face']
     face_as = edges50_[edges50_['segment'] != segment]['face']
 
     vert3 = monolayer.edge_df[(monolayer.edge_df['srce'] == vert1) &

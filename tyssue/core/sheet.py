@@ -107,7 +107,7 @@ class Sheet(Epithelium):
     def planar_sheet_3d(cls, identifier,
                         nx, ny, distx, disty):
         from scipy.spatial import Voronoi
-        from ..config.geometry import sheet_spec
+        from ..config.geometry import flat_sheet
         from .generation import hexa_grid2d, from_2d_voronoi
         grid = hexa_grid2d(nx, ny,
                            distx, disty)
@@ -116,5 +116,5 @@ class Sheet(Epithelium):
         datasets['face']['z'] = 0
 
         return cls(identifier, datasets,
-                   specs=sheet_spec(),
+                   specs=flat_sheet(),
                    coords=['x', 'y', 'z'])

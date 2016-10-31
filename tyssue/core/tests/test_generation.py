@@ -12,6 +12,7 @@ from pytest import raises
 import numpy as np
 import pandas as pd
 
+
 def test_3faces():
 
     datasets, _ = generation.three_faces_sheet()
@@ -28,8 +29,6 @@ def test_from_3d_voronoi():
     assert datasets['edge'].shape[0] == 1272
     assert datasets['face'].shape[0] == 283
     assert datasets['cell'].shape[0] == 72
-
-    
 
 
 def test_from_2d_voronoi():
@@ -91,17 +90,16 @@ def test_anchors():
     sheet = Sheet('test_anchors', datasets, specs)
 
     sheet.edge_df['opposite'] = get_opposite(sheet.edge_df)
-    
+
     expected_dict = {18:[1,13],19:[2,14],20:[3,15],21:[4,16],22:[5,17],23:[6,18],24:[7,19],25:[8,20],26:[9,21],27:[10,22],28:[11,23],29:[12,24]}
 
-    
+
     expected_res = pd.DataFrame.from_dict(expected_dict, orient="index")
     expected_res.columns = ['srce','trgt']
-    
-    
+
+
     generation.create_anchors(sheet)
 
     res_srce_trgt_anchors = sheet.edge_df.loc[18:, ['srce','trgt']]
-    
+
     assert res_srce_trgt_anchors.equals(expected_res)
-    

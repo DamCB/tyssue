@@ -136,6 +136,30 @@ def parse_edge_specs(edge_draw_specs):
     return arrow_specs, collection_specs
 
 
+def quick_edge_draw(sheet, coords=['x', 'y'], ax=None, **draw_spec_kw):
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    x, y = coords
+    srce_x = sheet.upcast_srce(sheet.vert_df[x]).values
+    srce_y = sheet.upcast_srce(sheet.vert_df[y]).values
+    trgt_x = sheet.upcast_trgt(sheet.vert_df[x]).values
+    trgt_y = sheet.upcast_trgt(sheet.vert_df[y]).values
+
+    lines_x, lines_y = np.zeros(2*sheet.Ne), np.zeros(2*sheet.Ne)
+    lines_x[::2] = srce_x
+    lines_x[1::2] = trgt_x
+    lines_y[::2] = srce_y
+    lines_y[1::2] = trgt_y
+    # Trick from https://github.com/matplotlib/
+    # matplotlib/blob/master/lib/matplotlib/tri/triplot.py#L65
+    lines_x = np.insert(lines_x, slice(None, None, 2), np.nan)
+    lines_y = np.insert(lines_y, slice(None, None, 2), np.nan)
+    ax.plot(lines_x, lines_y, **draw_spec_kw)
+    return ax
+
+
 def plot_forces(sheet, geom, model,
                 coords, scaling,
                 ax=None,
@@ -227,11 +251,11 @@ def get_arc_data(sheet):
     e_x = sheet.edge_df['dx'] / sheet.edge_df['length']
     e_y = sheet.edge_df['dy'] / sheet.edge_df['length']
 
-    center_x = ((srce_pos.x + trgt_pos.x)/2
-                - e_y * (radius - sheet.edge_df['sagitta']))
+    center_x = ((srce_pos.x + trgt_pos.x)/2 -
+                e_y * (radius - sheet.edge_df['sagitta']))
 
-    center_y = ((srce_pos.y + trgt_pos.y)/2
-                + e_x  * (radius - sheet.edge_df['sagitta']))
+    center_y = ((srce_pos.y + trgt_pos.y)/2 -
+                e_x * (radius - sheet.edge_df['sagitta']))
 
     alpha = sheet.edge_df['arc_chord_angle']
     beta = sheet.edge_df['chord_orient']
@@ -239,7 +263,7 @@ def get_arc_data(sheet):
     # Ok, I admit a fair amount of trial and
     # error to get to the stuff below :-p
     rot = beta - np.sign(alpha)*np.pi/2
-    theta1 = (- alpha + rot) * np.sign(alpha)
+    theta1 = (-alpha + rot) * np.sign(alpha)
     theta2 = (alpha + rot) * np.sign(alpha)
 
     center_data = pd.DataFrame.from_dict({
