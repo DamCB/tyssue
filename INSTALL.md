@@ -1,37 +1,48 @@
-## Installing tyssue
+## Installing tyssue with conda
+
+If you already have a conda environment ready:
+```
+conda install -c glyg tyssue
+```
+
+## From the beginnig
 
 Those are the instructions to install the package from source on a
 debian-like linux distribution. If you allready have a basic
 scientific python stack, use it, don't install anaconda.
 
 
-### Get Anaconda
+### Get and intall Anaconda
+
 Go to http://continuum.io/downloads and grab anaconda for your architecture.
 
-### Install Anaconda
 
 ```bash
 bash Anaconda3-2.2.0-Linux-x86_64.sh
 source .bashrc # update your PATH
 ```
 
-### Install package dependencies
-
-```bash
-sudo apt-get install git
-```
+If you don't want the whole distrib, you can alternatively download
+[miniconda](http://conda.pydata.org/miniconda.html)
 
 ### Create a virtual environment with `conda`
 
 ```bash
-conda create -n tyssue python=3.4 numpy scipy vispy matplotlib nose coverage
+conda create -n tyssue python=3.4 numpy scipy vispy matplotlib pytest tables numexpr
 ## activate the new environment
 source activate tyssue
-## install some friends
-conda install -c https://conda.anaconda.org/osgeo cgal
 ```
 
-### Download and complie `tyssue`
+### Install with conda
+
+```
+conda install -c glyg tyssue
+```
+
+### Alternative: Download and install `tyssue` from source
+
+If you want to do that, I assume you allready know how to manage
+dependencies on your platform.
 
 ```bash
 git clone https://github.com/CellModels/tyssue.git
