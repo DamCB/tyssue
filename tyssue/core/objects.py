@@ -491,6 +491,9 @@ class Epithelium():
           we'll just assert it worked.
         """
 
+        if not 'opposite' in self.edge_df.columns:
+            self.get_opposite()
+
         self.dble_edges = self.edge_df[self.edge_df['opposite'] >= 0].index
         theta = np.arctan2(self.edge_df.loc[self.dble_edges, 'dy'],
                            self.edge_df.loc[self.dble_edges, 'dx'])
