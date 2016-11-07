@@ -14,15 +14,13 @@ from ..config.subdiv import bulk_spec
 
 class EdgeSubdiv:
     """
-    Small `namedtuple` like container for
-    the subdivision arrays.
-
+    Container class to ease discretisation along the edges
 
     """
 
 
     def __init__(self, edge_df, **kwargs):
-        """Creates an indexer and a lookup table to ease
+        """Creates an indexer and an offset array  to ease
         discretisation along the edges.
 
         Parameters
@@ -32,7 +30,7 @@ class EdgeSubdiv:
 
         Keyword parameters
         ------------------
-        density_args: dictionnary,
+        density: dictionnary,
           the keywords arguments of density_func, defaults to {}
 
 
@@ -59,25 +57,38 @@ class EdgeSubdiv:
         self.density_lut = None
         self.update_all()
 
-
     def update_all(self):
         self.update_density_lut()
-        self.update_particules()
+        self.update_particles()
         self.update_upcaster()
         self.update_offset()
 
-    def update_density_lut(self):
+    def update_density_lut(self, density_lut=None):
+        """
+        Updates the density lookup table function.
+
+        The `density_lut` can be any function
+        with a single `num` argument
+
+
+        Parameters
+        ----------
+        density_lut: function, default None,
+          edge-wise function of the number of points
+        """
+        if density_lut is not None:
+            self.density_lut = density_lut
         if np.isclose(self.specs["gamma"], 1.0):
-            self.density_lut = lambda num: np.arange(0., num) / num
+            self.density_lut = lambda num: np.arange(0., num)/num
         else:
             gamma = self.specs["gamma"]
-            self.density_lut = (lambda num: np.arange(0., num)**gamma / num)
+            self.density_lut = lambda num: (np.arange(0., num)/num)**gamma
 
-    def update_particules(self):
+    def update_particles(self):
         """
         * Updates the number of particles per edge from edges length
         and density values:
-        `num_particules = length * density`
+        `num_particles = length * density`
         * Also updates the self.points df
         """
         points_per_edges = self.edge_df.eval('length * density').astype(np.int)
@@ -93,8 +104,6 @@ class EdgeSubdiv:
         'upcaster' indexes over self.edge_df repeated to
         upcast data from the edge df to the points df
         """
-        #
-
         self.points['upcaster'] = np.repeat(
             np.arange(self.edge_df.shape[0]),
             self.edge_df['num_particles'])
@@ -110,11 +119,11 @@ class EdgeSubdiv:
             return False
         if not self.points['upcaster'].shape[0] == self.n_points:
             return False
-        if not self.points['lut'].shape()[0] == self.n_points:
+        if not self.points['offset'].shape()[0] == self.n_points:
             return False
         return True
 
-    def edge_point_cloud(self, eptm,
+    def edge_point_cloud(self, srce_pos, r_ij,
                          coords=['x', 'y', 'z'],
                          dcoords=['dx', 'dy', 'dz']):
         """Generates a point cloud along the edges of the epithelium.
@@ -128,28 +137,31 @@ class EdgeSubdiv:
         upcaster: indexer of shape Np with the repeated
           edge index for each point
         """
-
-        srce_pos = eptm.upcast_srce(eptm.vert_df[eptm.coords])
-        for c in coords:
-            self.edge_df[c] = srce_pos[c]
-            self.edge_df['d'+c] = eptm.edge_df['d'+c]
+        for u, du in zip(coords, dcoords):
+            self.edge_df[u] = srce_pos[u]
+            self.edge_df['d'+u] = r_ij[du]
         cols = coords + dcoords
         upcast = self.edge_df.loc[self.points['upcaster'],
                                   cols]
-        upcast['lut'] = self.points['lut']
-        for c in eptm.coords:
+        upcast['offset'] = self.points['offset'].values
+        for c in coords:
             self.points[c] = upcast.eval(
-                '{} + lut * {}'.format(c, 'd'+c)).values
+                '{} + offset * {}'.format(c, 'd'+c)).values
+        if self.specs['noise'] > 0.0:
+            self.points[coords] += np.random.normal(scale=self.specs['noise'],
+                                                    size=(self.n_points, 3))
 
 
 def write_storm_csv(filename, points,
-                    eptm, split_by=None, **csv_args):
+                    coords=['x', 'y', 'z'],
+                    split_by=None, **csv_args):
 
     columns = ['frame', 'x [nm]', 'y [nm]', 'z [nm]',
                'uncertainty_xy', 'uncertainty_z']
+    points = points.dropna()
     storm_points = pd.DataFrame(np.zeros((points.shape[0], 6)),
                                 columns=columns)
-    storm_points[['x [nm]', 'y [nm]', 'z [nm]']] = points[eptm.coords].dropna()
+    storm_points[['x [nm]', 'y [nm]', 'z [nm]']] = points[coords]
     storm_points['frame'] = 1
     storm_points[['uncertainty_xy',
                   'uncertainty_z']] = 2.1
