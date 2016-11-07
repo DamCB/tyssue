@@ -3,26 +3,10 @@ import os
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 
-def core_spec():
-    """Solver default specification for scipy.optimize.minimize gradient
-    descent
-
-    .. code-block::
-
-        {
-            'face': {
-                'is_alive': true,
-                 },
-            'edge': {
-                'face': 0,
-                'srce': 0,
-                'trgt': 0
-                 },
-            'vert': {
-                'is_active': true,
-                 }
-        }
-
+def bulk_spec():
     """
-    specfile = os.path.join(CURRENT_DIR, 'core.json')
+    Default settings to perform edge subdivisions,
+    see tyssue.io.point_cloud.py
+    """
+    specfile = os.path.join(CURRENT_DIR, 'bulk.json')
     return load_spec(specfile)

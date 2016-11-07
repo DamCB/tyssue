@@ -39,9 +39,8 @@ class SheetGeometry(PlanarGeometry):
         coords = sheet.coords
         face_pos = sheet.upcast_face(sheet.face_df[coords]).values
         srce_pos = sheet.upcast_srce(sheet.vert_df[coords]).values
-        trgt_pos = sheet.upcast_trgt(sheet.vert_df[coords]).values
-
-        normals = np.cross(srce_pos - face_pos, trgt_pos - srce_pos)
+        normals = np.cross(srce_pos - face_pos,
+                           sheet.edge_df[sheet.dcoords].values)
         sheet.edge_df[sheet.ncoords] = normals
 
     @staticmethod
