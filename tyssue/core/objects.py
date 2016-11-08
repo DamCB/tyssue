@@ -5,7 +5,6 @@ import pandas as pd
 # from . import generation
 from ..utils.utils import set_data_columns, spec_updater
 from ..config.json_parser import load_default
-from .generation import make_df
 
 import warnings
 
@@ -490,6 +489,9 @@ class Epithelium():
           edge['dy'] == 0`. Until we need or find a better solution,
           we'll just assert it worked.
         """
+
+        if not 'opposite' in self.edge_df.columns:
+            self.edge_df['opposite'] = get_opposite(self.edge_df)
 
         self.dble_edges = self.edge_df[self.edge_df['opposite'] >= 0].index
         theta = np.arctan2(self.edge_df.loc[self.dble_edges, 'dy'],

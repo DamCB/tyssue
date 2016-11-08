@@ -94,6 +94,14 @@ centered models...).
 * The documentation is browsable online [here](http://tyssue.readthedocs.io/en/latest/)
 * Introduction notebooks are available [here](doc/notebooks).
 
+### Mailing list:
+
+tyssue@framaliste.org - https://framalistes.org/sympa/info/tyssue
+
+Subscribe ➙ https://framalistes.org/sympa/subscribe/tyssue
+Unsubscribe ➙ https://framalistes.org/sympa/sigrequest/tyssue
+
+
 ### Authors
 
 * Bertrand Caré - @bcare
@@ -106,10 +114,9 @@ centered models...).
 
 ## Dependencies
 
-As all the dependencies are already completely supported in python 3.x, **we won't be maintaining a
-python 2.x version**, because it's time to move on...
-
-### Python
+As all the dependencies are already completely supported in
+python 3.x, **we won't be maintaining a python 2.x version**, because
+it's time to move on...
 
 - Python >= 3.4
 - numpy >= 1.8
@@ -119,6 +126,10 @@ python 2.x version**, because it's time to move on...
 - vispy >= 0.4
 - pandas >= 0.16
 
+### Tests
+- pytest >= 3.0
+- converage >= 4.2
+- pytest-cov >= 2.3
 
 ## Install
 
