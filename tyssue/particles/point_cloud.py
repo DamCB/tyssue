@@ -50,7 +50,8 @@ class EdgeSubdiv:
         self.specs.update(**kwargs)
 
         if not 'density' in edge_df:
-            self.edge_df['density'] = self.specs['density']
+            unit_length = edge_df.length.mean()
+            self.edge_df['density'] = self.specs['density']/unit_length
         self.specs.update(**kwargs)
         self.n_points = 0
         self.points = None
@@ -95,8 +96,9 @@ class EdgeSubdiv:
         self.edge_df['num_particles'] = points_per_edges
         self.n_points = points_per_edges.sum()
         self.points = pd.DataFrame(np.zeros((self.n_points, 2)),
-                                            columns=['upcaster',
-                                                     'offset'])
+                                   columns=['upcaster',
+                                            'offset'])
+
     def update_upcaster(self):
         """
         resets the 'upcaster' column of self.points,
