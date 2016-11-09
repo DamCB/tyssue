@@ -92,7 +92,8 @@ class EdgeSubdiv:
         `num_particles = length * density`
         * Also updates the self.points df
         """
-        points_per_edges = self.edge_df.eval('length * density').astype(np.int)
+        points_per_edges = np.round(
+            self.edge_df.eval('length * density')).astype(np.int)
         self.edge_df['num_particles'] = points_per_edges
         self.n_points = points_per_edges.sum()
         self.points = pd.DataFrame(np.zeros((self.n_points, 2)),
@@ -126,8 +127,8 @@ class EdgeSubdiv:
         return True
 
     def edge_point_cloud(self, srce_pos, r_ij,
-                         coords=['x', 'y', 'z'],
-                         dcoords=['dx', 'dy', 'dz']):
+                         coords=('x', 'y', 'z'),
+                         dcoords=('dx', 'dy', 'dz')):
         """Generates a point cloud along the edges of the epithelium.
 
         If eptm.edge_df has a `"density"` column, it is used
