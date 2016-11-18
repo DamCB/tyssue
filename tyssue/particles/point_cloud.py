@@ -145,18 +145,34 @@ class EdgeSubdiv:
         return True
 
     def edge_point_cloud(self, srce_pos, r_ij,
+                         offset_modulation=None,
+                         modulation_kwargs=None,
                          coords=['x', 'y', 'z'],
                          dcoords=['dx', 'dy', 'dz']):
         """Generates a point cloud along the edges of the epithelium.
 
-        If eptm.edge_df has a `"density"` column, it is used
-        to modulate the number of points per edges on a edge basis.
+        if a offset_modulation function is provided, it is used to
+        transform the offsets
+
+        Parameters
+        ----------
+        srce_pos: DataFrame of shape (self.Ne, ndim)
+          with the origins of the points for each edge
+          (usually the edge upcasted source vertex)
+
+        r_ij: DataFrame of shape (self.Ne, ndim)
+          the edge vector coordiantes
+
+        offset_modulation: function of self returning
+          an array with shape (self.Np,) containing
+          the modified offsets. self.points['offset']
+          is used by default.
+        modulation_kwargs: keyword arguments to the modulation
+          function
 
         Returns
         -------
         points: (Np, 3) pd.DataFrame with the points positions
-        upcaster: indexer of shape Np with the repeated
-          edge index for each point
         """
         for u, du in zip(coords, dcoords):
             self.edge_df[u] = srce_pos[u]
@@ -164,18 +180,22 @@ class EdgeSubdiv:
         cols = coords + dcoords
         upcast = self.edge_df.loc[self.points['upcaster'],
                                   cols]
-        upcast['offset'] = self.points['offset'].values
+        if offset_modulation is None:
+            upcast['offset'] = self.points['offset'].values
+        else:
+            upcast['offset'] = offset_modulation(self, **modulation_kwargs)
         for c in coords:
             self.points[c] = upcast.eval(
                 '{} + offset * {}'.format(c, 'd'+c)).values
         if self.specs['noise'] > 0.0:
             self.points[coords] += np.random.normal(scale=self.specs['noise'],
                                                     size=(self.n_points, 3))
+        return self.points[coords]
 
 
 def get_edge_bases(eptm, base=('face', 'srce', 'trgt')):
 
-    edge_upcast_pos = {element: eptm.upcast_cols(eptm, element,
+    edge_upcast_pos = {element: eptm.upcast_cols(element,
                                                  eptm.coords)
                        for element in base}
     orig = base[0]
@@ -228,14 +248,21 @@ class FaceGrid:
             points.update({col: df[col].values for col in cols})
         self.points = pd.DataFrame.from_dict(points)
 
-    def face_point_cloud(self, coords=['x', 'y', 'z'],
+    def face_point_cloud(self,
+                         offset_modulation=None,
+                         modulation_kwargs=None,
+                         coords=['x', 'y', 'z'],
                          dcoords=['dx', 'dy', 'dz']):
         upcast = {}
+        if offset_modulation is None:
+            offsets = self.points[self.of_cols]
+        else:
+            offsets = offset_modulation(self, **modulation_kwargs)
         for key, subdiv in self.subdivs.items():
             upcast[key] = subdiv.edge_df.loc[self.points['up_{}'.format(key)],
                                              coords+dcoords+['length']].copy()
             upcast[key].reset_index(inplace=True)
-            upcast[key]['offset'] = self.points['of_{}'.format(key)].values
+            upcast[key]['offset'] = offsets['of_{}'.format(key)].values
 
         for u, du in zip(coords, dcoords):
             self.points[u] = (
