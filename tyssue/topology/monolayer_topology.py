@@ -2,9 +2,13 @@ import logging
 import numpy as np
 
 from ..geometry.bulk_geometry import MonoLayerGeometry
+from ..core.sheet import Sheet
+from ..geometry.sheet_geometry import SheetGeometry
 from .bulk_topology import get_division_vertices
 from .bulk_topology import cell_division as bulk_division
 from .sheet_topology import type1_transition as sheet_t1
+from .sheet_topology import get_division_edges as sheet_division_edges
+
 
 logger = logging.getLogger(name=__name__)
 
@@ -34,23 +38,29 @@ def cell_division(monolayer, mother,
 
     ab_axis = MonoLayerGeometry.basal_apical_axis(monolayer, mother)
     plane_normal = np.asarray(ab_axis)
+
     if orientation == 'horizontal':
-        plane_normal = ab_axis
+        vertices = get_division_vertices(monolayer,
+                                         mother=mother,
+                                         plane_normal=plane_normal)
     elif orientation == 'vertical':
-        # put the normal along the x axis
-        plane_normal = ab_axis[[0, 2, 1]] * np.array([0, 1, -1])
-        if psi != 0:
-            cp, sp = np.cos(psi), np.sin(psi)
-            rot = np.array([[1,  0,  0],
-                            [0,  cp, sp],
-                            [0, -sp, cp]])
-            plane_normal = np.dot(rot, plane_normal)
+        apical_sheet = monolayer.get_sub_sheet('apical')
+        m_apical_face = monolayer.edge_df[
+            (monolayer.edge_df['cell'] == mother) &
+            (monolayer.edge_df['segment'] == 'apical')]['face'].iloc[0]
+        apical_edges = sheet_division_edges(apical_sheet,
+                                            m_apical_face,
+                                            SheetGeometry)
+        basal_edges = []
+        for ae in apical_edges:
+            basal_edges.append(find_basal_edge(monolayer, ae))
+        division_edges = list(apical_edges) + basal_edges
+        vertices = get_division_vertices(monolayer,
+                                         division_edges=division_edges)
     else:
         raise ValueError('''orientation argument not understood,
 should be either "horizontal" or "vertical", not {}'''.format(orientation))
 
-    vertices = get_division_vertices(monolayer, mother,
-                                     plane_normal)
     daughter = bulk_division(monolayer, mother,
                              MonoLayerGeometry, vertices)
 

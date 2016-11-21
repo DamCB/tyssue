@@ -94,10 +94,10 @@ type 1 transition is not allowed''' % face_b)
 
 
 def cell_division(sheet, mother, geom,
-                  angle=None, axis='x'):
+                  angle=None):
 
     if not sheet.face_df.loc[mother, 'is_alive']:
-        logger.warning('Cell {} is not alive and cannot devide'.format(mother))
+        logger.warning('Cell %s is not alive and cannot devide', mother)
         return
     edge_a, edge_b = get_division_edges(sheet, mother, geom,
                                         angle=angle, axis='x')

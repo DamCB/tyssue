@@ -44,18 +44,21 @@ def get_division_edges(eptm, mother,
                             eptm.coords].values
     centers = (srce_pos + trgt_pos)/2
     theta = np.arctan2(centers[:, 2], centers[:, 1])
-    return division_edges.iloc[np.argsort(theta)]
+    return division_edges.index[np.argsort(theta)]
 
 
-def get_division_vertices(eptm, mother,
-                          plane_normal,
+def get_division_vertices(eptm,
+                          division_edges=None,
+                          mother=None,
+                          plane_normal=None,
                           plane_center=None):
 
-    division_edges = get_division_edges(eptm, mother,
-                                        plane_normal,
-                                        plane_center)
+    if division_edges is None:
+        division_edges = get_division_edges(eptm, mother,
+                                            plane_normal,
+                                            plane_center)
     vertices = []
-    for edge in division_edges.index:
+    for edge in division_edges:
         new_vert, *new_edges = add_vert(eptm, edge)
         vertices.append(new_vert)
     return vertices

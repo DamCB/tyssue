@@ -218,32 +218,6 @@ class Epithelium():
         # So this method is not actually called.
         self.specs['settings'][key] = value
 
-    @classmethod
-    def from_points(cls, identifier, points,
-                    indices_dict, specs,
-                    points_dataset='vert'):
-        '''
-        TODO: not sure this works as expected with the new indexing
-        '''
-
-        raise NotImplementedError('Epithelium.from_points() is not implemented and should not be used.') #pragma: no cover
-
-        # if points.shape[1] == 2:
-        #     coords = ['x', 'y']
-        # elif points.shape[1] == 3:
-        #     coords = ['x', 'y', 'z']
-        # else:
-        #     raise ValueError('the `points` argument must be'
-        #                      ' a (Nv, 2) or (Nv, 3) array')
-
-        # datasets = {}
-        # for key, spec in specs.items():
-        #     datasets[key] = make_df(index=indices_dict[key],
-        #                             spec=spec)
-        # datasets[points_dataset][coords] = points
-
-        # return cls.__init__(identifier, datasets, specs, coords=coords)
-
     def update_specs(self, new, reset=False):
 
         spec_updater(self.specs, new)
@@ -298,8 +272,6 @@ class Epithelium():
         # Should it return self.edge_df.index instead ?
         return self.edge_df[self.element_names]
 
-
-
     @property
     def Nc(self):
         if 'cell' in self.data_names:
@@ -347,20 +319,50 @@ class Epithelium():
         upcast.index = self.edge_df.index
         return upcast
 
+    def upcast_cols(self, element, columns):
+        """Syntactic sugar to upcast from the
+        epithelium datasets.
+
+        Parameters
+        ----------
+        element: {'srce'|'trgt'|'face'|'cell'}
+           corresponding self.edge_df column over which to index
+           if element is 'srce' or 'trgt', the upcast data will be
+           taken form self.vert_df
+        columns: index
+           the column(s) to be taken from the input dataset.
+
+        """
+        if element in ['srce', 'trgt']:
+            dataset = 'vert'
+        else:
+            dataset = element
+        return self._upcast(self.edge_df[element],
+                            self.datasets[dataset][columns])
+
     def upcast_srce(self, df):
         ''' Reindexes input data to self.edge_idx
         by repeating the values for each source entry
         '''
-        return self._upcast(self.e_srce_idx, df)
+        return self._upcast(self.edge_df['srce'], df)
 
     def upcast_trgt(self, df):
-        return self._upcast(self.e_trgt_idx, df)
+        ''' Reindexes input data to self.edge_idx
+        by repeating the values for each target entry
+        '''
+        return self._upcast(self.edge_df['trgt'], df)
 
     def upcast_face(self, df):
-        return self._upcast(self.e_face_idx, df)
+        ''' Reindexes input data to self.edge_idx
+        by repeating the values for each face entry
+        '''
+        return self._upcast(self.edge_df['face'], df)
 
     def upcast_cell(self, df):
-        return self._upcast(self.e_cell_idx, df)
+        ''' Reindexes input data to self.edge_idx
+        by repeating the values for each cell entry
+        '''
+        return self._upcast(self.edge_df['cell'], df)
 
     def _lvl_sum(self, df, lvl):
         df_ = df.copy()
@@ -425,53 +427,33 @@ class Epithelium():
         polys = self.edge_df.groupby('face').apply(_get_verts_pos).dropna()
         return polys
 
-    def _build_face_face_indexes(self): #pragma: no cover
-        #- BC -#
-        ## this method raises a ValueError
-        ## 'too many values to unpack'.
-        ## It's not used anywhere in the code,
-        ## or in the examples. I'm withdrawing
-        ## it from coverage for now.
-        '''
-        This is hackish and not optimized,
-        should be provided by CGAL
-        '''
-        cc_idx = []
-        for srce0, trgt0, face0 in self.edge_idx:
-            for srce1, trgt1, face1 in self.edge_idx:
-                if face0 != face1 and trgt0 == srce1 and \
-                  trgt1 == srce0 and not (face1, face0) in cc_idx:
-                    cc_idx.append((face0, face1))
-        cc_idx = pd.MultiIndex.from_tuples(cc_idx, names=['facea', 'faceb'])
-        return cc_idx
-
     def get_extra_indices(self):
         """Computes extra indices:
 
-        - `sheet.free_edges`: half-edges at the epithelium boundary
-        - `sheet.dble_edges`: half-edges inside the epithelium,
+        - `self.free_edges`: half-edges at the epithelium boundary
+        - `self.dble_edges`: half-edges inside the epithelium,
           with an opposite
-        - `sheet.east_edges`: half of the `dble_edges`, pointing east
+        - `self.east_edges`: half of the `dble_edges`, pointing east
           (figuratively)
-        - `sheet.west_edges`: half of the `dble_edges`, pointing west
+        - `self.west_edges`: half of the `dble_edges`, pointing west
            (the order of the east and west edges is conserved, so that
            the ith west half-edge is the opposite of the ith east half-edge)
-        - `sheet.sgle_edges`: joint index over free and east edges, spanning
+        - `self.sgle_edges`: joint index over free and east edges, spanning
            the entire graph without double edges
-        - `sheet.wrpd_edges`: joint index over free edges followed by the
+        - `self.wrpd_edges`: joint index over free edges followed by the
            east edges twice, such that a vector over the whole half-edge
             dataframe is wrapped over the single edges
-        - `sheet.srtd_edges`: index over the whole half-edge sorted such that
+        - `self.srtd_edges`: index over the whole half-edge sorted such that
            the free edges come first, then the east, then the west
 
         Also computes:
-        - `sheet.Ni`: the number of inside full edges
-          (i.e. `len(sheet.east_edges)`)
-        - `sheet.No`: the number of outside full edges
-          (i.e. `len(sheet.free_edges)`)
-        - `sheet.Nd`: the number of double half edges
-          (i.e. `len(sheet.dble_edges)`)
-        - `sheet.anti_sym`: `pd.Series` with shape `(sheet.Ne,)`
+        - `self.Ni`: the number of inside full edges
+          (i.e. `len(self.east_edges)`)
+        - `self.No`: the number of outside full edges
+          (i.e. `len(self.free_edges)`)
+        - `self.Nd`: the number of double half edges
+          (i.e. `len(self.dble_edges)`)
+        - `self.anti_sym`: `pd.Series` with shape `(self.Ne,)`
           with 1 at the free and east half-edges and -1
           at the opposite half-edges.
 
@@ -490,7 +472,7 @@ class Epithelium():
           we'll just assert it worked.
         """
 
-        if not 'opposite' in self.edge_df.columns:
+        if 'opposite' not in self.edge_df.columns:
             self.edge_df['opposite'] = get_opposite(self.edge_df)
 
         self.dble_edges = self.edge_df[self.edge_df['opposite'] >= 0].index
