@@ -1,5 +1,9 @@
 # tyssue : An epithelium simulation library
 
+![A nice banner](doc/illus/banner.png)
+
+<hr/>
+
 [![Build Status](https://travis-ci.org/DamCB/tyssue.svg?branch=master)](https://travis-ci.org/DamCB/tyssue)
 
 [![Coverage Status](https://coveralls.io/repos/CellModels/tyssue/badge.svg)](https://coveralls.io/r/CellModels/tyssue)
@@ -118,13 +122,22 @@ As all the dependencies are already completely supported in
 python 3.x, **we won't be maintaining a python 2.x version**, because
 it's time to move on...
 
+*Notes*:
+* You'll need the development version of vispy for certain features.
+* We started using [pythreejs](https://github.com/jovyan/pythreejs) for
+embeded 3D visualisation in the notebook.
+
+### Core
+
 - Python >= 3.4
 - numpy >= 1.8
 - scipy >= 0.12
 - pandas >= 0.13
 - matplotlib >= 1.3
-- vispy >= 0.4
+- vispy >= 0.5
 - pandas >= 0.16
+- tables >= 3.2.2
+
 
 ### Tests
 - pytest >= 3.0

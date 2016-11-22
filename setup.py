@@ -8,13 +8,12 @@ from setuptools import find_packages
 
 DISTNAME = 'tyssue'
 DESCRIPTION = 'tyssue is a living tissues, cell level, modeling library'
-LONG_DESCRIPTION = ('tyssue uses the scientific python ecosystem and CGAL'
-                    ' LinearCellComplex library to model epithelium at the'
-                    ' cellular level')
+LONG_DESCRIPTION = ('tyssue uses the scientific python ecosystem to model'
+                    ' epithelium at the cellular level')
 MAINTAINER = 'Guillaume Gay'
 MAINTAINER_EMAIL = 'guillaume@damcb.com'
 URL = 'https://github.com/DamCB/tyssue'
-LICENSE = 'MPL'
+LICENSE = 'MPL-2.0'
 DOWNLOAD_URL = 'https://github.com/DamCB/tyssue.git'
 
 files = ['*.so*', '*.a*', '*.lib*',
@@ -23,9 +22,9 @@ files = ['*.so*', '*.a*', '*.lib*',
 ## Version management copied form numpy
 ## Thanks to them!
 MAJOR               = 0
-MINOR               = 2
-MICRO               = 0
-ISRELEASED          = False
+MINOR               = 1
+MICRO               = 1
+ISRELEASED          = True
 VERSION             = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
