@@ -140,6 +140,8 @@ def quick_edge_draw(sheet, coords=['x', 'y'], ax=None, **draw_spec_kw):
 
     if ax is None:
         fig, ax = plt.subplots()
+    else:
+        fig = ax.get_figure()
 
     x, y = coords
     srce_x = sheet.upcast_srce(sheet.vert_df[x]).values
@@ -157,7 +159,8 @@ def quick_edge_draw(sheet, coords=['x', 'y'], ax=None, **draw_spec_kw):
     lines_x = np.insert(lines_x, slice(None, None, 2), np.nan)
     lines_y = np.insert(lines_y, slice(None, None, 2), np.nan)
     ax.plot(lines_x, lines_y, **draw_spec_kw)
-    return ax
+    ax.set_aspect('equal')
+    return fig, ax
 
 
 def plot_forces(sheet, geom, model,
