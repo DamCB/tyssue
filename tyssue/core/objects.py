@@ -60,12 +60,7 @@ default values is allways infered from the python parsed type. Thus
         }
 '''
 
-#- BC -#
-# Classes must inherit from Object in order for setters
-# decorators to work properly according to some
-# stackoverflow post, but it seems to work properly as
-# it is right now.
-class Epithelium():
+class Epithelium:
     '''
     The whole tissue.
 

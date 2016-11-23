@@ -28,7 +28,8 @@ def view_3js(sheet, **draw_specs):
                                       for c in colors]
             srce_c = sheet.upcast_srce(sheet.vert_df['hex_c'])
             trgt_c = sheet.upcast_trgt(sheet.vert_df['hex_c'])
-            colors = np.hstack([srce_c, trgt_c]).reshape(vertices.shape[0])
+            colors = np.vstack([srce_c.values,
+                                trgt_c.values]).T.reshape(vertices.shape[0])
             colors = list(colors)
         else:
             raise ValueError
@@ -37,7 +38,7 @@ def view_3js(sheet, **draw_specs):
                                     colors=colors)
     lines = py3js.Line(geometry=linesgeom,
                        material=py3js.LineBasicMaterial(
-                           linewidth=4,
+                           linewidth=spec['edge']['width'],
                            vertexColors='VertexColors'),
                        type='LinePieces')
     scene = py3js.Scene(
@@ -50,4 +51,4 @@ def view_3js(sheet, **draw_specs):
     renderer = py3js.Renderer(camera=c,
                               scene=scene,
                               controls=[py3js.OrbitControls(controlling=c)])
-    return renderer
+    return renderer, lines
