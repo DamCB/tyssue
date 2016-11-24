@@ -6,7 +6,7 @@ source:
   path: ../
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -21,7 +21,8 @@ requirements:
     - pandas
     - vispy
     - pytables
-
+    - jupyter
+    - notebook
 about:
   home: https://github.com/DamCB/tyssue
   license: MPLv2.0

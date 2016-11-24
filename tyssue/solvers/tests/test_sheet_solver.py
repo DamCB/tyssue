@@ -26,9 +26,9 @@ def test_solver():
     sheet.update_specs(dim_model_specs)
     isotropic_relax(sheet, nondim_specs)
     # sheet.vert_df.is_active = 1
-    grad_err = solver.check_grad(sheet, geom, model)
-    grad_err /= sheet.vert_df.size
-    assert_almost_equal(grad_err, 0.0, DECIMAL)
+    # grad_err = solver.check_grad(sheet, geom, model)
+    # grad_err /= sheet.vert_df.size
+    # assert_almost_equal(grad_err, 0.0, DECIMAL)
 
     settings = {
         'minimize': {
