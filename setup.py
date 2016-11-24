@@ -22,9 +22,9 @@ files = ['*.so*', '*.a*', '*.lib*',
 ## Version management copied form numpy
 ## Thanks to them!
 MAJOR               = 0
-MINOR               = 1
-MICRO               = 1
-ISRELEASED          = True
+MINOR               = 0
+MICRO               = 2
+ISRELEASED          = False
 VERSION             = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
