@@ -6,9 +6,6 @@ of the epithelium.
 
 import numpy as np
 import pandas as pd
-import collections
-
-from ..utils.utils import spec_updater
 from ..config.subdiv import bulk_spec
 
 
@@ -249,15 +246,10 @@ class FaceGrid:
         self.points = pd.DataFrame.from_dict(points)
 
     def face_point_cloud(self,
-                         offset_modulation=None,
-                         modulation_kwargs=None,
                          coords=['x', 'y', 'z'],
                          dcoords=['dx', 'dy', 'dz']):
         upcast = {}
-        if offset_modulation is None:
-            offsets = self.points[self.of_cols]
-        else:
-            offsets = offset_modulation(self, **modulation_kwargs)
+        offsets = self.points[self.of_cols]
         for key, subdiv in self.subdivs.items():
             upcast[key] = subdiv.edge_df.loc[self.points['up_{}'.format(key)],
                                              coords+dcoords+['length']].copy()
