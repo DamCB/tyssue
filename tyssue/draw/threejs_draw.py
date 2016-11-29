@@ -10,11 +10,16 @@ except ImportError:
           'use conda install -c conda-forge pythreejs')
 
 
-def view_3js(sheet, **draw_specs):
+def view_3js(sheet, coords=['x', 'y', 'z'], **draw_specs):
     spec = sheet_spec()
     spec.update(**draw_specs)
-    up_srce = sheet.upcast_srce(sheet.vert_df[['x', 'y', 'z']])
-    up_trgt = sheet.upcast_trgt(sheet.vert_df[['x', 'y', 'z']])
+    up_srce = sheet.upcast_srce(sheet.vert_df[coords])
+    up_trgt = sheet.upcast_trgt(sheet.vert_df[coords])
+
+    center = sheet.vert_df[coords].mean()
+    for c in coords:
+        up_srce[c] -= center[c]
+        up_trgt[c] -= center[c]
 
     vertices = np.hstack([up_srce.values, up_trgt.values])
     vertices = vertices.reshape(vertices.shape[0]*2, 3)
