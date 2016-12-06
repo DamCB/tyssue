@@ -246,6 +246,10 @@ def split_vert(sheet, vert, epsilon=0.):
     vert_in_edges = sheet.edge_df[(sheet.edge_df['trgt'] == vert)]
     # Grab relevant faces
     neighbor_faces = set(vert_out_edges['face'])
+    if len(neighbor_faces) == 1:
+        logger.info('''
+Chosen vertex %i is bound to a single cell, nothing to do''' % vert)
+        return
 
     # Create the new vertices
     num_new_vert = len(neighbor_faces) - 1
