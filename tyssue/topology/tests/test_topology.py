@@ -1,9 +1,11 @@
 from tyssue.core.sheet import Sheet
 
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom
-
+from tyssue.core.generation import three_faces_sheet
 from tyssue.stores import load_datasets
-from tyssue.topology.sheet_topology import cell_division, type1_transition
+from tyssue.topology.sheet_topology import (cell_division,
+                                            type1_transition,
+                                            split_vert)
 from tyssue.config.geometry import sheet_spec
 
 
@@ -40,3 +42,24 @@ def test_t1_transition():
     face = sheet.edge_df.loc[84, 'face']
     type1_transition(sheet, 84)
     assert sheet.edge_df.loc[84, 'face'] != face
+
+
+def test_split_vert():
+
+    datasets, specs = three_faces_sheet()
+    sheet = Sheet('3cells_2D', datasets, specs)
+    geom.update_all(sheet)
+
+    split_vert(sheet, 0, epsilon=1e-1)
+    geom.update_all(sheet)
+    assert sheet.Nv == 15
+    assert sheet.Ne == 18
+
+    datasets, specs = three_faces_sheet()
+    sheet = Sheet('3cells_2D', datasets, specs)
+    geom.update_all(sheet)
+
+    split_vert(sheet, 1, epsilon=1e-1)
+    geom.update_all(sheet)
+    assert sheet.Nv == 14
+    assert sheet.Ne == 18

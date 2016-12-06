@@ -226,3 +226,44 @@ def remove_face(sheet, face):
     sheet.reset_index()
     sheet.reset_topo()
     return new_vert
+
+
+def split_vert(sheet, vert, epsilon=0.):
+    """
+    Splits (or opens up) the sheet at vertex `vert`, creating
+    new verts and separating the connected opposite edges, see
+    ../../doc/illus/vertex_split.png
+
+    Parameters
+    ----------
+    sheet: a :class:`Sheet` instance
+    vert: int, index of the vertex to split
+    epsilon: float, the relative amount of recoil
+      of the new vertices towards the face centers
+    """
+    # Grab relevant edges
+    vert_out_edges = sheet.edge_df[(sheet.edge_df['srce'] == vert)]
+    vert_in_edges = sheet.edge_df[(sheet.edge_df['trgt'] == vert)]
+    # Grab relevant faces
+    neighbor_faces = set(vert_out_edges['face'])
+
+    # Create the new vertices
+    num_new_vert = len(neighbor_faces) - 1
+    vert_data = sheet.vert_df.loc[[vert, ] * num_new_vert]
+    sheet.vert_df = sheet.vert_df.append(vert_data, ignore_index=True)
+
+    new_verts = list(sheet.vert_df.index[-num_new_vert:])
+    split_verts = [vert, ] + new_verts
+
+    # reasign sources and targets in edge_df
+    for f, v in zip(neighbor_faces, split_verts):
+        eo = vert_out_edges[vert_out_edges['face'] == f].index
+        sheet.edge_df.loc[eo, 'srce'] = v
+        ei = vert_in_edges[vert_in_edges['face'] == f].index
+        sheet.edge_df.loc[ei, 'trgt'] = v
+    sheet.reset_topo()
+
+    faces = sheet.face_df.loc[neighbor_faces]
+    verts = sheet.vert_df.loc[split_verts]
+    dr = -verts[sheet.coords] + faces[sheet.coords].values
+    sheet.vert_df.loc[split_verts, sheet.coords] += dr*epsilon

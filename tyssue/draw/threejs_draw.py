@@ -10,16 +10,13 @@ except ImportError:
           'use conda install -c conda-forge pythreejs')
 
 
-def view_3js(sheet, coords=['x', 'y', 'z'], **draw_specs):
+def edge_lines(sheet, coords, **draw_specs):
+
     spec = sheet_spec()
     spec.update(**draw_specs)
-    up_srce = sheet.upcast_srce(sheet.vert_df[coords])
-    up_trgt = sheet.upcast_trgt(sheet.vert_df[coords])
 
-    center = sheet.vert_df[coords].mean()
-    for c in coords:
-        up_srce[c] -= center[c]
-        up_trgt[c] -= center[c]
+    up_srce = sheet.upcast_srce(sheet.vert_df[sheet.coords])
+    up_trgt = sheet.upcast_trgt(sheet.vert_df[sheet.coords])
 
     vertices = np.hstack([up_srce.values, up_trgt.values])
     vertices = vertices.reshape(vertices.shape[0]*2, 3)
@@ -41,11 +38,16 @@ def view_3js(sheet, coords=['x', 'y', 'z'], **draw_specs):
 
     linesgeom = py3js.PlainGeometry(vertices=[list(v) for v in vertices],
                                     colors=colors)
-    lines = py3js.Line(geometry=linesgeom,
-                       material=py3js.LineBasicMaterial(
-                           linewidth=spec['edge']['width'],
-                           vertexColors='VertexColors'),
-                       type='LinePieces')
+    return py3js.Line(geometry=linesgeom,
+                      material=py3js.LineBasicMaterial(
+                          linewidth=spec['edge']['width'],
+                          vertexColors='VertexColors'),
+                      type='LinePieces')
+
+
+def view_3js(sheet, coords=['x', 'y', 'z'], **draw_specs):
+
+    lines = edge_lines(sheet, coords, **draw_specs)
     scene = py3js.Scene(
         children=[lines,
                   py3js.DirectionalLight(color='#ccaabb',
