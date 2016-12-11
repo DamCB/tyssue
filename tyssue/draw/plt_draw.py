@@ -265,7 +265,7 @@ def get_arc_data(sheet):
 
     # Ok, I admit a fair amount of trial and
     # error to get to the stuff below :-p
-    rot = beta - np.sign(alpha)*np.pi/2
+    rot = beta - np.sign(alpha) * np.pi/2
     theta1 = (-alpha + rot) * np.sign(alpha)
     theta2 = (alpha + rot) * np.sign(alpha)
 

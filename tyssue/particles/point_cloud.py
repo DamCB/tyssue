@@ -195,17 +195,17 @@ def get_edge_bases(eptm, base=('face', 'srce', 'trgt')):
     edge_upcast_pos = {element: eptm.upcast_cols(element,
                                                  eptm.coords)
                        for element in base}
-    orig = base[0]
+    origin = base[0]
     edge_bases = {}
     for vertex in base[1:]:
         df = pd.DataFrame(0, columns=eptm.coords+eptm.dcoords+['length', ],
                           index=eptm.edge_df.index)
         df[eptm.dcoords] = (edge_upcast_pos[vertex].values -
-                            edge_upcast_pos[orig].values)
+                            edge_upcast_pos[origin].values)
 
         df['length'] = np.linalg.norm(df[eptm.dcoords].values, axis=1)
-        df[eptm.coords] = edge_upcast_pos[orig].values
-        edge_bases['{}_{}'.format(orig, vertex)] = df.copy()
+        df[eptm.coords] = edge_upcast_pos[origin].values
+        edge_bases['{}_{}'.format(origin, vertex)] = df.copy()
     return edge_bases
 
 
@@ -213,7 +213,7 @@ class FaceGrid:
 
     def __init__(self, edges_df, base, **kwargs):
 
-        self.orig = base[0]
+        self.origin = base[0]
         self.base = ['{}_{}'.format(base[0], other)
                      for other in base[1:]]
 
