@@ -494,7 +494,7 @@ class Epithelium:
             assert (2*self.Ni + self.No) == self.Ne
             assert self.west_edges.size == self.Ni
             assert self.Nd == 2*self.Ni
-        #- BC -#
+        # - BC -#
         # Not sure how to build
         # input data so the partition
         # fails (so we can see
