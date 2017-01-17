@@ -21,10 +21,10 @@ class BulkGeometry(SheetGeometry):
         '''
         cls.update_dcoords(eptm)
         cls.update_length(eptm)
+        cls.update_perimeters(eptm)
         cls.update_centroid(eptm)
         cls.update_normals(eptm)
         cls.update_areas(eptm)
-        cls.update_perimeters(eptm)
         cls.update_vol(eptm)
 
     @staticmethod
