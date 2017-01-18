@@ -537,8 +537,12 @@ class Epithelium:
     def get_invalid(self):
         """Returns a mask over edge for invalid faces
         """
-        is_invalid = self.edge_df.groupby('face').apply(_test_invalid)
-        return self.upcast_face(is_invalid)
+        is_invalid_face = self.edge_df.groupby('face').apply(_test_invalid)
+        invalid_edges = self.upcast_face(is_invalid_face)
+        if 'cell' in self.data_names:
+            is_invalid_cell = self.edge_df.groupby('cell').apply(_is_closed_cell)
+            invalid_edges = invalid_edges | self.upcast_cell(is_invalid_cell)
+        return invalid_edges
 
     def sanitize(self):
         """Removes invalid faces and associated vertices

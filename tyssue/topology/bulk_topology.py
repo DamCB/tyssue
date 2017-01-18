@@ -145,3 +145,207 @@ def cell_division(eptm, mother, geom, vertices):
     eptm.reset_index()
     eptm.reset_topo()
     return daughter
+
+
+def IH_transition(eptm, e_1011):
+    """
+    I → H transition as defined in Okuda et al. 2013
+    (DOI 10.1007/s10237-012-0430-7).
+
+    See tyssue/doc/illus/IH_transition.png for the definition of the
+    edges, which follow the one in the above article
+    """
+
+    v10, v11 = eptm.edge_df.loc[e_1011, ['srce', 'trgt']]
+    v_pairs = get_vertex_pairs_IH(eptm, e_1011)
+    try:
+        (v1, v4), (v2, v5), (v3, v6) = v_pairs
+    except ValueError:
+        print('Edge {} is not a valid junction to'
+              ' perform IH transition on, aborting'.format(e_1011))
+        return
+    new_vs = eptm.vert_df.loc[[v1, v2, v3]].copy()
+    eptm.vert_df = eptm.vert_df.append(new_vs, ignore_index=True)
+    v7, v8, v9 = eptm.vert_df.index[-3:]
+
+    srce_cell_orbits = eptm.get_orbits('srce', 'cell')
+    cA = list(set(srce_cell_orbits.loc[v1])
+              .intersection(srce_cell_orbits.loc[v2])
+              .intersection(srce_cell_orbits.loc[v3]))
+    cB = list(set(srce_cell_orbits.loc[v4])
+              .intersection(srce_cell_orbits.loc[v5])
+              .intersection(srce_cell_orbits.loc[v6]))
+    cC = list(set(srce_cell_orbits.loc[v1])
+              .intersection(srce_cell_orbits.loc[v2])
+              .intersection(srce_cell_orbits.loc[v11]))
+    cD = list(set(srce_cell_orbits.loc[v2])
+              .intersection(srce_cell_orbits.loc[v3])
+              .intersection(srce_cell_orbits.loc[v11]))
+    cE = list(set(srce_cell_orbits.loc[v3])
+              .intersection(srce_cell_orbits.loc[v1])
+              .intersection(srce_cell_orbits.loc[v11]))
+
+    cells = [c[0] if c else None
+             for c in [cA, cB, cC, cD, cE]]
+    cA, cB, cC, cD, cE = cells
+
+    # orient vertices 1,2,3 positively
+    r_12 = (eptm.vert_df.loc[v2, eptm.coords].values -
+            eptm.vert_df.loc[v1, eptm.coords].values).astype(np.float)
+    r_23 = (eptm.vert_df.loc[v3, eptm.coords].values -
+            eptm.vert_df.loc[v2, eptm.coords].values).astype(np.float)
+    r_123 = eptm.vert_df.loc[[v1, v2, v3], eptm.coords].mean(axis=0).values
+    r_A = eptm.cell_df.loc[cA, eptm.coords].values
+    orient = np.dot(np.cross(r_12, r_23), (r_123 - r_A))
+    if orient < 0:
+        v1, v2, v3 = v1, v3, v2
+        v4, v5, v6 = v4, v6, v5
+        cC, cE = cE, cC
+    vertices = [v1, v2, v3, v4, v5, v6,
+                v7, v8, v9, v10, v11]
+
+    for i, va, vb, new in zip(range(3),
+                              (v1, v2, v3),
+                              (v4, v5, v6),
+                              (v7, v8, v9)):
+        # assign v1 -> v10 edges to  v1 -> v7
+        e_a10s = eptm.edge_df[(eptm.edge_df['srce'] == va) &
+                              (eptm.edge_df['trgt'] == v10)].index
+        eptm.edge_df.loc[e_a10s, 'trgt'] = new
+        # assign v10 -> v1 edges to  v7 -> v1
+        e_10as = eptm.edge_df[(eptm.edge_df['srce'] == v10) &
+                              (eptm.edge_df['trgt'] == va)].index
+        eptm.edge_df.loc[e_10as, 'srce'] = new
+        # assign v4 -> v11 edges to  v4 -> v7
+        e_b11s = eptm.edge_df[(eptm.edge_df['srce'] == vb) &
+                              (eptm.edge_df['trgt'] == v11)].index
+        eptm.edge_df.loc[e_b11s, 'trgt'] = new
+        # assign v11 -> v4 edges to  v7 -> v4
+        e_11bs = eptm.edge_df[(eptm.edge_df['srce'] == v11) &
+                              (eptm.edge_df['trgt'] == vb)].index
+        eptm.edge_df.loc[e_11bs, 'srce'] = new
+
+    _set_new_pos_IH(eptm, e_1011, vertices)
+
+    face = eptm.edge_df.loc[e_1011, 'face']
+    new_fs = eptm.face_df.loc[[face, face]].copy()
+    eptm.face_df = eptm.face_df.append(new_fs,
+                                       ignore_index=True)
+    fa, fb = eptm.face_df.index[-2:]
+    edges_fa_fb = eptm.edge_df.loc[[e_1011, ]*6].copy()
+    eptm.edge_df = eptm.edge_df.append(edges_fa_fb,
+                                       ignore_index=True)
+    new_es = eptm.edge_df.index[-6:]
+    for eA, eB, (vi, vj) in zip(new_es[::2], new_es[1::2],
+                                [(v7, v8), (v8, v9), (v9, v7)]):
+        eptm.edge_df.loc[eA, ['srce', 'trgt', 'face', 'cell']] = vi, vj, fa, cA
+        eptm.edge_df.loc[eB, ['srce', 'trgt', 'face', 'cell']] = vj, vi, fb, cB
+
+    # Hardcoding this, as I don't see a clever way around
+    news = [(cA, v1, v2, v8, v7),
+            (cA, v1, v3, v7, v9),
+            (cA, v2, v3, v9, v8),
+            (cB, v4, v5, v7, v8),
+            (cB, v5, v6, v8, v9),
+            (cB, v6, v4, v9, v7),
+            (cC, v1, v2, v7, v8),
+            (cC, v4, v5, v8, v7),
+            (cD, v2, v3, v8, v9),
+            (cD, v5, v6, v9, v8),
+            (cE, v1, v3, v9, v7),
+            (cE, v4, v6, v7, v9)]
+    for args in news:
+        if args[0] is None:
+            continue
+        _add_edge_to_existing(eptm, *args)
+
+    # Removing the remaining edges and vertices
+    todel_edges = eptm.edge_df[(eptm.edge_df['srce'] == v10) |
+                               (eptm.edge_df['srce'] == v10) |
+                               (eptm.edge_df['srce'] == v11) |
+                               (eptm.edge_df['srce'] == v11)].index
+
+    eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
+    eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v10, v11])]
+    eptm.edge_df.index.name = 'edge'
+    eptm.reset_index()
+    eptm.reset_topo()
+
+
+def _add_edge_to_existing(eptm, cell, vi, vj, new_srce, new_trgt):
+    """
+    Add edges between vertices v7, v8 and v9 to the existing faces
+    """
+    cell_edges = eptm.edge_df[eptm.edge_df['cell'] == cell]
+    for f, data in cell_edges.groupby('face'):
+        if (vi in data['srce'].values) and (vj in data['srce'].values):
+            good_f = f
+            break
+    else:
+        raise ValueError('no face with vertices {} and {}'
+                         ' was found for cell {}'.format(vi, vj, cell))
+    eptm.edge_df = eptm.edge_df.append(cell_edges.iloc[-1],
+                                       ignore_index=True)
+    new_e = eptm.edge_df.index[-1]
+    eptm.edge_df.loc[new_e, ['srce', 'trgt',
+                             'face', 'cell']] = (new_srce, new_trgt,
+                                                 good_f, cell)
+
+
+def _set_new_pos_IH(eptm, e_1011, vertices):
+    '''Okuda 2013 equations 46 to 56
+
+    '''
+    Dl_th = eptm.settings['threshold_length']
+
+    (v1, v2, v3, v4, v5, v6,
+     v7, v8, v9, v10, v11) = vertices
+
+    # eq. 49
+    r_1011 = - eptm.edge_df.loc[e_1011, eptm.dcoords].values
+    u_T = (r_1011 / np.linalg.norm(r_1011))
+    # eq. 50
+    r0 = eptm.vert_df.loc[[v10, v11], eptm.coords].mean(axis=0).values
+
+    v_0ns = []
+    for vi, vj, vk in zip((v1, v2, v3),
+                          (v4, v5, v6),
+                          (v7, v8, v9)):
+        # eq. 54 - 56
+        r0i, r0j = (eptm.vert_df.loc[[vi, vj], eptm.coords].values -
+                    r0[np.newaxis, :])
+        w_0k = (r0i/np.linalg.norm(r0i) + r0j/np.linalg.norm(r0j)) / 2
+        # eq. 51 - 53
+        v_0k = w_0k - (np.dot(w_0k, u_T)) * u_T
+        v_0ns.append(v_0k)
+
+    # see definition of l_max bellow eq. 56
+    l_max = np.max([np.linalg.norm(v_n - v_m) for (v_n, v_m)
+                    in itertools.combinations(v_0ns, 2)])
+    # eq. 46 - 49
+    for vk, v_0k in zip((v7, v8, v9), v_0ns):
+        eptm.vert_df.loc[vk, eptm.coords] = r0 + (Dl_th / l_max) * v_0k
+
+
+
+def get_vertex_pairs_IH(eptm, e_1011):
+
+    srce_face_orbits = eptm.get_orbits('srce', 'face')
+    v10, v11 = eptm.edge_df.loc[e_1011, ['srce', 'trgt']]
+    v10_out = set(eptm.edge_df[eptm.edge_df['srce']==v10]['trgt']) - {v11}
+    faces_123 = {v: set(srce_face_orbits.loc[v])
+                 for v in v10_out}
+
+    v11_out = set(eptm.edge_df[eptm.edge_df['srce']==v11]['trgt']) - {v10}
+    faces_456 = {v: set(srce_face_orbits.loc[v])
+                 for v in v11_out}
+    v_pairs = []
+    for vi in v10_out:
+        for vj in v11_out:
+            common_face = faces_123[vi].intersection(faces_456[vj])
+            if common_face:
+                v_pairs.append((vi, vj))
+                break
+        else:
+            raise ValueError('No corresponding vertex for vertex {}'.format(vi))
+    return v_pairs
