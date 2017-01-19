@@ -16,7 +16,7 @@ def test_IH_transition():
     datasets = extrude(sheet.datasets,
                        method='translation')
 
-    eptm = Epithelium('20faces_3D', datasets, bulk_spec())
+    eptm = Epithelium('test_IHt', datasets, bulk_spec())
     BulkGeometry.update_all(eptm)
     Nc, Nf, Ne, Nv = eptm.Nc, eptm.Nf, eptm.Ne, eptm.Nv
     eptm.settings['threshold_length'] = 1e-3
@@ -28,5 +28,5 @@ def test_IH_transition():
     assert eptm.Nv == Nv + 1
 
     invalid = eptm.get_invalid()
-    np.testing.assert_array_equal(
-        invalid, np.zeros(eptm.Ne, dtype=np.bool))
+    assert np.alltrue(1 - invalid)
+    assert np.alltrue(eptm.edge_df['sub_vol'] > 0)
