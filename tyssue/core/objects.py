@@ -531,8 +531,13 @@ class Epithelium:
     def get_valid(self):
         """Set true if the face is a closed polygon
         """
-        is_valid = self.edge_df.groupby('face').apply(_test_valid)
-        self.edge_df['is_valid'] = self.upcast_face(is_valid)
+        is_valid_face = self.edge_df.groupby('face').apply(_test_valid)
+        is_valid = self.upcast_face(is_valid_face)
+        if 'cell' in self.data_names:
+            is_valid_cell = self.edge_df.groupby('cell').apply(
+                _is_closed_cell)
+            is_valid = is_valid | self.upcast_cell(is_valid_cell)
+        self.edge_df['is_valid'] = is_valid
 
     def get_invalid(self):
         """Returns a mask over edge for invalid faces
@@ -540,7 +545,8 @@ class Epithelium:
         is_invalid_face = self.edge_df.groupby('face').apply(_test_invalid)
         invalid_edges = self.upcast_face(is_invalid_face)
         if 'cell' in self.data_names:
-            is_invalid_cell = self.edge_df.groupby('cell').apply(_is_closed_cell)
+            is_invalid_cell = 1 - self.edge_df.groupby('cell').apply(
+                _is_closed_cell)
             invalid_edges = invalid_edges | self.upcast_cell(is_invalid_cell)
         return invalid_edges
 

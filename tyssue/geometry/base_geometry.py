@@ -5,6 +5,9 @@ import numpy as np
 class BaseGeometry():
     """
     """
+    @staticmethod
+    def update_all(sheet):
+        raise NotImplementedError
 
     @staticmethod
     def scale(sheet, delta, coords):
@@ -45,3 +48,16 @@ class BaseGeometry():
         upcast_pos.set_index(sheet.edge_df['face'],
                              append=True, inplace=True)
         sheet.face_df[sheet.coords] = upcast_pos.mean(level='face')
+
+    @classmethod
+    def center(cls, eptm):
+        """
+        Transates the epithelium vertices so that the center
+        of mass is at the center of the coordinate system,
+        and updates the geometry
+        """
+
+        eptm.vert_df[eptm.coords] = (
+            eptm.vert_df[eptm.coords].values -
+            eptm.vert_df[eptm.coords].mean(axis=0).values[np.newaxis, :])
+        cls.update_all(eptm)

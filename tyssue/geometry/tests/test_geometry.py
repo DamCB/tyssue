@@ -46,6 +46,14 @@ def test_face_rotation():
     face = 17
     normal = sheet.edge_df[sheet.edge_df['face'] == face][sheet.ncoords].mean()
     rot = sgeom.face_rotation(sheet, face, 0)
-                              # np.random.random()*2*np.pi)
     rotated = np.dot(rot, normal)
     np.testing.assert_allclose(rotated[:2], np.zeros(2), atol=1e-7)
+
+def test_center():
+
+    sheet = Sheet.planar_sheet_3d('sheet', 5, 5, 1, 1)
+    sheet.sanitize()
+    sgeom.update_all(sheet)
+    sgeom.center(sheet)
+    np.testing.assert_allclose(sheet.vert_df[sheet.coords].mean(axis=0),
+                               [0, 0, 0], atol=1e-7)
