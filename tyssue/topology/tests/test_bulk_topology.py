@@ -1,0 +1,32 @@
+import numpy as np
+from tyssue import Epithelium
+from tyssue import BulkGeometry
+from tyssue import Sheet
+from tyssue.config.geometry import bulk_spec
+
+from tyssue.core.generation import extrude
+
+from tyssue.topology.bulk_topology import IH_transition
+
+
+def test_IH_transition():
+
+    sheet = Sheet.planar_sheet_3d('sheet', 5, 5, 1, 1)
+    sheet.sanitize()
+    datasets = extrude(sheet.datasets,
+                       method='translation')
+
+    eptm = Epithelium('20faces_3D', datasets, bulk_spec())
+    BulkGeometry.update_all(eptm)
+    Nc, Nf, Ne, Nv = eptm.Nc, eptm.Nf, eptm.Ne, eptm.Nv
+    eptm.settings['threshold_length'] = 1e-3
+    IH_transition(eptm, 26)
+    BulkGeometry.update_all(eptm)
+    assert eptm.Nc == Nc
+    assert eptm.Nf == Nf + 2
+    assert eptm.Ne == Ne + 12
+    assert eptm.Nv == Nv + 1
+
+    invalid = eptm.get_invalid()
+    np.testing.assert_array_equal(
+        invalid, np.zeros(eptm.Ne, dtype=np.bool))
