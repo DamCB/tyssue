@@ -147,6 +147,22 @@ def cell_division(eptm, mother, geom, vertices):
     return daughter
 
 
+def opposite_face(eptm, fa, face_srce_orbit=None):
+    if face_srce_orbit is None:
+        face_srce_orbit = eptm.get_orbits(
+            'face', 'srce').groupby(level='face').apply(set)
+    face_pair = face_srce_orbit[face_srce_orbit ==
+                                face_srce_orbit[fa]].index
+    if len(face_pair) == 2:
+        opp_face = face_pair[face_pair != fa][0]
+    elif len(face_pair) == 1:
+        opp_face = -1
+    else:
+        raise ValueError('Invalid topology,'
+                         ' incorrect faces: {}'.format(face_pair))
+    return opp_face
+
+
 def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
@@ -157,7 +173,7 @@ def IH_transition(eptm, e_1011):
     """
 
     v10, v11 = eptm.edge_df.loc[e_1011, ['srce', 'trgt']]
-    v_pairs = get_vertex_pairs_IH(eptm, e_1011)
+    v_pairs = _get_vertex_pairs_IH(eptm, e_1011)
     try:
         (v1, v4), (v2, v5), (v3, v6) = v_pairs
     except ValueError:
@@ -168,27 +184,19 @@ def IH_transition(eptm, e_1011):
     eptm.vert_df = eptm.vert_df.append(new_vs, ignore_index=True)
     v7, v8, v9 = eptm.vert_df.index[-3:]
 
+    cells = []
     srce_cell_orbits = eptm.get_orbits('srce', 'cell')
-    cA = list(set(srce_cell_orbits.loc[v1])
-              .intersection(srce_cell_orbits.loc[v2])
-              .intersection(srce_cell_orbits.loc[v3]))
-    cB = list(set(srce_cell_orbits.loc[v4])
-              .intersection(srce_cell_orbits.loc[v5])
-              .intersection(srce_cell_orbits.loc[v6]))
-    cC = list(set(srce_cell_orbits.loc[v1])
-              .intersection(srce_cell_orbits.loc[v2])
-              .intersection(srce_cell_orbits.loc[v11]))
-    cD = list(set(srce_cell_orbits.loc[v2])
-              .intersection(srce_cell_orbits.loc[v3])
-              .intersection(srce_cell_orbits.loc[v11]))
-    cE = list(set(srce_cell_orbits.loc[v3])
-              .intersection(srce_cell_orbits.loc[v1])
-              .intersection(srce_cell_orbits.loc[v11]))
+    for vi, vj, vk in [(v1, v2, v3),
+                       (v4, v5, v6),
+                       (v1, v2, v11),
+                       (v2, v3, v11),
+                       (v3, v1, v11)]:
+        cell = list(set(srce_cell_orbits.loc[vi])
+                    .intersection(srce_cell_orbits.loc[vj])
+                    .intersection(srce_cell_orbits.loc[vk]))
+        cells.append(cell[0] if cell else None)
 
-    cells = [c[0] if c else None
-             for c in [cA, cB, cC, cD, cE]]
     cA, cB, cC, cD, cE = cells
-
     # orient vertices 1,2,3 positively
     r_12 = (eptm.vert_df.loc[v2, eptm.coords].values -
             eptm.vert_df.loc[v1, eptm.coords].values).astype(np.float)
@@ -271,19 +279,122 @@ def IH_transition(eptm, e_1011):
     eptm.reset_index()
     eptm.reset_topo()
 
+def HI_transition(eptm, face):
+    """
+    H → I transition as defined in Okuda et al. 2013
+    (DOI 10.1007/s10237-012-0430-7).
 
-def _add_edge_to_existing(eptm, cell, vi, vj, new_srce, new_trgt):
+    See tyssue/doc/illus/IH_transition.png for the definition of the
+    edges, which follow the one in the above article
+    """
+    if eptm.face_df.loc[face, 'num_sides'] != 3:
+        raise ValueError('Only three sided faces can undergo a H-I transition')
+
+    fa = face
+    f_edges = eptm.edge_df[eptm.edge_df['face'] == fa]
+    v7 = f_edges.iloc[0]['srce']
+    v8 = f_edges.iloc[0]['trgt']
+    v9 = f_edges[f_edges['srce'] == v8]['trgt'].iloc[0]
+
+    cA = f_edges['cell'].iloc[0]
+    face_srce_orbit = eptm.get_orbits(
+        'face', 'srce').groupby(level='face').apply(set)
+    fb = opposite_face(eptm, fa, face_srce_orbit)
+    cB = eptm.edge_df[eptm.edge_df['face'] == fb]['cell'].iloc[0]
+    cA_edges = eptm.edge_df[eptm.edge_df['cell'] == cA]
+    cB_edges = eptm.edge_df[eptm.edge_df['cell'] == cB]
+
+    eptm.vert_df = eptm.vert_df.append(eptm.vert_df.loc[[v8, v9]],
+                                       ignore_index=True)
+
+    eptm.vert_df.index.name = 'vert'
+    v10, v11 = eptm.vert_df.index[-2:]
+    _set_new_pos_HI(eptm, fa, fb, v10, v11)
+
+    v_pairs = []
+    for vk in (v7, v8, v9):
+        vi = cA_edges[cA_edges['srce'] == vk]['trgt'].iloc[0]
+        vj = cB_edges[cB_edges['srce'] == vk]['trgt'].iloc[0]
+        v_pairs.append((vi, vj))
+
+    (v1, v4), (v2, v5), (v3, v6) = v_pairs
+
+    srce_cell_orbit = eptm.get_orbits('srce', 'cell')
+    cells = [cA, cB, ]
+    for (vi, vj, vk) in [(v1, v2, v4),
+                         (v2, v3, v5),
+                         (v1, v3, v4)]:
+        cell = list(set(srce_cell_orbit.loc[vi])
+                    .intersection(srce_cell_orbit.loc[vj])
+                    .intersection(srce_cell_orbit.loc[vk]))
+
+        cells.append(cell[0] if cell else None)
+    cA, cB, cC, cD, cE = cells
+
+    for vi, vj, vk in zip((v1, v2, v3),
+                          (v4, v5, v6),
+                          (v7, v8, v9)):
+        e_iks = eptm.edge_df[(eptm.edge_df['srce'] == vi) &
+                             (eptm.edge_df['trgt'] == vk)].index
+        eptm.edge_df.loc[e_iks, 'trgt'] = v10
+
+        e_kis = eptm.edge_df[(eptm.edge_df['srce'] == vk) &
+                             (eptm.edge_df['trgt'] == vi)].index
+        eptm.edge_df.loc[e_kis, 'srce'] = v10
+
+        e_jks = eptm.edge_df[(eptm.edge_df['srce'] == vj) &
+                             (eptm.edge_df['trgt'] == vk)].index
+        eptm.edge_df.loc[e_jks, 'trgt'] = v11
+
+        e_kjs = eptm.edge_df[(eptm.edge_df['srce'] == vk) &
+                             (eptm.edge_df['trgt'] == vj)].index
+        eptm.edge_df.loc[e_kjs, 'srce'] = v11
+
+    # Closing the faces with v10 → v11 edges
+    news = [(cC, v2, v5, v10, v11),
+            (cC, v1, v4, v11, v10),
+            (cD, v2, v5, v11, v10),
+            (cD, v3, v6, v10, v11),
+            (cE, v3, v6, v11, v10),
+            (cE, v1, v4, v10, v11)]
+    for args in news:
+        if args[0] is None:
+            continue
+        _add_edge_to_existing(eptm, *args)
+
+    # Removing the remaining edges and vertices
+    todel_edges = eptm.edge_df[(eptm.edge_df['srce'] == v7) |
+                               (eptm.edge_df['trgt'] == v7) |
+                               (eptm.edge_df['srce'] == v8) |
+                               (eptm.edge_df['trgt'] == v8) |
+                               (eptm.edge_df['srce'] == v9) |
+                               (eptm.edge_df['trgt'] == v9)].index
+
+    eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
+    eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v7, v8, v9])]
+    eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete([fa, fb])]
+    eptm.edge_df.index.name = 'edge'
+
+    eptm.reset_index()
+    eptm.reset_topo()
+
+
+def _add_edge_to_existing(eptm, cell,
+                          vi, vj,
+                          new_srce, new_trgt):
     """
     Add edges between vertices v7, v8 and v9 to the existing faces
     """
     cell_edges = eptm.edge_df[eptm.edge_df['cell'] == cell]
     for f, data in cell_edges.groupby('face'):
-        if (vi in data['srce'].values) and (vj in data['srce'].values):
+        if {vi, vj, new_srce, new_trgt}.issubset(
+                set(data['srce']).union(data['trgt'])):
             good_f = f
             break
     else:
-        raise ValueError('no face with vertices {} and {}'
-                         ' was found for cell {}'.format(vi, vj, cell))
+        raise ValueError('no face with vertices {}, {}, {} and {}'
+                         ' was found for cell {}'
+                         .format(vi, vj, new_srce, new_trgt, cell))
     eptm.edge_df = eptm.edge_df.append(cell_edges.iloc[-1],
                                        ignore_index=True)
     new_e = eptm.edge_df.index[-1]
@@ -327,16 +438,15 @@ def _set_new_pos_IH(eptm, e_1011, vertices):
         eptm.vert_df.loc[vk, eptm.coords] = r0 + (Dl_th / l_max) * v_0k
 
 
-
-def get_vertex_pairs_IH(eptm, e_1011):
+def _get_vertex_pairs_IH(eptm, e_1011):
 
     srce_face_orbits = eptm.get_orbits('srce', 'face')
     v10, v11 = eptm.edge_df.loc[e_1011, ['srce', 'trgt']]
-    v10_out = set(eptm.edge_df[eptm.edge_df['srce']==v10]['trgt']) - {v11}
+    v10_out = set(eptm.edge_df[eptm.edge_df['srce'] == v10]['trgt']) - {v11}
     faces_123 = {v: set(srce_face_orbits.loc[v])
                  for v in v10_out}
 
-    v11_out = set(eptm.edge_df[eptm.edge_df['srce']==v11]['trgt']) - {v10}
+    v11_out = set(eptm.edge_df[eptm.edge_df['srce'] == v11]['trgt']) - {v10}
     faces_456 = {v: set(srce_face_orbits.loc[v])
                  for v in v11_out}
     v_pairs = []
@@ -347,5 +457,20 @@ def get_vertex_pairs_IH(eptm, e_1011):
                 v_pairs.append((vi, vj))
                 break
         else:
-            raise ValueError('No corresponding vertex for vertex {}'.format(vi))
+            raise ValueError('No corresponding vertex'
+                             ' for vertex {}'.format(vi))
     return v_pairs
+
+
+def _set_new_pos_HI(eptm, fa, fb, v10, v11):
+
+    r0 = eptm.face_df.loc[fa, eptm.coords].values
+    norm_a = eptm.edge_df[eptm.edge_df['face'] == fa][
+        eptm.ncoords].mean(axis=0).values
+    norm_b = eptm.edge_df[eptm.edge_df['face'] == fb][
+        eptm.ncoords].mean(axis=0).values
+    norm_a = norm_a / np.linalg.norm(norm_a)
+    norm_b = norm_b / np.linalg.norm(norm_b)
+    Dl_th = eptm.settings['threshold_length']
+    eptm.vert_df.loc[v10, eptm.coords] = r0 + Dl_th/2 * norm_b
+    eptm.vert_df.loc[v11, eptm.coords] = r0 + Dl_th/2 * norm_a
