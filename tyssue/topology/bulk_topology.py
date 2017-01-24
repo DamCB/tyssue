@@ -1,7 +1,7 @@
-
 import logging
 import itertools
-import numpy as np
+import numpy as np, pandas as pd
+from itertools import combinations
 from .sheet_topology import face_division
 from .base_topology import add_vert
 from ..geometry.utils import rotation_matrix
@@ -197,14 +197,27 @@ def IH_transition(eptm, e_1011):
         cells.append(cell[0] if cell else None)
 
     cA, cB, cC, cD, cE = cells
-    # orient vertices 1,2,3 positively
-    r_12 = (eptm.vert_df.loc[v2, eptm.coords].values -
-            eptm.vert_df.loc[v1, eptm.coords].values).astype(np.float)
-    r_23 = (eptm.vert_df.loc[v3, eptm.coords].values -
-            eptm.vert_df.loc[v2, eptm.coords].values).astype(np.float)
-    r_123 = eptm.vert_df.loc[[v1, v2, v3], eptm.coords].mean(axis=0).values
-    r_A = eptm.cell_df.loc[cA, eptm.coords].values
-    orient = np.dot(np.cross(r_12, r_23), (r_123 - r_A))
+    if cA is not None:
+        # orient vertices 1,2,3 positively
+        r_12 = (eptm.vert_df.loc[v2, eptm.coords].values -
+                eptm.vert_df.loc[v1, eptm.coords].values).astype(np.float)
+        r_23 = (eptm.vert_df.loc[v3, eptm.coords].values -
+                eptm.vert_df.loc[v2, eptm.coords].values).astype(np.float)
+        r_123 = eptm.vert_df.loc[[v1, v2, v3], eptm.coords].mean(axis=0).values
+        r_A = eptm.cell_df.loc[cA, eptm.coords].values
+        orient = np.dot(np.cross(r_12, r_23), (r_123 - r_A))
+    elif cB is not None:
+        # orient vertices 4,5,6 negatively
+        r_45 = (eptm.vert_df.loc[v5, eptm.coords].values -
+                eptm.vert_df.loc[v4, eptm.coords].values).astype(np.float)
+        r_56 = (eptm.vert_df.loc[v6, eptm.coords].values -
+                eptm.vert_df.loc[v5, eptm.coords].values).astype(np.float)
+        r_456 = eptm.vert_df.loc[[v4, v5, v6], eptm.coords].mean(axis=0).values
+        r_B = eptm.cell_df.loc[cB, eptm.coords].values
+        orient = -np.dot(np.cross(r_45, r_56), (r_456 - r_B))
+    else:
+        print('I - H transition is not possible without cells on either ends'
+              'of the edge - would result in a hole')
     if orient < 0:
         v1, v2, v3 = v1, v3, v2
         v4, v5, v6 = v4, v6, v5
@@ -278,6 +291,7 @@ def IH_transition(eptm, e_1011):
     eptm.edge_df.index.name = 'edge'
     eptm.reset_index()
     eptm.reset_topo()
+
 
 def HI_transition(eptm, face):
     """
@@ -474,3 +488,49 @@ def _set_new_pos_HI(eptm, fa, fb, v10, v11):
     Dl_th = eptm.settings['threshold_length']
     eptm.vert_df.loc[v10, eptm.coords] = r0 + Dl_th/2 * norm_b
     eptm.vert_df.loc[v11, eptm.coords] = r0 + Dl_th/2 * norm_a
+
+
+def condition_4i(eptm):
+    """
+    Return an index over the faces violating condition 4 i in Okuda et al 2013,
+    that is edges (from the same face) sharing two vertices simultaneously.
+    """
+    num_srces = eptm.edge_df.groupby('face')['srce'].apply(lambda s: len(set(s)))
+    num_sides = eptm.face_df['num_sides']
+    return eptm.face_df[num_srces != num_sides].index
+
+
+def get_neighbour_face_pairs(eptm):
+    """
+    Returns a pandas Series of neighboring face pairs (as forzen sets of 2 indexes)
+    """
+    pairs = []
+    eptm.edge_df['v_pair'] =  eptm.edge_df[['srce', 'trgt']].apply(frozenset, axis=1)
+
+    _ = eptm.edge_df.groupby('v_pair')['face'].apply(
+        lambda s: pairs.extend([frozenset((a, b)) for a, b in combinations(s.values, 2)]))
+    return pd.Series(pairs).drop_duplicates()
+
+def get_num_common_edges(eptm):
+    """
+    Returns the number of common edges between two neighboring faces
+    this number is set to -1 if those faces are opposite and share the
+    same edges.
+    """
+    pairs = get_neighbour_face_pairs(eptm)
+    face_v_pair_orbit = eptm.edge_df.groupby('face').apply(
+        lambda df: frozenset(df['v_pair']))
+    n_common = [
+        len(face_v_pair_orbit.loc[fa].intersection(face_v_pair_orbit.loc[fb]))
+        if face_v_pair_orbit.loc[fb] != face_v_pair_orbit.loc[fa]
+        else -1 for fa, fb in pairs]
+    n_common = pd.Series(n_common, index=pd.Index(pairs, name='face_pairs'))
+    return n_common
+
+def condition_4ii(eptm):
+    """
+    Return a list of face pairs sharing more than one edge, as defined
+    in Okuda et al. 2013 condition 4 ii
+    """
+    n_common = get_num_common_edges(eptm)
+    return list(n_common[n_common > 2].index)
