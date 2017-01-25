@@ -1,9 +1,8 @@
 import logging
 import itertools
-import numpy as np, pandas as pd
-from itertools import combinations
+import numpy as np
 from .sheet_topology import face_division
-from .base_topology import add_vert
+from .base_topology import add_vert, close_face
 from ..geometry.utils import rotation_matrix
 
 logger = logging.getLogger(name=__name__)
@@ -262,23 +261,9 @@ def IH_transition(eptm, e_1011):
         eptm.edge_df.loc[eA, ['srce', 'trgt', 'face', 'cell']] = vi, vj, fa, cA
         eptm.edge_df.loc[eB, ['srce', 'trgt', 'face', 'cell']] = vj, vi, fb, cB
 
-    # Hardcoding this, as I don't see a clever way around
-    news = [(cA, v1, v2, v8, v7),
-            (cA, v1, v3, v7, v9),
-            (cA, v2, v3, v9, v8),
-            (cB, v4, v5, v7, v8),
-            (cB, v5, v6, v8, v9),
-            (cB, v6, v4, v9, v7),
-            (cC, v1, v2, v7, v8),
-            (cC, v4, v5, v8, v7),
-            (cD, v2, v3, v8, v9),
-            (cD, v5, v6, v9, v8),
-            (cE, v1, v3, v9, v7),
-            (cE, v4, v6, v7, v9)]
-    for args in news:
-        if args[0] is None:
-            continue
-        _add_edge_to_existing(eptm, *args)
+    for cell in cells:
+        for face in eptm.edge_df[eptm.edge_df['cell'] == cell]['face']:
+            close_face(eptm, face)
 
     # Removing the remaining edges and vertices
     todel_edges = eptm.edge_df[(eptm.edge_df['srce'] == v10) |
@@ -365,16 +350,9 @@ def HI_transition(eptm, face):
         eptm.edge_df.loc[e_kjs, 'srce'] = v11
 
     # Closing the faces with v10 → v11 edges
-    news = [(cC, v2, v5, v10, v11),
-            (cC, v1, v4, v11, v10),
-            (cD, v2, v5, v11, v10),
-            (cD, v3, v6, v10, v11),
-            (cE, v3, v6, v11, v10),
-            (cE, v1, v4, v10, v11)]
-    for args in news:
-        if args[0] is None:
-            continue
-        _add_edge_to_existing(eptm, *args)
+    for cell in cells:
+        for face in eptm.edge_df[eptm.edge_df['cell'] == cell]['face']:
+            close_face(eptm, face)
 
     # Removing the remaining edges and vertices
     todel_edges = eptm.edge_df[(eptm.edge_df['srce'] == v7) |
@@ -488,49 +466,3 @@ def _set_new_pos_HI(eptm, fa, fb, v10, v11):
     Dl_th = eptm.settings['threshold_length']
     eptm.vert_df.loc[v10, eptm.coords] = r0 + Dl_th/2 * norm_b
     eptm.vert_df.loc[v11, eptm.coords] = r0 + Dl_th/2 * norm_a
-
-
-def condition_4i(eptm):
-    """
-    Return an index over the faces violating condition 4 i in Okuda et al 2013,
-    that is edges (from the same face) sharing two vertices simultaneously.
-    """
-    num_srces = eptm.edge_df.groupby('face')['srce'].apply(lambda s: len(set(s)))
-    num_sides = eptm.face_df['num_sides']
-    return eptm.face_df[num_srces != num_sides].index
-
-
-def get_neighbour_face_pairs(eptm):
-    """
-    Returns a pandas Series of neighboring face pairs (as forzen sets of 2 indexes)
-    """
-    pairs = []
-    eptm.edge_df['v_pair'] =  eptm.edge_df[['srce', 'trgt']].apply(frozenset, axis=1)
-
-    _ = eptm.edge_df.groupby('v_pair')['face'].apply(
-        lambda s: pairs.extend([frozenset((a, b)) for a, b in combinations(s.values, 2)]))
-    return pd.Series(pairs).drop_duplicates()
-
-def get_num_common_edges(eptm):
-    """
-    Returns the number of common edges between two neighboring faces
-    this number is set to -1 if those faces are opposite and share the
-    same edges.
-    """
-    pairs = get_neighbour_face_pairs(eptm)
-    face_v_pair_orbit = eptm.edge_df.groupby('face').apply(
-        lambda df: frozenset(df['v_pair']))
-    n_common = [
-        len(face_v_pair_orbit.loc[fa].intersection(face_v_pair_orbit.loc[fb]))
-        if face_v_pair_orbit.loc[fb] != face_v_pair_orbit.loc[fa]
-        else -1 for fa, fb in pairs]
-    n_common = pd.Series(n_common, index=pd.Index(pairs, name='face_pairs'))
-    return n_common
-
-def condition_4ii(eptm):
-    """
-    Return a list of face pairs sharing more than one edge, as defined
-    in Okuda et al. 2013 condition 4 ii
-    """
-    n_common = get_num_common_edges(eptm)
-    return list(n_common[n_common > 2].index)
