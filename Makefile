@@ -7,4 +7,4 @@ test:
 	cd tyssue/ && py.test && cd ..
 
 coverage:
-	cd tyssue/ && py.test --cov=tyssue --cov-config=../.coveragerc  && cd ..
+	cd tyssue/ && py.test --cov=tyssue --cov-config=../.coveragerc
