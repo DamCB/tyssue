@@ -1,8 +1,8 @@
-
-[run]
-branch = True
+[paths]
+source =
+     tyssue/
+     build/lib/tyssue
 
 [report]
-include = tyssue/*/tests/*
 exclude_lines =
       pragma: no cover
