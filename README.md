@@ -6,7 +6,7 @@
 
 [![Build Status](https://travis-ci.org/DamCB/tyssue.svg?branch=master)](https://travis-ci.org/DamCB/tyssue)
 
-[![Coverage Status](https://coveralls.io/repos/CellModels/tyssue/badge.svg)](https://coveralls.io/r/CellModels/tyssue)
+[![Coverage Status](https://coveralls.io/repos/DamCB/tyssue/badge.svg)](https://coveralls.io/r/CellModels/tyssue)
 
 [![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/)
 
