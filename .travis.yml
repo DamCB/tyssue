@@ -22,4 +22,5 @@ script:
   - make coverage
 
 after_success:
+  - cd tyssue
   - coveralls
