@@ -92,10 +92,6 @@ class SheetGeometry(PlanarGeometry):
                                             sheet.vert_df[u])
             sheet.vert_df['height'] = (sheet.vert_df['rho'] -
                                        sheet.vert_df['basal_shift'])
-            # sheet.face_df['rho'] = np.hypot(sheet.face_df[v],
-            #                                 sheet.face_df[u])
-            # sheet.face_df['height'] = (sheet.face_df['rho'] -
-            #                            sheet.face_df['basal_shift'])
 
         elif sheet.settings['geometry'] == 'flat':
             sheet.vert_df['rho'] = sheet.vert_df[w]
@@ -103,6 +99,7 @@ class SheetGeometry(PlanarGeometry):
                                        sheet.vert_df['basal_shift'])
 
         elif sheet.settings['geometry'] == 'spherical':
+            sheet.center()
             sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[sheet.coords],
                                                   axis=1)
             sheet.vert_df['height'] = (sheet.vert_df['rho'] -
