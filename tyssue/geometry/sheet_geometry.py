@@ -65,8 +65,8 @@ class SheetGeometry(PlanarGeometry):
             sheet.edge_df['sub_area'])
         sheet.face_df['vol'] = sheet.sum_face(sheet.edge_df['sub_vol'])
 
-    @staticmethod
-    def update_height(sheet):
+    @classmethod
+    def update_height(cls, sheet):
         """
         Update the height of the sheet vertices, based on the geometry
         specified in the sheet settings:
@@ -99,7 +99,8 @@ class SheetGeometry(PlanarGeometry):
                                        sheet.vert_df['basal_shift'])
 
         elif sheet.settings['geometry'] == 'spherical':
-            sheet.center()
+
+            cls.center(sheet)
             sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[sheet.coords],
                                                   axis=1)
             sheet.vert_df['height'] = (sheet.vert_df['rho'] -

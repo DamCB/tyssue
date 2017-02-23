@@ -60,4 +60,3 @@ class BaseGeometry():
         eptm.vert_df[eptm.coords] = (
             eptm.vert_df[eptm.coords].values -
             eptm.vert_df[eptm.coords].mean(axis=0).values[np.newaxis, :])
-        cls.update_all(eptm)

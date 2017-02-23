@@ -247,7 +247,8 @@ class Epithelium:
         self.update_mindex()
         if 'cell' in self.data_names:
             self.update_num_faces()
-        if 'opposite' in self.edge_df.columns:
+        if ('opposite' in self.edge_df.columns) and (
+                'cell' not in self.data_names):
             self.edge_df['opposite'] = get_opposite(self.edge_df)
 
     @property
