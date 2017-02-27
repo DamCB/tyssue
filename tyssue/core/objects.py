@@ -249,7 +249,11 @@ class Epithelium:
             self.update_num_faces()
         if ('opposite' in self.edge_df.columns) and (
                 'cell' not in self.data_names):
-            self.edge_df['opposite'] = get_opposite(self.edge_df)
+            try:
+                self.edge_df['opposite'] = get_opposite(self.edge_df)
+            except ValueError:
+                warnings.warn('Opposites could not be computed, are you sure '
+                              'you are using a sheet-like topology?')
 
     @property
     def face_idx(self):
