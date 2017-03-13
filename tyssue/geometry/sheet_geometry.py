@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np, pandas as pd
 
 from .planar_geometry import PlanarGeometry
 from .utils import rotation_matrix
@@ -166,14 +166,18 @@ class SheetGeometry(PlanarGeometry):
         """
 
         face_orbit = sheet.edge_df[sheet.edge_df['face'] == face]['srce']
-        n_sides = face_orbit.shape[0]
-        face_pos = np.repeat(
-            sheet.face_df.loc[face, sheet.coords].values,
-            n_sides).reshape(len(sheet.coords), n_sides).T
-        rel_pos = sheet.vert_df.loc[face_orbit.values, sheet.coords] - face_pos
-
-        rotation = cls.face_rotation(sheet, face, psi=psi)
-
-        rot_pos = rel_pos.copy()
-        rot_pos.loc[:] = np.dot(rotation, rel_pos.T).T
+        # n_sides = face_orbit.shape[0]
+        # face_pos = np.repeat(
+        #     sheet.face_df.loc[face, sheet.coords].values,
+        #     n_sides).reshape(len(sheet.coords), n_sides).T
+        rel_pos = (sheet.vert_df.loc[face_orbit.values, sheet.coords].values -
+                   sheet.face_df.loc[face, sheet.coords].values)
+        u, s, rotation = np.linalg.svd(rel_pos.astype(np.float),
+                                       full_matrices=False)
+        # rotation = cls.face_rotation(sheet, face, psi=psi)
+        if psi != 0:
+            rotation = np.dot(rotation_matrix(psi, [0, 0, 1]),
+                              rotation)
+        rot_pos = pd.DataFrame(np.dot(rel_pos, rotation.T),
+                               index=face_orbit, columns=sheet.coords)
         return rot_pos

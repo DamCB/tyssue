@@ -120,13 +120,13 @@ def get_division_edges(sheet, mother, geom,
         angle = np.random.random() * np.pi
 
     m_data = sheet.edge_df[sheet.edge_df['face'] == mother]
-    if angle == 0:
-        face_pos = sheet.face_df.loc[mother, sheet.coords]
-        rot_pos = sheet.vert_df[sheet.coords].copy()
-        for c in sheet.coords:
-            rot_pos.loc[:, c] = rot_pos[c] - face_pos[c]
-    else:
-        rot_pos = geom.face_projected_pos(sheet, mother, psi=angle)
+    # if angle == 0:
+    #     face_pos = sheet.face_df.loc[mother, sheet.coords]
+    #     rot_pos = sheet.vert_df[sheet.coords].copy()
+    #     for c in sheet.coords:
+    #         rot_pos.loc[:, c] = rot_pos[c] - face_pos[c]
+    # else:
+    rot_pos = geom.face_projected_pos(sheet, mother, psi=angle)
 
     srce_pos = rot_pos.loc[m_data['srce'], axis]
     srce_pos.index = m_data.index
