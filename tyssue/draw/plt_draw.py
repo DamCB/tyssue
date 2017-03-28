@@ -189,8 +189,7 @@ def plot_forces(sheet, geom, model,
     arrows[gcoords] = -grad_i[coords]  # F = -grad E
 
     if ax is None:
-        fig, ax = quick_edge_draw(sheet, coords,
-                                  **draw_specs)
+        fig, ax = quick_edge_draw(sheet, coords)
     else:
         fig = ax.get_figure()
 
