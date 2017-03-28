@@ -4,6 +4,16 @@ import warnings
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 
+
+def rod_sheet():
+    """Geomtetry specs of a rod sheet in 3D space
+
+    """
+
+    sheet_json = os.path.join(CURRENT_DIR, 'rod_sheet.json')
+    return load_spec(sheet_json)
+
+
 def cylindrical_sheet():
     """Geometry specification of a sheet in a 3D space
 

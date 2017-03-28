@@ -49,8 +49,8 @@ class BaseGeometry():
                              append=True, inplace=True)
         sheet.face_df[sheet.coords] = upcast_pos.mean(level='face')
 
-    @classmethod
-    def center(cls, eptm):
+    @staticmethod
+    def center(eptm):
         """
         Transates the epithelium vertices so that the center
         of mass is at the center of the coordinate system,
@@ -60,3 +60,28 @@ class BaseGeometry():
         eptm.vert_df[eptm.coords] = (
             eptm.vert_df[eptm.coords].values -
             eptm.vert_df[eptm.coords].mean(axis=0).values[np.newaxis, :])
+
+    @staticmethod
+    def dist_to_point(vert_df, point, coords):
+        """
+        Returns the distance of all vertices from point over the
+        coordinates
+
+        Parameters
+        ----------
+        vert_df: a :class:`pandas.DataFrame` with the points coordinates
+          in the columns given by the `coords` argument
+
+        point: a doublet (in 2D) or triplet (in 3D) giving the reference point
+          coordinates
+
+        coords: list of 2 or 3 strings giving the column names
+
+        Returns
+        -------
+
+        distance: a :class:`pandas.Series` with the same length
+          as the input `vert_df`
+        """
+        return sum(((vert_df[c] - u)**2 for
+                    c, u in zip(coords, point)))**0.5
