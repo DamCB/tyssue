@@ -81,7 +81,15 @@ class SheetGeometry(PlanarGeometry):
              specified in sheet.settings['height_axis']
           - 'spherical': the vertex height is measured with respect to its
              distance to the coordinate system centers
-
+          - 'rod': the vertex height is measured with respect to its
+             distance to the coordinate height axis if between the focii, and
+             from the closest focus otherwise. The focii positions are updated
+             before the height update.
+                 ---------------
+               /                 \
+              |  *            *   |
+               \                 /
+                 ---------------
         In all the cases, this distance is shifted by an amount of
         `sheet.vert_df['basal_shift']`
         """
@@ -90,21 +98,39 @@ class SheetGeometry(PlanarGeometry):
         if sheet.settings['geometry'] == 'cylindrical':
             sheet.vert_df['rho'] = np.hypot(sheet.vert_df[v],
                                             sheet.vert_df[u])
-            sheet.vert_df['height'] = (sheet.vert_df['rho'] -
-                                       sheet.vert_df['basal_shift'])
 
         elif sheet.settings['geometry'] == 'flat':
             sheet.vert_df['rho'] = sheet.vert_df[w]
-            sheet.vert_df['height'] = (sheet.vert_df[w] -
-                                       sheet.vert_df['basal_shift'])
 
         elif sheet.settings['geometry'] == 'spherical':
 
             cls.center(sheet)
             sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[sheet.coords],
                                                   axis=1)
-            sheet.vert_df['height'] = (sheet.vert_df['rho'] -
-                                       sheet.vert_df['basal_shift'])
+        elif sheet.settings['geometry'] == 'rod':
+
+            cls.center(sheet)
+            sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[[u, v]],
+                                                  axis=1)
+            b = np.percentile(sheet.vert_df['rho'], 95)
+            a = np.percentile(np.abs(sheet.vert_df[w]), 95)
+            w0 = (a - b)
+            sheet.settings['ab'] = [a, b]
+
+            l_mask = sheet.vert_df[sheet.vert_df[w] < -w0].index
+            r_mask = sheet.vert_df[sheet.vert_df[w] > w0].index
+
+            sheet.vert_df.loc[l_mask, 'rho'] = cls.dist_to_point(
+                sheet.vert_df.loc[l_mask],
+                [0, 0, -w0],
+                [u, v, w])
+            sheet.vert_df.loc[r_mask, 'rho'] = cls.dist_to_point(
+                sheet.vert_df.loc[r_mask],
+                [0, 0, w0],
+                [u, v, w])
+
+        sheet.vert_df['height'] = (sheet.vert_df['rho'] -
+                                   sheet.vert_df['basal_shift'])
 
         edge_height = sheet.upcast_srce(sheet.vert_df[['height', 'rho']])
         edge_height.set_index(sheet.edge_df['face'],

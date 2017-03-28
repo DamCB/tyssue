@@ -46,6 +46,23 @@ def edge_lines(sheet, coords, **draw_specs):
 
 
 def view_3js(sheet, coords=['x', 'y', 'z'], **draw_specs):
+    """
+    Creates a javascript renderer of the edge lines to be displayed
+    in Jupyter Notebooks
+
+    Returns
+    -------
+
+    renderer: a :class:`pythreejs.pythreejs.Renderer` instance
+    lines: a :class:`pythreejs.pythreejs.Line` object
+
+    Example
+    -------
+    >>> from IPython import display
+    >>> renderer, lines = view_3js(eptm)
+    >>> display(renderer)
+    """
+
 
     lines = edge_lines(sheet, coords, **draw_specs)
     scene = py3js.Scene(
