@@ -37,18 +37,3 @@ Please set `overwrite` to True
 ''' % fname)
     with open(fname, 'w+') as config_file:
         json.dump(spec, config_file)
-
-
-def load_default(aspect='core', sub_aspect=''):
-
-    warnings.warn('load_default is Deprecated,'
-                  ' use methods from config instead')
-    cur_dir = os.path.abspath(os.path.dirname(__file__))
-    # root = os.path.dirname(cur_dir)
-
-    specfile = os.path.join(cur_dir, aspect, sub_aspect+'.json',)
-    logger.info('Loading defaults from {}'.format(specfile))
-    if not os.path.isfile(specfile):
-        raise IOError('configuration file {} is missing'.format(specfile))
-
-    return load_spec(specfile)

@@ -1,13 +1,9 @@
 import numpy as np
 import pandas as pd
 
-# from .. import libtyssue_core as libcore
-# from . import generation
 from ..utils.utils import set_data_columns, spec_updater
-from ..config.json_parser import load_default
 
 import warnings
-
 import logging
 log = logging.getLogger(name=__name__)
 
@@ -204,31 +200,10 @@ class Epithelium:
     def settings(self):
         return self.specs['settings']
 
-    @settings.setter
-    def settings(self, key, value): #pragma: no cover
-        # (Actually the 'settings' getter is called
-        # and then the dictionary class setter
-        # instead of directly the 'settings' setter.)
-        # See http://stackoverflow.com/a/3137768
-        # So this method is not actually called.
-        self.specs['settings'][key] = value
-
     def update_specs(self, new, reset=False):
 
         spec_updater(self.specs, new)
         set_data_columns(self.datasets, new, reset)
-
-    def set_specs(self, domain, base,
-                  new_specs=None,
-                  default_base=None, reset=False):  # pragma: no cover
-        warnings.warn('Deprecated, use update_specs() instead.')
-
-        if base is None:
-            self.update_specs(load_default(domain, default_base), reset)
-        else:
-            self.update_specs(load_default(domain, base), reset)
-        if new_specs is not None:
-            self.update_specs(new_specs, reset)
 
     def update_num_sides(self):
         self.face_df['num_sides'] = self.edge_df.face.value_counts().loc[

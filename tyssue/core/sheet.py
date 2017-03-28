@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 
 from .objects import Epithelium, get_opposite
-from ..config.json_parser import load_default
+from ..config.geometry import flat_sheet
 
 
 class Sheet(Epithelium):
@@ -49,7 +49,7 @@ class Sheet(Epithelium):
 
         '''
         if specs is None:
-            specs = load_default('geometry', 'sheet')
+            specs = flat_sheet()
         super().__init__(identifier, datasets,
                          specs, coords)
 
