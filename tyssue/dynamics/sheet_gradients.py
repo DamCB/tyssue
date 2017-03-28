@@ -5,23 +5,53 @@ Base gradients for sheet like geometries
 import numpy as np
 import pandas as pd
 
-from ..utils.utils import _to_3d
+from ..utils.utils import _to_3d, _to_2d
+
+
+
+def cyl_height_grad(vert_df, coords):
+
+    r_to_rho = vert_df[coords] / _to_3d(vert_df['rho'])
+    r_to_rho[coords[-1]] = 0.
+    return r_to_rho
+
 
 
 def height_grad(sheet):
 
-    coords = sheet.coords
+    w = sheet.settings['height_axis']
+    u, v = (c for c in sheet.coords if c != w)
+    coords = [u, v, w]
+
     if sheet.settings['geometry'] == 'cylindrical':
         r_to_rho = sheet.vert_df[coords] / _to_3d(sheet.vert_df['rho'])
-        r_to_rho['z'] = 0.
+        r_to_rho[w] = 0.
 
     elif sheet.settings['geometry'] == 'flat':
         r_to_rho = sheet.vert_df[coords].copy()
-        r_to_rho[['x', 'y']] = 0.
-        r_to_rho[['z']] = 1.
+        r_to_rho[[u, v]] = 0.
+        r_to_rho[[w]] = 1.
 
     elif sheet.settings['geometry'] == 'spherical':
         r_to_rho = sheet.vert_df[coords] / _to_3d(sheet.vert_df['rho'])
+
+    elif sheet.settings['geometry'] == 'rod':
+
+        r_to_rho = sheet.vert_df[coords].copy()
+
+        r_to_rho[[u, v]] = sheet.vert_df[[u, v]] / _to_2d(sheet.vert_df['rho'])
+        r_to_rho[w] = 0.
+
+        l_mask = sheet.vert_df[sheet.vert_df['left_tip']].index
+        r_mask = sheet.vert_df[sheet.vert_df['right_tip']].index
+        a, b = sheet.settings['ab']
+        w0 = a - b
+
+        l_rel_z = sheet.vert_df.loc[l_mask, 'z'] - w0
+        r_to_rho.loc[l_mask, w] = l_rel_z / sheet.vert_df['rho']
+
+        r_rel_z = sheet.vert_df.loc[r_mask, 'z'] + w0
+        r_to_rho.loc[r_mask, w] = r_rel_z / sheet.vert_df['rho']
 
     return r_to_rho
 

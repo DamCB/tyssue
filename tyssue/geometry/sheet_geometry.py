@@ -116,9 +116,11 @@ class SheetGeometry(PlanarGeometry):
             a = np.percentile(np.abs(sheet.vert_df[w]), 95)
             w0 = (a - b)
             sheet.settings['ab'] = [a, b]
+            sheet.vert_df['left_tip'] = sheet.vert_df[w] < -w0
+            sheet.vert_df['right_tip'] = sheet.vert_df[w] > w0
 
-            l_mask = sheet.vert_df[sheet.vert_df[w] < -w0].index
-            r_mask = sheet.vert_df[sheet.vert_df[w] > w0].index
+            l_mask = sheet.vert_df[sheet.vert_df['left_tip']].index
+            r_mask = sheet.vert_df[sheet.vert_df['right_tip']].index
 
             sheet.vert_df.loc[l_mask, 'rho'] = cls.dist_to_point(
                 sheet.vert_df.loc[l_mask],

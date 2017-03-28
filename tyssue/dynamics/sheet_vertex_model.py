@@ -78,7 +78,7 @@ class SheetModel(PlanarModel):
 
         nrj_norm_factor = sheet.specs['settings']['nrj_norm_factor']
         if full_output:
-            return (E / nrj_norm_factor for E in energies)
+            return [E / nrj_norm_factor for E in energies]
         else:
             return sum(E.sum() for E in energies) / nrj_norm_factor
 

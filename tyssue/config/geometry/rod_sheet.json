@@ -15,7 +15,9 @@
      "is_active": true,
      "rho": 0.0,
      "height": 0.0,
-     "basal_shift": 4.0
+     "basal_shift": 4.0,
+     "left_tip": false,
+     "right_tip": false
      },
 "edge": {
     "srce": 0,
@@ -31,6 +33,7 @@
     },
 "settings": {
     "geometry": "rod",
-    "height_axis": "z"
+    "height_axis": "z",
+    "ab": [0.0, 0.0]
     }
 }
