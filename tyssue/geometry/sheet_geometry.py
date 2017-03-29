@@ -1,4 +1,5 @@
-import numpy as np, pandas as pd
+import numpy as np
+import pandas as pd
 
 from .planar_geometry import PlanarGeometry
 from .utils import rotation_matrix
@@ -103,22 +104,14 @@ class SheetGeometry(PlanarGeometry):
             sheet.vert_df['rho'] = sheet.vert_df[w]
 
         elif sheet.settings['geometry'] == 'spherical':
-
-            cls.center(sheet)
             sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[sheet.coords],
                                                   axis=1)
         elif sheet.settings['geometry'] == 'rod':
 
-            cls.center(sheet)
+            a, b = sheet.settings['ab']
+            w0 = b - a
             sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[[u, v]],
                                                   axis=1)
-            b = np.percentile(sheet.vert_df['rho'], 95)
-            a = np.percentile(np.abs(sheet.vert_df[w]), 95)
-            w0 = (a - b)
-            sheet.settings['ab'] = [a, b]
-            sheet.vert_df['left_tip'] = sheet.vert_df[w] < -w0
-            sheet.vert_df['right_tip'] = sheet.vert_df[w] > w0
-
             l_mask = sheet.vert_df[sheet.vert_df['left_tip']].index
             r_mask = sheet.vert_df[sheet.vert_df['right_tip']].index
 
@@ -138,6 +131,27 @@ class SheetGeometry(PlanarGeometry):
         edge_height.set_index(sheet.edge_df['face'],
                               append=True, inplace=True)
         sheet.face_df[['height', 'rho']] = edge_height.mean(level='face')
+
+    @classmethod
+    def reset_scafold(cls, sheet):
+        """
+        Re-centers and (in the case of a rod sheet) resets the
+        a-b parameters and tip masks
+        """
+
+        w = sheet.settings['height_axis']
+        u, v = (c for c in sheet.coords if c != w)
+
+        cls.center(sheet)
+        if sheet.settings['geometry'] == 'rod':
+            rho = np.linalg.norm(sheet.vert_df[[u, v]],
+                                 axis=1)
+            a = np.percentile(rho, 95)
+            b = np.percentile(np.abs(sheet.vert_df[w]), 95)
+            w0 = (b - a)
+            sheet.settings['ab'] = [a, b]
+            sheet.vert_df['left_tip'] = sheet.vert_df[w] < -w0
+            sheet.vert_df['right_tip'] = sheet.vert_df[w] > w0
 
     @staticmethod
     def face_rotation(sheet, face, psi=0):

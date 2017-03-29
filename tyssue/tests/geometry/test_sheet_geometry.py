@@ -37,4 +37,4 @@ def test_rod_update_height():
     sheet = Sheet('rod', datasets, specs)
     SheetGeometry.update_all(sheet)
 
-    assert (sheet.vert_df.rho.mean() - 0.7895479495559642)**2 < TOLERANCE
+    assert (sheet.vert_df.rho.mean() - 0.6430928644461761)**2 < TOLERANCE

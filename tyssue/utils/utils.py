@@ -89,3 +89,33 @@ def get_sub_eptm(eptm, edges):
 def single_cell(eptm, cell):
     edges = eptm.edge_df[eptm.edge_df['cell'] == cell].index
     return get_sub_eptm(eptm, edges)
+
+
+def scaled_unscaled(func, scale, eptm, geom,
+                    args=(), kwargs={}, coords=None):
+    """Scales the epithelium by an homotetic factor `scale`, applies
+    the function `func`, and scales back to original size.
+
+    Parameters
+    ----------
+    func: the function to apply to the scaled epithelium
+    scale: float, the scale to apply
+    eptm: a :class:`Epithelium` instance
+    geom: a :class:`Geometry` class
+    args: sequence, the arguments to pass to func
+    kwargs: dictionary, the keywords arguments
+      to pass to func
+    coords: the coordinates on which the scaling applies
+
+    Returns
+    -------
+    res: the result of the function func
+    """
+    if coords is None:
+        coords = eptm.coords
+    geom.scale(eptm, scale, coords)
+    geom.update_all(eptm)
+    res = func(*args, **kwargs)
+    geom.scale(eptm, 1/scale, coords)
+    geom.update_all(eptm)
+    return res
