@@ -8,6 +8,11 @@ from .effectors import elastic_force, elastic_energy
 
 
 class PlanarModel():
+    """
+    Model for a 2D junction network  in 2D.
+
+    """
+    energy_labels = ['tension', 'contractility', 'area']
 
     @staticmethod
     def dimentionalize(mod_specs, **kwargs):
@@ -80,9 +85,8 @@ class PlanarModel():
         grad_t = cls.tension_grad(sheet, grad_lij)
         grad_c = cls.contractile_grad(sheet, grad_lij)
         grad_a_srce, grad_a_trgt = cls.elastic_grad(sheet)
-        grad_i = ((sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
-                  sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
-                  sheet.sum_srce(grad_a_srce) + sheet.sum_trgt(grad_a_trgt))
+        grad_i = (sheet.sum_srce(grad_t + grad_c + grad_a_srce) +
+                  sheet.sum_trgt(grad_c + grad_a_trgt))
         if components:
             return grad_t, grad_c, grad_a_srce, grad_a_trgt
         return grad_i / norm_factor

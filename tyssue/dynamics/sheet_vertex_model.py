@@ -15,6 +15,12 @@ from ..utils.utils import _to_3d
 
 
 class SheetModel(PlanarModel):
+    """
+    Model for a 2D junction network  in 3D, aka 2.5D
+
+    """
+    energy_labels = ['tension', 'contractility', 'volume']
+
 
     @staticmethod
     def dimentionalize(mod_specs):
@@ -105,9 +111,8 @@ class SheetModel(PlanarModel):
             return grads
 
         grad_i = (
-            (sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
-            sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
-            sheet.sum_srce(grad_v_srce) + sheet.sum_trgt(grad_v_trgt)
+            sheet.sum_srce(grad_t + grad_c + grad_v_srce) +
+            sheet.sum_trgt(-grad_c + grad_v_trgt)
             )
         if 'is_anchor' in sheet.edge_df.columns:
             grad_i = grad_i + sheet.sum_srce(grad_a)
