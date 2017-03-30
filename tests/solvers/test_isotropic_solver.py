@@ -4,17 +4,17 @@ from tyssue import config
 from tyssue import Sheet, SheetGeometry as geom
 from tyssue.dynamics import SheetModel as model
 from tyssue.solvers.isotropic_solver import bruteforce_isotropic_relax
+from tyssue.stores import stores_dir
 
 from tyssue.io.hdf5 import load_datasets
 from numpy.testing import assert_almost_equal
 
 
-CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 TOLERANCE = 1e-8
 
 def test_iso_solver():
 
-    pth = os.path.join(CURRENT_DIR, '../../stores/rod_sheet.hf5')
+    pth = os.path.join(stores_dir, 'rod_sheet.hf5')
     datasets = load_datasets(pth)
     specs = config.geometry.rod_sheet()
     sheet = Sheet('rod', datasets, specs)
