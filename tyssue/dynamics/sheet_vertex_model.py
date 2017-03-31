@@ -4,6 +4,8 @@ Vertex model for an Epithelial sheet (see definitions).
 Depends on the sheet vertex geometry functions.
 """
 
+import numpy as np
+
 from copy import deepcopy
 
 from .base_gradients import length_grad
@@ -65,8 +67,11 @@ class SheetModel(PlanarModel):
         '''
         # consider only live faces:
         live_face_df = sheet.face_df[sheet.face_df.is_alive == 1]
+        upcast_active = sheet.upcast_srce(sheet.vert_df.is_active)
         upcast_alive = sheet.upcast_face(sheet.face_df.is_alive)
-        live_edge_df = sheet.edge_df[upcast_alive == 1]
+        sheet.edge_df['is_active'] = (upcast_alive.values &
+                                      upcast_active.values).astype(np.bool)
+        live_edge_df = sheet.edge_df[sheet.edge_df['is_active']]
 
         E_t = live_edge_df.eval('line_tension * length / 2')
         E_c = live_face_df.eval('0.5 * contractility * perimeter**2')

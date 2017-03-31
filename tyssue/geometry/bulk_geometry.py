@@ -15,6 +15,7 @@ class BulkGeometry(SheetGeometry):
         * the face centroids
         * the normals to each edge associated face
         * the face areas
+        * the cell areas
         * the vertices heights (depends on geometry)
         * the face volumes (depends on geometry)
 
@@ -40,6 +41,13 @@ class BulkGeometry(SheetGeometry):
             eptm.edge_df[eptm.ncoords].values, axis=1) / 6
 
         eptm.cell_df['vol'] = eptm.sum_cell(eptm.edge_df['sub_vol'])
+
+    @staticmethod
+    def update_areas(eptm):
+
+        SheetGeometry.update_areas(eptm)
+        eptm.cell_df['area'] = eptm.sum_cell(eptm.edge_df['sub_area'])
+
 
     @staticmethod
     def update_centroid(eptm):

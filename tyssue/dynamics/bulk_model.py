@@ -65,7 +65,7 @@ class BulkModel(SheetModel):
         E_t = eptm.edge_df.eval('line_tension * length / 2')
         E_c = eptm.face_df.eval(
             '0.5 * is_alive * contractility * perimeter**2')
-        E_a = elastic_energy(eptm.face_df,
+        E_a = elastic_energy(eptm.cell_df,
                              var='area',
                              elasticity='area_elasticity',
                              prefered='prefered_area')
@@ -148,15 +148,15 @@ class BulkModel(SheetModel):
         ''' Computes
         :math:`\nabla_i \left(K (V_\alpha - V_0)^2\right)`:
         '''
-        # volumic elastic force
-        # this is K * (V - V0)
-        kv_a0_ = elastic_force(eptm.face_df,
+        # cells surface elastic force
+        # this is K * (A_c - A0)
+        kv_a0_ = elastic_force(eptm.cell_df,
                                var='area',
                                elasticity='area_elasticity',
                                prefered='prefered_area')
 
-        kv_a0_ = kv_a0_ * eptm.face_df['is_alive']
-        kv_a0 = _to_3d(eptm.upcast_face(kv_a0_))
+        kv_a0_ = kv_a0_ * eptm.cell_df['is_alive']
+        kv_a0 = _to_3d(eptm.upcast_cell(kv_a0_))
         grad_a_srce, grad_a_trgt = area_grad(eptm)
         grad_a_srce = kv_a0 * grad_a_srce
         grad_a_trgt = kv_a0 * grad_a_trgt

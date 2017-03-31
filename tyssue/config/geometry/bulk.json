@@ -17,6 +17,7 @@
 "cell": {
     "z": 0.0,
     "x": 0.0,
+    "area": 0.0,
     "vol": 0.0,
     "num_faces": 6,
     "is_alive": true,
