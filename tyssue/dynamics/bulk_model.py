@@ -100,8 +100,8 @@ class BulkModel(SheetModel):
 
         grad_t = cls.tension_grad(sheet, grad_lij)
         grad_c = cls.contractile_grad(sheet, grad_lij)
-        grad_v_srce, grad_v_trgt = cls.elastic_grad_v(sheet)
         grad_a_srce, grad_a_trgt = cls.elastic_grad_a(sheet)
+        grad_v_srce, grad_v_trgt = cls.elastic_grad_v(sheet)
         grads = (grad_t, grad_c,
                  grad_v_srce, grad_v_trgt,
                  grad_a_srce, grad_a_trgt)

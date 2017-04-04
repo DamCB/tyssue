@@ -198,9 +198,11 @@ def plot_forces(sheet, geom, model,
                  **draw_specs['grad'])
     return fig, ax
 
+
 def plot_scaled_energies(sheet, geom, model, scales, ax=None):
 
     from ..utils import scaled_unscaled
+
     def get_energies():
         energies = np.array([e.mean() for e in
                              model.compute_energy(sheet, True)])
@@ -215,11 +217,10 @@ def plot_scaled_energies(sheet, geom, model, scales, ax=None):
         fig, ax = plt.subplots()
     else:
         fig = ax.get_figure()
+    ax.plot(scales, energies.sum(axis=1),
+            'k-', lw=4, alpha=0.3, label='total')
     for e, label in zip(energies.T, model.energy_labels):
         ax.plot(scales, e, label=label)
-
-    ax.plot(scales, energies.sum(axis=1),
-            'k-', lw=2, alpha=0.3, label='total')
     ax.legend()
     return fig, ax
 
