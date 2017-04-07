@@ -244,24 +244,25 @@ def test_summation():
     edge_copy = datasets['edge'].copy()
     edge_copy.index = eptm.edge_mindex
 
-    assert_array_equal(edge_copy.sum(level='cell'),eptm.sum_cell(eptm.edge_df))
+    assert_array_equal(edge_copy.sum(level='cell').values[:, 1],
+                       eptm.sum_cell(eptm.edge_df).values[:, 1])
 
-    eptm_2d.edge_df['test_sum'] = np.linspace(1,eptm_2d.Ne, eptm_2d.Ne)
+    eptm_2d.edge_df['test_sum'] = np.linspace(1, eptm_2d.Ne, eptm_2d.Ne)
 
-    res_sum_srce = eptm_2d.sum_srce(eptm_2d.edge_df['test_sum'])
-    expected_sum_srce = pd.Series([21.0, 20.0, 3.0, 4.0, 5.0, 14.0, 9.0, 10.0, 11.0, 26.0, 15.0, 16.0, 17.0])
+    res_sum_srce = eptm_2d.sum_srce(eptm_2d.edge_df['test_sum']).values.reshape((-1,))
+    expected_sum_srce = np.array([21.0, 20.0, 3.0, 4.0, 5.0, 14.0,
+                                 9.0, 10.0, 11.0, 26.0, 15.0, 16.0, 17.0])
+    res_sum_trgt = eptm_2d.sum_trgt(eptm_2d.edge_df['test_sum']).values.reshape((-1,))
+    expected_sum_trgt = np.array([36.0, 18.0, 2.0, 3.0, 4.0, 12.0, 8.0, 9.0, 10.0, 24.0, 14.0, 15.0, 16.0])
 
-    res_sum_trgt = eptm_2d.sum_trgt(eptm_2d.edge_df['test_sum'])
-    expected_sum_trgt = pd.Series([36.0, 18.0, 2.0, 3.0, 4.0, 12.0, 8.0, 9.0, 10.0, 24.0, 14.0, 15.0, 16.0])
+    res_sum_face = eptm_2d.sum_face(eptm_2d.edge_df['test_sum']).values.reshape((-1,))
+    expected_sum_face = np.array([21.0, 57.0, 93.0])
 
-    res_sum_face = eptm_2d.sum_face(eptm_2d.edge_df['test_sum'])
-    expected_sum_face = pd.Series([21.0, 57.0, 93.0])
+    for expected, res in zip(
+        [expected_sum_srce, expected_sum_trgt, expected_sum_face],
+        [res_sum_srce, res_sum_trgt, res_sum_face]):
 
-    assert (expected_sum_srce == res_sum_srce).all()
-    assert (expected_sum_trgt == res_sum_trgt).all()
-    assert (expected_sum_face == res_sum_face).all()
-
-
+        assert np.all(expected == res)
 
 
 def test_orbits():

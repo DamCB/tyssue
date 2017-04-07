@@ -340,9 +340,13 @@ class Epithelium:
         return self._upcast(self.edge_df['cell'], df)
 
     def _lvl_sum(self, df, lvl):
-        df_ = df.copy()
-        df_.index = self.edge_mindex
-        return df_.sum(level=lvl)
+        df_ = df
+        if isinstance(df, pd.Series):
+            df_ = df.to_frame()
+        elif lvl not in df.columns:
+            df_ = df.copy()
+        df_[lvl] = self.edge_df[lvl]
+        return df_.groupby(lvl).sum()
 
     def sum_srce(self, df):
         return self._lvl_sum(df, 'srce')
