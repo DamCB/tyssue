@@ -752,6 +752,22 @@ def get_opposite(edge_df):
     return opposite.astype(np.int)
 
 
+def get_opposite_faces(eptm):
+    """Populates the 'opposite' column of eptm.face_df with the index of
+    the opposite face or -1 if the face has no opposite.
+
+    """
+    face_v = eptm.edge_df.groupby('face').apply(lambda df: frozenset(df['srce']))
+    face_v2 = pd.Series(data=face_v.index, index=face_v.values)
+    eptm.face_df['opposite'] = -1
+    face_pairs = []
+    face_v2.groupby(level=0).apply(lambda s: face_pairs.append(list(s.values))
+                                   if len(s) == 2 else np.NaN).dropna()
+    face_pairs = np.array(face_pairs)
+    eptm.face_df.loc[face_pairs[:, 0], 'opposite'] = face_pairs[:, 1]
+    eptm.face_df.loc[face_pairs[:, 1], 'opposite'] = face_pairs[:, 0]
+
+
 def _is_closed_cell(e_df):
     edges = e_df[['srce', 'trgt']]
     for e, (srce, trgt) in edges.iterrows():

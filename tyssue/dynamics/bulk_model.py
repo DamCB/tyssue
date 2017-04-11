@@ -4,6 +4,7 @@ Vertex model for an Epithelial sheet (see definitions).
 Depends on the sheet vertex geometry functions.
 """
 import numpy as np
+import pandas as pd
 from copy import deepcopy
 
 from .base_gradients import length_grad
@@ -162,6 +163,46 @@ class BulkModel(SheetModel):
         grad_a_trgt = kv_a0 * grad_a_trgt
 
         return grad_a_srce, grad_a_trgt
+
+
+class BulkModelwithFreeBorders(BulkModel):
+
+    @classmethod
+    def compute_energy(cls, eptm, full_output=False):
+
+        E_bulk = BulkModel.compute_energy(eptm, full_output=False)
+        E_brdr = cls.border_energy(eptm)
+        return E_bulk + E_brdr
+
+    @staticmethod
+    def border_energy(eptm):
+
+        E_brdr = elastic_energy(eptm.edge_df.loc[eptm.border_es],
+                                var='length',
+                                elasticity='border_elasticity',
+                                prefered='prefered_length')
+        return E_brdr.sum()
+
+    @classmethod
+    def compute_gradient(cls, eptm, components=False):
+        base_grad = BulkModel.compute_gradient(eptm, components=False)
+        border_grad = cls.border_grad(eptm)
+        return base_grad + eptm.sum_srce(border_grad) - eptm.sum_trgt(border_grad)
+
+
+    @staticmethod
+    def border_grad(eptm):
+
+        grad_lij = length_grad(eptm)
+        kl_l0 = pd.Series(np.zeros(eptm.Ne),
+                          index=eptm.edge_df.index)
+
+        kl_l0.loc[eptm.border_es] = elastic_force(eptm.edge_df.loc[eptm.border_es],
+                                                  var='length',
+                                                  elasticity='border_elasticity',
+                                                  prefered='prefered_length')
+        return grad_lij * _to_3d(kl_l0)
+
 
 
 class LaminaModel(BulkModel):
