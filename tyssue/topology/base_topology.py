@@ -62,6 +62,7 @@ def close_face(eptm, face):
         single_trgt, = trgts.difference(srces)
     except ValueError:
         print('Closing only possible with exactly two dangling vertices')
+        return
 
     eptm.edge_df = eptm.edge_df.append(
         face_edges.iloc[0],
