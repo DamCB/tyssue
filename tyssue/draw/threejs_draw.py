@@ -9,6 +9,26 @@ except ImportError:
     print('You need pythreejs to use this module'
           'use conda install -c conda-forge pythreejs')
 
+def triangular_faces(sheet, coords, **draw_specs):
+    spec = sheet_spec()
+    spec.update(**draw_specs)
+    if 'visible' in sheet.face_df.columns:
+        vis_e = sheet.upcast_face(sheet.face_df['visible'])
+        faces = sheet.edge_df[vis_e][['srce', 'trgt', 'face']]
+    else:
+        faces = sheet.edge_df[['srce', 'trgt', 'face']].copy()
+
+
+    vertices = np.vstack([sheet.vert_df[coords],
+                          sheet.face_df[coords]])
+    vertices = vertices.reshape((-1, 3))
+    faces['face'] += sheet.Nv
+
+    facesgeom = py3js.PlainGeometry(vertices=[list(v) for v in vertices],
+                                    faces=[list(f) for f in faces.values])
+
+    return py3js.Mesh(geometry=facesgeom, material=py3js.LambertMaterial())
+
 
 def edge_lines(sheet, coords, **draw_specs):
 
@@ -63,16 +83,23 @@ def view_3js(sheet, coords=['x', 'y', 'z'], **draw_specs):
     >>> display(renderer)
     """
 
+    spec = sheet_spec()
+    spec.update(**draw_specs)
+    children = [py3js.DirectionalLight(color='#ccaabb',
+                                       position=[0, 5, 0]),
+                py3js.AmbientLight(color='#cccccc')]
 
-    lines = edge_lines(sheet, coords, **draw_specs)
-    scene = py3js.Scene(
-        children=[lines,
-                  py3js.DirectionalLight(color='#ccaabb',
-                                         position=[0, 5, 0]),
-                  py3js.AmbientLight(color='#cccccc')])
+    if spec['edge']['visible']:
+        lines = edge_lines(sheet, coords, **spec)
+        children.append(lines)
+    if spec['face']['visible']:
+        faces = triangular_faces(sheet, coords, **spec)
+        children.append(faces)
 
-    c = py3js.PerspectiveCamera(position=[0, 5, 5])
-    renderer = py3js.Renderer(camera=c,
+
+    scene = py3js.Scene(children=children)
+    cam = py3js.PerspectiveCamera(position=[0, 5, 5])
+    renderer = py3js.Renderer(camera=cam,
                               scene=scene,
-                              controls=[py3js.OrbitControls(controlling=c)])
-    return renderer, lines
+                              controls=[py3js.OrbitControls(controlling=cam)])
+    return renderer, scene

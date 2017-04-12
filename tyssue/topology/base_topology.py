@@ -70,8 +70,6 @@ def close_face(eptm, face):
     eptm.edge_df.index.name = 'edge'
     new_edge = eptm.edge_df.index[-1]
     eptm.edge_df.loc[new_edge, ['srce', 'trgt']] = single_trgt, single_srce
-    eptm.reset_index()
-    eptm.reset_topo()
 
 
 def condition_4i(eptm):
