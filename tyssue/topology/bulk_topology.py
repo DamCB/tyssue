@@ -4,6 +4,7 @@ import numpy as np
 from .sheet_topology import face_division
 from .base_topology import add_vert, close_face
 from ..geometry.utils import rotation_matrix
+from ..core.objects import get_opposite_faces
 
 logger = logging.getLogger(name=__name__)
 
@@ -147,6 +148,7 @@ def cell_division(eptm, mother, geom, vertices):
 
 
 def opposite_face(eptm, fa, face_srce_orbit=None):
+
     if face_srce_orbit is None:
         face_srce_orbit = eptm.get_orbits(
             'face', 'srce').groupby(level='face').apply(set)
@@ -296,9 +298,10 @@ def HI_transition(eptm, face):
     v9 = f_edges[f_edges['srce'] == v8]['trgt'].iloc[0]
 
     cA = f_edges['cell'].iloc[0]
-    face_srce_orbit = eptm.get_orbits(
-        'face', 'srce').groupby(level='face').apply(set)
-    fb = opposite_face(eptm, fa, face_srce_orbit)
+
+    get_opposite_faces(eptm)
+    fb = eptm.face_df['opposite'].loc[fa]
+
     cB = eptm.edge_df[eptm.edge_df['face'] == fb]['cell'].iloc[0]
     cA_edges = eptm.edge_df[eptm.edge_df['cell'] == cA]
     cB_edges = eptm.edge_df[eptm.edge_df['cell'] == cB]
@@ -312,10 +315,12 @@ def HI_transition(eptm, face):
 
     v_pairs = []
     for vk in (v7, v8, v9):
-        vi = cA_edges[cA_edges['srce'] == vk]['trgt'].iloc[0]
-        vj = cB_edges[cB_edges['srce'] == vk]['trgt'].iloc[0]
-        v_pairs.append((vi, vj))
+        vis = set(cA_edges[cA_edges['srce'] == vk]['trgt'])
+        vi, = vis.difference({v7, v8, v9})
 
+        vjs = set(cB_edges[cB_edges['srce'] == vk]['trgt'])
+        vj, = vjs.difference({v7, v8, v9})
+        v_pairs.append((vi, vj))
     (v1, v4), (v2, v5), (v3, v6) = v_pairs
 
     srce_cell_orbit = eptm.get_orbits('srce', 'cell')

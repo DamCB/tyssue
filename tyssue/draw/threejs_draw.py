@@ -7,7 +7,32 @@ try:
     import pythreejs as py3js
 except ImportError:
     print('You need pythreejs to use this module'
-          'use conda install -c conda-forge pythreejs')
+          ' use conda install -c conda-forge pythreejs')
+
+
+def highlight_cells(eptm, cells, reset_visible=False):
+    if reset_visible:
+        eptm.face_df['face'] = False
+
+    for cell in cells:
+        cell_faces = eptm.edge_df[eptm.edge_df['cell']==cell]['face']
+        highlight_faces(eptm.face_df, cell_faces, reset_visible=False)
+
+
+
+def highlight_faces(face_df, faces,
+                    reset_visible=False):
+    """
+    Sets the faces visibility to 1
+
+    If `reset_visible` is `True`, sets all the other faces
+    to `visible = False`
+    """
+    if ('visible' not in face_df.columns) or reset_visible:
+        face_df['visible'] = False
+
+    face_df.loc[faces, 'visible'] = True
+
 
 def triangular_faces(sheet, coords, **draw_specs):
     spec = sheet_spec()

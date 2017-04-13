@@ -759,10 +759,16 @@ def get_opposite_faces(eptm):
     """
     face_v = eptm.edge_df.groupby('face').apply(lambda df: frozenset(df['srce']))
     face_v2 = pd.Series(data=face_v.index, index=face_v.values)
+    grouped = face_v2.groupby(level=0)
+    cardinal = grouped.apply(len)
+    if cardinal.max() > 2:
+        raise ValueError('Invalid topology,'
+                         ' incorrect faces: {}'.format(cardinal.argmax()))
     eptm.face_df['opposite'] = -1
+
     face_pairs = []
-    face_v2.groupby(level=0).apply(lambda s: face_pairs.append(list(s.values))
-                                   if len(s) == 2 else np.NaN).dropna()
+    grouped.apply(lambda s: face_pairs.append(list(s.values))
+                  if len(s) == 2 else np.NaN).dropna()
     face_pairs = np.array(face_pairs)
     eptm.face_df.loc[face_pairs[:, 0], 'opposite'] = face_pairs[:, 1]
     eptm.face_df.loc[face_pairs[:, 1], 'opposite'] = face_pairs[:, 0]

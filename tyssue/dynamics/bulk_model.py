@@ -1,7 +1,7 @@
 """
-Vertex model for an Epithelial sheet (see definitions).
+Dynamical models for monlayer and bulk epithelium.
 
-Depends on the sheet vertex geometry functions.
+
 """
 import numpy as np
 import pandas as pd
@@ -13,6 +13,8 @@ from .bulk_gradients import volume_grad
 from .effectors import elastic_force, elastic_energy
 from ..utils.utils import _to_3d
 from .sheet_vertex_model import SheetModel
+
+
 
 
 class BulkModel(SheetModel):
@@ -92,6 +94,7 @@ class BulkModel(SheetModel):
     @classmethod
     def compute_gradient(cls, sheet, components=False):
         '''
+
         If components is True, returns the individual terms
         (grad_t, grad_c, grad_v)
         '''
