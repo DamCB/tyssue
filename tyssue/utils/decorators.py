@@ -24,6 +24,6 @@ def validate(func):
         eptm = args[0]
         result = func(*args, **kwargs)
         if not eptm.validate():
-            raise ValueError('An invalid epithelium was returned')
+            raise ValueError('An invalid epithelium was produced')
         return result
     return with_validate

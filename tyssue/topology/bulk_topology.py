@@ -151,6 +151,26 @@ def cell_division(eptm, mother, geom, vertices):
     eptm.reset_topo()
     return daughter
 
+def find_rearangements(eptm):
+    """Finds the candidates for IH and HI transitions
+
+    Returns
+    -------
+    edges_HI: set of indexes of short edges
+    faces_IH: set of indexes of small triangular faces
+    """
+    l_th = eptm.settings['threshold_length']
+    up_num_sides = eptm.upcast_face(eptm.face_df['num_sides'])
+    shorts = eptm.edge_df[eptm.edge_df['length'] < l_th]
+    non_triangular = up_num_sides[up_num_sides > 4 ].index
+    edges_IH = set(shorts.index).intersection(non_triangular)
+
+    max_f_length = shorts.groupby('face')['length'].apply(max)
+    short_faces = max_f_length[max_f_length < l_th].index
+    three_faces = eptm.face_df[eptm.face_df['num_sides'] == 3].index
+    faces_HI = set(three_faces).intersection(short_faces)
+    return edges_IH, faces_HI
+
 
 @do_undo
 @validate
@@ -294,11 +314,12 @@ def HI_transition(eptm, face):
 
     get_opposite_faces(eptm)
     fb = eptm.face_df['opposite'].loc[fa]
+    if fb > 0:
+        cB = eptm.edge_df[eptm.edge_df['face'] == fb]['cell'].iloc[0]
+    else:
+        cB = None
 
-    cB = eptm.edge_df[eptm.edge_df['face'] == fb]['cell'].iloc[0]
     cA_edges = eptm.edge_df[eptm.edge_df['cell'] == cA]
-    cB_edges = eptm.edge_df[eptm.edge_df['cell'] == cB]
-
     eptm.vert_df = eptm.vert_df.append(eptm.vert_df.loc[[v8, v9]],
                                        ignore_index=True)
 
@@ -311,8 +332,8 @@ def HI_transition(eptm, face):
         vis = set(cA_edges[cA_edges['srce'] == vk]['trgt'])
         vi, = vis.difference({v7, v8, v9})
 
-        vjs = set(cB_edges[cB_edges['srce'] == vk]['trgt'])
-        vj, = vjs.difference({v7, v8, v9})
+        vjs = set(eptm.edge_df[eptm.edge_df['srce'] == vk]['trgt'])
+        vj, = vjs.difference({v7, v8, v9, vi})
         v_pairs.append((vi, vj))
     (v1, v4), (v2, v5), (v3, v6) = v_pairs
 
