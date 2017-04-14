@@ -9,10 +9,26 @@ from ..core.objects import get_opposite_faces
 logger = logging.getLogger(name=__name__)
 
 
+def do_undo(func, *args, **kwargs):
+    """Decorator that creates a copy of the first argument
+    (usually an epithelium object) and restores it if the function fails.
+
+    The first argument in `*args` should have a `copy()` method.
+    """
+    eptm = args[0]
+    bck_eptm = eptm.copy()
+    try:
+        return func(*args, **kwargs)
+    except Exception as err:
+        eptm = bck_eptm
+        raise err
+
+@do_undo
 def get_division_edges(eptm, mother,
                        plane_normal,
                        plane_center=None):
-
+    """
+    """
     plane_normal = np.asarray(plane_normal)
     if plane_center is None:
         plane_center = eptm.cell_df.loc[mother, eptm.coords]
@@ -64,6 +80,7 @@ def get_division_vertices(eptm,
     return vertices
 
 
+@do_undo
 def cell_division(eptm, mother, geom, vertices):
 
     cell_cols = eptm.cell_df.loc[mother]
@@ -147,23 +164,7 @@ def cell_division(eptm, mother, geom, vertices):
     return daughter
 
 
-def opposite_face(eptm, fa, face_srce_orbit=None):
-
-    if face_srce_orbit is None:
-        face_srce_orbit = eptm.get_orbits(
-            'face', 'srce').groupby(level='face').apply(set)
-    face_pair = face_srce_orbit[face_srce_orbit ==
-                                face_srce_orbit[fa]].index
-    if len(face_pair) == 2:
-        opp_face = face_pair[face_pair != fa][0]
-    elif len(face_pair) == 1:
-        opp_face = -1
-    else:
-        raise ValueError('Invalid topology,'
-                         ' incorrect faces: {}'.format(face_pair))
-    return opp_face
-
-
+@do_undo
 def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
@@ -219,6 +220,7 @@ def IH_transition(eptm, e_1011):
     else:
         print('I - H transition is not possible without cells on either ends'
               'of the edge - would result in a hole')
+
     if orient < 0:
         v1, v2, v3 = v1, v3, v2
         v4, v5, v6 = v4, v6, v5
@@ -280,6 +282,7 @@ def IH_transition(eptm, e_1011):
     eptm.reset_topo()
 
 
+@do_undo
 def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013
