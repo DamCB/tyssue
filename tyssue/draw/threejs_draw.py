@@ -10,19 +10,15 @@ except ImportError:
           ' use conda install -c conda-forge pythreejs')
 
 
-def highlight_cells(eptm, cells, reset_visible=False):
+def highlight_cells(eptm, *cells, reset_visible=False):
 
     if reset_visible:
-        eptm.face_df['face'] = False
-
-    if isinstance(cells, int):
-        cell_faces = eptm.edge_df[eptm.edge_df['cell']==cells]['face']
-        highlight_faces(eptm.face_df, cell_faces, reset_visible=False)
-        return
+        eptm.face_df['visible'] = False
 
     for cell in cells:
         cell_faces = eptm.edge_df[eptm.edge_df['cell']==cell]['face']
-        highlight_faces(eptm.face_df, cell_faces, reset_visible=False)
+        highlight_faces(eptm.face_df, cell_faces,
+                        reset_visible=False)
 
 
 
