@@ -5,25 +5,12 @@ from .sheet_topology import face_division
 from .base_topology import add_vert, close_face
 from ..geometry.utils import rotation_matrix
 from ..core.objects import get_opposite_faces
+from ..utils.decorators import do_undo, validate
 
 logger = logging.getLogger(name=__name__)
 
 
-def do_undo(func, *args, **kwargs):
-    """Decorator that creates a copy of the first argument
-    (usually an epithelium object) and restores it if the function fails.
 
-    The first argument in `*args` should have a `copy()` method.
-    """
-    eptm = args[0]
-    bck_eptm = eptm.copy()
-    try:
-        return func(*args, **kwargs)
-    except Exception as err:
-        eptm = bck_eptm
-        raise err
-
-@do_undo
 def get_division_edges(eptm, mother,
                        plane_normal,
                        plane_center=None):
@@ -81,6 +68,7 @@ def get_division_vertices(eptm,
 
 
 @do_undo
+@validate
 def cell_division(eptm, mother, geom, vertices):
 
     cell_cols = eptm.cell_df.loc[mother]
@@ -165,6 +153,7 @@ def cell_division(eptm, mother, geom, vertices):
 
 
 @do_undo
+@validate
 def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
@@ -283,6 +272,7 @@ def IH_transition(eptm, e_1011):
 
 
 @do_undo
+@validate
 def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013
