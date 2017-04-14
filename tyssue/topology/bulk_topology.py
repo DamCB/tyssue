@@ -383,7 +383,9 @@ def HI_transition(eptm, face):
 
     eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
     eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v7, v8, v9])]
-    eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete([fa, fb])]
+    eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete([fa])]
+    if fb > 0:
+        eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete([fa])]
     eptm.edge_df.index.name = 'edge'
 
     eptm.reset_index()
