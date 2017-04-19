@@ -368,6 +368,7 @@ def HI_transition(eptm, face):
                              (eptm.edge_df['trgt'] == vj)].index
         eptm.edge_df.loc[e_kjs, 'srce'] = v11
 
+
     # Closing the faces with v10 → v11 edges
     for cell in cells:
         for face in eptm.edge_df[eptm.edge_df['cell'] == cell]['face']:
@@ -383,11 +384,9 @@ def HI_transition(eptm, face):
 
     eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
     eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v7, v8, v9])]
-    eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete([fa])]
-    if fb > 0:
-        eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete([fb])]
+    orphan_faces = set(eptm.face_df.index).difference(eptm.edge_df.face)
+    eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete(list(orphan_faces))].copy()
     eptm.edge_df.index.name = 'edge'
-
     eptm.reset_index()
     eptm.reset_topo()
 

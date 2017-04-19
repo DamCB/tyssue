@@ -21,7 +21,6 @@ def highlight_cells(eptm, *cells, reset_visible=False):
                         reset_visible=False)
 
 
-
 def highlight_faces(face_df, faces,
                     reset_visible=False):
     """
