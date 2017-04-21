@@ -1,0 +1,17 @@
+{
+"cell": {
+    "vol_elasticity": 1.0,
+    "prefered_vol": 1.0,
+    "area_elasticity": 1.0,
+    "prefered_area": 1.0
+    },
+"face": {
+    "contractility": 0.04
+    },
+"edge": {
+     "line_tension": 0.12
+     },
+"settings": {
+    "nrj_norm_factor": 1.0
+    }
+}

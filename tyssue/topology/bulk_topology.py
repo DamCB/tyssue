@@ -4,14 +4,18 @@ import numpy as np
 from .sheet_topology import face_division
 from .base_topology import add_vert, close_face
 from ..geometry.utils import rotation_matrix
+from ..core.objects import get_opposite_faces
+from ..utils.decorators import do_undo, validate
 
 logger = logging.getLogger(name=__name__)
+
 
 
 def get_division_edges(eptm, mother,
                        plane_normal,
                        plane_center=None):
-
+    """
+    """
     plane_normal = np.asarray(plane_normal)
     if plane_center is None:
         plane_center = eptm.cell_df.loc[mother, eptm.coords]
@@ -63,6 +67,8 @@ def get_division_vertices(eptm,
     return vertices
 
 
+@do_undo
+@validate
 def cell_division(eptm, mother, geom, vertices):
 
     cell_cols = eptm.cell_df.loc[mother]
@@ -145,23 +151,29 @@ def cell_division(eptm, mother, geom, vertices):
     eptm.reset_topo()
     return daughter
 
+def find_rearangements(eptm):
+    """Finds the candidates for IH and HI transitions
 
-def opposite_face(eptm, fa, face_srce_orbit=None):
-    if face_srce_orbit is None:
-        face_srce_orbit = eptm.get_orbits(
-            'face', 'srce').groupby(level='face').apply(set)
-    face_pair = face_srce_orbit[face_srce_orbit ==
-                                face_srce_orbit[fa]].index
-    if len(face_pair) == 2:
-        opp_face = face_pair[face_pair != fa][0]
-    elif len(face_pair) == 1:
-        opp_face = -1
-    else:
-        raise ValueError('Invalid topology,'
-                         ' incorrect faces: {}'.format(face_pair))
-    return opp_face
+    Returns
+    -------
+    edges_HI: set of indexes of short edges
+    faces_IH: set of indexes of small triangular faces
+    """
+    l_th = eptm.settings['threshold_length']
+    up_num_sides = eptm.upcast_face(eptm.face_df['num_sides'])
+    shorts = eptm.edge_df[eptm.edge_df['length'] < l_th]
+    non_triangular = up_num_sides[up_num_sides > 4 ].index
+    edges_IH = set(shorts.index).intersection(non_triangular)
+
+    max_f_length = shorts.groupby('face')['length'].apply(max)
+    short_faces = max_f_length[max_f_length < l_th].index
+    three_faces = eptm.face_df[eptm.face_df['num_sides'] == 3].index
+    faces_HI = set(three_faces).intersection(short_faces)
+    return edges_IH, faces_HI
 
 
+@do_undo
+@validate
 def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
@@ -217,6 +229,7 @@ def IH_transition(eptm, e_1011):
     else:
         print('I - H transition is not possible without cells on either ends'
               'of the edge - would result in a hole')
+
     if orient < 0:
         v1, v2, v3 = v1, v3, v2
         v4, v5, v6 = v4, v6, v5
@@ -278,6 +291,8 @@ def IH_transition(eptm, e_1011):
     eptm.reset_topo()
 
 
+@do_undo
+@validate
 def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013
@@ -296,13 +311,15 @@ def HI_transition(eptm, face):
     v9 = f_edges[f_edges['srce'] == v8]['trgt'].iloc[0]
 
     cA = f_edges['cell'].iloc[0]
-    face_srce_orbit = eptm.get_orbits(
-        'face', 'srce').groupby(level='face').apply(set)
-    fb = opposite_face(eptm, fa, face_srce_orbit)
-    cB = eptm.edge_df[eptm.edge_df['face'] == fb]['cell'].iloc[0]
-    cA_edges = eptm.edge_df[eptm.edge_df['cell'] == cA]
-    cB_edges = eptm.edge_df[eptm.edge_df['cell'] == cB]
 
+    get_opposite_faces(eptm)
+    fb = eptm.face_df['opposite'].loc[fa]
+    if fb > 0:
+        cB = eptm.edge_df[eptm.edge_df['face'] == fb]['cell'].iloc[0]
+    else:
+        cB = None
+
+    cA_edges = eptm.edge_df[eptm.edge_df['cell'] == cA]
     eptm.vert_df = eptm.vert_df.append(eptm.vert_df.loc[[v8, v9]],
                                        ignore_index=True)
 
@@ -312,10 +329,12 @@ def HI_transition(eptm, face):
 
     v_pairs = []
     for vk in (v7, v8, v9):
-        vi = cA_edges[cA_edges['srce'] == vk]['trgt'].iloc[0]
-        vj = cB_edges[cB_edges['srce'] == vk]['trgt'].iloc[0]
-        v_pairs.append((vi, vj))
+        vis = set(cA_edges[cA_edges['srce'] == vk]['trgt'])
+        vi, = vis.difference({v7, v8, v9})
 
+        vjs = set(eptm.edge_df[eptm.edge_df['srce'] == vk]['trgt'])
+        vj, = vjs.difference({v7, v8, v9, vi})
+        v_pairs.append((vi, vj))
     (v1, v4), (v2, v5), (v3, v6) = v_pairs
 
     srce_cell_orbit = eptm.get_orbits('srce', 'cell')
@@ -349,6 +368,7 @@ def HI_transition(eptm, face):
                              (eptm.edge_df['trgt'] == vj)].index
         eptm.edge_df.loc[e_kjs, 'srce'] = v11
 
+
     # Closing the faces with v10 → v11 edges
     for cell in cells:
         for face in eptm.edge_df[eptm.edge_df['cell'] == cell]['face']:
@@ -364,9 +384,9 @@ def HI_transition(eptm, face):
 
     eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
     eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v7, v8, v9])]
-    eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete([fa, fb])]
+    orphan_faces = set(eptm.face_df.index).difference(eptm.edge_df.face)
+    eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete(list(orphan_faces))].copy()
     eptm.edge_df.index.name = 'edge'
-
     eptm.reset_index()
     eptm.reset_topo()
 

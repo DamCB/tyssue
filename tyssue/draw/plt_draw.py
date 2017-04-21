@@ -199,6 +199,35 @@ def plot_forces(sheet, geom, model,
     return fig, ax
 
 
+def plot_scaled_energies(sheet, geom, model, scales, ax=None):
+
+    from ..utils import scaled_unscaled
+
+    def get_energies():
+        energies = np.array([e.mean() for e in
+                             model.compute_energy(sheet, True)])
+
+        return energies
+
+    energies = np.array([scaled_unscaled(get_energies, scale,
+                                         sheet, geom)
+                         for scale in scales])
+    print(energies.shape)
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.get_figure()
+    ax.plot(scales, energies.sum(axis=1),
+            'k-', lw=4, alpha=0.3, label='total')
+    for e, label in zip(energies.T, model.energy_labels):
+        ax.plot(scales, e, label=label)
+    ax.legend()
+    return fig, ax
+
+
+
+
+
 def plot_analytical_to_numeric_comp(sheet, model, geom,
                                     isotropic_model, nondim_specs):
 
@@ -212,8 +241,11 @@ def plot_analytical_to_numeric_comp(sheet, model, geom,
 
     ax.plot(deltas, iso.isotropic_energy(deltas, nondim_specs), 'k-',
             label='Analytical total')
-    ax.plot(sheet.delta_o, iso.isotropic_energy(sheet.delta_o,
-                                                nondim_specs), 'ro')
+    try:
+        ax.plot(sheet.delta_o, iso.isotropic_energy(sheet.delta_o,
+                                                    nondim_specs), 'ro')
+    except:
+        pass
     ax.plot(deltas, iso.elasticity(deltas), 'b-',
             label='Analytical volume elasticity')
     ax.plot(deltas, iso.contractility(deltas, gamma), color='orange', ls='-',

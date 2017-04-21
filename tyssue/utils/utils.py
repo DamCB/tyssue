@@ -68,12 +68,12 @@ def data_at_opposite(sheet, edge_data, free_value=None):
 
 
 def get_sub_eptm(eptm, edges):
-    from ..objects.core import Epithelium
+    from ..core.objects import Epithelium
 
     edge_df = eptm.edge_df.loc[edges]
-    vert_df = eptm.vert_df.loc[set(edge_df['srce'])].copy()
-    face_df = eptm.face_df.loc[set(edge_df['face'])].copy()
-    cell_df = eptm.cell_df.loc[set(edge_df['cell'])].copy()
+    vert_df = eptm.vert_df.loc[set(edge_df['srce'])]#.copy()
+    face_df = eptm.face_df.loc[set(edge_df['face'])]#.copy()
+    cell_df = eptm.cell_df.loc[set(edge_df['cell'])]#.copy()
 
     datasets = {'edge': edge_df,
                 'face': face_df,
@@ -81,6 +81,16 @@ def get_sub_eptm(eptm, edges):
                 'cell': cell_df}
 
     sub_eptm = Epithelium('sub', datasets, eptm.specs)
+    sub_eptm.datasets['edge']['edge_o'] = edges
+    sub_eptm.datasets['edge']['srce_o'] = edge_df['srce']
+    sub_eptm.datasets['edge']['trgt_o'] = edge_df['trgt']
+    sub_eptm.datasets['edge']['face_o'] = edge_df['face']
+    sub_eptm.datasets['edge']['cell_o'] = edge_df['cell']
+
+    sub_eptm.datasets['vert']['srce_o'] = set(edge_df['srce'])
+    sub_eptm.datasets['face']['face_o'] = set(edge_df['face'])
+    sub_eptm.datasets['cell']['cell_o'] = set(edge_df['cell'])
+
     sub_eptm.reset_index()
     sub_eptm.reset_topo()
     return sub_eptm

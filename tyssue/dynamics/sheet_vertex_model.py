@@ -4,6 +4,8 @@ Vertex model for an Epithelial sheet (see definitions).
 Depends on the sheet vertex geometry functions.
 """
 
+import numpy as np
+
 from copy import deepcopy
 
 from .base_gradients import length_grad
@@ -15,6 +17,12 @@ from ..utils.utils import _to_3d
 
 
 class SheetModel(PlanarModel):
+    """
+    Model for a 2D junction network  in 3D, aka 2.5D
+
+    """
+    energy_labels = ['tension', 'contractility', 'volume']
+
 
     @staticmethod
     def dimentionalize(mod_specs):
@@ -59,8 +67,11 @@ class SheetModel(PlanarModel):
         '''
         # consider only live faces:
         live_face_df = sheet.face_df[sheet.face_df.is_alive == 1]
+        upcast_active = sheet.upcast_srce(sheet.vert_df.is_active)
         upcast_alive = sheet.upcast_face(sheet.face_df.is_alive)
-        live_edge_df = sheet.edge_df[upcast_alive == 1]
+        sheet.edge_df['is_active'] = (upcast_alive.values &
+                                      upcast_active.values).astype(np.bool)
+        live_edge_df = sheet.edge_df[sheet.edge_df['is_active']]
 
         E_t = live_edge_df.eval('line_tension * length / 2')
         E_c = live_face_df.eval('0.5 * contractility * perimeter**2')
@@ -105,9 +116,8 @@ class SheetModel(PlanarModel):
             return grads
 
         grad_i = (
-            (sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
-            sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
-            sheet.sum_srce(grad_v_srce) + sheet.sum_trgt(grad_v_trgt)
+            sheet.sum_srce(grad_t + grad_c + grad_v_srce) +
+            sheet.sum_trgt(-grad_c + grad_v_trgt)
             )
         if 'is_anchor' in sheet.edge_df.columns:
             grad_i = grad_i + sheet.sum_srce(grad_a)

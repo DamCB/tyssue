@@ -4,6 +4,12 @@ import os
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
+def quasistatic_bulk_spec():
+    specfile = os.path.join(CURRENT_DIR, 'bulk_qs.json')
+    return load_spec(specfile)
+
+
+
 def quasistatic_plane_spec():
     """Default specification for the dynamics
     of a sheet vertex model - also suitable for general faceted tissue

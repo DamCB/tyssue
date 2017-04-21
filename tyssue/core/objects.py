@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from collections import deque
 
 from ..utils.utils import set_data_columns, spec_updater
 
@@ -75,6 +76,9 @@ class Epithelium:
         and value types of the modeled tyssue
 
         '''
+        # backup container
+        # TODO: pass the max backup number as a config argument
+        self._backups = deque(maxlen=5)
         if coords is None:
             coords = ['x', 'y', 'z']
         self.coords = coords
@@ -87,22 +91,13 @@ class Epithelium:
 
         # each of those has a separate dataframe, as well as entries in
         # the specification files
-        frame_types = {'edge', 'vert', 'face',
+        _frame_types = {'edge', 'vert', 'face',
                        'cell'}
-
-        # # Really just to ensure the debugger is silent
-        # [self.edge_df,
-        #  self.vert_df,
-        #  self.face_df,
-        #  self.cell_df] = [None, ] * 4
-
         self.identifier = identifier
-        if not set(datasets).issubset(frame_types):
+        if not set(datasets).issubset(_frame_types):
             raise ValueError('The `datasets` dictionnary should'
-                             ' contain keys in {}'.format(frame_types))
+                             ' contain keys in {}'.format(_frame_types))
         self.datasets = datasets
-        # for name, data in datasets.items():
-        #     setattr(self, '{}_df'.format(name), data)
         self.data_names = list(datasets.keys())
         self.element_names = ['srce', 'trgt',
                               'face', 'cell'][:len(self.data_names)]
@@ -157,20 +152,6 @@ class Epithelium:
     def vert_df(self, value):
         self.datasets['vert'] = value
 
-    # @property
-    # def datasets(self):
-    #     datasets = {element: getattr(self, '{}_df'.format(element))
-    #                 for element in self.data_names}
-    #     return datasets
-
-    # # @datasets.getter
-    # # def datasets(self, level):
-    # #     return getattr(self, '{}_df'.format(level))
-
-    # @datasets.setter
-    # def datasets(self, level, new_df):
-    #     setattr(self, '{}_df'.format(level), new_df)
-
     def copy(self, deep_copy=True):
         """
         Returns a copy of the epithelium
@@ -195,6 +176,20 @@ class Epithelium:
         new = Epithelium(identifier, datasets,
                          specs=self.specs, coords=None)
         return new
+
+    def backup(self):
+        """Creates a copy of self and keeps a reference to it
+        in the self.backups stack.
+
+        """
+        log.info('Backing up')
+        self._backups.append(self.copy(deep_copy=True))
+
+    def restore(self):
+        log.info('Restoring')
+        bck = self._backups.pop()
+        self.datasets = bck.datasets
+        self.specs = bck.specs
 
     @property
     def settings(self):
@@ -340,9 +335,13 @@ class Epithelium:
         return self._upcast(self.edge_df['cell'], df)
 
     def _lvl_sum(self, df, lvl):
-        df_ = df.copy()
-        df_.index = self.edge_mindex
-        return df_.sum(level=lvl)
+        df_ = df
+        if isinstance(df, pd.Series):
+            df_ = df.to_frame()
+        elif lvl not in df.columns:
+            df_ = df.copy()
+        df_[lvl] = self.edge_df[lvl]
+        return df_.groupby(lvl).sum()
 
     def sum_srce(self, df):
         return self._lvl_sum(df, 'srce')
@@ -508,8 +507,16 @@ class Epithelium:
         self.reset_topo()
         self.get_extra_indices()
 
+    def validate(self):
+        """returns True if the mesh is validated
+
+        e.g. has only closed polygons and polyhedra
+        """
+        return np.alltrue(1 - self.get_invalid())
+
     def get_valid(self):
-        """Set true if the face is a closed polygon
+        """Set the 'is_valid' column to true if the faces are all closed polygons,
+        and the cells closed polyhedra.
         """
         is_valid_face = self.edge_df.groupby('face').apply(_test_valid)
         is_valid = self.upcast_face(is_valid_face)
@@ -520,7 +527,7 @@ class Epithelium:
         self.edge_df['is_valid'] = is_valid
 
     def get_invalid(self):
-        """Returns a mask over edge for invalid faces
+        """Returns a mask over self.edge_df for invalid faces
         """
         is_invalid_face = self.edge_df.groupby('face').apply(_test_invalid)
         invalid_edges = self.upcast_face(is_invalid_face)
@@ -746,6 +753,28 @@ def get_opposite(edge_df):
     opposite[np.isnan(opposite)] = -1
 
     return opposite.astype(np.int)
+
+
+def get_opposite_faces(eptm):
+    """Populates the 'opposite' column of eptm.face_df with the index of
+    the opposite face or -1 if the face has no opposite.
+
+    """
+    face_v = eptm.edge_df.groupby('face').apply(lambda df: frozenset(df['srce']))
+    face_v2 = pd.Series(data=face_v.index, index=face_v.values)
+    grouped = face_v2.groupby(level=0)
+    cardinal = grouped.apply(len)
+    if cardinal.max() > 2:
+        raise ValueError('Invalid topology,'
+                         ' incorrect faces: {}'.format(cardinal.argmax()))
+    eptm.face_df['opposite'] = -1
+
+    face_pairs = []
+    grouped.apply(lambda s: face_pairs.append(list(s.values))
+                  if len(s) == 2 else np.NaN).dropna()
+    face_pairs = np.array(face_pairs)
+    eptm.face_df.loc[face_pairs[:, 0], 'opposite'] = face_pairs[:, 1]
+    eptm.face_df.loc[face_pairs[:, 1], 'opposite'] = face_pairs[:, 0]
 
 
 def _is_closed_cell(e_df):

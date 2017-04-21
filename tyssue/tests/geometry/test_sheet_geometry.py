@@ -4,6 +4,7 @@ import pandas as pd
 from tyssue import config, Sheet, SheetGeometry
 from tyssue.core.generation import three_faces_sheet
 from tyssue.io.hdf5 import load_datasets
+from tyssue.stores import stores_dir
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 TOLERANCE = 1e-8
@@ -31,7 +32,7 @@ def test_spherical_update_height():
 
 def test_rod_update_height():
 
-    pth = os.path.join(CURRENT_DIR, '../../stores/rod_sheet.hf5')
+    pth = os.path.join(stores_dir, 'rod_sheet.hf5')
     datasets = load_datasets(pth)
     specs = config.geometry.rod_sheet()
     sheet = Sheet('rod', datasets, specs)

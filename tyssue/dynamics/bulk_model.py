@@ -1,9 +1,10 @@
 """
-Vertex model for an Epithelial sheet (see definitions).
+Dynamical models for monlayer and bulk epithelium.
 
-Depends on the sheet vertex geometry functions.
+
 """
 import numpy as np
+import pandas as pd
 from copy import deepcopy
 
 from .base_gradients import length_grad
@@ -14,7 +15,14 @@ from ..utils.utils import _to_3d
 from .sheet_vertex_model import SheetModel
 
 
+
+
 class BulkModel(SheetModel):
+    """
+    Model for a 3D epithelium  in 3D, including Monolayers
+
+    """
+    energy_labels = ['tension', 'contractility', 'area', 'volume']
 
     @staticmethod
     def dimentionalize(mod_specs):
@@ -60,7 +68,7 @@ class BulkModel(SheetModel):
         E_t = eptm.edge_df.eval('line_tension * length / 2')
         E_c = eptm.face_df.eval(
             '0.5 * is_alive * contractility * perimeter**2')
-        E_a = elastic_energy(eptm.face_df,
+        E_a = elastic_energy(eptm.cell_df,
                              var='area',
                              elasticity='area_elasticity',
                              prefered='prefered_area')
@@ -86,6 +94,7 @@ class BulkModel(SheetModel):
     @classmethod
     def compute_gradient(cls, sheet, components=False):
         '''
+
         If components is True, returns the individual terms
         (grad_t, grad_c, grad_v)
         '''
@@ -95,8 +104,8 @@ class BulkModel(SheetModel):
 
         grad_t = cls.tension_grad(sheet, grad_lij)
         grad_c = cls.contractile_grad(sheet, grad_lij)
-        grad_v_srce, grad_v_trgt = cls.elastic_grad_v(sheet)
         grad_a_srce, grad_a_trgt = cls.elastic_grad_a(sheet)
+        grad_v_srce, grad_v_trgt = cls.elastic_grad_v(sheet)
         grads = (grad_t, grad_c,
                  grad_v_srce, grad_v_trgt,
                  grad_a_srce, grad_a_trgt)
@@ -109,10 +118,10 @@ class BulkModel(SheetModel):
             return grads
 
         grad_i = (
-            (sheet.sum_srce(grad_t) - sheet.sum_trgt(grad_t))/2 +
-            sheet.sum_srce(grad_c) - sheet.sum_trgt(grad_c) +
-            sheet.sum_srce(grad_v_srce) + sheet.sum_trgt(grad_v_trgt) +
-            sheet.sum_srce(grad_a_srce) + sheet.sum_trgt(grad_a_trgt))
+            sheet.sum_srce(grad_t + grad_c +
+                           grad_a_srce + grad_v_srce) +
+            sheet.sum_trgt(-grad_c + grad_a_trgt + grad_v_trgt)
+            )
         if 'is_anchor' in sheet.edge_df.columns:
             grad_i = grad_i + sheet.sum_srce(grad_anc)
 
@@ -143,15 +152,15 @@ class BulkModel(SheetModel):
         ''' Computes
         :math:`\nabla_i \left(K (V_\alpha - V_0)^2\right)`:
         '''
-        # volumic elastic force
-        # this is K * (V - V0)
-        kv_a0_ = elastic_force(eptm.face_df,
+        # cells surface elastic force
+        # this is K * (A_c - A0)
+        kv_a0_ = elastic_force(eptm.cell_df,
                                var='area',
                                elasticity='area_elasticity',
                                prefered='prefered_area')
 
-        kv_a0_ = kv_a0_ * eptm.face_df['is_alive']
-        kv_a0 = _to_3d(eptm.upcast_face(kv_a0_))
+        kv_a0_ = kv_a0_ * eptm.cell_df['is_alive']
+        kv_a0 = _to_3d(eptm.upcast_cell(kv_a0_))
         grad_a_srce, grad_a_trgt = area_grad(eptm)
         grad_a_srce = kv_a0 * grad_a_srce
         grad_a_trgt = kv_a0 * grad_a_trgt
@@ -159,36 +168,80 @@ class BulkModel(SheetModel):
         return grad_a_srce, grad_a_trgt
 
 
-class LaminaModel(BulkModel):
+class BulkModelwithFreeBorders(BulkModel):
 
     @classmethod
     def compute_energy(cls, eptm, full_output=False):
-        E_b = BulkModel.compute_energy(eptm)
-        lamina = eptm.edge_df.loc[eptm.lamina_edges]
-        E_l = lamina.eval('0.5 * length_elasticity'
-                          '* (length - prefered_length)**2').sum()
-        return E_b + E_l
+
+        E_bulk = BulkModel.compute_energy(eptm, full_output=False)
+        E_brdr = cls.border_energy(eptm)
+        return E_bulk + E_brdr
 
     @staticmethod
-    def compute_gradient(eptm, components=False):
-        grad = BulkModel.compute_gradient(eptm)
-        lamina = eptm.edge_df.loc[eptm.lamina_edges]
+    def border_energy(eptm):
 
-        grad_lij = length_grad(eptm).loc[eptm.lamina_edges]
-        kl_l0 = elastic_force(lamina,
-                              var='length',
-                              elasticity='length_elasticity',
-                              prefered='prefered_length')
-        grad_l_ = _to_3d(kl_l0) * grad_lij
-        grad_l_ = grad_l_.set_index(lamina['srce'])
+        E_brdr = elastic_energy(eptm.edge_df.loc[eptm.border_es],
+                                var='length',
+                                elasticity='border_elasticity',
+                                prefered='prefered_length')
+        return E_brdr.sum()
 
-        grad_l_srce = grad_l_.sum(level='srce')
-        grad_l_ = grad_l_.set_index(lamina['trgt'])
-        grad_l_trgt = grad_l_.sum(level='trgt')
-        grad_l = (grad_l_srce - grad_l_trgt)/2
-        grad_l.replace(np.nan, 0, inplace=True)
-        grad.loc[grad_l.index] += grad_l
-        return grad
+    @classmethod
+    def compute_gradient(cls, eptm, components=False):
+        base_grad = BulkModel.compute_gradient(eptm, components=False)
+        border_grad = cls.border_grad(eptm)
+        return base_grad + eptm.sum_srce(border_grad) - eptm.sum_trgt(border_grad)
+
+
+    @staticmethod
+    def border_grad(eptm):
+
+        grad_lij = length_grad(eptm)
+        kl_l0 = pd.Series(np.zeros(eptm.Ne),
+                          index=eptm.edge_df.index)
+
+        kl_l0.loc[eptm.border_es] = elastic_force(eptm.edge_df.loc[eptm.border_es],
+                                                  var='length',
+                                                  elasticity='border_elasticity',
+                                                  prefered='prefered_length')
+        return grad_lij * _to_3d(kl_l0)
+
+
+
+class LaminaModel(BulkModel):
+    """Not implemented yet
+    """
+    pass
+
+
+    # @classmethod
+    # def compute_energy(cls, eptm, full_output=False):
+    #     E_b = BulkModel.compute_energy(eptm)
+    #     lamina = eptm.edge_df.loc[eptm.lamina_edges]
+    #     E_l = lamina.eval('0.5 * length_elasticity'
+    #                       '* (length - prefered_length)**2').sum()
+    #     return E_b + E_l
+
+    # @staticmethod
+    # def compute_gradient(eptm, components=False):
+    #     grad = BulkModel.compute_gradient(eptm)
+    #     lamina = eptm.edge_df.loc[eptm.lamina_edges]
+
+    #     grad_lij = length_grad(eptm).loc[eptm.lamina_edges]
+    #     kl_l0 = elastic_force(lamina,
+    #                           var='length',
+    #                           elasticity='length_elasticity',
+    #                           prefered='prefered_length')
+    #     grad_l_ = _to_3d(kl_l0) * grad_lij
+    #     grad_l_ = grad_l_.set_index(lamina['srce'])
+
+    #     grad_l_srce = grad_l_.sum(level='srce')
+    #     grad_l_ = grad_l_.set_index(lamina['trgt'])
+    #     grad_l_trgt = grad_l_.sum(level='trgt')
+    #     grad_l = (grad_l_srce - grad_l_trgt)/2
+    #     grad_l.replace(np.nan, 0, inplace=True)
+    #     grad.loc[grad_l.index] += grad_l
+    #     return grad
 
 
 def set_model(eptm, model, apical_spec, modifiers):

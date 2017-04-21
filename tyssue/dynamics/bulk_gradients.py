@@ -10,8 +10,9 @@ def volume_grad(eptm):
     face_pos = eptm.upcast_face(eptm.face_df[eptm.coords])
     srce_pos = eptm.upcast_srce(eptm.vert_df[eptm.coords])
     trgt_pos = eptm.upcast_trgt(eptm.vert_df[eptm.coords])
-    grad_v_srce = np.cross((srce_pos - cell_pos), (face_pos - cell_pos)) / 6
-    grad_v_trgt = -np.cross((trgt_pos - cell_pos), (face_pos - cell_pos)) / 6
+
+    grad_v_srce = np.cross((trgt_pos - cell_pos), (face_pos - cell_pos)) / 4
+    grad_v_trgt = -np.cross((srce_pos - cell_pos), (face_pos - cell_pos)) / 4
     return (pd.DataFrame(grad_v_srce, index=eptm.edge_df.index,
                          columns=eptm.coords),
             pd.DataFrame(grad_v_trgt, index=eptm.edge_df.index,
