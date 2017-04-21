@@ -22,10 +22,10 @@ files = ['*.so*', '*.a*', '*.lib*',
 ## Version management copied form numpy
 ## Thanks to them!
 MAJOR               = 0
-MINOR               = 0
-MICRO               = 2
-ISRELEASED          = False
-VERSION             = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
+MINOR               = 2
+MICRO               = 'rc1'
+ISRELEASED          = True
+VERSION             = '%d.%d.%s' % (MAJOR, MINOR, MICRO)
 
 
 def git_version():
