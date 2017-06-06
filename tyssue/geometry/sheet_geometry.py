@@ -112,8 +112,8 @@ class SheetGeometry(PlanarGeometry):
             w0 = b - a
             sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[[u, v]],
                                                   axis=1)
-            l_mask = sheet.vert_df[sheet.vert_df['left_tip']].index
-            r_mask = sheet.vert_df[sheet.vert_df['right_tip']].index
+            l_mask = sheet.vert_df[sheet.vert_df['left_tip'] == 1].index
+            r_mask = sheet.vert_df[sheet.vert_df['right_tip'] == 1].index
 
             sheet.vert_df.loc[l_mask, 'rho'] = cls.dist_to_point(
                 sheet.vert_df.loc[l_mask],

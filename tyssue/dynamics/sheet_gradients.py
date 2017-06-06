@@ -42,8 +42,8 @@ def height_grad(sheet):
         r_to_rho[[u, v]] = sheet.vert_df[[u, v]] / _to_2d(sheet.vert_df['rho'])
         r_to_rho[w] = 0.
 
-        l_mask = sheet.vert_df[sheet.vert_df['left_tip']].index
-        r_mask = sheet.vert_df[sheet.vert_df['right_tip']].index
+        l_mask = sheet.vert_df[sheet.vert_df['left_tip'].astype(np.bool)].index
+        r_mask = sheet.vert_df[sheet.vert_df['right_tip'].astype(np.bool)].index
         a, b = sheet.settings['ab']
         w0 = a - b
 
