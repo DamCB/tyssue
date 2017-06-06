@@ -24,7 +24,7 @@ files = ['*.so*', '*.a*', '*.lib*',
 MAJOR               = 0
 MINOR               = 2
 MICRO               = 'rc1'
-ISRELEASED          = True
+ISRELEASED          = False
 VERSION             = '%d.%d.%s' % (MAJOR, MINOR, MICRO)
 
 
