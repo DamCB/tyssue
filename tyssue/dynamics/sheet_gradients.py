@@ -53,6 +53,9 @@ def height_grad(sheet):
         r_rel_z = sheet.vert_df.loc[r_mask, 'z'] + w0
         r_to_rho.loc[r_mask, w] = r_rel_z / sheet.vert_df['rho']
 
+    elif sheet.settings['geometry'] == 'surfacic':
+        r_to_rho = sheet.vert_df[coords] * 0.
+
     return r_to_rho
 
 

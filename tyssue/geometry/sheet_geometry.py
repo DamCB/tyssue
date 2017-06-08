@@ -112,6 +112,8 @@ class SheetGeometry(PlanarGeometry):
             w0 = b - a
             sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[[u, v]],
                                                   axis=1)
+            sheet.vert_df['left_tip'] = sheet.vert_df[w] < -w0
+            sheet.vert_df['right_tip'] = sheet.vert_df[w] > w0
             l_mask = sheet.vert_df[sheet.vert_df['left_tip'] == 1].index
             r_mask = sheet.vert_df[sheet.vert_df['right_tip'] == 1].index
 
@@ -123,6 +125,9 @@ class SheetGeometry(PlanarGeometry):
                 sheet.vert_df.loc[r_mask],
                 [0, 0, w0],
                 [u, v, w])
+
+        elif sheet.settings['geometry'] == 'surfacic':
+            sheet.vert_df['rho'] = 1.
 
         sheet.vert_df['height'] = (sheet.vert_df['rho'] -
                                    sheet.vert_df['basal_shift'])
@@ -148,10 +153,7 @@ class SheetGeometry(PlanarGeometry):
                                  axis=1)
             a = np.percentile(rho, 95)
             b = np.percentile(np.abs(sheet.vert_df[w]), 95)
-            w0 = (b - a)
             sheet.settings['ab'] = [a, b]
-            sheet.vert_df['left_tip'] = sheet.vert_df[w] < -w0
-            sheet.vert_df['right_tip'] = sheet.vert_df[w] > w0
 
     @staticmethod
     def face_rotation(sheet, face, psi=0):
