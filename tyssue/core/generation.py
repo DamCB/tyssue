@@ -478,7 +478,7 @@ def get_ellipsoid_centers(a, b, c, n_zs,
     return centers
 
 
-def ellipsoid_sheet(a, b, c, n_zs, **kwargs)
+def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
 
     centers = get_ellipsoid_centers(a, b, c, n_zs,
                                     **kwargs)
