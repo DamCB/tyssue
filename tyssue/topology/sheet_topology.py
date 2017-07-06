@@ -271,3 +271,23 @@ Chosen vertex %i is bound to a single cell, nothing to do''' % vert)
     verts = sheet.vert_df.loc[split_verts]
     dr = -verts[sheet.coords] + faces[sheet.coords].values
     sheet.vert_df.loc[split_verts, sheet.coords] += dr*epsilon
+
+
+def resolve_t1s(sheet, geom, model, solver, max_iter=60):
+
+    l_th = sheet.settings['threshold_length']
+    i = 0
+    while sheet.edge_df.length.min() < l_th:
+
+        for edge in sheet.edge_df[sheet.edge_df.length < l_th].sort_values('length').index:
+            try:
+                type1_transition(sheet, edge)
+            except KeyError:
+                continue
+            sheet.reset_index()
+            sheet.reset_topo()
+            geom.update_all(sheet)
+        solver.find_energy_min(sheet, geom, model)
+        i += 1
+        if i > max_iter:
+            break
