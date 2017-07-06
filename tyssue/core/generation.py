@@ -480,6 +480,10 @@ def get_ellipsoid_centers(a, b, c, n_zs,
 
 def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
 
+    from . import Epithelium
+    from scipy.spatial import Voronoi
+    from .. import config
+
     centers = get_ellipsoid_centers(a, b, c, n_zs,
                                     **kwargs)
     centers = centers.append(pd.Series(
