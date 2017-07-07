@@ -484,12 +484,25 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
     from scipy.spatial import Voronoi
     from .. import config
 
+def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
+    from . import Epithelium
+    from scipy.spatial import Voronoi
+    from .. import config
+    from ..utils.utils import single_cell
+    from ..geometry.bulk_geometry import BulkGeometry
+
     centers = get_ellipsoid_centers(a, b, c, n_zs,
                                     **kwargs)
+
+    centers['x'] /= a
+    centers['y'] /= b
+    centers['z'] /= c
+
     centers = centers.append(pd.Series(
         {'x':0, 'y':0, 'z':0,
          'theta':0, 'phi':0,}),
          ignore_index=True)
+
     vor3d = Voronoi(centers[list('xyz')].values)
     vor3d.close()
     dsets = from_3d_voronoi(vor3d)
@@ -498,9 +511,11 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
 
     eptm.update_specs(config.geometry.bulk_spec())
     eptm.update_specs(config.dynamics.quasistatic_bulk_spec())
+
     eptm.vert_df['rho'] = np.linalg.norm(eptm.vert_df[eptm.coords], axis=1)
     eptm.vert_df['theta'] = np.arcsin(eptm.vert_df.eval('z/rho'))
     eptm.vert_df['phi'] = np.arctan2(eptm.vert_df['y'], eptm.vert_df['x'])
+
     eptm.vert_df['x'] = a * np.cos(eptm.vert_df['theta']) * np.cos(eptm.vert_df['phi'])
     eptm.vert_df['y'] = b * np.cos(eptm.vert_df['theta']) * np.sin(eptm.vert_df['phi'])
     eptm.vert_df['z'] = c * np.sin(eptm.vert_df['theta'])
@@ -510,7 +525,6 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
 
     BulkGeometry.update_all(eptm)
     return eptm
-
 
 def create_anchors(sheet):
     '''Adds an edge linked to every vertices at the boundary
