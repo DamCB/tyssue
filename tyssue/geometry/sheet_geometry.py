@@ -225,3 +225,18 @@ class SheetGeometry(PlanarGeometry):
         rot_pos = pd.DataFrame(np.dot(rel_pos, rotation.T),
                                index=face_orbit, columns=sheet.coords)
         return rot_pos
+
+class EllipsoidGeometry(SheetGeometry):
+
+    @classmethod
+    def update_height(cls, eptm):
+        a, b, c = eptm.settings['abc']
+        theta = np.arcsin((eptm.vert_df.z/c).clip(-1, 1))
+        eptm.vert_df['basal_shift'] = (a * np.cos(theta) -
+                                       eptm.specs['vert']['basal_shift'])
+        super().update_height(eptm)
+
+    @staticmethod
+    def scale(eptm, scale, coords):
+        SheetGeometry.scale(eptm, scale, coords)
+        eptm.settings['abc'] = [u*scale for u in eptm.settings['abc']]
