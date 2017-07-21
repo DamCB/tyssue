@@ -39,14 +39,15 @@ class SheetModel(PlanarModel):
         h0 = dim_mod_specs['face']['prefered_height']
         gamma = dim_mod_specs['face']['contractility']
 
-        dim_mod_specs['face']['contractility'] = gamma * Kv * A0 * h0**2
-        dim_mod_specs['face']['prefered_vol'] = A0 * h0
+        V0 = A0 * h0
+        dim_mod_specs['face']['prefered_vol'] = V0
+        dim_mod_specs['face']['contractility'] = gamma * Kv * V0**(4/3.)
 
         lbda = dim_mod_specs['edge']['line_tension']
-        dim_mod_specs['edge']['line_tension'] = lbda * Kv * A0**1.5 * h0**2
+        dim_mod_specs['edge']['line_tension'] = lbda * Kv * V0**(5/3.)
 
         dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5 * h0**2
-        dim_mod_specs['settings']['nrj_norm_factor'] = Kv * (A0*h0)**2
+        dim_mod_specs['settings']['nrj_norm_factor'] = Kv * (V0)**2
 
         if 'anchor_tension' in dim_mod_specs['edge']:
             t_a = dim_mod_specs['edge']['anchor_tension']
