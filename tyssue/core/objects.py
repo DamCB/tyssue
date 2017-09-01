@@ -179,7 +179,7 @@ class Epithelium:
             datasets = self.datasets
 
         identifier = self.identifier+'_copy'
-        new = Epithelium(identifier, datasets,
+        new = type(self)(identifier, datasets,
                          specs=self.specs, coords=None)
         return new
 
