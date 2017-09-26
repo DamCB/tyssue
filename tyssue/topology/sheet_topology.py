@@ -25,7 +25,7 @@ def type1_transition(sheet, edge01, epsilon=0.1):
     if sheet.face_df.loc[face_b, 'num_sides'] < 4:
         logger.warning('''Face %s has 3 sides,
 type 1 transition is not allowed''' % face_b)
-        return
+        return face_b
 
     edge10_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
                             (sheet.edge_df['trgt'] == vert0)]
@@ -38,8 +38,8 @@ type 1 transition is not allowed''' % face_b)
     face_d = int(edge10_.loc[edge10, 'face'])
     if sheet.face_df.loc[face_d, 'num_sides'] < 4:
         logger.warning('''Face %s has 3 sides,
-        type 1 transition is not allowed''' % face_b)
-        return
+        type 1 transition is not allowed''' % face_d)
+        return face_d
 
     edge05_ = sheet.edge_df[(sheet.edge_df['srce'] == vert0) &
                             (sheet.edge_df['face'] == face_d)]
@@ -91,6 +91,7 @@ type 1 transition is not allowed''' % face_b)
     # Type 1 transitions might create 3 sided cells, we remove those
     for tri_face in sheet.face_df[sheet.face_df['num_sides'] == 3].index:
         remove_face(sheet, tri_face)
+    return 0
 
 
 def cell_division(sheet, mother, geom,
