@@ -7,8 +7,9 @@
         "shape": "right",
         "color": "#2b5d0a",
         "alpha": 0.8,
-        "zorder": 1
-	},
+        "zorder": 1,
+	"colormap": "viridis"
+    },
     "vert": {
         "visible": true,
         "s": 100,
