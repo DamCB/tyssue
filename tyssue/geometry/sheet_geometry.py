@@ -228,13 +228,19 @@ class SheetGeometry(PlanarGeometry):
 
 class EllipsoidGeometry(SheetGeometry):
 
-    @classmethod
-    def update_height(cls, eptm):
+    @staticmethod
+    def update_height(eptm):
+
         a, b, c = eptm.settings['abc']
-        theta = np.arcsin((eptm.vert_df.z/c).clip(-1, 1))
-        eptm.vert_df['basal_shift'] = (a * np.cos(theta) -
+        eptm.vert_df['theta'] = np.arcsin((eptm.vert_df.z/c).clip(-1, 1))
+        eptm.vert_df['vitelline_rho'] = a * np.cos(eptm.vert_df['theta'])
+        eptm.vert_df['basal_shift'] = (eptm.vert_df['vitelline_rho'] -
                                        eptm.specs['vert']['basal_shift'])
-        super().update_height(eptm)
+        eptm.vert_df['delta_rho'] = (
+            np.linalg.norm(eptm.vert_df[['x', 'y']], axis=1) -
+            eptm.vert_df['vitelline_rho']).clip(lower=0)
+
+        SheetGeometry.update_height(eptm)
 
     @staticmethod
     def scale(eptm, scale, coords):
