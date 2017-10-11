@@ -10,7 +10,7 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda create -q -f environment.yaml
+  - conda create -q --file environment.yaml
   - source activate tyssue
   - pip install coveralls
 
