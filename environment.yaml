@@ -6,7 +6,7 @@ channels: !!python/tuple
   'conda-forge'
 
 dependencies:
-- python>=3.5
+- python>=3.6
 - numpy
 - scipy
 - matplotlib
@@ -15,4 +15,6 @@ dependencies:
 - jupyter
 - notebook
 # - vispy install from source
+- ipywidgets
 - pythreejs
+- ipyvolume

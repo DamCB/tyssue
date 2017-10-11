@@ -21,6 +21,25 @@ def division_time_table(sheet, mother,
     return times, time_table.sort_index()
 
 
+def contraction_time_table(sheet, face,
+                           events, start_t=0):
+    settings = sheet.settings['apoptosis']
+    n_steps = settings['contract_steps']
+    contractile_increase = settings['contractile_increase']
+
+    times = range(start_t, start_t+n_steps)
+
+    cell_time_idx = pd.MultiIndex.from_tuples(
+        [(t, face) for t in times],
+        names=['t', 'face'])
+
+    time_table = pd.DataFrame(index=cell_time_idx,
+                              columns=events.keys())
+    contract = np.ones(n_steps) * contractile_increase / n_steps
+    time_table.loc[start_t: start_t+n_steps, 'contract'] = contract
+    return times, time_table.sort_index()
+
+
 def apoptosis_time_table(sheet,
                          apoptotic_cell,
                          events,

@@ -28,4 +28,4 @@ def test_iso_solver():
     sheet.update_specs(dyn_specs, reset=True)
     geom.update_all(sheet)
     res = bruteforce_isotropic_relax(sheet, geom, model)
-    assert_almost_equal(res['x'], 1.6003272823187629)
+    assert_almost_equal(res['x'], 1.6001116383)

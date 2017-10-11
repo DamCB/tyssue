@@ -25,7 +25,7 @@ def type1_transition(sheet, edge01, epsilon=0.1):
     if sheet.face_df.loc[face_b, 'num_sides'] < 4:
         logger.warning('''Face %s has 3 sides,
 type 1 transition is not allowed''' % face_b)
-        return
+        return face_b
 
     edge10_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
                             (sheet.edge_df['trgt'] == vert0)]
@@ -38,8 +38,8 @@ type 1 transition is not allowed''' % face_b)
     face_d = int(edge10_.loc[edge10, 'face'])
     if sheet.face_df.loc[face_d, 'num_sides'] < 4:
         logger.warning('''Face %s has 3 sides,
-        type 1 transition is not allowed''' % face_b)
-        return
+        type 1 transition is not allowed''' % face_d)
+        return face_d
 
     edge05_ = sheet.edge_df[(sheet.edge_df['srce'] == vert0) &
                             (sheet.edge_df['face'] == face_d)]
@@ -88,9 +88,10 @@ type 1 transition is not allowed''' % face_b)
                                               (mean_pos - face_d_pos) *
                                               epsilon)
     sheet.reset_topo()
-    # Type 1 transitions might create 3 sided cells, we remove those
-    for tri_face in sheet.face_df[sheet.face_df['num_sides'] == 3].index:
+    # Type 1 transitions might create 3 or 2 sided cells, we remove those
+    for tri_face in sheet.face_df[sheet.face_df['num_sides'] < 4].index:
         remove_face(sheet, tri_face)
+    return 0
 
 
 def cell_division(sheet, mother, geom,
@@ -271,3 +272,23 @@ Chosen vertex %i is bound to a single cell, nothing to do''' % vert)
     verts = sheet.vert_df.loc[split_verts]
     dr = -verts[sheet.coords] + faces[sheet.coords].values
     sheet.vert_df.loc[split_verts, sheet.coords] += dr*epsilon
+
+
+def resolve_t1s(sheet, geom, model, solver, max_iter=60):
+
+    l_th = sheet.settings['threshold_length']
+    i = 0
+    while sheet.edge_df.length.min() < l_th:
+
+        for edge in sheet.edge_df[sheet.edge_df.length < l_th].sort_values('length').index:
+            try:
+                type1_transition(sheet, edge)
+            except KeyError:
+                continue
+            sheet.reset_index()
+            sheet.reset_topo()
+            geom.update_all(sheet)
+        solver.find_energy_min(sheet, geom, model)
+        i += 1
+        if i > max_iter:
+            break

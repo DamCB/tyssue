@@ -439,6 +439,93 @@ def extrude(apical_datasets,
     return datasets
 
 
+def get_ellipsoid_centers(a, b, c, n_zs,
+                          pos_err=0., phase_err=0.):
+
+    dist = c / (1.76*n_zs)
+    zs = np.linspace(-c, c, n_zs)
+
+    thetas = np.arcsin(zs/c)
+    av_rhos = (a + b) * np.cos(thetas) / 2
+    n_cells = np.ceil(av_rhos/dist).astype(np.int)
+
+    phis = np.concatenate(
+        [np.linspace(-np.pi, np.pi, nc, endpoint=False)
+         + (np.pi/nc) * (i%2) for i, nc in enumerate(n_cells)])
+
+    if phase_err > 0:
+        phis += np.random.normal(scale=phase_err*np.pi,
+                                 size=phis.shape)
+
+    zs = np.concatenate(
+        [z * np.ones(nc) for z, nc in zip(zs, n_cells)])
+    thetas = np.concatenate(
+        [theta * np.ones(nc) for theta, nc in zip(thetas, n_cells)])
+
+    xs = a * np.cos(thetas) * np.cos(phis)
+    ys = b * np.cos(thetas) * np.sin(phis)
+
+    if pos_err >=0.:
+        xs += np.random.normal(scale=pos_err,
+                               size=thetas.shape)
+        ys += np.random.normal(scale=pos_err,
+                               size=thetas.shape)
+        zs += np.random.normal(scale=pos_err,
+                               size=thetas.shape)
+    centers = pd.DataFrame.from_dict(
+        {'x': xs, 'y': ys, 'z': zs,
+         'theta': thetas, 'phi': phis})
+    return centers
+
+
+def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
+
+    from . import Epithelium
+    from scipy.spatial import Voronoi
+    from .. import config
+
+def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
+    from . import Epithelium
+    from scipy.spatial import Voronoi
+    from .. import config
+    from ..utils.utils import single_cell
+    from ..geometry.bulk_geometry import BulkGeometry
+
+    centers = get_ellipsoid_centers(a, b, c, n_zs,
+                                    **kwargs)
+
+    centers['x'] /= a
+    centers['y'] /= b
+    centers['z'] /= c
+
+    centers = centers.append(pd.Series(
+        {'x':0, 'y':0, 'z':0,
+         'theta':0, 'phi':0,}),
+         ignore_index=True)
+
+    vor3d = Voronoi(centers[list('xyz')].values)
+    vor3d.close()
+    dsets = from_3d_voronoi(vor3d)
+    veptm = Epithelium('v', dsets, config.geometry.bulk_spec())
+    eptm = single_cell(veptm, centers.shape[0]-1)
+
+    eptm.update_specs(config.geometry.bulk_spec())
+    eptm.update_specs(config.dynamics.quasistatic_bulk_spec())
+
+    eptm.vert_df['rho'] = np.linalg.norm(eptm.vert_df[eptm.coords], axis=1)
+    eptm.vert_df['theta'] = np.arcsin(eptm.vert_df.eval('z/rho'))
+    eptm.vert_df['phi'] = np.arctan2(eptm.vert_df['y'], eptm.vert_df['x'])
+
+    eptm.vert_df['x'] = a * np.cos(eptm.vert_df['theta']) * np.cos(eptm.vert_df['phi'])
+    eptm.vert_df['y'] = b * np.cos(eptm.vert_df['theta']) * np.sin(eptm.vert_df['phi'])
+    eptm.vert_df['z'] = c * np.sin(eptm.vert_df['theta'])
+
+    eptm.cell_df.prefered_vol = (4*np.pi/3) * a * b * c
+    eptm.cell_df.prefered_area = 140000
+
+    BulkGeometry.update_all(eptm)
+    return eptm
+
 def create_anchors(sheet):
     '''Adds an edge linked to every vertices at the boundary
     and create anchor vertices

@@ -112,8 +112,10 @@ class SheetGeometry(PlanarGeometry):
             w0 = b - a
             sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[[u, v]],
                                                   axis=1)
-            l_mask = sheet.vert_df[sheet.vert_df['left_tip']].index
-            r_mask = sheet.vert_df[sheet.vert_df['right_tip']].index
+            sheet.vert_df['left_tip'] = sheet.vert_df[w] < -w0
+            sheet.vert_df['right_tip'] = sheet.vert_df[w] > w0
+            l_mask = sheet.vert_df[sheet.vert_df['left_tip'] == 1].index
+            r_mask = sheet.vert_df[sheet.vert_df['right_tip'] == 1].index
 
             sheet.vert_df.loc[l_mask, 'rho'] = cls.dist_to_point(
                 sheet.vert_df.loc[l_mask],
@@ -123,6 +125,9 @@ class SheetGeometry(PlanarGeometry):
                 sheet.vert_df.loc[r_mask],
                 [0, 0, w0],
                 [u, v, w])
+
+        elif sheet.settings['geometry'] == 'surfacic':
+            sheet.vert_df['rho'] = 1.
 
         sheet.vert_df['height'] = (sheet.vert_df['rho'] -
                                    sheet.vert_df['basal_shift'])
@@ -148,10 +153,7 @@ class SheetGeometry(PlanarGeometry):
                                  axis=1)
             a = np.percentile(rho, 95)
             b = np.percentile(np.abs(sheet.vert_df[w]), 95)
-            w0 = (b - a)
             sheet.settings['ab'] = [a, b]
-            sheet.vert_df['left_tip'] = sheet.vert_df[w] < -w0
-            sheet.vert_df['right_tip'] = sheet.vert_df[w] > w0
 
     @staticmethod
     def face_rotation(sheet, face, psi=0):
@@ -223,3 +225,24 @@ class SheetGeometry(PlanarGeometry):
         rot_pos = pd.DataFrame(np.dot(rel_pos, rotation.T),
                                index=face_orbit, columns=sheet.coords)
         return rot_pos
+
+class EllipsoidGeometry(SheetGeometry):
+
+    @staticmethod
+    def update_height(eptm):
+
+        a, b, c = eptm.settings['abc']
+        eptm.vert_df['theta'] = np.arcsin((eptm.vert_df.z/c).clip(-1, 1))
+        eptm.vert_df['vitelline_rho'] = a * np.cos(eptm.vert_df['theta'])
+        eptm.vert_df['basal_shift'] = (eptm.vert_df['vitelline_rho'] -
+                                       eptm.specs['vert']['basal_shift'])
+        eptm.vert_df['delta_rho'] = (
+            np.linalg.norm(eptm.vert_df[['x', 'y']], axis=1) -
+            eptm.vert_df['vitelline_rho']).clip(lower=0)
+
+        SheetGeometry.update_height(eptm)
+
+    @staticmethod
+    def scale(eptm, scale, coords):
+        SheetGeometry.scale(eptm, scale, coords)
+        eptm.settings['abc'] = [u*scale for u in eptm.settings['abc']]

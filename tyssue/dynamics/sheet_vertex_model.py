@@ -68,8 +68,10 @@ class SheetModel(PlanarModel):
         '''
         # consider only live faces:
         live_face_df = sheet.face_df[sheet.face_df.is_alive == 1]
-        upcast_active = sheet.upcast_srce(sheet.vert_df.is_active)
-        upcast_alive = sheet.upcast_face(sheet.face_df.is_alive)
+        upcast_active = sheet.upcast_srce(
+            sheet.vert_df.is_active).astype(np.bool)
+        upcast_alive = sheet.upcast_face(
+            sheet.face_df.is_alive).astype(np.bool)
         sheet.edge_df['is_active'] = (upcast_alive.values &
                                       upcast_active.values).astype(np.bool)
         live_edge_df = sheet.edge_df[sheet.edge_df['is_active']]
