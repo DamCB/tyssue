@@ -88,8 +88,8 @@ type 1 transition is not allowed''' % face_b)
                                               (mean_pos - face_d_pos) *
                                               epsilon)
     sheet.reset_topo()
-    # Type 1 transitions might create 3 sided cells, we remove those
-    for tri_face in sheet.face_df[sheet.face_df['num_sides'] == 3].index:
+    # Type 1 transitions might create 3 or 2 sided cells, we remove those
+    for tri_face in sheet.face_df[sheet.face_df['num_sides'] < 4].index:
         remove_face(sheet, tri_face)
     return 0
 
