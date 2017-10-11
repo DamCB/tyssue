@@ -14,7 +14,7 @@ dependencies:
 - pytables
 - jupyter
 - notebook
-# - vispy install from source
+- quantities
 - ipywidgets
 - pythreejs
 - ipyvolume

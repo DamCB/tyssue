@@ -1,0 +1,11 @@
+numpy
+scipy
+matplotlib
+pandas
+pytables
+jupyter
+notebook
+quantities
+ipywidgets
+pythreejs
+ipyvolume
