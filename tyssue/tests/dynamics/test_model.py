@@ -43,7 +43,7 @@ def test_adim():
     new_mod_specs['edge']['line_tension'] = 0.
     assert new_mod_specs['edge']['line_tension'] == 0.
     assert default_mod_specs['edge']['line_tension'] == 0.04
-    assert dim_mod_specs['edge']['line_tension'] == 0.04 * 1 * 24**1.5 * 10**2
+    assert dim_mod_specs['edge']['line_tension'] == 0.04 * 1 * (24*10)**(5/3)
 
 
 def test_compute_energy():
@@ -61,14 +61,14 @@ def test_compute_energy():
     isotropic_relax(sheet, nondim_specs)
 
     Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
-    assert_almost_equal(Et.mean(), 0.03314789986876715, decimal=DECIMAL)
-    assert_almost_equal(Ec.mean(), 0.21975665314196263, decimal=DECIMAL)
+    assert_almost_equal(Et.mean(), 0.017387980536558049, decimal=DECIMAL)
+    assert_almost_equal(Ec.mean(), 0.060468373427944269, decimal=DECIMAL)
     assert_almost_equal(Ev.mean(), 0.045933846726741855, decimal=DECIMAL)
 
     energy = model.compute_energy(sheet, full_output=False)
-    assert_almost_equal(energy, 18.583115963252297, decimal=DECIMAL)
+    assert_almost_equal(energy, 8.4292041349613758, decimal=DECIMAL)
     assert_almost_equal(energy/sheet.face_df.is_alive.sum(),
-                        0.46457789908130742, decimal=2)
+                        0.21073010337403439, decimal=2)
 
 
 def test_compute_gradient():
