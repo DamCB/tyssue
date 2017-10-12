@@ -3,4 +3,3 @@ exclude_lines =
       pragma: no cover
 omit =
       */tests*
-data_file = .coverage
