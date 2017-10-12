@@ -12,6 +12,7 @@ before_install:
   - conda info -a
   - conda env create -q -f environment.yml
   - source activate tyssue
+  - conda install pytest pytest-cov
   - pip install coveralls
 
 install:
