@@ -10,7 +10,6 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda create -q -f environement.yml
   - source activate tyssue
   - conda install numpy scipy pandas matplotlib nose coverage vispy pip pytables pytest pytest-cov
   - conda install -c conda-forge quantities
