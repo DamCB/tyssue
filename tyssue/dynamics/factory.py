@@ -87,11 +87,18 @@ def model_factory(effectors, ref_effector):
             grads = [f.gradient(eptm) for f in effectors]
             if components:
                 return grads
-            srce_grads = (g[0] for g in grads)
-            trgt_grads = (g[1] for g in grads if g[1] is not None)
+            srce_grads = (g[0] for g in grads
+                          if g[0].shape[0] == eptm.Ne)
+            trgt_grads = (g[1] for g in grads
+                          if (g[1] is not None)
+                          and (g[1].shape[0] == eptm.Ne))
+            vert_grads = (g[0] for g in grads
+                          if g[0].shape == eptm.Nv)
+
             grad_i = (eptm.sum_srce(sum(srce_grads))
                       + eptm.sum_trgt(sum(trgt_grads))
-                      * to_nd(eptm.vert_df.is_active, eptm.dim))
+                      + vert_grads) * to_nd(eptm.vert_df.is_active,
+                                            eptm.dim)
 
             return grad_i / norm_factor
 
