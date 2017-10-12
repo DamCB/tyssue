@@ -1,8 +1,15 @@
-from ..utils import to_nd
 import warnings
 
+from copy import deepcopy
 
-def model_factory(effectors):
+from .effectors import dimensionalize as dimensionalize
+from .effectors import normalize as normalize
+
+from ..utils import to_nd
+
+
+
+def model_factory(effectors, ref_effector):
     """Produces a Model class with the provided effectors.
 
     Parameters
@@ -27,8 +34,28 @@ def model_factory(effectors):
             labels.append(f.label)
             specs[f.element] = specs[f.element].union(f.specs)
 
-        __doc__ = """Dynamical model with the following interactions:
-{} from the effectors: {}.""".format(labels, effectors)
+        __doc__ = """Dynamical model with the following effectors:\n"""
+        __doc__ = __doc__+'\n'.join(labels)
+
+        @staticmethod
+        def dimensionalize(nondim_specs):
+            dim_specs = deepcopy(nondim_specs)
+            for effector in effectors:
+                if effector == ref_effector:
+                    continue
+                dimensionalize(nondim_specs, dim_specs,
+                               effector, ref_effector)
+
+            ref_nrj = ref_effector.get_nrj_norm(dim_specs)
+            dim_specs['settings']['nrj_norm_factor'] = ref_nrj
+            return dim_specs
+
+        @staticmethod
+        def normalize(dim_specs):
+            nondim_specs = deepcopy(dim_specs)
+            for effector in effectors:
+                normalize(dim_specs, nondim_specs,
+                          effector, ref_effector)
 
         @staticmethod
         def compute_energy(eptm, full_output=False):

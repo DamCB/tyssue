@@ -23,7 +23,6 @@ class SheetModel(PlanarModel):
     """
     energy_labels = ['tension', 'contractility', 'volume']
 
-
     @staticmethod
     def dimentionalize(mod_specs):
         """
@@ -46,13 +45,12 @@ class SheetModel(PlanarModel):
         lbda = dim_mod_specs['edge']['line_tension']
         dim_mod_specs['edge']['line_tension'] = lbda * Kv * V0**(5/3.)
 
-        dim_mod_specs['settings']['grad_norm_factor'] = Kv * A0**1.5 * h0**2
+        dim_mod_specs['settings']['grad_norm_factor'] = Kv * V0**(5/3.)
         dim_mod_specs['settings']['nrj_norm_factor'] = Kv * (V0)**2
 
         if 'anchor_tension' in dim_mod_specs['edge']:
             t_a = dim_mod_specs['edge']['anchor_tension']
-            dim_mod_specs['edge']['anchor_tension'] = (t_a * Kv *
-                                                       A0**1.5 * h0**2)
+            dim_mod_specs['edge']['anchor_tension'] = t_a * Kv * V0**(5/3.)
 
         return dim_mod_specs
 

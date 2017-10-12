@@ -32,8 +32,11 @@ class AbstractEffector:
 
 
     """
-    dimentionless = False
-    dimentions = None
+    dimensions = None
+    magnitude = None
+    spatial_ref = None, None
+    temporal_ref = None, None
+
     label = 'Abstract effector'
     element = None  # cell, face, edge or vert
     specs = {}
@@ -46,17 +49,29 @@ class AbstractEffector:
     def gradient(eptm):
         raise NotImplemented
 
+    @staticmethod
+    def get_nrj_norm(specs):
+        raise NotImplemented
+
+
 
 class LengthElasticity(AbstractEffector):
 
-    dimentionless = False
-    dimentions = units.line_elasticity
+    dimensions = units.line_elasticity
     label = 'Length elasticity'
+    magnitude = 'length_elasticity'
     element = 'edge'
+    spatial_ref = 'prefered_length', units.length
+
     specs = {'is_active',
              'length',
              'length_elasticity',
              'prefered_length'}
+
+    @staticmethod
+    def get_nrj_norm(specs):
+        return (specs['edge']['length_elasticity']
+                * specs['edge']['prefered_length']**2)
 
     @staticmethod
     def energy(eptm):
@@ -78,14 +93,22 @@ class LengthElasticity(AbstractEffector):
 
 class FaceAreaElasticity(AbstractEffector):
 
-    dimentionless = False
-    dimentions = units.area_elasticity
+    dimensionless = False
+    dimensions = units.area_elasticity
+    magnitude = 'area_elasticity'
     label = 'Area elasticity'
     element = 'face'
     specs = {'is_alive',
              'area',
              'area_elasticity',
              'prefered_area'}
+
+    spatial_ref = 'prefered_area', units.area
+
+    @staticmethod
+    def get_nrj_norm(specs):
+        return (specs['face']['area_elasticity']
+                * specs['face']['prefered_area']**2)
 
     @staticmethod
     def energy(eptm):
@@ -118,14 +141,22 @@ class FaceAreaElasticity(AbstractEffector):
 
 
 class FaceVolumeElasticity(AbstractEffector):
-    dimentionless = False
-    dimentions = units.vol_elasticity
+
+    dimensions = units.vol_elasticity
+    magnitude = 'vol_elasticity'
     label = 'Volume elasticity'
     element = 'face'
     specs = {'is_alive',
              'vol',
              'vol_elasticity',
              'prefered_vol'}
+
+    spatial_ref = 'prefered_vol', units.vol
+
+    @staticmethod
+    def get_nrj_norm(specs):
+        return (specs['face']['vol_elasticity']
+                * specs['face']['prefered_vol']**2)
 
     @staticmethod
     def energy(eptm):
@@ -161,14 +192,21 @@ class FaceVolumeElasticity(AbstractEffector):
 
 class CellAreaElasticity(AbstractEffector):
 
-    dimentionless = False
-    dimentions = units.area_elasticity
+    dimensions = units.area_elasticity
+    magnitude = 'area_elasticity'
     label = 'Area elasticity'
     element = 'cell'
     specs = {'is_alive',
              'area',
              'area_elasticity',
              'prefered_area'}
+
+    spatial_ref = 'prefered_area', units.area
+
+    @staticmethod
+    def get_nrj_norm(specs):
+        return (specs['cell']['area_elasticity']
+                * specs['cell']['prefered_area']**2)
 
     @staticmethod
     def energy(eptm):
@@ -198,14 +236,21 @@ class CellAreaElasticity(AbstractEffector):
 
 class CellVolumeElasticity(AbstractEffector):
 
-    dimentionless = False
-    dimentions = units.vol_elasticity
+    dimensions = units.vol_elasticity
+    magnitude = 'vol_elasticity'
     label = 'Volume elasticity'
     element = 'cell'
+    spatial_ref = 'prefered_vol', units.vol
+
     specs = {'is_alive',
              'vol',
              'vol_elasticity',
              'prefered_vol'}
+
+    @staticmethod
+    def get_nrj_norm(specs):
+        return (specs['cell']['vol_elasticity']
+                * specs['cel']['prefered_vol']**2)
 
     @staticmethod
     def energy(eptm):
@@ -234,12 +279,15 @@ class CellVolumeElasticity(AbstractEffector):
 
 class LineTension(AbstractEffector):
 
-    dimentionless = False
-    dimentions = units.line_tension
+    dimensions = units.line_tension
+    magnitude = 'line_tension'
     label = 'Line tension'
     element = 'edge'
     specs = {'is_active',
              'line_tension'}
+
+    spatial_ref = 'mean_length', units.length
+
 
     @staticmethod
     def energy(eptm):
@@ -257,13 +305,15 @@ class LineTension(AbstractEffector):
 
 class FaceContractility(AbstractEffector):
 
-    dimentionless = False
-    dimentions = units.line_elasticity
+    dimensions = units.line_elasticity
+    magnitude = 'contractility'
     label = 'Contractility'
     element = 'face'
     specs = {'is_alive',
              'perimeter',
              'contractility'}
+
+    spatial_ref = 'mean_perimeter', units.length
 
     @staticmethod
     def energy(eptm):
@@ -271,8 +321,8 @@ class FaceContractility(AbstractEffector):
                                  '* contractility'
                                  '* perimeter ** 2')
 
-    @classmethod
-    def gradient(cls, eptm):
+    @staticmethod
+    def gradient(eptm):
 
         gamma_ = eptm.face_df.eval('contractility * perimeter * is_alive')
         gamma = eptm.upcast_face(gamma_)
@@ -286,17 +336,91 @@ class FaceContractility(AbstractEffector):
 
 class SurfaceTension(AbstractEffector):
 
-    dimentionless = False
-    dimentions = units.area_tension
+    dimensions = units.area_tension
+    magnitude = 'surf_tension'
+
+    spatial_ref = 'prefered_area', units.area
+
     label = 'Surface tension'
     element = 'face'
     specs = {'is_active',
-             'line_tension'}
+             'surf_tension'}
 
-    @staticmethod
-    def energy(eptm):
-        raise NotImplemented
+
+
+class LineViscosity(AbstractEffector):
+
+    dimensions = units.line_viscosity
+    magnitude = 'edge_viscosity'
+
+    label = 'Linear viscosity'
+    element = 'edge'
+    spatial_ref = 'mean_length', units.length
+    temporal_ref = 'dt', units.time
+    specs = {'is_active',
+             'edge_viscosity'}
 
     @staticmethod
     def gradient(eptm):
-        raise NotImplemented
+        grad_srce = eptm.edge_df[['vx', 'vy', 'vz']] * to_nd(
+            eptm.edge_df['edge_viscosity'], len(eptm.coords))
+        grad_srce.columns = ['g'+u for u in eptm.coords]
+        return grad_srce, None
+
+
+def _exponants(dimensions, ref_dimensions,
+               spatial_unit=None,
+               temporal_unit=None):
+
+    spatial_exponant = time_exponant = 0
+    rel_dimensionality = (dimensions/ref_dimensions).dimensionality
+
+    if spatial_unit is not None:
+        spatial_exponant = (
+            rel_dimensionality.get(units.length, 0)
+            / spatial_unit.dimensionality[units.length])
+
+    if temporal_unit is not None:
+        time_exponant = (
+            rel_dimensionality.get(units.time, 0)
+            / temporal_unit.dimensionality[units.time])
+    print(spatial_exponant, time_exponant)
+    return spatial_exponant, time_exponant
+
+
+def scaler(nondim_specs, dim_specs,
+           effector, ref_effector):
+    spatial_val, spatial_unit = ref_effector.spatial_ref
+    temporal_val, temporal_unit = ref_effector.temporal_ref
+
+    s_expo, t_expo = _exponants(effector.dimensions,
+                                ref_effector.dimensions,
+                                spatial_unit,
+                                temporal_unit)
+
+    ref_magnitude = ref_effector.magnitude
+    ref_element = ref_effector.element
+    factor = (dim_specs[ref_element][ref_magnitude]
+              * dim_specs[ref_element].get(spatial_val, 1)**s_expo
+              * dim_specs[ref_element].get(temporal_val, 1)**t_expo)
+    return factor
+
+
+def dimensionalize(nondim_specs, dim_specs,
+                   effector, ref_effector):
+    magnitude = effector.magnitude
+    element = effector.element
+    factor = scaler(nondim_specs, dim_specs,
+                    effector, ref_effector)
+    dim_specs[element][magnitude] = factor * nondim_specs[element][magnitude]
+    return dim_specs
+
+
+def normalize(dim_specs, nondim_specs,
+              effector, ref_effector):
+    magnitude = effector.magnitude
+    element = effector.element
+    factor = scaler(nondim_specs, dim_specs,
+                    effector, ref_effector)
+    dim_specs[element][magnitude] = nondim_specs[element][magnitude] / factor
+    return dim_specs
