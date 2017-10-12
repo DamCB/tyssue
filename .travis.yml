@@ -12,8 +12,6 @@ before_install:
   - conda info -a
   - conda env create -q -f environment.yml
   - source activate tyssue
-  - conda install numpy scipy pandas matplotlib nose coverage vispy pip pytables pytest pytest-cov
-  - conda install -c conda-forge quantities
   - pip install coveralls
 
 install:
