@@ -8,7 +8,6 @@ from .effectors import normalize as normalize
 from ..utils import to_nd
 
 
-
 def model_factory(effectors, ref_effector):
     """Produces a Model class with the provided effectors.
 
@@ -82,7 +81,7 @@ def model_factory(effectors, ref_effector):
 
             eptm.edge_df['is_active'] = (
                 eptm.upcast_srce(eptm.vert_df['is_active'])
-                * eptm.upcast_srce(eptm.face_df['is_alive']))
+                * eptm.upcast_face(eptm.face_df['is_alive']))
 
             grads = [f.gradient(eptm) for f in effectors]
             if components:
@@ -97,8 +96,8 @@ def model_factory(effectors, ref_effector):
 
             grad_i = (eptm.sum_srce(sum(srce_grads))
                       + eptm.sum_trgt(sum(trgt_grads))
-                      + vert_grads) * to_nd(eptm.vert_df.is_active,
-                                            eptm.dim)
+                      + sum(vert_grads)) * to_nd(eptm.vert_df.is_active,
+                                                 eptm.dim)
 
             return grad_i / norm_factor
 

@@ -250,7 +250,7 @@ class CellVolumeElasticity(AbstractEffector):
     @staticmethod
     def get_nrj_norm(specs):
         return (specs['cell']['vol_elasticity']
-                * specs['cel']['prefered_vol']**2)
+                * specs['cell']['prefered_vol']**2)
 
     @staticmethod
     def energy(eptm):
@@ -287,7 +287,6 @@ class LineTension(AbstractEffector):
              'line_tension'}
 
     spatial_ref = 'mean_length', units.length
-
 
     @staticmethod
     def energy(eptm):
@@ -347,7 +346,6 @@ class SurfaceTension(AbstractEffector):
              'surf_tension'}
 
 
-
 class LineViscosity(AbstractEffector):
 
     dimensions = units.line_viscosity
@@ -384,7 +382,6 @@ def _exponants(dimensions, ref_dimensions,
         time_exponant = (
             rel_dimensionality.get(units.time, 0)
             / temporal_unit.dimensionality[units.time])
-    print(spatial_exponant, time_exponant)
     return spatial_exponant, time_exponant
 
 
