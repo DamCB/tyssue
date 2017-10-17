@@ -111,7 +111,7 @@ class Epithelium:
         self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
                                                      names=self.element_names)
         # # Topology (geometry independant)
-        self.reset_topo()
+        # self.reset_topo()
         self.bbox = None
         self.set_bbox()
 

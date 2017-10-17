@@ -11,11 +11,12 @@ from ..config.draw import sheet_spec
 try:
     import ipyvolume as ipv
 except ImportError:
-    print(
-    '''This module needs ipyvolume to work.
+    print('''
+This module needs ipyvolume to work.
 You can install it with:
 $ conda install -c conda-forge ipyvolume
-    ''')
+''')
+
 
 def view_ipv(sheet, coords=['x', 'y', 'z'], **edge_specs):
     """
@@ -37,12 +38,7 @@ def view_ipv(sheet, coords=['x', 'y', 'z'], **edge_specs):
     elif hasattr(spec['color'], '__len__'):
         color = _color_from_sequence(spec, sheet)[:, :3]
 
-    u, v, w = coords
-    mesh = ipv.plot_trisurf(sheet.vert_df[u],
-                            sheet.vert_df[v],
-                            sheet.vert_df[w],
-                            lines=sheet.edge_df[['srce', 'trgt']],
-                            color=color)
+    mesh = get_mesh(sheet, coords, color)
     fig = ipv.gcf()
     box_size = max(*(sheet.vert_df[u].ptp()
                      for u in sheet.coords))
@@ -52,6 +48,17 @@ def view_ipv(sheet, coords=['x', 'y', 'z'], **edge_specs):
     ipv.xyzlim(lim_inf, lim_sup)
     ipv.show()
     return fig, mesh
+
+
+def get_mesh(sheet, coords, color):
+
+    u, v, w = coords
+    mesh = ipv.plot_trisurf(sheet.vert_df[u],
+                            sheet.vert_df[v],
+                            sheet.vert_df[w],
+                            lines=sheet.edge_df[['srce', 'trgt']],
+                            color=color)
+    return mesh
 
 
 def _color_from_sequence(edge_spec, sheet):
