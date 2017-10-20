@@ -96,7 +96,7 @@ class Sheet(Epithelium):
                         nx, ny, distx, disty):
         from scipy.spatial import Voronoi
         from ..config.geometry import planar_spec
-        from .generation import hexa_grid2d, from_2d_voronoi
+        from ..generation import hexa_grid2d, from_2d_voronoi
         grid = hexa_grid2d(nx, ny, distx, disty)
         datasets = from_2d_voronoi(Voronoi(grid))
         return cls(identifier, datasets,
@@ -108,7 +108,7 @@ class Sheet(Epithelium):
                         nx, ny, distx, disty):
         from scipy.spatial import Voronoi
         from ..config.geometry import flat_sheet
-        from .generation import hexa_grid2d, from_2d_voronoi
+        from ..generation import hexa_grid2d, from_2d_voronoi
         grid = hexa_grid2d(nx, ny,
                            distx, disty)
         datasets = from_2d_voronoi(Voronoi(grid))
