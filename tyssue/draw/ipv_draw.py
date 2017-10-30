@@ -46,7 +46,6 @@ def view_ipv(sheet, coords=['x', 'y', 'z'], **edge_specs):
     lim_inf = sheet.vert_df[sheet.coords].min().min() - border
     lim_sup = sheet.vert_df[sheet.coords].max().max() + border
     ipv.xyzlim(lim_inf, lim_sup)
-    ipv.show()
     return fig, mesh
 
 
