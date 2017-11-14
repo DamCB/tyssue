@@ -49,6 +49,12 @@ def model_factory(effectors, ref_effector):
             dim_specs['settings']['nrj_norm_factor'] = ref_nrj
             return dim_specs
 
+        @classmethod
+        def dimentionalize(cls, nondim_specs):
+            warnings.warn('''This badly  worded method is deprecated,
+ use dimensionalize instead''')
+            return cls.dimensionalize(nondim_specs)
+
         @staticmethod
         def normalize(dim_specs):
             nondim_specs = deepcopy(dim_specs)
