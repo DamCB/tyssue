@@ -54,7 +54,6 @@ class AbstractEffector:
         raise NotImplemented
 
 
-
 class LengthElasticity(AbstractEffector):
 
     dimensions = units.line_elasticity

@@ -51,7 +51,7 @@ def model_factory(effectors, ref_effector):
 
         @classmethod
         def dimentionalize(cls, nondim_specs):
-            warnings.warn('''This badly  worded method is deprecated,
+            warnings.warn('''This badly worded method is deprecated,
  use dimensionalize instead''')
             return cls.dimensionalize(nondim_specs)
 

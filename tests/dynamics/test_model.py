@@ -39,7 +39,7 @@ def test_adim():
             }
         }
     new_mod_specs = deepcopy(default_mod_specs)
-    dim_mod_specs = model.dimentionalize(new_mod_specs)
+    dim_mod_specs = model.dimensionalize(new_mod_specs)
     new_mod_specs['edge']['line_tension'] = 0.
     assert new_mod_specs['edge']['line_tension'] == 0.
     assert default_mod_specs['edge']['line_tension'] == 0.04
@@ -54,7 +54,7 @@ def test_compute_energy():
 
     sheet = Sheet('emin', datasets, specs)
     nondim_specs = config.dynamics.quasistatic_sheet_spec()
-    dim_model_specs = model.dimentionalize(nondim_specs)
+    dim_model_specs = model.dimensionalize(nondim_specs)
     sheet.update_specs(dim_model_specs, reset=True)
 
     geom.update_all(sheet)
@@ -62,11 +62,11 @@ def test_compute_energy():
 
     Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
     assert_almost_equal(Et.mean(), 0.017387980536558049, decimal=DECIMAL)
-    assert_almost_equal(Ec.mean(), 0.060468373427944269, decimal=DECIMAL)
-    assert_almost_equal(Ev.mean(), 0.045933846726741855, decimal=DECIMAL)
+    assert_almost_equal(Ec.mean(), 0.043191695305674474, decimal=DECIMAL)
+    assert_almost_equal(Ev.mean(), 0.032809890519101326, decimal=DECIMAL)
 
     energy = model.compute_energy(sheet, full_output=False)
-    assert_almost_equal(energy, 8.4292041349613758, decimal=DECIMAL)
+    assert_almost_equal(energy, 8.9847252720185065, decimal=DECIMAL)
     assert_almost_equal(energy/sheet.face_df.is_alive.sum(),
                         0.21073010337403439, decimal=2)
 
@@ -79,16 +79,17 @@ def test_compute_gradient():
 
     sheet = Sheet('emin', datasets, specs)
     nondim_specs = config.dynamics.quasistatic_sheet_spec()
-    dim_model_specs = model.dimentionalize(nondim_specs)
+    dim_model_specs = model.dimensionalize(nondim_specs)
     sheet.update_specs(dim_model_specs)
 
     geom.update_all(sheet)
     isotropic_relax(sheet, nondim_specs)
 
     nrj_norm_factor = sheet.specs['settings']['nrj_norm_factor']
-    (grad_t, grad_c,
-     grad_v_srce, grad_v_trgt) = model.compute_gradient(sheet,
-                                                        components=True)
+    print('Norm factor: ', nrj_norm_factor)
+    ((grad_t, _), (grad_c, _),
+     (grad_v_srce, grad_v_trgt)) = model.compute_gradient(sheet,
+                                                          components=True)
     grad_t_norm = np.linalg.norm(grad_t, axis=0).sum() / nrj_norm_factor
     assert_almost_equal(grad_t_norm, 0.4497370048, decimal=DECIMAL)
 
