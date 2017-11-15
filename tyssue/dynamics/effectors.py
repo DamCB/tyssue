@@ -85,7 +85,7 @@ class LengthElasticity(AbstractEffector):
                               'length',
                               'length_elasticity * is_active / 2',
                               'prefered_length')
-        grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, len(eptm.coords))
+        grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, eptm.dim)
         grad.columns = ['g'+u for u in eptm.coords]
         return grad, None
 
