@@ -91,7 +91,7 @@ def test_compute_gradient():
      (grad_v_srce, grad_v_trgt)) = model.compute_gradient(sheet,
                                                           components=True)
     grad_t_norm = np.linalg.norm(grad_t, axis=0).sum() / nrj_norm_factor
-    assert_almost_equal(grad_t_norm, 0.4497370048, decimal=DECIMAL)
+    assert_almost_equal(grad_t_norm, 0.22486850242320636, decimal=DECIMAL)
 
     grad_c_norm = np.linalg.norm(grad_c, axis=0).sum() / nrj_norm_factor
     assert_almost_equal(grad_c_norm, 0.49692791, decimal=DECIMAL)

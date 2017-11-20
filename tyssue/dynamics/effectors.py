@@ -87,7 +87,7 @@ class LengthElasticity(AbstractEffector):
                               'prefered_length')
         grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, eptm.dim)
         grad.columns = ['g'+u for u in eptm.coords]
-        return grad, None
+        return grad/2, -grad/2
 
 
 class FaceAreaElasticity(AbstractEffector):
@@ -296,9 +296,10 @@ class LineTension(AbstractEffector):
     @staticmethod
     def gradient(eptm):
         grad_srce = - eptm.edge_df[eptm.ucoords] * to_nd(
-            eptm.edge_df.eval('line_tension * is_active'), len(eptm.coords))
+            eptm.edge_df.eval('line_tension * is_active/2'), len(eptm.coords))
         grad_srce.columns = ['g'+u for u in eptm.coords]
-        return grad_srce, None
+        grad_trgt = -grad_srce
+        return grad_srce, grad_trgt
 
 
 class FaceContractility(AbstractEffector):
