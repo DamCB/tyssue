@@ -85,8 +85,8 @@ class PlanarModel():
         grad_t = cls.tension_grad(sheet, grad_lij)
         grad_c = cls.contractile_grad(sheet, grad_lij)
         grad_a_srce, grad_a_trgt = cls.elastic_grad(sheet)
-        grad_i = (sheet.sum_srce(grad_t + grad_c + grad_a_srce) +
-                  sheet.sum_trgt(grad_c + grad_a_trgt))
+        grad_i = (sheet.sum_srce(grad_t/2 + grad_c + grad_a_srce) +
+                  sheet.sum_trgt(-grad_t/2 - grad_c + grad_a_trgt))
         if components:
             return grad_t, grad_c, grad_a_srce, grad_a_trgt
         return grad_i / norm_factor
