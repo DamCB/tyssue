@@ -174,7 +174,7 @@ class Epithelium:
 
         identifier = self.identifier+'_copy'
         new = type(self)(identifier, datasets,
-                         specs=self.specs, coords=None)
+                         specs=self.specs, coords=self.coords)
         return new
 
     def backup(self):
