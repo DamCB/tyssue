@@ -2,7 +2,7 @@ def do_undo(func):
     """Decorator that creates a copy of the first argument
     (usually an epithelium object) and restores it if the function fails.
 
-    The first argument in `*args` should have a `backup()` method.
+    The first argument in `*args` should have `backup()` and `restore()` methods.
     """
     def with_bckup(*args, **kwargs):
         eptm = args[0]
@@ -24,6 +24,18 @@ def validate(func):
         eptm = args[0]
         result = func(*args, **kwargs)
         if not eptm.validate():
-            raise ValueError('An invalid epithelium was produced')
+            raise ValueError('''
+An invalid epithelium was produced
+
+To see which edges are invalid, you can inspect
+the 'is_valid' column of the `edge_df` dataframe,
+or for example the bad cells involved:
+
+>>> bad_edges = eptm.edge_df[~eptm.edge_df['is_valid']].index
+>>> bad_cells = eptm.edge_df.loc[bad_edges, 'cell'].unique()
+
+If case the epithelium was restored after being invalidated, you can find the
+invalid epithelium as the `_bad` attribute of the restored one''')
+
         return result
     return with_validate
