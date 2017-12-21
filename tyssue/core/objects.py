@@ -133,12 +133,7 @@ class Epithelium:
 
     @property
     def cell_df(self):
-        #- BC -#
-        # Recommends to test if the epithelium has a 'cell' df before returning,
-        # some epitheliums don't require this object (2D)
-        # Should it raise a warning/error if the user asks for
-        # a cell_df from an eptm that doesn't have one ?
-        return self.datasets['cell']
+        return self.datasets.get('cell', None)
 
     @cell_df.setter
     def cell_df(self, value):
