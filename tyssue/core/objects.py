@@ -777,7 +777,7 @@ def get_opposite_faces(eptm):
 
     face_pairs = []
     grouped.apply(lambda s: face_pairs.append(list(s.values))
-                  if len(s) == 2 else np.NaN).dropna()
+                  if len(s) == 2 else np.nan).dropna()
     face_pairs = np.array(face_pairs)
     eptm.face_df.loc[face_pairs[:, 0], 'opposite'] = face_pairs[:, 1]
     eptm.face_df.loc[face_pairs[:, 1], 'opposite'] = face_pairs[:, 0]
