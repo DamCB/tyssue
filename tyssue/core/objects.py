@@ -84,6 +84,9 @@ class Epithelium:
         self.coords = coords
         # edge's dx, dy, dz
         self.dcoords = ['d'+c for c in self.coords]
+        # edge's unit length vector
+        self.ucoords = ['u'+c for c in self.coords]
+
         self.dim = len(self.coords)
         # edge's normals
         if self.dim == 3:

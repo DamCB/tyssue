@@ -74,10 +74,9 @@ def model_factory(effectors, ref_effector):
         @staticmethod
         def compute_gradient(eptm, components=False):
             norm_factor = eptm.specs['settings'].get('nrj_norm_factor', 1)
-            if not hasattr(eptm, 'ucoords'):
+            if not eptm.ucoords[0] in eptm.edge_df.columns:
                 warnings.warn('setting ucoords in grad computation,'
                               'please fix your specs')
-                eptm.ucoords = ['u' + c for c in eptm.coords]
                 for uc in eptm.ucoords:
                     eptm.edge_df[uc] = 0.0
 
