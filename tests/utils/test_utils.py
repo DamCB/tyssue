@@ -1,6 +1,6 @@
 from tyssue.utils import utils
 from tyssue import Sheet, SheetGeometry
-from tyssue.core.generation import three_faces_sheet
+from tyssue.generation import three_faces_sheet
 from numpy.testing import assert_almost_equal
 
 

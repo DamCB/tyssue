@@ -1,6 +1,6 @@
 import os
 
-from tyssue.core.generation import three_faces_sheet
+from tyssue.generation import three_faces_sheet
 from tyssue.core.sheet import Sheet
 
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom

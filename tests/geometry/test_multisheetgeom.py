@@ -2,7 +2,7 @@ import numpy as np
 
 from tyssue.core.multisheet import MultiSheet
 from tyssue.geometry.multisheetgeometry import MultiSheetGeometry
-from tyssue.core.generation import hexa_grid2d, from_2d_voronoi
+from tyssue.generation import hexa_grid2d, from_2d_voronoi
 from scipy.spatial import Voronoi
 
 import tyssue

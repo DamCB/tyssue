@@ -3,12 +3,12 @@ import pandas as pd
 from numpy.testing import assert_array_equal
 
 from tyssue.core import Epithelium
-from tyssue.core.generation import three_faces_sheet
+from tyssue.generation import three_faces_sheet
 from tyssue.core.objects import get_opposite, _ordered_edges, ordered_vert_idxs
 from tyssue import config
 from tyssue.geometry.planar_geometry import PlanarGeometry
 from tyssue.geometry.sheet_geometry import SheetGeometry
-from tyssue.core.generation import extrude, hexa_grid3d, hexa_grid2d
+from tyssue.generation import extrude, hexa_grid3d, hexa_grid2d
 from tyssue.config.dynamics import quasistatic_sheet_spec
 from tyssue.config.geometry import spherical_sheet
 from pytest import raises

@@ -4,7 +4,7 @@ import pandas as pd
 from scipy.spatial import cKDTree
 from .objects import Epithelium
 from .sheet import Sheet
-from .generation import extrude, subdivide_faces
+from ..generation import extrude, subdivide_faces
 from ..geometry.bulk_geometry import BulkGeometry
 
 

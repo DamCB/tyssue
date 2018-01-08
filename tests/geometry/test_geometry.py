@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 from tyssue.core.sheet import Sheet
-from tyssue.core.generation import three_faces_sheet
+from tyssue.generation import three_faces_sheet
 from tyssue.io.hdf5 import load_datasets
 from tyssue.geometry.sheet_geometry import SheetGeometry as sgeom
 

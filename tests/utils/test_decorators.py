@@ -1,6 +1,6 @@
 from tyssue import Epithelium
 from tyssue.utils.decorators import do_undo, validate
-from tyssue.core.generation import three_faces_sheet
+from tyssue.generation import three_faces_sheet
 
 @do_undo
 def bad_action(eptm):

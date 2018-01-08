@@ -22,7 +22,7 @@ def test_solver():
 
     sheet = Sheet('emin', datasets, specs)
     nondim_specs = config.dynamics.quasistatic_sheet_spec()
-    dim_model_specs = model.dimentionalize(nondim_specs)
+    dim_model_specs = model.dimensionalize(nondim_specs)
 
     sheet.update_specs(dim_model_specs)
     isotropic_relax(sheet, nondim_specs)
