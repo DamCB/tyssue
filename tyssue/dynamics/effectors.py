@@ -53,6 +53,16 @@ class AbstractEffector:
     def get_nrj_norm(specs):
         raise NotImplemented
 
+    @classmethod
+    @property
+    def __doc__(cls):
+        f"""Effector implementing {cls.label} with a magnitude factor
+ {cls.magnitude}.
+
+Works on an `Epithelium` object's {cls.element} elements.
+"""
+
+
 
 class LengthElasticity(AbstractEffector):
 
@@ -364,6 +374,49 @@ class LineViscosity(AbstractEffector):
             eptm.edge_df['edge_viscosity'], len(eptm.coords))
         grad_srce.columns = ['g'+u for u in eptm.coords]
         return grad_srce, None
+
+class BorderElasticity(AbstractEffector):
+    dimensions = units.line_elasticity
+    label = 'Border edges elasticity'
+    magnitude = 'border_elasticity'
+    element = 'edge'
+    spatial_ref = 'prefered_length', units.length
+
+    specs = {'is_active',
+             'length',
+             'border_elasticity',
+             'prefered_length'}
+
+    @staticmethod
+    def get_nrj_norm(specs):
+        return (specs['edge']['border_elasticity']
+                * specs['edge']['prefered_length']**2)
+
+    @staticmethod
+    def energy(eptm):
+        return elastic_energy(eptm.edge_df.loc[eptm.border_es],
+                              'length',
+                              'border_elasticity * is_active / 2',
+                              'prefered_length')
+
+    @staticmethod
+    def gradient(eptm):
+
+        kl_l0 = pd.Series(np.zeros(eptm.Ne),
+                          index=eptm.edge_df.index)
+
+        kl_l0.loc[eptm.border_es] = elastic_force(
+            eptm.edge_df.loc[eptm.border_es],
+            var='length',
+            elasticity='border_elasticity',
+            prefered='prefered_length')
+        grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, eptm.dim)
+        grad.columns = ['g'+u for u in eptm.coords]
+        return grad/2, -grad/2
+
+        grad.columns = ['g'+u for u in eptm.coords]
+
+        return grad/2, -grad/2
 
 
 def _exponants(dimensions, ref_dimensions,

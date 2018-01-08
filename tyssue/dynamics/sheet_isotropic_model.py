@@ -1,5 +1,5 @@
 '''
-Isotropic functions
+Isotropic energy model from Farhadifar et al. 2007 article
 '''
 import numpy as np
 from ..geometry.sheet_geometry import SheetGeometry as sgeom
