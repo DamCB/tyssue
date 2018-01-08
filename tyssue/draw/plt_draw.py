@@ -178,7 +178,7 @@ def plot_forces(sheet, geom, model,
         app_grad = approx_grad(sheet, geom, model)
         grad_i = pd.DataFrame(index=sheet.vert_idx,
                               data=app_grad.reshape((-1, len(sheet.coords))),
-                              columns=sheet.coords) * scaling
+                              columns=['g'+c for c in sheet.coords]) * scaling
 
     else:
         grad_i = model.compute_gradient(sheet, components=False) * scaling
@@ -186,7 +186,7 @@ def plot_forces(sheet, geom, model,
     arrows = pd.DataFrame(columns=coords + gcoords,
                           index=sheet.vert_df.index)
     arrows[coords] = sheet.vert_df[coords]
-    arrows[gcoords] = -grad_i[coords]  # F = -grad E
+    arrows[gcoords] = -grad_i[gcoords]  # F = -grad E
 
     if ax is None:
         fig, ax = quick_edge_draw(sheet, coords)

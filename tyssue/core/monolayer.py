@@ -12,9 +12,9 @@ class Monolayer(Epithelium):
     """
     3D monolayer epithelium
     """
-    def __init__(self, name, datasets, specs):
+    def __init__(self, name, datasets, specs, coords=None):
 
-        super().__init__(name, datasets, specs)
+        super().__init__(name, datasets, specs, coords)
         self.vert_df['is_active'] = 1
         self.cell_df['is_alive'] = 1
         self.face_df['is_alive'] = 1

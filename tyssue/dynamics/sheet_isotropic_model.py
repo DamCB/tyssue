@@ -52,22 +52,22 @@ def isotropic_energies(sheet, model, geom,
 
 
 def isotropic_relax(sheet, nondim_specs, geom=sgeom):
-    """Deforms the sheet so that the faces area and
-    pseudo-volume are at their isotropic optimum (on average)
+    """Deforms the sheet so that the faces pseudo-volume is at their
+    isotropic optimum (on average)
 
     The specified model specs is assumed to be non-dimentional
     """
 
     area0 = sheet.face_df['prefered_area'].mean()
     h_0 = sheet.face_df['prefered_height'].mean()
+    vol0 = area0 * h_0
 
     live_faces = sheet.face_df[sheet.face_df.is_alive == 1]
-
-    area_avg = live_faces.area.mean()
+    vol_avg = live_faces.vol.mean()
     rho_avg = sheet.vert_df.rho.mean()
 
     # ## Set height and area to height0 and area0
-    delta = (area0 / area_avg)**0.5
+    delta = (vol0 / vol_avg)**(1/3)
     geom.scale(sheet, delta, coords=sheet.coords)
     sheet.face_df['basal_shift'] = rho_avg * delta - h_0
     sheet.vert_df['basal_shift'] = rho_avg * delta - h_0

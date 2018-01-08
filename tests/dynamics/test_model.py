@@ -61,14 +61,14 @@ def test_compute_energy():
     isotropic_relax(sheet, nondim_specs)
 
     Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
-    assert_almost_equal(Et.mean(), 0.017387980536558049, decimal=DECIMAL)
-    assert_almost_equal(Ec.mean(), 0.043191695305674474, decimal=DECIMAL)
-    assert_almost_equal(Ev.mean(), 0.032809890519101326, decimal=DECIMAL)
+    assert_almost_equal(Et.mean(), 0.026126171269835349, decimal=DECIMAL)
+    assert_almost_equal(Ec.mean(), 0.097547859436179621, decimal=DECIMAL)
+    assert_almost_equal(Ev.mean(), 0.11764800899700815, decimal=DECIMAL)
 
     energy = model.compute_energy(sheet, full_output=False)
-    assert_almost_equal(energy, 8.9847252720185065, decimal=DECIMAL)
+    assert_almost_equal(energy, 19.157287217653735, decimal=DECIMAL)
     assert_almost_equal(energy/sheet.face_df.is_alive.sum(),
-                        0.21073010337403439, decimal=2)
+                        0.47893218044134339, decimal=2)
 
 
 def test_compute_gradient():
