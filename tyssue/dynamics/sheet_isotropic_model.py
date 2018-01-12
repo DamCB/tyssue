@@ -11,12 +11,12 @@ def elasticity(delta):
     return (delta**3 - 1)**2 / 2.
 
 
-def contractility(delta, gamma):
-    return gamma * mu**2 * delta**2 / 2.
+def contractility(delta, alpha, gamma):
+    return 18 * gamma * alpha**(-2/3) * delta**2
 
 
-def tension(delta, lbda):
-    return lbda * mu * delta / 2.
+def tension(delta, alpha, lbda):
+    return 3 * lbda * alpha**(-1/3) * delta / 2.
 
 
 def isotropic_energies(sheet, model, geom,
@@ -27,6 +27,7 @@ def isotropic_energies(sheet, model, geom,
     rho_avg = sheet.vert_df.rho.mean()
     area0 = sheet.specs['face']['prefered_area']
     h_0 = sheet.specs['face']['prefered_height']
+
 
     # ## Set height and area to height0 and area0
     delta_0 = (area0 / area_avg)**0.5
@@ -60,7 +61,7 @@ def isotropic_relax(sheet, nondim_specs, geom=sgeom):
 
     area0 = sheet.face_df['prefered_area'].mean()
     h_0 = sheet.face_df['prefered_height'].mean()
-    vol0 = area0 * h_0
+    vol0 = sheet.face_df['prefered_vol'].mean()
 
     live_faces = sheet.face_df[sheet.face_df.is_alive == 1]
     vol_avg = live_faces.vol.mean()
@@ -69,6 +70,7 @@ def isotropic_relax(sheet, nondim_specs, geom=sgeom):
     # ## Set height and area to height0 and area0
     delta = (vol0 / vol_avg)**(1/3)
     geom.scale(sheet, delta, coords=sheet.coords)
+
     sheet.face_df['basal_shift'] = rho_avg * delta - h_0
     sheet.vert_df['basal_shift'] = rho_avg * delta - h_0
     geom.update_all(sheet)
