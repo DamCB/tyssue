@@ -63,12 +63,10 @@ def test_compute_energy():
     Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
     assert_almost_equal(Et.mean(), 0.026126171269835349, decimal=DECIMAL)
     assert_almost_equal(Ec.mean(), 0.097547859436179621, decimal=DECIMAL)
-    assert_almost_equal(Ev.mean(), 0.11764800899700815, decimal=DECIMAL)
+    assert_almost_equal(Ev.mean(), 0.11478185003186218, decimal=DECIMAL)
 
     energy = model.compute_energy(sheet, full_output=False)
-    assert_almost_equal(energy, 19.157287217653735, decimal=DECIMAL)
-    assert_almost_equal(energy/sheet.face_df.is_alive.sum(),
-                        0.47893218044134339, decimal=2)
+    assert_almost_equal(energy, 18.996782315605557, decimal=DECIMAL)
 
 
 def test_compute_gradient():
@@ -98,8 +96,8 @@ def test_compute_gradient():
 
     grad_vs_norm = np.linalg.norm(grad_v_srce.dropna(),
                                   axis=0).sum() / nrj_norm_factor
-    assert_almost_equal(grad_vs_norm, 0.3028136725, decimal=DECIMAL)
+    assert_almost_equal(grad_vs_norm, 0.37818943702074725, decimal=DECIMAL)
 
     grad_vt_norm = np.linalg.norm(grad_v_trgt.dropna(),
                                   axis=0).sum() / nrj_norm_factor
-    assert_almost_equal(grad_vt_norm, 0.277320351, decimal=DECIMAL)
+    assert_almost_equal(grad_vt_norm, 0.32234408741502257, decimal=DECIMAL)
