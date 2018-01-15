@@ -58,13 +58,14 @@ class SheetEvents():
 
         edges = self.sheet.edge_df[self.sheet.edge_df['face'] ==
                                    self.idx_lookup(face)]
-        shorter = edges.length.argmin()
+        shorter = edges.length.idxmin()
         type1_transition(self.sheet, shorter)
 
         self.geom.update_all(self.sheet)
 
     def type3(self, face, *args):
-
+        if face not in self.sheet.face_df.index:
+            return
         remove_face(self.sheet, face)
         self.geom.update_all(self.sheet)
 

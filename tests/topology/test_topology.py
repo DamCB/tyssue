@@ -1,5 +1,6 @@
-import pytest
-from tyssue.core.generation import three_faces_sheet
+import os
+
+from tyssue.generation import three_faces_sheet
 from tyssue.core.sheet import Sheet
 
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom
@@ -7,20 +8,20 @@ from tyssue.topology.base_topology import (close_face, add_vert,
                                            condition_4i,
                                            condition_4ii)
 
-from tyssue.core.generation import three_faces_sheet
-from tyssue.stores import load_datasets
+from tyssue.stores import stores_dir
+from tyssue.io.hdf5 import load_datasets
 from tyssue.topology.sheet_topology import (cell_division,
                                             type1_transition,
                                             split_vert)
-from tyssue.config.geometry import sheet_spec
-
+from tyssue.config.geometry import cylindrical_sheet
 
 
 def test_condition4i():
     sheet = Sheet('test', *three_faces_sheet())
     assert len(condition_4i(sheet)) == 0
 
-    sheet.edge_df = sheet.edge_df.append(sheet.edge_df.iloc[-1], ignore_index=True)
+    sheet.edge_df = sheet.edge_df.append(sheet.edge_df.iloc[-1],
+                                         ignore_index=True)
     sheet.edge_df.index.name = 'edge'
     sheet.reset_index()
     sheet.reset_topo()
@@ -35,14 +36,16 @@ def test_condition4ii():
     sheet.reset_topo()
     assert len(condition_4ii(sheet)) == 1
 
+
 def test_division():
 
-    h5store = 'small_hexagonal.hf5'
+    h5store = os.path.join(stores_dir, 'small_hexagonal.hf5')
+
     datasets = load_datasets(h5store,
                              data_names=['face',
                                          'vert',
                                          'edge'])
-    specs = sheet_spec()
+    specs = cylindrical_sheet()
     sheet = Sheet('emin', datasets, specs)
     geom.update_all(sheet)
 
@@ -57,11 +60,11 @@ def test_division():
 
 def test_t1_transition():
 
-    h5store = 'small_hexagonal.hf5'
+    h5store = os.path.join(stores_dir, 'small_hexagonal.hf5')
     datasets = load_datasets(
         h5store,
         data_names=['face', 'vert', 'edge'])
-    specs = sheet_spec()
+    specs = cylindrical_sheet()
     sheet = Sheet('emin', datasets, specs)
     geom.update_all(sheet)
     face = sheet.edge_df.loc[84, 'face']
@@ -88,7 +91,6 @@ def test_split_vert():
     geom.update_all(sheet)
     assert sheet.Nv == 14
     assert sheet.Ne == 18
-
 
 
 def test_close_face():

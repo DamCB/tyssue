@@ -8,13 +8,11 @@ import pandas as pd
 from ..utils.utils import _to_3d, _to_2d
 
 
-
 def cyl_height_grad(vert_df, coords):
 
     r_to_rho = vert_df[coords] / _to_3d(vert_df['rho'])
     r_to_rho[coords[-1]] = 0.
     return r_to_rho
-
 
 
 def height_grad(sheet):

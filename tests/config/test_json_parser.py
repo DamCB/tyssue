@@ -14,6 +14,7 @@ def test_load_spec():
     assert 'face' in config
     assert config['face']['num_sides'] == 6
 
+
 def test_save_spec():
     config = load_spec(TESTCONFIG)
     tmp = tempfile.NamedTemporaryFile()
@@ -23,6 +24,7 @@ def test_save_spec():
     with pytest.raises(IOError):
         save_spec(config, tmp.name, False)
 
+
 def test_default():
-    spec = config.geometry.sheet_spec()
+    spec = config.geometry.cylindrical_sheet()
     assert spec['face']['x'] == 0.0

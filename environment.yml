@@ -12,7 +12,8 @@ dependencies:
 - pytables
 - jupyter
 - notebook
-- vispy
+- quantities
 - ipywidgets
 - pythreejs
 - ipyvolume
+- vispy

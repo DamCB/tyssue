@@ -1,14 +1,17 @@
+import os
 import numpy as np
 
 from tyssue.core.sheet import Sheet
-from tyssue.core.generation import three_faces_sheet
-
+from tyssue.generation import three_faces_sheet
+from tyssue.io.hdf5 import load_datasets
 from tyssue.geometry.sheet_geometry import SheetGeometry as sgeom
-from tyssue.stores import load_datasets
+
+from tyssue.stores import stores_dir
 from tyssue import config
 
 
 def test_3faces():
+
     datasets, specs = three_faces_sheet()
     sheet = Sheet('3faces_2D', datasets, specs)
     sgeom.update_dcoords(sheet)
@@ -36,10 +39,10 @@ def test_3faces():
 
 def test_face_rotation():
 
-    h5store = 'small_hexagonal.hf5'
+    h5store = os.path.join(stores_dir, 'small_hexagonal.hf5')
     datasets = load_datasets(h5store,
                              data_names=['face', 'vert', 'edge'])
-    specs = config.geometry.sheet_spec()
+    specs = config.geometry.cylindrical_sheet()
 
     sheet = Sheet('emin', datasets, specs)
     sgeom.update_all(sheet)
@@ -48,6 +51,7 @@ def test_face_rotation():
     rot = sgeom.face_rotation(sheet, face, 0)
     rotated = np.dot(rot, normal)
     np.testing.assert_allclose(rotated[:2], np.zeros(2), atol=1e-7)
+
 
 def test_center():
 

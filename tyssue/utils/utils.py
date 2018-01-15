@@ -15,6 +15,11 @@ def _to_3d(df):
     return df_3d
 
 
+def to_nd(df, ndim):
+    df_nd = np.asarray(df).repeat(ndim).reshape((df.size, ndim))
+    return df_nd
+
+
 def combine_specs(*specs):
 
     combined = {}

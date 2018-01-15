@@ -28,6 +28,7 @@ def quasistatic_plane_spec():
              "radial_tension": 0.0
              },
         "edge": {
+             "is_active": 1,
              "line_tension": 0.12
              },
         "settings": {

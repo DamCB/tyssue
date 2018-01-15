@@ -1,9 +1,9 @@
 from scipy.spatial import Voronoi
-from tyssue.core import generation
+from tyssue import generation
 from tyssue.core.sheet import Sheet
-from tyssue.core.generation import hexa_grid3d, from_3d_voronoi
-from tyssue.core.generation import hexa_grid2d, from_2d_voronoi
-from tyssue.core.generation import extrude, subdivide_faces
+from tyssue.generation import hexa_grid3d, from_3d_voronoi
+from tyssue.generation import hexa_grid2d, from_2d_voronoi
+from tyssue.generation import extrude, subdivide_faces
 
 from tyssue.core.objects import get_opposite
 

@@ -4,7 +4,7 @@ from numpy.testing import assert_array_equal
 
 from tyssue import config
 from tyssue.core import Epithelium
-from tyssue.core.generation import three_faces_sheet, extrude, hexa_grid3d, hexa_grid2d, subdivide_faces
+from tyssue.generation import three_faces_sheet, extrude, hexa_grid3d, hexa_grid2d, subdivide_faces
 from tyssue.geometry.planar_geometry import PlanarGeometry
 from numpy import pi
 

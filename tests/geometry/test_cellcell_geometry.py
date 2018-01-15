@@ -5,7 +5,7 @@ from numpy.testing import assert_array_equal
 from scipy.spatial import Voronoi
 
 from tyssue.core import Epithelium
-from tyssue.core.generation import three_faces_sheet, extrude
+from tyssue.generation import three_faces_sheet, extrude
 from tyssue.geometry.bulk_geometry import BulkGeometry
 from tyssue.geometry.cellcell_geometry import scale, update_dcoords, update_length, update_all
 

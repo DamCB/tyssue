@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ..utils.utils import _to_2d, _to_3d
+from ..utils.utils import _to_2d
 
 
 def area_grad(sheet):
@@ -23,11 +23,7 @@ def area_grad(sheet):
     grad_a_trgt['x'] = -r_ak['y'] * sheet.edge_df['nz']
     grad_a_trgt['y'] = r_ak['x'] * sheet.edge_df['nz']
 
-    if len(sheet.coords) == 2:
-        grad_a_srce = _to_2d(inv_area) * grad_a_srce
-        grad_a_trgt = _to_2d(inv_area) * grad_a_trgt
-    if len(sheet.coords) == 3:
-        grad_a_srce = _to_3d(inv_area) * grad_a_srce
-        grad_a_trgt = _to_3d(inv_area) * grad_a_trgt
+    grad_a_srce = _to_2d(inv_area) * grad_a_srce
+    grad_a_trgt = _to_2d(inv_area) * grad_a_trgt
 
     return grad_a_srce, grad_a_trgt

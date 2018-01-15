@@ -84,6 +84,9 @@ class Epithelium:
         self.coords = coords
         # edge's dx, dy, dz
         self.dcoords = ['d'+c for c in self.coords]
+        # edge's unit length vector
+        self.ucoords = ['u'+c for c in self.coords]
+
         self.dim = len(self.coords)
         # edge's normals
         if self.dim == 3:
@@ -111,7 +114,7 @@ class Epithelium:
         self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
                                                      names=self.element_names)
         # # Topology (geometry independant)
-        self.reset_topo()
+        # self.reset_topo()
         self.bbox = None
         self.set_bbox()
 
@@ -205,8 +208,7 @@ class Epithelium:
         set_data_columns(self.datasets, new, reset)
 
     def update_num_sides(self):
-        self.face_df['num_sides'] = self.edge_df.face.value_counts().loc[
-            self.face_df.index]
+        self.face_df['num_sides'] = self.edge_df.face.value_counts()
 
     def update_num_faces(self):
         self.cell_df['num_faces'] = self.edge_df.groupby('cell').apply(

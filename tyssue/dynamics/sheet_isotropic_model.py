@@ -1,11 +1,10 @@
 '''
-Isotropic functions
+Isotropic energy model from Farhadifar et al. 2007 article
 '''
 import numpy as np
 from ..geometry.sheet_geometry import SheetGeometry as sgeom
 
-mu = 6 * np.sqrt(2. / (3 * np.sqrt(3)))
-
+mu = 2**1.5 * 3**.25
 
 def elasticity(delta):
     return (delta**3 - 1)**2 / 2.
@@ -22,15 +21,20 @@ def tension(delta, lbda):
 def isotropic_energies(sheet, model, geom,
                        deltas, nondim_specs):
 
+    # bck_face_shift = sheet.face_df['basal_shift']
+    # bck_vert_shift = sheet.vert_df['basal_shift']
     # ## Faces only area and height
-    area_avg = sheet.face_df[sheet.face_df['is_alive'] == 1].area.mean()
-    rho_avg = sheet.vert_df.rho.mean()
-    area0 = sheet.specs['face']['prefered_area']
-    h_0 = sheet.specs['face']['prefered_height']
 
-    # ## Set height and area to height0 and area0
-    delta_0 = (area0 / area_avg)**0.5
+    V_0 = sheet.specs['face']['prefered_vol']
+    vol_avg = sheet.face_df[sheet.face_df['is_alive'] == 1].vol.mean()
+    rho_avg = sheet.vert_df.rho.mean()
+
+    # ## Set height and volume to height0 and V0
+    delta_0 = (V_0 / vol_avg)**(1/3)
     geom.scale(sheet, delta_0, sheet.coords)
+
+    h_0 = V_0**(1/3)
+
     sheet.face_df['basal_shift'] = rho_avg * delta_0 - h_0
     sheet.vert_df['basal_shift'] = rho_avg * delta_0 - h_0
     geom.update_all(sheet)
@@ -40,34 +44,31 @@ def isotropic_energies(sheet, model, geom,
         geom.scale(sheet, delta,
                    sheet.coords+['basal_shift'])
         geom.update_all(sheet)
-
         Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
         energies[n, :] = [Et.sum(), Ec.sum(), Ev.sum()]
         geom.scale(sheet, 1/delta, sheet.coords+['basal_shift'])
         geom.update_all(sheet)
-
     energies /= sheet.face_df['is_alive'].sum()
     isotropic_relax(sheet, nondim_specs)
+
     return energies
 
 
 def isotropic_relax(sheet, nondim_specs, geom=sgeom):
-    """Deforms the sheet so that the faces area and
-    pseudo-volume are at their isotropic optimum (on average)
+    """Deforms the sheet so that the faces pseudo-volume is at their
+    isotropic optimum (on average)
 
     The specified model specs is assumed to be non-dimentional
     """
 
-    area0 = sheet.face_df['prefered_area'].mean()
-    h_0 = sheet.face_df['prefered_height'].mean()
-
+    vol0 = sheet.face_df['prefered_vol'].mean()
+    h_0 = vol0**(1/3)
     live_faces = sheet.face_df[sheet.face_df.is_alive == 1]
-
-    area_avg = live_faces.area.mean()
+    vol_avg = live_faces.vol.mean()
     rho_avg = sheet.vert_df.rho.mean()
 
-    # ## Set height and area to height0 and area0
-    delta = (area0 / area_avg)**0.5
+    # ## Set height and volume to height0 and vol0
+    delta = (vol0 / vol_avg)**(1/3)
     geom.scale(sheet, delta, coords=sheet.coords)
     sheet.face_df['basal_shift'] = rho_avg * delta - h_0
     sheet.vert_df['basal_shift'] = rho_avg * delta - h_0
@@ -100,6 +101,7 @@ def isotropic_energy(delta, mod_specs):
 def isotropic_grad_poly(mod_specs):
     lbda = mod_specs['edge']['line_tension']
     gamma = mod_specs['face']['contractility']
+
     grad_poly = [3, 0, 0, -3,
                  mu**2 * gamma,
                  mu * lbda / 2.]

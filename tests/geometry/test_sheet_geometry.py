@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 from tyssue import config, Sheet, SheetGeometry
-from tyssue.core.generation import three_faces_sheet
+from tyssue.generation import three_faces_sheet
 from tyssue.io.hdf5 import load_datasets
 from tyssue.stores import stores_dir
 

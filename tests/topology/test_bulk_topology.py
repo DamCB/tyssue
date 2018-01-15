@@ -4,7 +4,7 @@ from tyssue import BulkGeometry
 from tyssue import Sheet
 from tyssue.config.geometry import bulk_spec
 
-from tyssue.core.generation import extrude
+from tyssue.generation import extrude
 
 from tyssue.topology.bulk_topology import IH_transition, HI_transition
 
