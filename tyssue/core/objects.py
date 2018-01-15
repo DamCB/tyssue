@@ -68,12 +68,18 @@ class Epithelium:
         '''
         Creates an epithelium
 
-        Parameters:
-        -----------
-        identifier: string
-        datasets: dictionary of dataframes
-        the datasets dict specifies the names, data columns
-        and value types of the modeled tyssue
+        Parameters
+        ----------
+        identifier : string
+        datasets : dictionary of dataframes
+          the datasets dict specifies the names, data columns
+          and value types of the modeled tyssue
+
+        Note
+        ----
+        For efficiency reasons, we have to maintain monotonous RangeIndex
+        for each dataset. Thus, _the index of an element can change_,
+        and should not be used as an identifier.
 
         '''
         # backup container
@@ -290,8 +296,8 @@ class Epithelium:
                           self.e_face_idx)).T
 
     def _upcast(self, idx, df):
-
-        upcast = df.loc[idx]
+        ## Assumes a flat index
+        upcast = df.take(idx)
         upcast.index = self.edge_df.index
         return upcast
 
@@ -622,11 +628,15 @@ class Epithelium:
 
         new_vertidx = pd.Series(np.arange(self.vert_df.shape[0]),
                                 index=self.vert_df.index)
-        self.edge_df['srce'] = self.upcast_srce(new_vertidx)
-        self.edge_df['trgt'] = self.upcast_trgt(new_vertidx)
+        # Here we use loc and not the take from upcast
+
+        self.edge_df['srce'] = new_vertidx.loc[self.edge_df['srce']].values
+        self.edge_df['trgt'] = new_vertidx.loc[self.edge_df['trgt']].values
+
         new_fidx = pd.Series(np.arange(self.face_df.shape[0]),
                              index=self.face_df.index)
-        self.edge_df['face'] = self.upcast_face(new_fidx)
+
+        self.edge_df['face'] = new_fidx.loc[self.edge_df['face']].values
 
         self.vert_df.reset_index(drop=True, inplace=True)
         self.vert_df.index.name = 'vert'
@@ -637,7 +647,7 @@ class Epithelium:
         if 'cell' in self.data_names:
             new_cidx = pd.Series(np.arange(self.cell_df.shape[0]),
                                  index=self.cell_df.index)
-            self.edge_df['cell'] = self.upcast_cell(new_cidx)
+            self.edge_df['cell'] = new_cidx.loc[self.edge_df['cell']].values
             self.cell_df.reset_index(drop=True, inplace=True)
             self.cell_df.index.name = 'cell'
 
