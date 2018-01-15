@@ -1,9 +1,7 @@
 name: tyssue
-channels: !!python/tuple
-- !!python/unicode
-  'defaults'
-- !!python/unicode
-  'conda-forge'
+channels:
+- defaults
+- conda-forge
 
 dependencies:
 - python>=3.6
@@ -18,3 +16,4 @@ dependencies:
 - ipywidgets
 - pythreejs
 - ipyvolume
+- vispy
