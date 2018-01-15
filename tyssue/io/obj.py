@@ -1,7 +1,11 @@
 import numpy as np
 import pandas as pd
 
-from vispy.io import write_mesh
+try:
+    from vispy.io import write_mesh
+except ImportError:
+    print('You need vispy to use the .OBJ export')
+
 import logging
 
 logger = logging.getLogger(name=__name__)

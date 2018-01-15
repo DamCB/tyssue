@@ -136,12 +136,7 @@ class Epithelium:
 
     @property
     def cell_df(self):
-        #- BC -#
-        # Recommends to test if the epithelium has a 'cell' df before returning,
-        # some epitheliums don't require this object (2D)
-        # Should it raise a warning/error if the user asks for
-        # a cell_df from an eptm that doesn't have one ?
-        return self.datasets['cell']
+        return self.datasets.get('cell', None)
 
     @cell_df.setter
     def cell_df(self, value):
@@ -177,20 +172,29 @@ class Epithelium:
 
         identifier = self.identifier+'_copy'
         new = type(self)(identifier, datasets,
-                         specs=self.specs, coords=None)
+                         specs=self.specs, coords=self.coords)
         return new
 
     def backup(self):
         """Creates a copy of self and keeps a reference to it
-        in the self.backups stack.
+        in the self._backups deque.
 
         """
         log.info('Backing up')
         self._backups.append(self.copy(deep_copy=True))
 
     def restore(self):
+        '''Resets the eptithelium data to its last backed up state
+
+        A copy of the current state prior to restoring is kept in the
+        `_bad` attribute for inspection.
+        '''
+
         log.info('Restoring')
+        log.info('a copy of the unrestored epithelium'
+                 ' is stored in the `_bad` attribute')
         bck = self._backups.pop()
+        self._bad = self.copy(deep_copy=True)
         self.datasets = bck.datasets
         self.specs = bck.specs
 
@@ -514,7 +518,7 @@ class Epithelium:
 
         e.g. has only closed polygons and polyhedra
         """
-        return np.alltrue(1 - self.get_invalid())
+        return np.alltrue(~self.get_invalid())
 
     def get_valid(self):
         """Set the 'is_valid' column to true if the faces are all closed polygons,
@@ -527,6 +531,7 @@ class Epithelium:
                 _is_closed_cell)
             is_valid = is_valid | self.upcast_cell(is_valid_cell)
         self.edge_df['is_valid'] = is_valid
+        return is_valid
 
     def get_invalid(self):
         """Returns a mask over self.edge_df for invalid faces
@@ -537,6 +542,7 @@ class Epithelium:
             is_invalid_cell = 1 - self.edge_df.groupby('cell').apply(
                 _is_closed_cell)
             invalid_edges = invalid_edges | self.upcast_cell(is_invalid_cell)
+        self.edge_df['is_valid'] = ~invalid_edges
         return invalid_edges
 
     def sanitize(self):
@@ -773,7 +779,7 @@ def get_opposite_faces(eptm):
 
     face_pairs = []
     grouped.apply(lambda s: face_pairs.append(list(s.values))
-                  if len(s) == 2 else np.NaN).dropna()
+                  if len(s) == 2 else np.nan).dropna()
     face_pairs = np.array(face_pairs)
     eptm.face_df.loc[face_pairs[:, 0], 'opposite'] = face_pairs[:, 1]
     eptm.face_df.loc[face_pairs[:, 1], 'opposite'] = face_pairs[:, 0]

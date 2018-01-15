@@ -4,7 +4,7 @@ import pandas as pd
 from scipy.spatial import cKDTree
 from .objects import Epithelium
 from .sheet import Sheet
-from ..generation import extrude, subdivide_faces
+from .generation import extrude, subdivide_faces
 from ..geometry.bulk_geometry import BulkGeometry
 
 
@@ -14,7 +14,8 @@ class Monolayer(Epithelium):
     """
     def __init__(self, name, datasets, specs, coords=None):
 
-        super().__init__(name, datasets, specs, coords)
+        super().__init__(name, datasets,
+                         specs, coords)
         self.vert_df['is_active'] = 1
         self.cell_df['is_alive'] = 1
         self.face_df['is_alive'] = 1

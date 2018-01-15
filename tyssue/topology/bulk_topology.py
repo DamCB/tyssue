@@ -68,7 +68,7 @@ def get_division_vertices(eptm,
 
 
 @do_undo
-@validate
+# @validate
 def cell_division(eptm, mother, geom, vertices):
 
     cell_cols = eptm.cell_df.loc[mother]

@@ -6,6 +6,8 @@ import warnings
 
 from matplotlib import cm
 
+import ipyvolume as ipv
+
 from ..config.draw import sheet_spec
 
 try:
