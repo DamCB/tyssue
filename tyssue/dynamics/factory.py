@@ -28,7 +28,8 @@ def model_factory(effectors, ref_effector):
         specs = {'cell': set(),
                  'face': set(),
                  'edge': set(),
-                 'vert': set()}
+                 'vert': set(),
+                 'settings': set()}
         for f in effectors:
             labels.append(f.label)
             specs[f.element] = specs[f.element].union(f.specs)
