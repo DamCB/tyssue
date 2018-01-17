@@ -260,6 +260,7 @@ class Epithelium:
             return self.cell_df.shape[0]
         elif 'face' in self.data_names:
             return self.face_df.shape[0]
+        return None
 
     @property
     def Nv(self):
