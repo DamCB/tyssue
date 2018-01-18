@@ -47,7 +47,7 @@ class PlanarGeometry(BaseGeometry):
         '''
         Updates the normal coordniate of each (srce, trgt, face) face.
         '''
-        sheet.edge_df['sub_area'] = np.abs(sheet.edge_df['nz']) / 2
+        sheet.edge_df['sub_area'] = sheet.edge_df['nz'] / 2
         sheet.face_df['area'] = sheet.sum_face(sheet.edge_df['sub_area'])
 
     @staticmethod

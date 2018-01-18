@@ -67,6 +67,8 @@ Works on an `Epithelium` object's {cls.element} elements.
 
 
 class LengthElasticity(AbstractEffector):
+    """Elastic half edge
+    """
 
     dimensions = units.line_elasticity
     label = 'Length elasticity'
@@ -88,18 +90,18 @@ class LengthElasticity(AbstractEffector):
     def energy(eptm):
         return elastic_energy(eptm.edge_df,
                               'length',
-                              'length_elasticity * is_active / 2',
+                              'length_elasticity * is_active',
                               'prefered_length')
 
     @staticmethod
     def gradient(eptm):
         kl_l0 = elastic_force(eptm.edge_df,
                               'length',
-                              'length_elasticity * is_active / 2',
+                              'length_elasticity * is_active',
                               'prefered_length')
         grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, eptm.dim)
         grad.columns = ['g'+u for u in eptm.coords]
-        return grad, -grad
+        return -grad, grad
 
 
 class FaceAreaElasticity(AbstractEffector):

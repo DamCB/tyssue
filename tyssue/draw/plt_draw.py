@@ -169,7 +169,7 @@ def plot_forces(sheet, geom, model,
                 approx_grad=None,
                 **draw_specs_kw):
     """Plot the net forces at each vertex, with their amplitudes multiplied
-    by `scaling`
+    by `scaling`. To be clear, this is the oposite of the gradient - grad E.
     """
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)

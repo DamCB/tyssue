@@ -98,7 +98,7 @@ def model_factory(effectors, ref_effector):
                           if (g[1] is not None)
                           and (g[1].shape[0] == eptm.Ne))
             vert_grads = (g[0] for g in grads
-                          if g[0].shape == eptm.Nv)
+                          if g[0].shape[0] == eptm.Nv)
 
             grad_i = (eptm.sum_srce(sum(srce_grads))
                       + eptm.sum_trgt(sum(trgt_grads))
