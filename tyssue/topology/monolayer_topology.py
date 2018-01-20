@@ -52,7 +52,7 @@ def cell_division(monolayer, mother,
                                             m_apical_face,
                                             SheetGeometry)
         basal_edges = []
-        for ae in apical_edges:
+        for ae in apical_edges[::-1]:
             basal_edges.append(find_basal_edge(monolayer, ae))
         division_edges = list(apical_edges) + basal_edges
         vertices = get_division_vertices(monolayer,
