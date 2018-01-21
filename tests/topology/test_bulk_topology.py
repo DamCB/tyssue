@@ -1,13 +1,12 @@
 import numpy as np
-from tyssue import Epithelium
-from tyssue import BulkGeometry
+from tyssue import Epithelium, Monolayer
+from tyssue import BulkGeometry, MonoLayerGeometry
 from tyssue import Sheet
 from tyssue.config.geometry import bulk_spec
 
-from tyssue.generation import extrude
-
+from tyssue.generation import extrude, three_faces_sheet
 from tyssue.topology.bulk_topology import IH_transition, HI_transition
-
+from tyssue.topology.monolayer_topology import cell_division
 
 def test_IH_transition():
 
@@ -55,3 +54,18 @@ def test_HI_transition():
     invalid = eptm.get_invalid()
     assert np.alltrue(1 - invalid)
     assert np.alltrue(eptm.edge_df['sub_vol'] > 0)
+
+
+def test_monolayer_division():
+    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets = extrude(datasets_2d, method='translation')
+    eptm = Monolayer('test_volume',datasets, specs, coords=['x','y','z'])
+    MonoLayerGeometry.update_all(eptm)
+    for orientation in ['vertical', 'horizontal']:
+        daughter = cell_division(eptm, 0,
+                                 orientation=orientation)
+        eptm.reset_topo()
+        eptm.reset_index()
+
+        assert eptm.validate()
+    assert eptm.Nc == 5
