@@ -62,7 +62,7 @@ def get_division_vertices(eptm,
                                             plane_center)
     vertices = []
     for edge in division_edges:
-        new_vert, *new_edges = add_vert(eptm, edge)
+        new_vert, *_ = add_vert(eptm, edge)
         vertices.append(new_vert)
     return vertices
 
@@ -150,6 +150,7 @@ def cell_division(eptm, mother, geom, vertices):
     eptm.reset_index()
     eptm.reset_topo()
     return daughter
+
 
 def find_rearangements(eptm):
     """Finds the candidates for IH and HI transitions

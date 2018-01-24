@@ -6,7 +6,7 @@ from .base_topology import add_vert
 logger = logging.getLogger(name=__name__)
 
 
-def type1_transition(sheet, edge01, epsilon=0.1):
+def type1_transition(sheet, edge01, epsilon=0.1, remove_tri_faces=True):
     """Performs a type 1 transition around the edge edge01
 
     See ../../doc/illus/t1_transition.png for a sketch of the definition
@@ -14,10 +14,14 @@ def type1_transition(sheet, edge01, epsilon=0.1):
 
     Parameters
     ----------
-    sheet: a `Sheet` instance
-    edge_01: int, index of the edge around which the transition takes place
-    epsilon: float, initial length of the new edge.
-
+    sheet : a `Sheet` instance
+    edge_01 : int
+       index of the edge around which the transition takes place
+    epsilon : float, optional
+       default 0.1, the initial length of the new edge.
+    remove_tri_faces : bool, optional
+       if True (the default), will remove triangular cells
+       after the T1 transition is performed
     """
     # Grab the neighbours
     vert0, vert1, face_b = sheet.edge_df.loc[
@@ -29,47 +33,46 @@ type 1 transition is not allowed''' % face_b)
 
     edge10_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
                             (sheet.edge_df['trgt'] == vert0)]
-    if not len(edge10_.index):
-        raise ValueError('opposite edge to {} with '
-                         'source {} and target {} not found'.format(
-                             edge01, vert0, vert1))
-    edge10 = edge10_.index[0]
+    # if not len(edge10_.index):
+    #     raise ValueError('opposite edge to {} with '
+    #                      'source {} and target {} not found'.format(
+    #                          edge01, vert0, vert1))
+    edge10 = edge10_.index
 
-    face_d = int(edge10_.loc[edge10, 'face'])
-    if sheet.face_df.loc[face_d, 'num_sides'] < 4:
+    face_d = _cast_to_int(edge10_.loc[edge10, 'face'])
+    if face_d != -1 and sheet.face_df.loc[face_d, 'num_sides'] < 4:
         logger.warning('''Face %s has 3 sides,
         type 1 transition is not allowed''' % face_d)
         return face_d
 
     edge05_ = sheet.edge_df[(sheet.edge_df['srce'] == vert0) &
                             (sheet.edge_df['face'] == face_d)]
-    edge05 = edge05_.index[0]
-    vert5 = int(edge05_['trgt'])
+    edge05 = edge05_.index
+    vert5 = _cast_to_int(edge05_['trgt'])
 
     edge50_ = sheet.edge_df[(sheet.edge_df['srce'] == vert5) &
                             (sheet.edge_df['trgt'] == vert0)]
-    edge50 = edge50_.index[0]
-    face_a = int(edge50_['face'])
+    edge50 = edge50_.index
+    face_a = _cast_to_int(edge50_['face'])
 
     edge13_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
                             (sheet.edge_df['face'] == face_b)]
-    edge13 = edge13_.index[0]
-    vert3 = int(edge13_['trgt'])
+    edge13 = edge13_.index
+    vert3 = _cast_to_int(edge13_['trgt'])
 
     edge31_ = sheet.edge_df[(sheet.edge_df['srce'] == vert3) &
                             (sheet.edge_df['trgt'] == vert1)]
-    edge31 = edge31_.index[0]
-    face_c = int(edge31_['face'])
+    edge31 = edge31_.index
+    face_c = _cast_to_int(edge31_['face'])
 
     edge13_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
                             (sheet.edge_df['face'] == face_b)]
-    edge13 = edge13_.index[0]
-    vert3 = int(edge13_['trgt'])
+    edge13 = edge13_.index
+    vert3 = _cast_to_int(edge13_['trgt'])
 
     # Perform the rearangements
-
-    sheet.edge_df.loc[edge01, 'face'] = int(face_c)
-    sheet.edge_df.loc[edge10, 'face'] = int(face_a)
+    sheet.edge_df.loc[edge01, 'face'] = face_c
+    sheet.edge_df.loc[edge10, 'face'] = face_a
     sheet.edge_df.loc[edge13, ['srce', 'trgt', 'face']] = vert0, vert3, face_b
     sheet.edge_df.loc[edge31, ['srce', 'trgt', 'face']] = vert3, vert0, face_c
 
@@ -77,17 +80,22 @@ type 1 transition is not allowed''' % face_b)
     sheet.edge_df.loc[edge05, ['srce', 'trgt', 'face']] = vert1, vert5, face_d
 
     # Displace the vertices
-    mean_pos = (sheet.vert_df.loc[vert0, sheet.coords] +
-                sheet.vert_df.loc[vert1, sheet.coords]) / 2
+    mean_pos = (sheet.vert_df.loc[vert0, sheet.coords]
+                + sheet.vert_df.loc[vert1, sheet.coords]) / 2
     face_b_pos = sheet.face_df.loc[face_b, sheet.coords]
-    sheet.vert_df.loc[vert0, sheet.coords] = (mean_pos -
-                                              (mean_pos - face_b_pos) *
-                                              epsilon)
+    sheet.vert_df.loc[vert0, sheet.coords] = (mean_pos
+                                              - (mean_pos - face_b_pos)
+                                              * epsilon)
     face_d_pos = sheet.face_df.loc[face_d, sheet.coords]
-    sheet.vert_df.loc[vert1, sheet.coords] = (mean_pos -
-                                              (mean_pos - face_d_pos) *
-                                              epsilon)
+    sheet.vert_df.loc[vert1, sheet.coords] = (mean_pos
+                                              - (mean_pos - face_d_pos)
+                                              * epsilon)
+
+    sheet.edge_df = sheet.edge_df[sheet.edge_df['face'] != -1]
+
     sheet.reset_topo()
+    if not remove_tri_faces:
+        return 0
     # Type 1 transitions might create 3 or 2 sided cells, we remove those
     for tri_face in sheet.face_df[sheet.face_df['num_sides'] < 4].index:
         remove_face(sheet, tri_face)
@@ -267,6 +275,7 @@ Chosen vertex %i is bound to a single cell, nothing to do''' % vert)
         ei = vert_in_edges[vert_in_edges['face'] == f].index
         sheet.edge_df.loc[ei, 'trgt'] = v
     sheet.reset_topo()
+    sheet.reset_index()
 
     faces = sheet.face_df.loc[neighbor_faces]
     verts = sheet.vert_df.loc[split_verts]
@@ -292,3 +301,14 @@ def resolve_t1s(sheet, geom, model, solver, max_iter=60):
         i += 1
         if i > max_iter:
             break
+
+def _cast_to_int(df_value):
+
+    if len(df_value) == 1:
+        return int(df_value)
+    elif len(df_value) == 0:
+        return -1
+    else:
+        raise ValueError(
+            'Trying to retrieve an integer from '
+            'a more than length 1 df ')
