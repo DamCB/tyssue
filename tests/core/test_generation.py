@@ -4,6 +4,7 @@ from tyssue.core.sheet import Sheet
 from tyssue.generation import hexa_grid3d, from_3d_voronoi
 from tyssue.generation import hexa_grid2d, from_2d_voronoi
 from tyssue.generation import extrude, subdivide_faces
+from tyssue import Epithelium, BulkGeometry, config
 
 from tyssue.core.objects import get_opposite
 
@@ -27,9 +28,15 @@ def test_from_3d_voronoi():
     datasets = from_3d_voronoi(Voronoi(grid))
     assert datasets['vert'].shape[0] == 139
     assert datasets['edge'].shape[0] == 1272
-    assert datasets['face'].shape[0] == 283
-    assert datasets['cell'].shape[0] == 72
-
+    assert datasets['face'].shape[0] == 141
+    assert datasets['cell'].shape[0] == 70
+    bulk = Epithelium('bulk', datasets,
+                      config.geometry.bulk_spec())
+    bulk.reset_index()
+    bulk.reset_topo()
+    BulkGeometry.update_all(bulk)
+    bulk.sanitize()
+    assert bulk.validate()
 
 def test_from_2d_voronoi():
 
@@ -81,7 +88,7 @@ def test_hexagrid3d_noise():
     datasets = from_3d_voronoi(Voronoi(grid))
     assert datasets['vert'].shape[0] == 318
     assert datasets['edge'].shape[0] == 3300
-    assert datasets['face'].shape[0] == 409
+    assert datasets['face'].shape[0] == 335
     assert datasets['cell'].shape[0] == 72
 
 
