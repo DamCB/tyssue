@@ -91,12 +91,13 @@ class Sheet(Epithelium):
 
         return neighbors.reset_index(drop=True).loc[1:]
 
-    def sheet_extract(self, key_word_column, coords=['x', 'y', 'z']):
+    def sheet_extract(self, face_mask, coords=['x', 'y', 'z']):
         """ Extract a new sheet from the embryo sheet
         that correspond to a key word that define a face.
         Parameters
         ----------
         sheet: a :class:Sheet object
+        face_mask : column name in face composed by boolean value
         coords
         Returns
         -------
@@ -108,31 +109,19 @@ class Sheet(Epithelium):
         datasets = {}
 
         datasets['face'] = self.face_df[
-            self.face_df[key_word_column] == True].copy()
+            self.face_df[face_mask] == True].copy()
         datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
             datasets['face'].index)].copy()
-        datasets['vert'] = self.vert_df[self.vert_df['srce_o'].isin(
-            datasets['edge']['srce_o'])].copy()
-
-        # reasign index
-        old_index = list(datasets['vert'].index)
-        datasets['vert'].reset_index(drop=True, inplace=True)
-
-        # Dictionnary creation
-        dic = {}
-        for i in range(len(old_index)):
-            dic[old_index[i]] = datasets['vert'].index[i]
-
-        datasets['edge']['srce'].replace(dic, inplace=True)
-        datasets['edge']['trgt'].replace(dic, inplace=True)
-        datasets['edge']['srce_o'].replace(dic, inplace=True)
-        datasets['edge']['trgt_o'].replace(dic, inplace=True)
+        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()]
 
         subsheet = Sheet('subsheet', datasets, self.specs)
+        subsheet = Sheet('subsheet', datasets, self.specs)
+        subsheet.reset_index()
+        subsheet.reset_topo()
         return (subsheet)
 
 
-    def sheet_extract_coordinate(self, xmin, xmax, ymin, ymax, zmin, zmax,
+    def extract_bounding_box(self, x_boundary = None, y_boundary = None, z_boundary = None,
                                  coords=['x', 'y', 'z']):
         """ Extract a new sheet from the embryo sheet
         that correspond to boundary coordinate
@@ -154,20 +143,25 @@ class Sheet(Epithelium):
         x, y, z = coords
         datasets = {}
 
-        datasets['face'] = self.face_df[(self.face_df['z'] > zmin)
-                                      & (self.face_df['z'] < zmax)].copy()
-
-        datasets['face'] = datasets['face'][(datasets['face']['x'] > xmin)
+        if x_boundary is not None:
+            xmin, xmax = x_boundary
+            datasets['face'] = datasets['face'][(datasets['face']['x'] > xmin)
                                     & (datasets['face']['x'] < xmax)].copy()
 
-        datasets['face'] = datasets['face'][(datasets['face']['y'] > ymin)
+        if y_boundary is not None:
+            ymin, ymax = y_boundary
+            datasets['face'] = datasets['face'][(datasets['face']['y'] > ymin)
                                     & (datasets['face']['y'] < ymax)].copy()
+
+        if z_boundary is not None:
+            zmin, zmax = z_boundary
+            datasets['face'] = self.face_df[(self.face_df['z'] > zmin)
+                                      & (self.face_df['z'] < zmax)].copy()
 
         datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
             datasets['face'].index)].copy()
 
-        datasets['vert'] = self.vert_df[self.vert_df['srce_o'].isin(
-            datasets['edge']['srce_o'])].copy()
+        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()]
 
         # reasign index
         old_index = list(datasets['vert'].index)
