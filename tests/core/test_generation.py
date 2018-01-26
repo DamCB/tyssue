@@ -104,6 +104,13 @@ def test_anchors():
     assert res_srce_trgt_anchors.equals(expected_res)
 
 
+def test_sheet_extract():
+    datasets, specs = generation.three_faces_sheet()
+    sheet = Sheet('test_sheet_extract_coordinate', datasets, specs)
+    subsheet = sheet.sheet_extract('is_alive')
+    assert sheet['face']['is_alive'] == True
+
+
 def test_sheet_extract_coordinate():
     datasets, specs = generation.three_faces_sheet()
     sheet = Sheet('test_sheet_extract_coordinate', datasets, specs)
