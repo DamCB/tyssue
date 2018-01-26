@@ -91,6 +91,102 @@ class Sheet(Epithelium):
 
         return neighbors.reset_index(drop=True).loc[1:]
 
+    def sheet_extract(self, key_word_column, coords=['x', 'y', 'z']):
+        """ Extract a new sheet from the embryo sheet
+        that correspond to a key word that define a face.
+        Parameters
+        ----------
+        sheet: a :class:Sheet object
+        coords
+        Returns
+        -------
+        sheet_fold_patch_extract :
+            subsheet corresponding to the fold patch area.
+
+        """
+        x, y, z = coords
+        datasets = {}
+
+        datasets['face'] = self.face_df[
+            self.face_df[key_word_column] == True].copy()
+        datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
+            datasets['face'].index)].copy()
+        datasets['vert'] = self.vert_df[self.vert_df['srce_o'].isin(
+            datasets['edge']['srce_o'])].copy()
+
+        # reasign index
+        old_index = list(datasets['vert'].index)
+        datasets['vert'].reset_index(drop=True, inplace=True)
+
+        # Dictionnary creation
+        dic = {}
+        for i in range(len(old_index)):
+            dic[old_index[i]] = datasets['vert'].index[i]
+
+        datasets['edge']['srce'].replace(dic, inplace=True)
+        datasets['edge']['trgt'].replace(dic, inplace=True)
+        datasets['edge']['srce_o'].replace(dic, inplace=True)
+        datasets['edge']['trgt_o'].replace(dic, inplace=True)
+
+        subsheet = Sheet('subsheet', datasets, self.specs)
+        return (subsheet)
+
+
+    def sheet_extract_coordinate(self, xmin, xmax, ymin, ymax, zmin, zmax,
+                                 coords=['x', 'y', 'z']):
+        """ Extract a new sheet from the embryo sheet
+        that correspond to boundary coordinate
+        define by the user.
+        Parameters
+        ----------
+        sheet: a :class:Sheet object
+        xmin, xmax : boundary
+        ymin, ymax : boundary
+        zmin, zmax : boundary
+        coords
+
+        Returns
+        -------
+        sheet_extract :
+            subsheet
+
+        """
+        x, y, z = coords
+        datasets = {}
+
+        datasets['face'] = self.face_df[(self.face_df['z'] > zmin)
+                                      & (self.face_df['z'] < zmax)].copy()
+
+        datasets['face'] = datasets['face'][(datasets['face']['x'] > xmin)
+                                    & (datasets['face']['x'] < xmax)].copy()
+
+        datasets['face'] = datasets['face'][(datasets['face']['y'] > ymin)
+                                    & (datasets['face']['y'] < ymax)].copy()
+
+        datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
+            datasets['face'].index)].copy()
+
+        datasets['vert'] = self.vert_df[self.vert_df['srce_o'].isin(
+            datasets['edge']['srce_o'])].copy()
+
+        # reasign index
+        old_index = list(datasets['vert'].index)
+        datasets['vert'].reset_index(drop=True, inplace=True)
+
+        # Dictionnary creation
+        dic = {}
+        for i in range(len(old_index)):
+            dic[old_index[i]] = datasets['vert'].index[i]
+
+        datasets['edge']['srce'].replace(dic, inplace=True)
+        datasets['edge']['trgt'].replace(dic, inplace=True)
+        datasets['edge']['srce_o'].replace(dic, inplace=True)
+        datasets['edge']['trgt_o'].replace(dic, inplace=True)
+
+        sheet_extract = Sheet('sheet_extract', datasets, self.specs)
+        return (sheet_extract)
+
+
     @classmethod
     def planar_sheet_2d(cls, identifier,
                         nx, ny, distx, disty):
@@ -118,3 +214,4 @@ class Sheet(Epithelium):
         return cls(identifier, datasets,
                    specs=flat_sheet(),
                    coords=['x', 'y', 'z'])
+
