@@ -102,3 +102,18 @@ def test_anchors():
 
     res_srce_trgt_anchors = sheet.edge_df.loc[18:, ['srce', 'trgt']]
     assert res_srce_trgt_anchors.equals(expected_res)
+
+
+def test_sheet_extract_coordinate():
+    datasets, specs = generation.three_faces_sheet()
+    sheet = Sheet('test_sheet_extract_coordinate', datasets, specs)
+    subsheet = sheet.sheet_extract_coordinate(
+                        max(sheet['face']['x'])/2, min(sheet['face']['x'])/2,
+                        max(sheet['face']['y'])/2, min(sheet['face']['y'])/2,
+                        max(sheet['face']['z'])/2, min(sheet['face']['z'])/2)
+    assert max(subsheet['face']['x']) <= max(subsheet['face']['x'])/2
+    assert min(subsheet['face']['x']) >= min(subsheet['face']['x'])/2
+    assert max(subsheet['face']['y']) <= max(subsheet['face']['y'])/2
+    assert min(subsheet['face']['y']) >= min(subsheet['face']['y'])/2
+    assert max(subsheet['face']['z']) <= max(subsheet['face']['z'])/2
+    assert min(subsheet['face']['z']) >= min(subsheet['face']['z'])/2
