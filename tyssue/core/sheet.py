@@ -78,8 +78,8 @@ class Sheet(Epithelium):
         # Start with the face so that it's not gathered later
         neighbors = pd.DataFrame.from_dict({'face': [face],
                                             'order': [0]})
-        for k in range(order+1):
-            for neigh in neighbors[neighbors['order'] == k-1]['face']:
+        for k in range(order + 1):
+            for neigh in neighbors[neighbors['order'] == k - 1]['face']:
                 new_neighs = self.get_neighbors(neigh)
                 new_neighs = set(new_neighs).difference(neighbors['face'])
 
@@ -115,14 +115,12 @@ class Sheet(Epithelium):
         datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()]
 
         subsheet = Sheet('subsheet', datasets, self.specs)
-        subsheet = Sheet('subsheet', datasets, self.specs)
         subsheet.reset_index()
         subsheet.reset_topo()
         return (subsheet)
 
-
-    def extract_bounding_box(self, x_boundary = None, y_boundary = None, z_boundary = None,
-                                 coords=['x', 'y', 'z']):
+    def extract_bounding_box(self, x_boundary=None, y_boundary=None,
+                             z_boundary=None, coords=['x', 'y', 'z']):
         """ Extract a new sheet from the embryo sheet
         that correspond to boundary coordinate
         define by the user.
@@ -142,44 +140,35 @@ class Sheet(Epithelium):
         """
         x, y, z = coords
         datasets = {}
+        datasets['face'] = self.face_df.copy()
 
         if x_boundary is not None:
             xmin, xmax = x_boundary
-            datasets['face'] = datasets['face'][(datasets['face']['x'] > xmin)
-                                    & (datasets['face']['x'] < xmax)].copy()
+            datasets['face'] = datasets['face'][
+                (datasets['face']['x'] > xmin) & (datasets['face']['x'] < xmax)
+            ].copy()
 
         if y_boundary is not None:
             ymin, ymax = y_boundary
-            datasets['face'] = datasets['face'][(datasets['face']['y'] > ymin)
-                                    & (datasets['face']['y'] < ymax)].copy()
+            datasets['face'] = datasets['face'][
+                (datasets['face']['y'] > ymin) & (datasets['face']['y'] < ymax)
+            ].copy()
 
         if z_boundary is not None:
             zmin, zmax = z_boundary
-            datasets['face'] = self.face_df[(self.face_df['z'] > zmin)
-                                      & (self.face_df['z'] < zmax)].copy()
+            datasets['face'] = datasets['face'][
+                (datasets['face']['z'] > zmin) & (datasets['face']['z'] < zmax)
+            ].copy()
 
         datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
             datasets['face'].index)].copy()
 
         datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()]
 
-        # reasign index
-        old_index = list(datasets['vert'].index)
-        datasets['vert'].reset_index(drop=True, inplace=True)
-
-        # Dictionnary creation
-        dic = {}
-        for i in range(len(old_index)):
-            dic[old_index[i]] = datasets['vert'].index[i]
-
-        datasets['edge']['srce'].replace(dic, inplace=True)
-        datasets['edge']['trgt'].replace(dic, inplace=True)
-        datasets['edge']['srce_o'].replace(dic, inplace=True)
-        datasets['edge']['trgt_o'].replace(dic, inplace=True)
-
-        sheet_extract = Sheet('sheet_extract', datasets, self.specs)
-        return (sheet_extract)
-
+        subsheet = Sheet('subsheet', datasets, self.specs)
+        subsheet.reset_index()
+        subsheet.reset_topo()
+        return (subsheet)
 
     @classmethod
     def planar_sheet_2d(cls, identifier,
@@ -208,4 +197,3 @@ class Sheet(Epithelium):
         return cls(identifier, datasets,
                    specs=flat_sheet(),
                    coords=['x', 'y', 'z'])
-
