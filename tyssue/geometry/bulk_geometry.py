@@ -73,6 +73,7 @@ class BulkGeometry(SheetGeometry):
         is_outward = proj >= 0
         return is_outward
 
+
 class RNRGeometry(BulkGeometry):
 
     @staticmethod

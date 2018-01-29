@@ -70,7 +70,7 @@ should be either "horizontal" or "vertical", not {}'''.format(orientation))
     if orientation == 'vertical':
         monolayer.face_df.loc[septum, 'segment'] = 'sagittal'
         monolayer.edge_df.loc[septum_edges, 'segment'] = 'sagittal'
-        _assign_vert_segment(monolayer, mother, vertices)
+        _assign_vert_segment(monolayer, vertices)
 
     elif orientation == 'horizontal':
         monolayer.face_df.loc[septum[0], 'segment'] = 'apical'
@@ -84,7 +84,7 @@ should be either "horizontal" or "vertical", not {}'''.format(orientation))
     return daughter
 
 
-def _assign_vert_segment(monolayer, cell, vertices):
+def _assign_vert_segment(monolayer, vertices):
 
     for v in vertices:
         segs = set(monolayer.edge_df[
