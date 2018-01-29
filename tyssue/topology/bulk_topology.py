@@ -156,7 +156,6 @@ def cell_division(eptm, mother, geom, vertices):
             eptm.edge_df.loc[f_edges, 'cell'] = daughter
     eptm.reset_index()
     eptm.reset_topo()
-    #geom.update_all(eptm)
     return daughter
 
 
