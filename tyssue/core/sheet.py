@@ -78,8 +78,8 @@ class Sheet(Epithelium):
         # Start with the face so that it's not gathered later
         neighbors = pd.DataFrame.from_dict({'face': [face],
                                             'order': [0]})
-        for k in range(order+1):
-            for neigh in neighbors[neighbors['order'] == k-1]['face']:
+        for k in range(order + 1):
+            for neigh in neighbors[neighbors['order'] == k - 1]['face']:
                 new_neighs = self.get_neighbors(neigh)
                 new_neighs = set(new_neighs).difference(neighbors['face'])
 
@@ -90,6 +90,85 @@ class Sheet(Epithelium):
                 neighbors = pd.concat([neighbors, new_neighs])
 
         return neighbors.reset_index(drop=True).loc[1:]
+
+    def sheet_extract(self, face_mask, coords=['x', 'y', 'z']):
+        """ Extract a new sheet from the embryo sheet
+        that correspond to a key word that define a face.
+        Parameters
+        ----------
+        sheet: a :class:Sheet object
+        face_mask : column name in face composed by boolean value
+        coords
+        Returns
+        -------
+        sheet_fold_patch_extract :
+            subsheet corresponding to the fold patch area.
+
+        """
+        x, y, z = coords
+        datasets = {}
+
+        datasets['face'] = self.face_df[
+            self.face_df[face_mask] == True].copy()
+        datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
+            datasets['face'].index)].copy()
+        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()]
+
+        subsheet = Sheet('subsheet', datasets, self.specs)
+        subsheet.reset_index()
+        subsheet.reset_topo()
+        return (subsheet)
+
+    def extract_bounding_box(self, x_boundary=None, y_boundary=None,
+                             z_boundary=None, coords=['x', 'y', 'z']):
+        """ Extract a new sheet from the embryo sheet
+        that correspond to boundary coordinate
+        define by the user.
+        Parameters
+        ----------
+        sheet: a :class:Sheet object
+        xmin, xmax : boundary
+        ymin, ymax : boundary
+        zmin, zmax : boundary
+        coords
+
+        Returns
+        -------
+        sheet_extract :
+            subsheet
+
+        """
+        x, y, z = coords
+        datasets = {}
+        datasets['face'] = self.face_df.copy()
+
+        if x_boundary is not None:
+            xmin, xmax = x_boundary
+            datasets['face'] = datasets['face'][
+                (datasets['face']['x'] > xmin) & (datasets['face']['x'] < xmax)
+            ].copy()
+
+        if y_boundary is not None:
+            ymin, ymax = y_boundary
+            datasets['face'] = datasets['face'][
+                (datasets['face']['y'] > ymin) & (datasets['face']['y'] < ymax)
+            ].copy()
+
+        if z_boundary is not None:
+            zmin, zmax = z_boundary
+            datasets['face'] = datasets['face'][
+                (datasets['face']['z'] > zmin) & (datasets['face']['z'] < zmax)
+            ].copy()
+
+        datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
+            datasets['face'].index)].copy()
+
+        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()]
+
+        subsheet = Sheet('subsheet', datasets, self.specs)
+        subsheet.reset_index()
+        subsheet.reset_topo()
+        return (subsheet)
 
     @classmethod
     def planar_sheet_2d(cls, identifier,

@@ -74,7 +74,7 @@ class SheetEvents():
         verts = self.sheet.edge_df[self.sheet.edge_df['face'] ==
                                    self.idx_lookup(face)]['srce'].unique()
         factor = args[0]
-        new_tension = self.sheet.specs['edge']['line_tension'] * factor
+        new_tension = self.sheet.specs['edge']['radial_tension'] * factor
         self.sheet.vert_df.loc[verts, 'radial_tension'] += new_tension
 
     def divide(self, face, *args):

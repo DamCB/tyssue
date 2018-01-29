@@ -102,3 +102,25 @@ def test_anchors():
 
     res_srce_trgt_anchors = sheet.edge_df.loc[18:, ['srce', 'trgt']]
     assert res_srce_trgt_anchors.equals(expected_res)
+
+
+def test_sheet_extract():
+    datasets, specs = generation.three_faces_sheet()
+    sheet = Sheet('test_sheet_extract_coordinate', datasets, specs)
+    subsheet = sheet.sheet_extract('is_alive')
+    assert subsheet.face_df['is_alive'].all() == True
+
+
+def test_sheet_extract_coordinate():
+    grid = hexa_grid2d(6, 4, 3, 3)
+    datasets = from_2d_voronoi(Voronoi(grid))
+    sheet = Sheet('test_extract_bounding_box', datasets)
+    subsheet = sheet.extract_bounding_box(
+                        [sheet.face_df['x'].min(), sheet.face_df['x'].max()/2],
+                        [sheet.face_df['y'].min(), sheet.face_df['y'].max()/2])
+    assert subsheet.face_df['x'].max() <= sheet.face_df['x'].max()/2
+    assert subsheet.face_df['x'].min() >= sheet.face_df['x'].min()
+    assert subsheet.face_df['y'].max() <= sheet.face_df['y'].max()/2
+    assert subsheet.face_df['y'].min() >= sheet.face_df['y'].min()
+    assert subsheet.face_df['z'].max() <= sheet.face_df['z'].max()
+    assert subsheet.face_df['z'].min() >= sheet.face_df['z'].min()
