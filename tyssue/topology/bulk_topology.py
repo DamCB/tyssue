@@ -4,8 +4,10 @@ import numpy as np
 from .sheet_topology import face_division
 from .base_topology import add_vert, close_face
 from ..geometry.utils import rotation_matrix
+from ..geometry.bulk_geometry import BulkGeometry
 from ..core.objects import get_opposite_faces
 from ..utils.decorators import do_undo, validate
+
 
 logger = logging.getLogger(name=__name__)
 
@@ -22,13 +24,17 @@ def get_division_edges(eptm, mother,
 
     n_xy = np.linalg.norm(plane_normal[:2])
     theta = -np.arctan2(n_xy, plane_normal[2])
-    direction = [plane_normal[1], -plane_normal[0], 0]
-    rot = rotation_matrix(theta, direction)
+    if np.linalg.norm(plane_normal[:2]) < 1e-10:
+        rot = None
+    else:
+        direction = [plane_normal[1], -plane_normal[0], 0]
+        rot = rotation_matrix(theta, direction)
     cell_verts = set(eptm.edge_df[eptm.edge_df['cell'] == mother]['srce'])
     vert_pos = eptm.vert_df.loc[cell_verts, eptm.coords]
     for c in eptm.coords:
         vert_pos[c] -= plane_center[c]
-    vert_pos[:] = np.dot(vert_pos, rot)
+    if rot is not None:
+        vert_pos[:] = np.dot(vert_pos, rot)
 
     mother_edges = eptm.edge_df[eptm.edge_df['cell'] == mother]
     srce_z = vert_pos.loc[mother_edges['srce'], 'z']
@@ -46,7 +52,7 @@ def get_division_edges(eptm, mother,
     trgt_pos = vert_pos.loc[division_edges['trgt'],
                             eptm.coords].values
     centers = (srce_pos + trgt_pos)/2
-    theta = np.arctan2(centers[:, 2], centers[:, 1])
+    theta = np.arctan2(centers[:, 1], centers[:, 0])
     return division_edges.iloc[np.argsort(theta)].index
 
 
@@ -140,6 +146,7 @@ def cell_division(eptm, mother, geom, vertices):
     for face in mother_faces:
         if face == septum[0]:
             continue
+
         dr = eptm.face_df.loc[face, eptm.coords] - m_septum_pos
         proj = (dr.values * m_septum_norm).sum(axis=0)
         f_edges = eptm.edge_df[eptm.edge_df['face'] == face].index
@@ -149,6 +156,7 @@ def cell_division(eptm, mother, geom, vertices):
             eptm.edge_df.loc[f_edges, 'cell'] = daughter
     eptm.reset_index()
     eptm.reset_topo()
+    #geom.update_all(eptm)
     return daughter
 
 
