@@ -108,19 +108,19 @@ def test_sheet_extract():
     datasets, specs = generation.three_faces_sheet()
     sheet = Sheet('test_sheet_extract_coordinate', datasets, specs)
     subsheet = sheet.sheet_extract('is_alive')
-    assert sheet['face']['is_alive'] == True
+    assert subsheet.face_df['is_alive'].all() == True
 
 
 def test_sheet_extract_coordinate():
-    datasets, specs = generation.three_faces_sheet()
-    sheet = Sheet('test_sheet_extract_coordinate', datasets, specs)
-    subsheet = sheet.sheet_extract_coordinate(
-                        max(sheet['face']['x'])/2, min(sheet['face']['x'])/2,
-                        max(sheet['face']['y'])/2, min(sheet['face']['y'])/2,
-                        max(sheet['face']['z'])/2, min(sheet['face']['z'])/2)
-    assert max(subsheet['face']['x']) <= max(subsheet['face']['x'])/2
-    assert min(subsheet['face']['x']) >= min(subsheet['face']['x'])/2
-    assert max(subsheet['face']['y']) <= max(subsheet['face']['y'])/2
-    assert min(subsheet['face']['y']) >= min(subsheet['face']['y'])/2
-    assert max(subsheet['face']['z']) <= max(subsheet['face']['z'])/2
-    assert min(subsheet['face']['z']) >= min(subsheet['face']['z'])/2
+    grid = hexa_grid2d(6, 4, 3, 3)
+    datasets = from_2d_voronoi(Voronoi(grid))
+    sheet = Sheet('test_extract_bounding_box', datasets)
+    subsheet = sheet.extract_bounding_box(
+                        [sheet.face_df['x'].min(), sheet.face_df['x'].max()/2],
+                        [sheet.face_df['y'].min(), sheet.face_df['y'].max()/2])
+    assert subsheet.face_df['x'].max() <= sheet.face_df['x'].max()/2
+    assert subsheet.face_df['x'].min() >= sheet.face_df['x'].min()
+    assert subsheet.face_df['y'].max() <= sheet.face_df['y'].max()/2
+    assert subsheet.face_df['y'].min() >= sheet.face_df['y'].min()
+    assert subsheet.face_df['z'].max() <= sheet.face_df['z'].max()
+    assert subsheet.face_df['z'].min() >= sheet.face_df['z'].min()
