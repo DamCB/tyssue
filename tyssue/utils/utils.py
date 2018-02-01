@@ -134,23 +134,3 @@ def scaled_unscaled(func, scale, eptm, geom,
     geom.scale(eptm, 1/scale, coords)
     geom.update_all(eptm)
     return res
-
-
-def edge_modify_original_value(sheet, column, new_value):
-    sheet.edge_df[column] = new_value
-    return (sheet)
-
-
-def vert_modify_original_value(sheet, column, new_value):
-    sheet.vert_df[column] = new_value
-    return (sheet)
-
-
-def face_modify_original_value(sheet, column, new_value):
-    sheet.face_df[column] = new_value
-    return (sheet)
-
-
-def cell_modify_original_value(sheet, column, new_value):
-    sheet.cell_df[column] = new_value
-    return (sheet)
