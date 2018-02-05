@@ -2,8 +2,10 @@ from scipy.spatial import Voronoi
 from tyssue.utils import utils
 from tyssue import Sheet, SheetGeometry
 from tyssue.generation import three_faces_sheet, extrude
+from tyssue.generation import hexa_grid2d, from_2d_voronoi
 from numpy.testing import assert_almost_equal
 from tyssue import Monolayer, config
+from tyssue.topology.base_topology import close_face
 
 
 def test_scaled_unscaled():
@@ -23,8 +25,6 @@ def test_scaled_unscaled():
     assert_almost_equal(sc_area / post_area, 4.)
 
 
-
-
 def test_modify():
 
     datasets, _ = three_faces_sheet()
@@ -34,18 +34,30 @@ def test_modify():
     mono.update_specs(config.dynamics.quasistatic_bulk_spec(),
                       reset=True)
     modifiers = {
-        'apical' : {
+        'apical': {
             'edge': {'line_tension': 1.},
             'face': {'contractility': 0.2},
-            },
-        'basal' : {
+        },
+        'basal': {
             'edge': {'line_tension': 3.},
             'face': {'contractility': 0.1},
-            }
         }
+    }
 
     utils.modify_segments(mono, modifiers)
     assert mono.edge_df.loc[mono.apical_edges,
                             'line_tension'].unique()[0] == 1.
     assert mono.edge_df.loc[mono.basal_edges,
                             'line_tension'].unique()[0] == 3.
+
+
+def test_ar_calculation():
+    sheet = Sheet('test', *three_faces_sheet())
+    e0 = sheet.edge_df.index[0]
+    face = sheet.edge_df.loc[e0, 'face']
+    sheet.edge_df = sheet.edge_df.loc[sheet.edge_df.index[1:]].copy()
+    close_face(sheet, face)
+
+    sheet.face_df['AR'] = utils.ar_calculation(sheet)
+    #print(sheet.face_df['AR'])
+    assert 'AR' in sheet.face_df

@@ -76,9 +76,9 @@ def get_sub_eptm(eptm, edges):
     from ..core.objects import Epithelium
 
     edge_df = eptm.edge_df.loc[edges]
-    vert_df = eptm.vert_df.loc[set(edge_df['srce'])]#.copy()
-    face_df = eptm.face_df.loc[set(edge_df['face'])]#.copy()
-    cell_df = eptm.cell_df.loc[set(edge_df['cell'])]#.copy()
+    vert_df = eptm.vert_df.loc[set(edge_df['srce'])]  # .copy()
+    face_df = eptm.face_df.loc[set(edge_df['face'])]  # .copy()
+    cell_df = eptm.cell_df.loc[set(edge_df['cell'])]  # .copy()
 
     datasets = {'edge': edge_df,
                 'face': face_df,
@@ -131,7 +131,7 @@ def scaled_unscaled(func, scale, eptm, geom,
     geom.scale(eptm, scale, coords)
     geom.update_all(eptm)
     res = func(*args, **kwargs)
-    geom.scale(eptm, 1/scale, coords)
+    geom.scale(eptm, 1 / scale, coords)
     geom.update_all(eptm)
     return res
 
@@ -172,3 +172,39 @@ def modify_segments(eptm, modifiers):
             idx = eptm.segment_index(segment, element)
             for param_name, param_value in parameters.items():
                 eptm.datasets[element].loc[idx, param_name] = param_value
+
+
+def ar_calculation(sheet):
+    """ Calculate the aspect ratio of each fac of the sheet
+
+    Parameters
+    ----------
+    eptm: a :class:Sheet object
+
+    Returns
+    -------
+    AR: pandas series of aspect ratio for all faces.
+
+    """
+    face_vertices = sheet.face_polygons(sheet.coords)
+    ar = []
+    for face_number in range(len(sheet.face_df)):
+        x_value = []
+        z_value = []
+        for i in range(len(face_vertices[face_number])):
+            x_value.append(face_vertices[face_number][i][0])
+            z_value.append(face_vertices[face_number][i][2])
+        x_value = np.array(x_value)
+        z_value = np.array(z_value)
+        major = x_value.ptp()
+        minor = z_value.ptp()
+
+        if major < minor:
+            tmp = major
+            major = minor
+            minor = tmp
+        if minor == 0:
+            ar.append(0)
+        else:
+            ar.append(major / minor)
+    return pd.Series(ar)
