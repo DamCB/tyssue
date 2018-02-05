@@ -72,6 +72,27 @@ def test_t1_transition():
     assert sheet.edge_df.loc[84, 'face'] != face
 
 
+def test_t1_at_border():
+    datasets, specs = three_faces_sheet()
+    sheet = Sheet('3cells_2D', datasets, specs)
+    geom.update_all(sheet)
+    # double half edge with no right cell (aka cell c)
+    type1_transition(sheet, 0, epsilon=0.4)
+    sheet.reset_index()
+    assert sheet.validate()
+    # single half edge with no bottom cell (aka cell d)
+    geom.update_all(sheet)
+    type1_transition(sheet, 16, epsilon=0.5)
+    geom.update_all(sheet)
+    assert sheet.validate()
+    # single half edge with no left cell (aka cell a)
+    geom.update_all(sheet)
+    type1_transition(sheet, 17, epsilon=0.5)
+    geom.update_all(sheet)
+    assert sheet.validate()
+
+
+
 def test_split_vert():
 
     datasets, specs = three_faces_sheet()

@@ -1,6 +1,9 @@
 '''
 Generic forces and energies
 '''
+import pandas as pd
+import numpy as np
+
 from ..utils import to_nd
 from . import units
 
@@ -43,15 +46,15 @@ class AbstractEffector:
 
     @staticmethod
     def energy(eptm):
-        raise NotImplemented
+        raise NotImplementedError
 
     @staticmethod
     def gradient(eptm):
-        raise NotImplemented
+        raise NotImplementedError
 
     @staticmethod
     def get_nrj_norm(specs):
-        raise NotImplemented
+        raise NotImplementedError
 
     @classmethod
     @property
@@ -63,8 +66,9 @@ Works on an `Epithelium` object's {cls.element} elements.
 """
 
 
-
 class LengthElasticity(AbstractEffector):
+    """Elastic half edge
+    """
 
     dimensions = units.line_elasticity
     label = 'Length elasticity'
@@ -86,18 +90,18 @@ class LengthElasticity(AbstractEffector):
     def energy(eptm):
         return elastic_energy(eptm.edge_df,
                               'length',
-                              'length_elasticity * is_active / 2',
+                              'length_elasticity * is_active',
                               'prefered_length')
 
     @staticmethod
     def gradient(eptm):
         kl_l0 = elastic_force(eptm.edge_df,
                               'length',
-                              'length_elasticity * is_active / 2',
+                              'length_elasticity * is_active',
                               'prefered_length')
         grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, eptm.dim)
         grad.columns = ['g'+u for u in eptm.coords]
-        return grad/2, -grad/2
+        return -grad, grad
 
 
 class FaceAreaElasticity(AbstractEffector):
@@ -286,6 +290,7 @@ class CellVolumeElasticity(AbstractEffector):
         return grad_v_srce, grad_v_trgt
 
 
+
 class LineTension(AbstractEffector):
 
     dimensions = units.line_tension
@@ -375,6 +380,7 @@ class LineViscosity(AbstractEffector):
         grad_srce.columns = ['g'+u for u in eptm.coords]
         return grad_srce, None
 
+
 class BorderElasticity(AbstractEffector):
     dimensions = units.line_elasticity
     label = 'Border edges elasticity'
@@ -412,10 +418,6 @@ class BorderElasticity(AbstractEffector):
             prefered='prefered_length')
         grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, eptm.dim)
         grad.columns = ['g'+u for u in eptm.coords]
-        return grad/2, -grad/2
-
-        grad.columns = ['g'+u for u in eptm.coords]
-
         return grad/2, -grad/2
 
 

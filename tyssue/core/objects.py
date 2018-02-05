@@ -260,6 +260,7 @@ class Epithelium:
             return self.cell_df.shape[0]
         elif 'face' in self.data_names:
             return self.face_df.shape[0]
+        return None
 
     @property
     def Nv(self):
@@ -366,6 +367,9 @@ class Epithelium:
 
     def sum_cell(self, df):
         return self._lvl_sum(df, 'cell')
+
+    def get_opposite(self):
+        self.edge_df['opposite'] = get_opposite(self.edge_df)
 
     def get_orbits(self, center, periph):
         """Returns a dataframe with a `(center, edge)` MultiIndex with `periph`

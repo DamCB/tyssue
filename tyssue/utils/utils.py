@@ -134,3 +134,41 @@ def scaled_unscaled(func, scale, eptm, geom,
     geom.scale(eptm, 1/scale, coords)
     geom.update_all(eptm)
     return res
+
+
+def modify_segments(eptm, modifiers):
+    """Modifies the datasets of a segmented epithelium
+    according to the passed modifiers.
+
+    Parameters
+    ----------
+    eptm : :class:`tyssue.Epithelium`
+    modifiers : nested dictionnary
+
+    Note
+    ----
+    This functions assumes that the epithelium has a `segment_index`
+    method as implemented in the :class:`tyssue.Monolayer`.
+
+    Example
+    -------
+    >>> modifiers = {
+    >>>     'apical' : {
+    >>>         'edge': {'line_tension': 1.},
+    >>>         'face': {'prefered_area': 0.2},
+    >>>     },
+    >>>     'basal' : {
+    >>>         'edge': {'line_tension': 3.},
+    >>>         'face': {'prefered_area': 0.1},
+    >>>     }
+    >>> modify_segments(monolayer, modifiers)
+    >>> monolayer.ver_df.loc[monolayer.apical_edges,
+    >>>                      'line_tension'].unique()[0] == 1.
+    True
+    """
+
+    for segment, spec in modifiers.items():
+        for element, parameters in spec.items():
+            idx = eptm.segment_index(segment, element)
+            for param_name, param_value in parameters.items():
+                eptm.datasets[element].loc[idx, param_name] = param_value

@@ -52,7 +52,7 @@ def cell_division(monolayer, mother,
                                             m_apical_face,
                                             SheetGeometry)
         basal_edges = []
-        for ae in apical_edges:
+        for ae in apical_edges[::-1]:
             basal_edges.append(find_basal_edge(monolayer, ae))
         division_edges = list(apical_edges) + basal_edges
         vertices = get_division_vertices(monolayer,
@@ -70,7 +70,7 @@ should be either "horizontal" or "vertical", not {}'''.format(orientation))
     if orientation == 'vertical':
         monolayer.face_df.loc[septum, 'segment'] = 'sagittal'
         monolayer.edge_df.loc[septum_edges, 'segment'] = 'sagittal'
-        _assign_vert_segment(monolayer, mother, vertices)
+        _assign_vert_segment(monolayer, vertices)
 
     elif orientation == 'horizontal':
         monolayer.face_df.loc[septum[0], 'segment'] = 'apical'
@@ -84,7 +84,7 @@ should be either "horizontal" or "vertical", not {}'''.format(orientation))
     return daughter
 
 
-def _assign_vert_segment(monolayer, cell, vertices):
+def _assign_vert_segment(monolayer, vertices):
 
     for v in vertices:
         segs = set(monolayer.edge_df[
