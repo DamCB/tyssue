@@ -47,6 +47,7 @@ def spec_updater(specs, new):
     """
     Add element to the new dictionary to the specs dictionary.
     Update value if the key already exist.
+
     Parameters
     ----------
     specs: specification that will be modified
@@ -76,6 +77,15 @@ def data_at_opposite(sheet, edge_data, free_value=None):
     Returns a pd.DataFrame with the values of the input edge_data
     at the opposite edges. For free edges, optionaly replaces Nan values
     with free_value
+
+    Parameters
+    ----------
+    sheet: a :class:`Sheet` instance
+    edge_data:  dataframe contain value of edge
+
+    Returns
+    -------
+    opposite: pandas series contain value of opposite edge
     """
     if isinstance(edge_data, pd.Series):
         opposite = pd.Series(
@@ -92,6 +102,18 @@ def data_at_opposite(sheet, edge_data, free_value=None):
 
 
 def get_sub_eptm(eptm, edges):
+    """
+    Define sub-epithelium corresponding to the edges.
+
+    Parameters
+    ----------
+    eptm: a :class:`Epithelium` instance
+    edges: list of edges includes in the sub-epithelium
+
+    Returns
+    -------
+    sub_eptm: a :class:`Epithelium` instance
+    """
     from ..core.objects import Epithelium
 
     edge_df = eptm.edge_df.loc[edges]
@@ -122,6 +144,8 @@ def get_sub_eptm(eptm, edges):
 
 def single_cell(eptm, cell):
     """
+    Define epithelium instance for all element to a define cell.
+
     Parameters
     ----------
     eptm: a :class:`Epithelium` instance

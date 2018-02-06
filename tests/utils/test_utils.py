@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from scipy.spatial import Voronoi
 from tyssue.utils import utils
 from tyssue import Sheet, SheetGeometry
@@ -8,6 +9,7 @@ from tyssue.generation import hexa_grid3d, from_3d_voronoi
 from numpy.testing import assert_almost_equal
 from tyssue import Monolayer, config
 from tyssue.topology.base_topology import close_face
+from tyssue.core.objects import get_opposite
 
 
 def test_to_nd():
@@ -28,6 +30,15 @@ def test_spec_updater():
     utils.spec_updater(specs, new_specs)
     print(specs)
     assert specs['face']['geometry'] == new_specs['face']['geometry']
+
+
+def test_data_at_opposite():
+    grid = hexa_grid2d(6, 4, 3, 3)
+    datasets = from_2d_voronoi(Voronoi(grid))
+    sheet = Sheet('test', datasets)
+    sheet.edge_df['opposite'] = get_opposite(sheet.edge_df)
+    opposite = utils.data_at_opposite(sheet, pd.DataFrame(sheet.edge_df.index))
+    assert opposite[0].all() == sheet.edge_df['opposite'].all()
 
 
 def test_single_cell():
