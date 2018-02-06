@@ -227,6 +227,14 @@ def modify_segments(eptm, modifiers):
                 eptm.datasets[element].loc[idx, param_name] = param_value
 
 
+def _compute_ar(df):
+    major = df.x.ptp()
+    minor = df.z.ptp()
+    if major < minor:
+        minor, major = major, minor
+    return 0 if minor == 0 else major / minor
+
+
 def ar_calculation(sheet):
     """ Calculate the aspect ratio of each fac of the sheet
 
@@ -237,27 +245,17 @@ def ar_calculation(sheet):
     Returns
     -------
     AR: pandas series of aspect ratio for all faces.
-
     """
-    face_vertices = sheet.face_polygons(sheet.coords)
-    ar = []
-    for face_number in range(len(sheet.face_df)):
-        x_value = []
-        z_value = []
-        for i in range(len(face_vertices[face_number])):
-            x_value.append(face_vertices[face_number][i][0])
-            z_value.append(face_vertices[face_number][i][2])
-        x_value = np.array(x_value)
-        z_value = np.array(z_value)
-        major = x_value.ptp()
-        minor = z_value.ptp()
+    from ..geometry.sheet_geometry import SheetGeometry
 
-        if major < minor:
-            tmp = major
-            major = minor
-            minor = tmp
-        if minor == 0:
-            ar.append(0)
-        else:
-            ar.append(major / minor)
-    return pd.Series(ar)
+    projected_srce_pos = pd.DataFrame()
+    for face in np.unique(sheet.edge_df['face']):
+        projected_srce_pos = SheetGeometry.face_projected_pos(sheet, face)
+    sheet.vert_df.loc[projected_srce_pos.index, 'x'] = projected_srce_pos['x']
+    sheet.vert_df.loc[projected_srce_pos.index, 'y'] = projected_srce_pos['y']
+    sheet.vert_df.loc[projected_srce_pos.index, 'z'] = projected_srce_pos['z']
+
+    srce_pos = sheet.upcast_srce(
+        sheet.vert_df[sheet.coords])
+    srce_pos['face'] = sheet.edge_df['face']
+    return srce_pos.groupby('face').apply(_compute_ar)
