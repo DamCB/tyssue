@@ -1,8 +1,10 @@
+import numpy as np
 from scipy.spatial import Voronoi
 from tyssue.utils import utils
 from tyssue import Sheet, SheetGeometry
 from tyssue.generation import three_faces_sheet, extrude
 from tyssue.generation import hexa_grid2d, from_2d_voronoi
+from tyssue.generation import hexa_grid3d, from_3d_voronoi
 from numpy.testing import assert_almost_equal
 from tyssue import Monolayer, config
 from tyssue.topology.base_topology import close_face
@@ -11,9 +13,8 @@ from tyssue.topology.base_topology import close_face
 def test_to_nd():
     grid = hexa_grid2d(6, 4, 3, 3)
     datasets = from_2d_voronoi(Voronoi(grid))
-    sheet = Sheet('test_extract_bounding_box', datasets)
+    sheet = Sheet('test', datasets)
     result = utils._to_3d(sheet.face_df['x'])
-
     assert result.shape[1] == 3
 
 
@@ -27,6 +28,14 @@ def test_spec_updater():
     utils.spec_updater(specs, new_specs)
     print(specs)
     assert specs['face']['geometry'] == new_specs['face']['geometry']
+
+
+def test_single_cell():
+    grid = hexa_grid3d(6, 4, 3)
+    datasets = from_3d_voronoi(Voronoi(grid))
+    sheet = Sheet('test', datasets)
+    eptm = utils.single_cell(sheet, 1)
+    assert len(eptm.edge_df) == len(sheet.edge_df[sheet.edge_df['cell'] == 1])
 
 
 def test_scaled_unscaled():

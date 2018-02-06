@@ -121,6 +121,16 @@ def get_sub_eptm(eptm, edges):
 
 
 def single_cell(eptm, cell):
+    """
+    Parameters
+    ----------
+    eptm: a :class:`Epithelium` instance
+    cell: identifier of a cell
+
+    Returns
+    -------
+    sub_etpm: class:'Epithelium' instance corresponding to the cell
+    """
     edges = eptm.edge_df[eptm.edge_df['cell'] == cell].index
     return get_sub_eptm(eptm, edges)
 
