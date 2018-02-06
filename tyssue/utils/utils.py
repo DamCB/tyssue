@@ -6,16 +6,27 @@ logger = logging.getLogger(name=__name__)
 
 
 def _to_2d(df):
-    df_2d = np.asarray(df).repeat(2).reshape((df.size, 2))
+    df_2d = to_nd(df, 2)
     return df_2d
 
 
 def _to_3d(df):
-    df_3d = np.asarray(df).repeat(3).reshape((df.size, 3))
+    df_3d = to_nd(df, 3)
     return df_3d
 
 
 def to_nd(df, ndim):
+    """
+    Give a new shape to an input data by duplicating its column.
+    Parameters
+    ----------
+    df: input data that will be reshape
+    ndim: dimension of the new reshape data.   
+
+    Returns
+    -------
+    df_nd: return array reshaped in ndim.
+    """
     df_nd = np.asarray(df).repeat(ndim).reshape((df.size, ndim))
     return df_nd
 

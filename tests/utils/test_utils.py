@@ -8,6 +8,15 @@ from tyssue import Monolayer, config
 from tyssue.topology.base_topology import close_face
 
 
+def test_to_nd():
+    grid = hexa_grid2d(6, 4, 3, 3) 
+    datasets = from_2d_voronoi(Voronoi(grid)) 
+    sheet = Sheet('test_extract_bounding_box', datasets) 
+    result = utils._to_3d(sheet.face_df['x'])
+
+    assert result.shape[1] == 3
+
+
 def test_scaled_unscaled():
 
     sheet = Sheet('3faces_3D', *three_faces_sheet())
@@ -59,5 +68,4 @@ def test_ar_calculation():
     close_face(sheet, face)
 
     sheet.face_df['AR'] = utils.ar_calculation(sheet)
-    #print(sheet.face_df['AR'])
     assert 'AR' in sheet.face_df
