@@ -9,12 +9,24 @@ from tyssue.topology.base_topology import close_face
 
 
 def test_to_nd():
-    grid = hexa_grid2d(6, 4, 3, 3) 
-    datasets = from_2d_voronoi(Voronoi(grid)) 
-    sheet = Sheet('test_extract_bounding_box', datasets) 
+    grid = hexa_grid2d(6, 4, 3, 3)
+    datasets = from_2d_voronoi(Voronoi(grid))
+    sheet = Sheet('test_extract_bounding_box', datasets)
     result = utils._to_3d(sheet.face_df['x'])
 
     assert result.shape[1] == 3
+
+
+def test_spec_updater():
+    specs = {'face': {'is_active': True,
+                      'height': 4,
+                      'radial_tension': 0.1},
+             'edge': {'x': 2,
+                      'y': 1}}
+    new_specs = {'face': {'geometry': 'ellipsoidal'}}
+    utils.spec_updater(specs, new_specs)
+    print(specs)
+    assert specs['face']['geometry'] == new_specs['face']['geometry']
 
 
 def test_scaled_unscaled():

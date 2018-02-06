@@ -21,7 +21,7 @@ def to_nd(df, ndim):
     Parameters
     ----------
     df: input data that will be reshape
-    ndim: dimension of the new reshape data.   
+    ndim: dimension of the new reshape data.
 
     Returns
     -------
@@ -44,6 +44,14 @@ def combine_specs(*specs):
 
 
 def spec_updater(specs, new):
+    """
+    Add element to the new dictionary to the specs dictionary.
+    Update value if the key already exist.
+    Parameters
+    ----------
+    specs: specification that will be modified
+    new: dictionary of new specification
+    """
     for key, spec in specs.items():
         if new.get(key) is not None:
             spec.update(new[key])
