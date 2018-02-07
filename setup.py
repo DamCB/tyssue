@@ -118,7 +118,7 @@ if __name__ == "__main__":
                      "Operating System :: MacOS",
                      "Operating System :: Microsoft",
                      "Operating System :: POSIX :: Linux",
-                     "Programming Language :: Python :: 3.4",
+                     "Programming Language :: Python :: 3.6",
 #                     "Programming Language :: Python :: Implementation :: CPython",
                      "Topic :: Scientific/Engineering :: Bio-Informatics",
                      "Topic :: Scientific/Engineering :: Medical Science Apps",

@@ -1,9 +1,17 @@
+"""The behviors module defines time tables used to set up series of events.
+
+"""
+
+
 import numpy as np
 import pandas as pd
 
 
 def division_time_table(sheet, mother,
                         events, start_t=0):
+    """Time table for a cell division in 2.5D
+
+    """
 
     n_steps = sheet.settings['growth_steps']
     times = range(start_t,
