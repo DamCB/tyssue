@@ -246,16 +246,6 @@ def ar_calculation(sheet):
     -------
     AR: pandas series of aspect ratio for all faces.
     """
-    from ..geometry.sheet_geometry import SheetGeometry
-
-    projected_srce_pos = pd.DataFrame()
-    for face in np.unique(sheet.edge_df['face']):
-        projected_srce_pos = SheetGeometry.face_projected_pos(sheet, face)
-    sheet.vert_df.loc[projected_srce_pos.index, 'x'] = projected_srce_pos['x']
-    sheet.vert_df.loc[projected_srce_pos.index, 'y'] = projected_srce_pos['y']
-    sheet.vert_df.loc[projected_srce_pos.index, 'z'] = projected_srce_pos['z']
-
-    srce_pos = sheet.upcast_srce(
-        sheet.vert_df[sheet.coords])
+    srce_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
     srce_pos['face'] = sheet.edge_df['face']
     return srce_pos.groupby('face').apply(_compute_ar)

@@ -6,7 +6,7 @@ from tyssue import Sheet, SheetGeometry
 from tyssue.generation import three_faces_sheet, extrude
 from tyssue.generation import hexa_grid2d, from_2d_voronoi
 from tyssue.generation import hexa_grid3d, from_3d_voronoi
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_allclose
 from tyssue import Monolayer, config
 from tyssue.topology.base_topology import close_face
 from tyssue.core.objects import get_opposite
@@ -99,5 +99,9 @@ def test_ar_calculation():
     sheet.edge_df = sheet.edge_df.loc[sheet.edge_df.index[1:]].copy()
     close_face(sheet, face)
 
+    sheet.vert_df['z'] = sheet.vert_df['y']
+    SheetGeometry.update_all(sheet)
     sheet.face_df['AR'] = utils.ar_calculation(sheet)
-    assert 'AR' in sheet.face_df
+    sheet.vert_df['x'] = sheet.vert_df['x'] * 2
+    sheet.face_df['AR2'] = utils.ar_calculation(sheet)
+    assert_allclose(sheet.face_df['AR2'], 2 * sheet.face_df['AR'])
