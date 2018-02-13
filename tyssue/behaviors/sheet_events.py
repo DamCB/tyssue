@@ -34,11 +34,10 @@ class SheetEvents():
             'type3': self.type3,
             'divide': self.divide,
             'ab_pull': self.ab_pull,
-            }
+        }
         return events
 
     def shrink(self, face, *args):
-
         factor = args[0]
         new_vol = self.sheet.specs['face']['prefered_vol'] * factor
         self.sheet.face_df.loc[self.idx_lookup(face),
@@ -74,7 +73,7 @@ class SheetEvents():
         verts = self.sheet.edge_df[self.sheet.edge_df['face'] ==
                                    self.idx_lookup(face)]['srce'].unique()
         factor = args[0]
-        new_tension = self.sheet.specs['edge']['radial_tension'] * factor
+        new_tension = self.sheet.specs['vert']['radial_tension'] * factor
         self.sheet.vert_df.loc[verts, 'radial_tension'] += new_tension
 
     def divide(self, face, *args):

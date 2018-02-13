@@ -217,6 +217,7 @@ class Epithelium:
         self.face_df['num_sides'] = self.edge_df.face.value_counts()
 
     def update_num_faces(self):
+        print ("update_num_faces")
         self.cell_df['num_faces'] = self.edge_df.groupby('cell').apply(
             lambda df: df['face'].unique().size)
 
