@@ -3,7 +3,7 @@ import pandas as pd
 from collections import deque
 
 from ..utils.utils import set_data_columns, spec_updater
-
+from tyssue.utils.decorators import do_undo, validate
 import warnings
 import logging
 log = logging.getLogger(name=__name__)
@@ -216,6 +216,7 @@ class Epithelium:
     def update_num_sides(self):
         self.face_df['num_sides'] = self.edge_df.face.value_counts()
 
+    @do_undo
     def update_num_faces(self):
         print ("update_num_faces")
         self.cell_df['num_faces'] = self.edge_df.groupby('cell').apply(

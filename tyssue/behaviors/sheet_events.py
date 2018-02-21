@@ -49,9 +49,12 @@ class SheetEvents():
     def contract(self, face, *args):
 
         factor = args[0]
-        new_contractility = self.sheet.specs['face']['contractility'] * factor
-        self.sheet.face_df.loc[self.idx_lookup(face),
-                               'contractility'] += new_contractility
+        if self.sheet.face_df.loc[self.idx_lookup(face),
+                                  'area'] > 10**-2:
+            new_contractility = self.sheet.specs[
+                'face']['contractility'] * factor
+            self.sheet.face_df.loc[self.idx_lookup(face),
+                                   'contractility'] += new_contractility
 
     def type1_at_shorter(self, face, *args):
 
