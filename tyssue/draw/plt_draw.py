@@ -14,7 +14,7 @@ from ..utils.utils import spec_updater
 COORDS = ['x', 'y']
 
 
-def sheet_view(sheet, coords=COORDS, ax=None,  **draw_specs_kw):
+def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
     """ Base view function, parametrizable
     through draw_secs
     """

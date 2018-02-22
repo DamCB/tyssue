@@ -401,6 +401,17 @@ class Epithelium:
             lambda df: df[periph])
         return orbits
 
+    def idx_lookup(self, elem_id, element):
+        """returns the current index of the element
+        with the 'id' column equal to elem_id
+        """
+        df = self.datasets[element]['id']
+        idx = df[df==elem_id].index
+        if len(idx):
+            return idx[0]
+        else:
+            return None
+
     def face_polygons(self, coords):
         def _get_verts_pos(face):
             try:

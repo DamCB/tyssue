@@ -13,191 +13,171 @@ from collections import deque
 from ..topology.sheet_topology import (remove_face,
                                        type1_transition,
                                        cell_division)
+from ..geometry.sheet_geometry import SheetGeometry
+
 logger = logging.getLogger(__name__)
 
 
-class SheetEvents():
+def division(sheet, manager, face_id,
+             growth_rate=0.1,
+             critical_vol=2.,
+             geom=SheetGeometry):
+    """Cell division happens through cell growth up to a critical volume,
+    follow by actual division of the face.
+    """
 
-    def __init__(self, sheet, model, geom):
-        self.sheet = sheet
-        self.model = model
-        self.geom = geom
-        self.current_deque = deque()
-        self.next_deque = deque()
+    face = sheet.idx_lookup(face_id, 'face')
+    if face is None:
+        return
+    critical_vol *= sheet.specs['prefered_vol']
+    if sheet.face_df['vol'] < critical_vol:
+        grow(sheet, face, growth_rate)
+        manager.append(division, face_id,
+                       args=(growth_rate, critical_vol, geom))
+    else:
+        daughter = cell_division(sheet, face, geom)
+        sheet.face_df.loc[daughter, 'id'] = sheet.face_df.id.max()+1
 
-    def idx_lookup(self, face_id):
-        return self.sheet.face_df[
-            self.sheet.face_df.id == face_id].index[0]
 
-    @property
-    def events(self):
-        events = {
-            'shrink': self.shrink,
-            'grow': self.grow,
-            'contract': self.contract,
-            'type1_at_shorter': self.type1_at_shorter,
-            'type3': self.type3,
-            'divide': self.divide,
-            'ab_pull': self.ab_pull,
-            'type1_at_shorter_pull': self.type1_at_shorter_pull,
-        }
-        return events
+def apoptosis(sheet, manager, face_id,
+              shrink_rate=0.1,
+              critical_area=1e-2,
+              radial_tension=0.1,
+              contractile_increase=0.1,
+              contract_span=2,
+              geom=SheetGeometry):
+    """Apoptotic behavior
 
-    def add_events(self, face_event):
-        """
-        Add new face with their event.
+    While the cell's apical area is bigger than a threshold, the
+    cell shrinks, and the contractility of its neighbors is increased.
+    once the critical area is reached, the cell is eliminated
+    from the apical surface through successive type 1 transition. Once
+    only three sides are left, the cell is eliminated from the tissue.
 
-        Parameters
-        ----------
-        face_event : list of tuples (face, event)
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    manager : a :class:`EventManager` object
+    face_id : int,
+        the id of the apoptotic cell
+    shrink_rate : float, default 0.1
+        the rate of reduction of the cell's prefered volume
+        e.g. the prefered volume is devided by a factor 1+shrink_rate
+    critical_area : area at which the face is eliminated from the sheet
+    radial_tension : amount of radial tension added at each contraction steps
+    contractile_increase : increase in contractility at the cell neighbors
+    contract_span : number of neighbors affected by the contracitity increase
+    geom : the geometry class used
+    """
 
-        """
+    settings = {'shrink_rate': shrink_rate,
+                'critical_area': critical_area,
+                'radial_tension': radial_tension,
+                'contractile_increase': contractile_increase,
+                'contract_span': contract_span,
+                'geom': geom}
 
-        self.current_deque.extend(face_event)
+    face = sheet.idx_lookup(face_id, 'face')
+    if face is None:
+        return
 
-    def execute_behaviors(self):
-        """
-        Execute event present in current_deque
-        Complete the next deque with the corresponding event for each cell.
-        Replace current_deque by next_deque and clear it.
-        """
-
-        while self.current_deque:
-            (face, event_name) = self.current_deque.popleft()
-            print('face: {}, event: {}'.format(face, event_name))
-            self.events[event_name](face)
-
-        random.shuffle(self.next_deque)
-        self.current_deque = self.next_deque.copy()
-        self.next_deque.clear()
-
-    def contract(self, face):
-        """
-        Contract the face by multiplying the contractility by a factor.
-
-        Parameters
-        ----------
-        face : id face
-        """
-        if face not in self.sheet.face_df['id'].values:
-            return
-        face_line = self.sheet.face_df.loc[self.idx_lookup(face)]
-        settings = self.sheet.settings
-        if face_line['area'] > settings['delamination']['critical_area']:
-            factor = self.sheet.settings[
-                'delamination']['contractile_increase']
-            new_contractility = self.sheet.specs[
-                'face']['contractility'] * factor
-            self.sheet.face_df.loc[self.idx_lookup(face),
-                                   'contractility'] += new_contractility
-
-            self.next_deque.append((face, 'contract'))
+    if sheet.face_df.loc[face, 'area'] > critical_area:
+        # Shrink and pull
+        shrink(sheet, face, shrink_rate)
+        ab_pull(sheet, face, radial_tension)
+        # contract neighbors
+        neighbors = sheet.get_neighborhood(face, contract_span)
+        neighbors['id'] = sheet.face_df.loc[neighbors.face, 'id'].values
+        manager.extend([
+            (contraction, neighbor['id'], (contractile_increase/neighbor['order'],))
+            for _, neighbor in neighbors.iterrows()])
+        done = False
+    else:
+        if sheet.face_df.loc[face, 'num_sides'] > 3:
+            type1_at_shorter(sheet, face, geom)
+            done = False
         else:
-            self.next_deque.append((face, 'type1_at_shorter_pull'))
+            type3(sheet, face, geom)
+            done = True
+    if not done:
+        manager.append(apoptosis, face_id, kwargs=settings)
 
-    def type1_at_shorter_pull(self, face):
-        """
-        Put an apico-basal tension and execute a type1 transition
-        for the minimal edge of the face.
 
-        Parameters
-        ----------
-        face : id face
-        """
-        if face not in self.sheet.face_df['id'].values:
-            return
-        # pull event
-        verts = self.sheet.edge_df[self.sheet.edge_df['face'] ==
-                                   self.idx_lookup(face)]['srce'].unique()
-        factor = self.sheet.settings['delamination']['radial_tension']
-        new_tension = self.sheet.specs['vert']['radial_tension'] * factor
-        self.sheet.vert_df.loc[verts, 'radial_tension'] += new_tension
+def contraction(sheet, manager, face_id,
+                contractile_increase=1.,
+                critical_area=1e-2,
+                max_contractility=10):
+    """Single step contraction event
+    """
+    face = sheet.idx_lookup(face_id, 'face')
+    if face is None:
+        return
+    if ((sheet.face_df.loc[face, 'area'] < critical_area)
+        or (sheet.face_df.loc[face, 'contractility'] > max_contractility)):
+        return
+    contract(sheet, face, contractile_increase)
 
-        # type1 event
-        edges = self.sheet.edge_df[self.sheet.edge_df['face'] ==
-                                   self.idx_lookup(face)]
-        shorter = edges.length.idxmin()
-        type1_transition(self.sheet, shorter)
-        self.geom.update_all(self.sheet)
 
-        if face not in self.sheet.face_df['id'].values:
-            return
-        if self.sheet.face_df.loc[self.idx_lookup(face)]['num_sides'] > 4:
-            self.next_deque.append((face, 'type1_at_shorter_pull'))
+def grow(sheet, face, growth_rate):
+    """Multiplies the equilibrium volume of face face by a
+    a factor (1+growth_rate)
+    """
+    sheet.face_df.loc[face, 'prefered_vol'] *= (1+growth_rate)
 
-    def type1_at_shorter(self, face):
-        """
-        Execute a type1 transition for the minimal edge of the face.
 
-        Parameters
-        ----------
-        face : id face
-        """
-        if face not in self.sheet.face_df['id'].values:
-            return
-        edges = self.sheet.edge_df[self.sheet.edge_df['face'] ==
-                                   self.idx_lookup(face)]
-        shorter = edges.length.idxmin()
-        type1_transition(self.sheet, shorter)
+def shrink(sheet, face, shrink_rate):
+    """Devides the equilibrium volume of face face by a
+    a factor 1+shrink_rate
+    """
+    sheet.face_df.loc[face, 'prefered_vol'] /= (1+shrink_rate)
 
-        self.geom.update_all(self.sheet)
 
-        if face not in self.sheet.face_df['id'].values:
-            return
-        if self.sheet.face_df.loc[self.idx_lookup(face)]['num_sides'] > 4:
-            self.next_deque.append((face, 'type1_at_shorter'))
+def type1_at_shorter(sheet, face, geom):
+    """
+    Execute a type1 transition on the shorter edge of a face.
 
-    def type3(self, face, *args):
-        """
-        Execute a type3 transition by removing the face when it has 3 edges.
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of the face
+    geom : a Geometry class
+    """
+    edges = sheet.edge_df[sheet.edge_df['face'] == face]
+    shorter = edges.length.idxmin()
+    type1_transition(sheet, shorter)
+    geom.update_all(sheet)
 
-        Parameters
-        ----------
-        face : id face
-        """
-        if face not in self.sheet.face_df['id'].values:
-            return
-        try:
-            if self.sheet.face_df.loc[self.idx_lookup(face)]['num_sides'] == 3:
-                remove_face(self.sheet, face)
-                self.geom.update_all(self.sheet)
-            elif self.sheet.face_df.loc[self.idx_lookup(face)]['num_sides'] > 3:
-                self.events['type1_at_shorter'](face)
-                #self.next_deque.append((face, 'type3'))
-        except ValueError:
-            print(
-                'failed: face: {}, error: {Try to remove face with less \
-                            than 3 faces}'.format(face))
-            raise ValueError
 
-    def shrink(self, face, *args):
-        warnings.simplefilter("always")
-        warnings.warn("La fonction shrink n'est pas a jour avec \
-                            collections.deque.", DeprecationWarning)
+def type3(sheet, face, geom):
+    """Removes the face and updates the geometry
 
-        factor = args[0]
-        new_vol = self.sheet.specs['face']['prefered_vol'] * factor
-        self.sheet.face_df.loc[self.idx_lookup(face),
-                               'prefered_vol'] = new_vol
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of the face
+    geom : a Geometry class
 
-    def grow(self, face, *args):
-        warnings.simplefilter("always")
-        warnings.warn("La fonction shrink n'est pas a jour avec \
-                            collections.deque.", DeprecationWarning)
-        self.shrink(face, *args)
+    """
+    remove_face(sheet, face)
+    geom.update_all(sheet)
 
-    def ab_pull(self, face, *args):
-        warnings.simplefilter("always")
-        warnings.warn("La fonction shrink n'est pas a jour avec \
-                            collections.deque.", DeprecationWarning)
-        verts = self.sheet.edge_df[self.sheet.edge_df['face'] ==
-                                   self.idx_lookup(face)]['srce'].unique()
-        factor = args[0]
-        new_tension = self.sheet.specs['vert']['radial_tension'] * factor
-        self.sheet.vert_df.loc[verts, 'radial_tension'] += new_tension
 
-    def divide(self, face, *args):
-        warnings.simplefilter("always")
-        warnings.warn("La fonction shrink n'est pas a jour avec \
-                            collections.deque.", DeprecationWarning)
-        cell_division(self.sheet, self.idx_lookup(face), self.geom, *args)
+def contract(sheet, face, contractile_increase):
+    """
+    Contract the face by increasing the 'contractility' parameter
+    by contractile_increase
+
+    Parameters
+    ----------
+    face : id face
+
+    """
+    new_contractility = contractile_increase
+    sheet.face_df.loc[face, 'contractility'] += new_contractility
+
+
+def ab_pull(sheet, face, radial_tension):
+    """ Adds radial_tension to the face's vertices radial_tension
+    """
+    verts = sheet.edge_df[sheet.edge_df['face'] == face]['srce'].unique()
+    sheet.vert_df.loc[verts, 'radial_tension'] += radial_tension

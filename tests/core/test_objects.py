@@ -23,6 +23,13 @@ def test_3faces():
     assert (eptm.Nc, eptm.Nv, eptm.Ne) == (3, 13, 18)
 
 
+def test_idx_lookup():
+    datasets, specs = three_faces_sheet()
+    eptm = Epithelium('3faces_2D', datasets, specs)
+    eptm.face_df['id'] = eptm.face_df.index.values
+    assert eptm.idx_lookup(1, 'face') == 1
+
+
 def test_triangular_mesh():
     datasets, specs = three_faces_sheet()
     eptm = Epithelium('3faces_2D', datasets, specs)
