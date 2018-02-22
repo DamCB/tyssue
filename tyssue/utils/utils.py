@@ -227,25 +227,33 @@ def modify_segments(eptm, modifiers):
                 eptm.datasets[element].loc[idx, param_name] = param_value
 
 
-def _compute_ar(df):
-    major = df.x.ptp()
-    minor = df.z.ptp()
+def _compute_ar(df, coords):
+    u, v = coords
+    major = df[u].ptp()
+    minor = df[v].ptp()
     if major < minor:
         minor, major = major, minor
     return 0 if minor == 0 else major / minor
 
 
-def ar_calculation(sheet):
-    """ Calculate the aspect ratio of each fac of the sheet
+def ar_calculation(sheet, coords=['x', 'y']):
+    """ Calculates the aspect ratio of each face of the sheet
 
     Parameters
     ----------
-    eptm: a :class:Sheet object
+    eptm : a :class:`Sheet` object
+    coords : list of str, optional, default ['x', 'y']
+      the coordinates on which to compute the aspect ratio
 
     Returns
     -------
     AR: pandas series of aspect ratio for all faces.
+
+    Note
+    ----
+    As is the case in ImageJ, the returned aspect ratio is always higher than 1
+
     """
     srce_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
     srce_pos['face'] = sheet.edge_df['face']
-    return srce_pos.groupby('face').apply(_compute_ar)
+    return srce_pos.groupby('face').apply(_compute_ar, coords)

@@ -94,14 +94,8 @@ def test_modify():
 
 def test_ar_calculation():
     sheet = Sheet('test', *three_faces_sheet())
-    e0 = sheet.edge_df.index[0]
-    face = sheet.edge_df.loc[e0, 'face']
-    sheet.edge_df = sheet.edge_df.loc[sheet.edge_df.index[1:]].copy()
-    close_face(sheet, face)
-
-    sheet.vert_df['z'] = sheet.vert_df['y']
     SheetGeometry.update_all(sheet)
-    sheet.face_df['AR'] = utils.ar_calculation(sheet)
+    sheet.face_df['AR'] = utils.ar_calculation(sheet, coords=['x', 'y'])
     sheet.vert_df['x'] = sheet.vert_df['x'] * 2
-    sheet.face_df['AR2'] = utils.ar_calculation(sheet)
+    sheet.face_df['AR2'] = utils.ar_calculation(sheet, coords=['x', 'y'])
     assert_allclose(sheet.face_df['AR2'], 2 * sheet.face_df['AR'])
