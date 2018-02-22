@@ -566,11 +566,14 @@ class Epithelium:
         the cells and faces containing those edges
         """
         top_level = self.element_names[-1]
-        log.info('Removing cells at the {} level'.format(top_level))
+        log.info('Removing cells at the %s level', top_level)
         fto_rm = self.edge_df.loc[edge_out, top_level].unique()
-        if not len(fto_rm):
+        if not fto_rm.shape[0]:
             log.info('Nothing to remove')
             return
+        if fto_rm.shape[0] == self.datasets[top_level].shape[0]:
+            raise ValueError('sanitize would delete the whole epithlium')
+
         fto_rm.sort()
         log.info('{} {} level elements will be removed'.format(len(fto_rm),
                                                                top_level))
@@ -797,6 +800,43 @@ def get_opposite_faces(eptm):
     face_pairs = np.array(face_pairs)
     eptm.face_df.loc[face_pairs[:, 0], 'opposite'] = face_pairs[:, 1]
     eptm.face_df.loc[face_pairs[:, 1], 'opposite'] = face_pairs[:, 0]
+
+
+def _next_edge(edf):
+
+    edf['edge'] = edf.index
+    next_edge = edf.set_index(
+        'srce', append=False).loc[
+            edf['trgt'], 'edge'].values
+    return pd.Series(index=edf.index, data=next_edge)
+
+def _prev_edge(edf):
+
+    edf['edge'] = edf.index
+    next_edge = edf.set_index(
+        'trgt', append=False).loc[
+            edf['srce'], 'edge'].values
+    return pd.Series(index=edf.index, data=next_edge)
+
+
+def get_next_edges(sheet):
+    '''
+    returns a pd.Series with the index of the next
+    edge for each edge
+    '''
+    next_e = sheet.edge_df.groupby('face').apply(_next_edge)
+    next_e.index = next_e.index.droplevel('face')
+    return next_e.sort_index()
+
+
+def get_prev_edges(sheet):
+    '''
+    returns a pd.Series with the index of the next
+    edge for each edge
+    '''
+    prev_e = sheet.edge_df.groupby('face').apply(_prev_edge)
+    prev_e.index = prev_e.index.droplevel('face')
+    return prev_e.sort_index()
 
 
 def _is_closed_cell(e_df):
