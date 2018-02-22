@@ -1,3 +1,6 @@
+import time
+
+
 def do_undo(func):
     """Decorator that creates a copy of the first argument
     (usually an epithelium object) and restores it if the function fails.
@@ -8,11 +11,13 @@ def do_undo(func):
         eptm = args[0]
         eptm.backup()
         try:
-            return func(*args, **kwargs)
+            res = func(*args, **kwargs)
+            return res
         except Exception as err:
             eptm.restore()
             raise err
     return with_bckup
+
 
 def validate(func):
     """Decorator that validate the epithelium after the
@@ -39,3 +44,17 @@ invalid epithelium as the `_bad` attribute of the restored one''')
 
         return result
     return with_validate
+
+
+def time_exe(func):
+
+    def with_time_exe(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+
+        print('function : {} \ttime: {2:2f}sec'.format(
+            func.__name__, end - start))
+        return result
+
+    return with_time_exe
