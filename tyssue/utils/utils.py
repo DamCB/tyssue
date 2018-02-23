@@ -6,16 +6,27 @@ logger = logging.getLogger(name=__name__)
 
 
 def _to_2d(df):
-    df_2d = np.asarray(df).repeat(2).reshape((df.size, 2))
+    df_2d = to_nd(df, 2)
     return df_2d
 
 
 def _to_3d(df):
-    df_3d = np.asarray(df).repeat(3).reshape((df.size, 3))
+    df_3d = to_nd(df, 3)
     return df_3d
 
 
 def to_nd(df, ndim):
+    """
+    Give a new shape to an input data by duplicating its column.
+    Parameters
+    ----------
+    df: input data that will be reshape
+    ndim: dimension of the new reshape data.
+
+    Returns
+    -------
+    df_nd: return array reshaped in ndim.
+    """
     df_nd = np.asarray(df).repeat(ndim).reshape((df.size, ndim))
     return df_nd
 
@@ -33,6 +44,15 @@ def combine_specs(*specs):
 
 
 def spec_updater(specs, new):
+    """
+    Add element to the new dictionary to the specs dictionary.
+    Update value if the key already exist.
+
+    Parameters
+    ----------
+    specs: specification that will be modified
+    new: dictionary of new specification
+    """
     for key, spec in specs.items():
         if new.get(key) is not None:
             spec.update(new[key])
@@ -57,6 +77,15 @@ def data_at_opposite(sheet, edge_data, free_value=None):
     Returns a pd.DataFrame with the values of the input edge_data
     at the opposite edges. For free edges, optionaly replaces Nan values
     with free_value
+
+    Parameters
+    ----------
+    sheet: a :class:`Sheet` instance
+    edge_data:  dataframe contain value of edge
+
+    Returns
+    -------
+    opposite: pandas series contain value of opposite edge
     """
     if isinstance(edge_data, pd.Series):
         opposite = pd.Series(
@@ -73,12 +102,24 @@ def data_at_opposite(sheet, edge_data, free_value=None):
 
 
 def get_sub_eptm(eptm, edges):
+    """
+    Define sub-epithelium corresponding to the edges.
+
+    Parameters
+    ----------
+    eptm: a :class:`Epithelium` instance
+    edges: list of edges includes in the sub-epithelium
+
+    Returns
+    -------
+    sub_eptm: a :class:`Epithelium` instance
+    """
     from ..core.objects import Epithelium
 
     edge_df = eptm.edge_df.loc[edges]
-    vert_df = eptm.vert_df.loc[set(edge_df['srce'])]#.copy()
-    face_df = eptm.face_df.loc[set(edge_df['face'])]#.copy()
-    cell_df = eptm.cell_df.loc[set(edge_df['cell'])]#.copy()
+    vert_df = eptm.vert_df.loc[set(edge_df['srce'])]  # .copy()
+    face_df = eptm.face_df.loc[set(edge_df['face'])]  # .copy()
+    cell_df = eptm.cell_df.loc[set(edge_df['cell'])]  # .copy()
 
     datasets = {'edge': edge_df,
                 'face': face_df,
@@ -102,6 +143,18 @@ def get_sub_eptm(eptm, edges):
 
 
 def single_cell(eptm, cell):
+    """
+    Define epithelium instance for all element to a define cell.
+
+    Parameters
+    ----------
+    eptm: a :class:`Epithelium` instance
+    cell: identifier of a cell
+
+    Returns
+    -------
+    sub_etpm: class:'Epithelium' instance corresponding to the cell
+    """
     edges = eptm.edge_df[eptm.edge_df['cell'] == cell].index
     return get_sub_eptm(eptm, edges)
 
@@ -131,7 +184,7 @@ def scaled_unscaled(func, scale, eptm, geom,
     geom.scale(eptm, scale, coords)
     geom.update_all(eptm)
     res = func(*args, **kwargs)
-    geom.scale(eptm, 1/scale, coords)
+    geom.scale(eptm, 1 / scale, coords)
     geom.update_all(eptm)
     return res
 
@@ -172,3 +225,35 @@ def modify_segments(eptm, modifiers):
             idx = eptm.segment_index(segment, element)
             for param_name, param_value in parameters.items():
                 eptm.datasets[element].loc[idx, param_name] = param_value
+
+
+def _compute_ar(df, coords):
+    u, v = coords
+    major = df[u].ptp()
+    minor = df[v].ptp()
+    if major < minor:
+        minor, major = major, minor
+    return 0 if minor == 0 else major / minor
+
+
+def ar_calculation(sheet, coords=['x', 'y']):
+    """ Calculates the aspect ratio of each face of the sheet
+
+    Parameters
+    ----------
+    eptm : a :class:`Sheet` object
+    coords : list of str, optional, default ['x', 'y']
+      the coordinates on which to compute the aspect ratio
+
+    Returns
+    -------
+    AR: pandas series of aspect ratio for all faces.
+
+    Note
+    ----
+    As is the case in ImageJ, the returned aspect ratio is always higher than 1
+
+    """
+    srce_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
+    srce_pos['face'] = sheet.edge_df['face']
+    return srce_pos.groupby('face').apply(_compute_ar, coords)

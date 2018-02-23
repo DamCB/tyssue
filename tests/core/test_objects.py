@@ -5,6 +5,7 @@ from numpy.testing import assert_array_equal
 from tyssue.core import Epithelium
 from tyssue.generation import three_faces_sheet
 from tyssue.core.objects import get_opposite, _ordered_edges, ordered_vert_idxs
+from tyssue.core.objects import get_next_edges, get_prev_edges
 from tyssue import config
 from tyssue.geometry.planar_geometry import PlanarGeometry
 from tyssue.geometry.sheet_geometry import SheetGeometry
@@ -13,11 +14,20 @@ from tyssue.config.dynamics import quasistatic_sheet_spec
 from tyssue.config.geometry import spherical_sheet
 from pytest import raises
 
+
+
 def test_3faces():
 
     datasets, specs = three_faces_sheet()
     eptm = Epithelium('3faces_2D', datasets, specs)
     assert (eptm.Nc, eptm.Nv, eptm.Ne) == (3, 13, 18)
+
+
+def test_idx_lookup():
+    datasets, specs = three_faces_sheet()
+    eptm = Epithelium('3faces_2D', datasets, specs)
+    eptm.face_df['id'] = eptm.face_df.index.values
+    assert eptm.idx_lookup(1, 'face') == 1
 
 
 def test_triangular_mesh():
@@ -769,3 +779,23 @@ def test_ordered_edges():
     ## testing the exception case in ordered_vert_idxs :
     res_invalid_face = ordered_vert_idxs(eptm.edge_df.loc[eptm.edge_df['face'] == 98765])
     assert np.isnan(res_invalid_face)
+
+
+
+def test_get_prev_edges():
+
+    tri_face = Epithelium('3', *three_faces_sheet())
+    prev = get_prev_edges(tri_face).values
+    expected = np.array([ 5,  0,  1,  2,  3,  4,
+                         11,  6,  7,  8,  9, 10,
+                         17, 12, 13, 14, 15, 16])
+    assert_array_equal(prev, expected)
+
+def test_get_next_edges():
+
+    tri_face = Epithelium('3', *three_faces_sheet())
+    prev = get_next_edges(tri_face).values
+    expected = np.array([ 1,  2,  3,  4,  5,  0,
+                         7,  8,  9, 10, 11,  6,
+                         13, 14, 15, 16, 17, 12])
+    assert_array_equal(prev, expected)

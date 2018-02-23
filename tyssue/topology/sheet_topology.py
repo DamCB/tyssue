@@ -2,10 +2,11 @@ import logging
 import numpy as np
 
 from .base_topology import add_vert
-
+from tyssue.utils.decorators import do_undo, validate
 logger = logging.getLogger(name=__name__)
 
 
+@do_undo
 def type1_transition(sheet, edge01, epsilon=0.1, remove_tri_faces=True):
     """Performs a type 1 transition around the edge edge01
 
@@ -33,7 +34,6 @@ type 1 transition is not allowed''' % face_b)
 
     edge10_ = sheet.edge_df[(sheet.edge_df['srce'] == vert1) &
                             (sheet.edge_df['trgt'] == vert0)]
-
     if not len(edge10_.index):
         # edge01 is at a border, we need to add the opposite
         # half edge
@@ -50,7 +50,6 @@ type 1 transition is not allowed''' % face_b)
         logger.warning('''Face %s has 3 sides,
         type 1 transition is not allowed''' % face_d)
         return face_d
-
     edge20_ = sheet.edge_df[(sheet.edge_df['trgt'] == vert0) &
                             (sheet.edge_df['face'] == face_b)]
     edge20 = edge20_.index
@@ -99,12 +98,10 @@ type 1 transition is not allowed''' % face_b)
         raise ValueError('Edge has no neighbour around vertex %d',
                          vert0)
 
-
-    print('faces a, b, c, d')
-    print(face_a, face_b, face_c, face_d)
-    print('vertices 0, 1, 2, 3, 5')
-    print(vert0, vert1, vert2, vert3, vert5)
-
+    logger.debug('faces a, b, c, d')
+    logger.debug(face_a, face_b, face_c, face_d)
+    logger.debug('vertices 0, 1, 2, 3, 5')
+    logger.debug(vert0, vert1, vert2, vert3, vert5)
 
     # Perform the rearangements
     sheet.edge_df.loc[edge01, 'face'] = face_c
@@ -136,8 +133,11 @@ type 1 transition is not allowed''' % face_b)
     if not remove_tri_faces:
         return 0
     # Type 1 transitions might create 3 or 2 sided cells, we remove those
-    for tri_face in sheet.face_df[sheet.face_df['num_sides'] < 4].index:
-        remove_face(sheet, tri_face)
+    tri_faces = sheet.face_df[sheet.face_df['num_sides'] < 4].index
+    while len(tri_faces):
+        remove_face(sheet, tri_faces[0])
+        tri_faces = sheet.face_df[sheet.face_df['num_sides'] < 4].index
+
     return 0
 
 
@@ -260,9 +260,9 @@ def remove_face(sheet, face):
                                   sheet.edge_df['trgt']]
 
     sheet.edge_df = sheet.edge_df[sheet.edge_df['face'] != face].copy()
-    # fidx = sheet.face_df.index.delete(face)
-    sheet.face_df.loc[face] = np.nan
-    sheet.face_df.loc[face, 'is_alive'] = 0
+
+    fidx = sheet.face_df.index.delete(face)
+    sheet.face_df = sheet.face_df.loc[fidx].copy()
 
     logger.info('removed {} of {} vertices '
                 .format(len(verts), sheet.vert_df.shape[0]))
@@ -319,7 +319,7 @@ Chosen vertex %i is bound to a single cell, nothing to do''' % vert)
     faces = sheet.face_df.loc[neighbor_faces]
     verts = sheet.vert_df.loc[split_verts]
     dr = -verts[sheet.coords] + faces[sheet.coords].values
-    sheet.vert_df.loc[split_verts, sheet.coords] += dr*epsilon
+    sheet.vert_df.loc[split_verts, sheet.coords] += dr * epsilon
 
 
 def resolve_t1s(sheet, geom, model, solver, max_iter=60):
@@ -340,6 +340,7 @@ def resolve_t1s(sheet, geom, model, solver, max_iter=60):
         i += 1
         if i > max_iter:
             break
+
 
 def _cast_to_int(df_value):
 

@@ -7,75 +7,177 @@ Event management module
 
 import logging
 import pandas as pd
+import warnings
+import random
+from collections import deque
 from ..topology.sheet_topology import (remove_face,
                                        type1_transition,
                                        cell_division)
+from ..geometry.sheet_geometry import SheetGeometry
+
 logger = logging.getLogger(__name__)
 
 
-class SheetEvents():
+def division(sheet, manager, face_id,
+             growth_rate=0.1,
+             critical_vol=2.,
+             geom=SheetGeometry):
+    """Cell division happens through cell growth up to a critical volume,
+    follow by actual division of the face.
+    """
 
-    def __init__(self, sheet, model, geom):
-        self.sheet = sheet
-        self.model = model
-        self.geom = geom
+    face = sheet.idx_lookup(face_id, 'face')
+    if face is None:
+        return
+    critical_vol *= sheet.specs['prefered_vol']
+    if sheet.face_df['vol'] < critical_vol:
+        grow(sheet, face, growth_rate)
+        manager.append(division, face_id,
+                       args=(growth_rate, critical_vol, geom))
+    else:
+        daughter = cell_division(sheet, face, geom)
+        sheet.face_df.loc[daughter, 'id'] = sheet.face_df.id.max()+1
 
-    def idx_lookup(self, face_id):
-        return self.sheet.face_df[
-            self.sheet.face_df.id == face_id].index[0]
 
-    @property
-    def events(self):
-        events = {
-            'shrink': self.shrink,
-            'grow': self.grow,
-            'contract': self.contract,
-            'type1_at_shorter': self.type1_at_shorter,
-            'type3': self.type3,
-            'divide': self.divide,
-            'ab_pull': self.ab_pull,
-            }
-        return events
+def apoptosis(sheet, manager, face_id,
+              shrink_rate=0.1,
+              critical_area=1e-2,
+              radial_tension=0.1,
+              contractile_increase=0.1,
+              contract_span=2,
+              geom=SheetGeometry):
+    """Apoptotic behavior
 
-    def shrink(self, face, *args):
+    While the cell's apical area is bigger than a threshold, the
+    cell shrinks, and the contractility of its neighbors is increased.
+    once the critical area is reached, the cell is eliminated
+    from the apical surface through successive type 1 transition. Once
+    only three sides are left, the cell is eliminated from the tissue.
 
-        factor = args[0]
-        new_vol = self.sheet.specs['face']['prefered_vol'] * factor
-        self.sheet.face_df.loc[self.idx_lookup(face),
-                               'prefered_vol'] = new_vol
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    manager : a :class:`EventManager` object
+    face_id : int,
+        the id of the apoptotic cell
+    shrink_rate : float, default 0.1
+        the rate of reduction of the cell's prefered volume
+        e.g. the prefered volume is devided by a factor 1+shrink_rate
+    critical_area : area at which the face is eliminated from the sheet
+    radial_tension : amount of radial tension added at each contraction steps
+    contractile_increase : increase in contractility at the cell neighbors
+    contract_span : number of neighbors affected by the contracitity increase
+    geom : the geometry class used
+    """
 
-    def grow(self, face, *args):
-        self.shrink(face, *args)
+    settings = {'shrink_rate': shrink_rate,
+                'critical_area': critical_area,
+                'radial_tension': radial_tension,
+                'contractile_increase': contractile_increase,
+                'contract_span': contract_span,
+                'geom': geom}
 
-    def contract(self, face, *args):
+    face = sheet.idx_lookup(face_id, 'face')
+    if face is None:
+        return
 
-        factor = args[0]
-        new_contractility = self.sheet.specs['face']['contractility'] * factor
-        self.sheet.face_df.loc[self.idx_lookup(face),
-                               'contractility'] += new_contractility
+    if sheet.face_df.loc[face, 'area'] > critical_area:
+        # Shrink and pull
+        shrink(sheet, face, shrink_rate)
+        ab_pull(sheet, face, radial_tension)
+        # contract neighbors
+        neighbors = sheet.get_neighborhood(face, contract_span).dropna()
+        neighbors['id'] = sheet.face_df.loc[neighbors.face, 'id'].values
+        manager.extend([
+            (contraction, neighbor['id'], (contractile_increase/neighbor['order'],))
+            for _, neighbor in neighbors.iterrows()])
+        done = False
+    else:
+        if sheet.face_df.loc[face, 'num_sides'] > 3:
+            type1_at_shorter(sheet, face, geom)
+            done = False
+        else:
+            type3(sheet, face, geom)
+            done = True
+    if not done:
+        manager.append(apoptosis, face_id, kwargs=settings)
 
-    def type1_at_shorter(self, face, *args):
 
-        edges = self.sheet.edge_df[self.sheet.edge_df['face'] ==
-                                   self.idx_lookup(face)]
-        shorter = edges.length.idxmin()
-        type1_transition(self.sheet, shorter)
+def contraction(sheet, manager, face_id,
+                contractile_increase=1.,
+                critical_area=1e-2,
+                max_contractility=10):
+    """Single step contraction event
+    """
+    face = sheet.idx_lookup(face_id, 'face')
+    if face is None:
+        return
+    if ((sheet.face_df.loc[face, 'area'] < critical_area)
+        or (sheet.face_df.loc[face, 'contractility'] > max_contractility)):
+        return
+    contract(sheet, face, contractile_increase)
 
-        self.geom.update_all(self.sheet)
 
-    def type3(self, face, *args):
-        if face not in self.sheet.face_df.index:
-            return
-        remove_face(self.sheet, face)
-        self.geom.update_all(self.sheet)
+def grow(sheet, face, growth_rate):
+    """Multiplies the equilibrium volume of face face by a
+    a factor (1+growth_rate)
+    """
+    sheet.face_df.loc[face, 'prefered_vol'] *= (1+growth_rate)
 
-    def ab_pull(self, face, *args):
 
-        verts = self.sheet.edge_df[self.sheet.edge_df['face'] ==
-                                   self.idx_lookup(face)]['srce'].unique()
-        factor = args[0]
-        new_tension = self.sheet.specs['edge']['radial_tension'] * factor
-        self.sheet.vert_df.loc[verts, 'radial_tension'] += new_tension
+def shrink(sheet, face, shrink_rate):
+    """Devides the equilibrium volume of face face by a
+    a factor 1+shrink_rate
+    """
+    sheet.face_df.loc[face, 'prefered_vol'] /= (1+shrink_rate)
 
-    def divide(self, face, *args):
-        cell_division(self.sheet, self.idx_lookup(face), self.geom, *args)
+
+def type1_at_shorter(sheet, face, geom):
+    """
+    Execute a type1 transition on the shorter edge of a face.
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of the face
+    geom : a Geometry class
+    """
+    edges = sheet.edge_df[sheet.edge_df['face'] == face]
+    shorter = edges.length.idxmin()
+    type1_transition(sheet, shorter)
+    geom.update_all(sheet)
+
+
+def type3(sheet, face, geom):
+    """Removes the face and updates the geometry
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of the face
+    geom : a Geometry class
+
+    """
+    remove_face(sheet, face)
+    geom.update_all(sheet)
+
+
+def contract(sheet, face, contractile_increase):
+    """
+    Contract the face by increasing the 'contractility' parameter
+    by contractile_increase
+
+    Parameters
+    ----------
+    face : id face
+
+    """
+    new_contractility = contractile_increase
+    sheet.face_df.loc[face, 'contractility'] += new_contractility
+
+
+def ab_pull(sheet, face, radial_tension):
+    """ Adds radial_tension to the face's vertices radial_tension
+    """
+    verts = sheet.edge_df[sheet.edge_df['face'] == face]['srce'].unique()
+    sheet.vert_df.loc[verts, 'radial_tension'] += radial_tension
