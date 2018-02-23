@@ -86,7 +86,7 @@ def apoptosis(sheet, manager, face_id,
         shrink(sheet, face, shrink_rate)
         ab_pull(sheet, face, radial_tension)
         # contract neighbors
-        neighbors = sheet.get_neighborhood(face, contract_span)
+        neighbors = sheet.get_neighborhood(face, contract_span).dropna()
         neighbors['id'] = sheet.face_df.loc[neighbors.face, 'id'].values
         manager.extend([
             (contraction, neighbor['id'], (contractile_increase/neighbor['order'],))

@@ -98,10 +98,10 @@ type 1 transition is not allowed''' % face_b)
         raise ValueError('Edge has no neighbour around vertex %d',
                          vert0)
 
-    print('faces a, b, c, d')
-    print(face_a, face_b, face_c, face_d)
-    print('vertices 0, 1, 2, 3, 5')
-    print(vert0, vert1, vert2, vert3, vert5)
+    logger.debug('faces a, b, c, d')
+    logger.debug(face_a, face_b, face_c, face_d)
+    logger.debug('vertices 0, 1, 2, 3, 5')
+    logger.debug(vert0, vert1, vert2, vert3, vert5)
 
     # Perform the rearangements
     sheet.edge_df.loc[edge01, 'face'] = face_c

@@ -21,7 +21,7 @@ class EventManager():
 
 
     """
-    def __init__(self, element, ):
+    def __init__(self, element):
         """Creates an events class
 
         Parameters
@@ -32,6 +32,8 @@ class EventManager():
         self.current = deque()
         self.next = deque()
         self.element = element
+        self.current.append((wait, -1, (1,), {}))
+
 
     def extend(self, events):
         """
