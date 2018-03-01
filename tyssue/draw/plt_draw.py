@@ -3,6 +3,7 @@ Matplotlib based plotting
 """
 
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from matplotlib.path import Path
 from matplotlib.patches import Polygon, FancyArrow, Arc, PathPatch
 from matplotlib.collections import PatchCollection
@@ -98,7 +99,7 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
     draw_spec.update(**draw_spec_kw)
 
     x, y = coords
-    dx, dy = ('d'+c for c in coords)
+    dx, dy = ('d' + c for c in coords)
     app_length = np.hypot(sheet.edge_df[dx],
                           sheet.edge_df[dy])
 
@@ -149,7 +150,7 @@ def quick_edge_draw(sheet, coords=['x', 'y'], ax=None, **draw_spec_kw):
     trgt_x = sheet.upcast_trgt(sheet.vert_df[x]).values
     trgt_y = sheet.upcast_trgt(sheet.vert_df[y]).values
 
-    lines_x, lines_y = np.zeros(2*sheet.Ne), np.zeros(2*sheet.Ne)
+    lines_x, lines_y = np.zeros(2 * sheet.Ne), np.zeros(2 * sheet.Ne)
     lines_x[::2] = srce_x
     lines_x[1::2] = trgt_x
     lines_y[::2] = srce_y
@@ -173,12 +174,12 @@ def plot_forces(sheet, geom, model,
     """
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
-    gcoords = ['g'+c for c in coords]
+    gcoords = ['g' + c for c in coords]
     if approx_grad is not None:
         app_grad = approx_grad(sheet, geom, model)
         grad_i = pd.DataFrame(index=sheet.vert_idx,
                               data=app_grad.reshape((-1, len(sheet.coords))),
-                              columns=['g'+c for c in sheet.coords]) * scaling
+                              columns=['g' + c for c in sheet.coords]) * scaling
 
     else:
         grad_i = model.compute_gradient(sheet, components=False) * scaling
@@ -223,9 +224,6 @@ def plot_scaled_energies(sheet, geom, model, scales, ax=None):
         ax.plot(scales, e, label=label)
     ax.legend()
     return fig, ax
-
-
-
 
 
 def plot_analytical_to_numeric_comp(sheet, model, geom,
@@ -285,10 +283,10 @@ def get_arc_data(sheet):
     e_x = sheet.edge_df['dx'] / sheet.edge_df['length']
     e_y = sheet.edge_df['dy'] / sheet.edge_df['length']
 
-    center_x = ((srce_pos.x + trgt_pos.x)/2 -
+    center_x = ((srce_pos.x + trgt_pos.x) / 2 -
                 e_y * (radius - sheet.edge_df['sagitta']))
 
-    center_y = ((srce_pos.y + trgt_pos.y)/2 -
+    center_y = ((srce_pos.y + trgt_pos.y) / 2 -
                 e_x * (radius - sheet.edge_df['sagitta']))
 
     alpha = sheet.edge_df['arc_chord_angle']
@@ -296,17 +294,17 @@ def get_arc_data(sheet):
 
     # Ok, I admit a fair amount of trial and
     # error to get to the stuff below :-p
-    rot = beta - np.sign(alpha) * np.pi/2
+    rot = beta - np.sign(alpha) * np.pi / 2
     theta1 = (-alpha + rot) * np.sign(alpha)
     theta2 = (alpha + rot) * np.sign(alpha)
 
     center_data = pd.DataFrame.from_dict({
-            'radius': np.abs(radius),
-            'x': center_x,
-            'y': center_y,
-            'theta1': theta1,
-            'theta2': theta2
-            })
+        'radius': np.abs(radius),
+        'x': center_x,
+        'y': center_y,
+        'theta1': theta1,
+        'theta2': theta2
+    })
     return center_data
 
 
@@ -324,12 +322,126 @@ def curved_view(sheet, radius_cutoff=1e3):
             patch = PathPatch(Path(xy))
         else:
             patch = Arc(edge[['x', 'y']],
-                        2*edge['radius'],
-                        2*edge['radius'],
-                        theta1=edge['theta1']*180/np.pi,
-                        theta2=edge['theta2']*180/np.pi)
+                        2 * edge['radius'],
+                        2 * edge['radius'],
+                        theta1=edge['theta1'] * 180 / np.pi,
+                        theta2=edge['theta2'] * 180 / np.pi)
         curves.append(patch)
     ax.add_collection(PatchCollection(curves, False,
                                       **{'facecolors': 'none'}))
     ax.autoscale()
+    return fig, ax
+
+
+def sagittal_view(sheet, min_slice, max_slice, face_mask='',
+                  coords=['x', 'y'], sagittal_axis='z',
+                  a=87, b=87, c=87):
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    thetas = np.linspace(0, 2 * np.pi)
+    ax.plot(c * np.cos(thetas), a * np.sin(thetas), color='grey')
+
+    subset_face_df = sheet.face_df[(sheet.face_df[sagittal_axis] > min_slice)
+                                   & (sheet.face_df[sagittal_axis] < max_slice)]
+    plt.plot(subset_face_df[coords[0]],
+             subset_face_df[coords[1]], 'o', color='black')
+
+    if face_mask:
+        sheet = sheet.sheet_extract(face_mask)
+        subset_face_df = sheet.face_df[(sheet.face_df[sagittal_axis] > min_slice)
+                                       & (sheet.face_df[sagittal_axis] < max_slice)]
+        plt.plot(subset_face_df[coords[0]],
+                 subset_face_df[coords[1]], 'o', color='red')
+
+    ax.set_xlabel(coords[0])
+    ax.set_ylabel(coords[1])
+    return fig, ax
+
+
+def multiple_sheet_view(sheet, face_mask='', a=87, b=87, c=150):
+
+    sheet_fold_patch = sheet.sheet_extract(face_mask)
+
+    plt.figure(figsize=(18.5, 10.5))
+    G = gridspec.GridSpec(2, 2)
+    axes_1 = plt.subplot(G[0, 0])
+    axes_2 = plt.subplot(G[1, 0])
+    axes_3 = plt.subplot(G[:, 1])
+
+    thetas = np.linspace(0, 2 * np.pi)
+    axes_1.plot(c * np.cos(thetas), a * np.sin(thetas))
+    fig, axes_1 = quick_edge_draw(sheet, coords=['z', 'y'], ax=axes_1,
+                                  alpha=0.6, lw=0.1)
+    axes_1.plot(sheet_fold_patch.face_df['z'],
+                sheet_fold_patch.face_df['y'],
+                'o',  color='red', alpha=0.8, ms=5)
+    axes_1.set_title('lateral view')
+    axes_1.set_xlabel('z')
+    axes_1.set_ylabel('y')
+
+    thetas = np.linspace(0, 2 * np.pi)
+    axes_2.plot(c * np.cos(thetas), a * np.sin(thetas))
+    fig, axes_2 = quick_edge_draw(sheet, coords=['z', 'x'], ax=axes_2,
+                                  alpha=0.6, lw=0.1)
+    axes_2.plot(sheet_fold_patch.face_df['z'],
+                sheet_fold_patch.face_df['x'],
+                'o', color='red', alpha=0.8, ms=5)
+    axes_2.set_title('ventral view')
+    axes_2.set_xlabel('z')
+    axes_2.set_ylabel('x')
+
+    c = a
+    thetas = np.linspace(0, 2 * np.pi)
+    axes_3.plot(c * np.cos(thetas), a * np.sin(thetas))
+    fig, axes_3 = quick_edge_draw(sheet, coords=['x', 'y'], ax=axes_3,
+                                  alpha=0.6, lw=0.1)
+    axes_3.plot(sheet_fold_patch.face_df['x'],
+                sheet_fold_patch.face_df['y'],
+                'o', color='red', alpha=0.8, ms=5)
+
+    axes_3.set_title('sagittal view')
+    axes_3.set_xlabel('x')
+    axes_3.set_ylabel('y')
+
+    plt.tight_layout()
+
+    return plt
+
+
+def color_info_view(sheet, face_information, color_map,
+                    face_mask='', face_mask_color_map='hot',
+                    coords=['x', 'y'], a=87, b=87, c=150):
+    
+    draw_specs = sheet_spec()
+
+    perso_cmap = np.linspace(1.0, 1.0, num=sheet.face_df.shape[
+        0]) * sheet.face_df[face_information]
+    sheet.face_df['col'] = perso_cmap / (max(perso_cmap))
+
+    cmap_face = plt.cm.get_cmap(color_map)
+    face_color_cmap = cmap_face(sheet.face_df.col)
+
+    list_edge_in_fold_patch = sheet.edge_df['face'].isin(
+        sheet.face_df[sheet.face_df[face_mask] == True].index)
+
+    cmap_edge = np.linspace(1.0, 1.0, num=sheet.edge_df.shape[
+                            0]) * list_edge_in_fold_patch
+    sheet.edge_df['col'] = cmap_edge / (max(cmap_edge))
+
+    cmap_edge = plt.cm.get_cmap(face_mask_color_map)
+    edge_color_cmap = cmap_edge(sheet.edge_df.col)
+
+    draw_specs['edge']['visible'] = True
+    draw_specs['edge']['color'] = edge_color_cmap
+    draw_specs['vert']['visible'] = False
+    draw_specs['face']['visible'] = True
+    draw_specs['face']['color'] = face_color_cmap
+    draw_specs['face']['alpha'] = 0.5
+
+    fig, ax = sheet_view(sheet, coords=coords, **draw_specs)
+    fig.set_size_inches(18.5, 10.5, forward=True)
+    ax.set_xlabel(coords[0])
+    ax.set_ylabel(coords[1])
+
     return fig, ax
