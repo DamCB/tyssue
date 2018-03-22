@@ -145,7 +145,8 @@ def type1_at_shorter(sheet, face, geom, remove_tri_faces=True):
     """
     edges = sheet.edge_df[sheet.edge_df['face'] == face]
     shorter = edges.length.idxmin()
-    type1_transition(sheet, shorter, min(edges.length), remove_tri_faces)
+    #type1_transition(sheet, shorter, 2 * min(edges.length), remove_tri_faces)
+    type1_transition(sheet, shorter, 0.1, remove_tri_faces)
     geom.update_all(sheet)
 
 
@@ -188,4 +189,4 @@ def ab_pull(sheet, face, radial_tension, distributed=False):
     if distributed:
         radial_tension = radial_tension / len(verts)
 
-    sheet.vert_df.loc[verts, 'radial_tension'] = radial_tension
+    sheet.vert_df.loc[verts, 'radial_tension'] += radial_tension
