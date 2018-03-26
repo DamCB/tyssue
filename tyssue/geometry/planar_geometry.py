@@ -45,7 +45,7 @@ class PlanarGeometry(BaseGeometry):
     @staticmethod
     def update_areas(sheet):
         '''
-        Updates the normal coordniate of each (srce, trgt, face) face.
+        Updates the normal coordinate of each (srce, trgt, face) face.
         '''
         sheet.edge_df['sub_area'] = sheet.edge_df['nz'] / 2
         sheet.face_df['area'] = sheet.sum_face(sheet.edge_df['sub_area'])
@@ -60,9 +60,9 @@ class PlanarGeometry(BaseGeometry):
         """
         rot_pos = sheet.vert_df[sheet.coords].copy()
         face_x, face_y = sheet.face_df.loc[face, ['x', 'y']]
-        rot_pos.x = ((sheet.vert_df.x - face_x) * np.cos(psi) -
-                     (sheet.vert_df.y - face_y) * np.sin(psi))
-        rot_pos.y = ((sheet.vert_df.x - face_x) * np.sin(psi) +
-                     (sheet.vert_df.y - face_y) * np.cos(psi))
+        rot_pos.x = ((sheet.vert_df.x - face_x) * np.cos(psi)
+                     - (sheet.vert_df.y - face_y) * np.sin(psi))
+        rot_pos.y = ((sheet.vert_df.x - face_x) * np.sin(psi)
+                     + (sheet.vert_df.y - face_y) * np.cos(psi))
 
         return rot_pos

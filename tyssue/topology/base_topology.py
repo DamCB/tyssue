@@ -5,9 +5,46 @@ from itertools import combinations
 logger = logging.getLogger(name=__name__)
 
 def add_vert(eptm, edge):
-    """
-    Adds a vertex in the middle of the edge,
-    which is split as is its opposite
+    """Adds a vertex in the middle of the edge,
+
+    which is split as is its opposite(s)
+
+    Parameters
+    ----------
+    eptm : a :class:`Epithelium` instance
+    edge : int
+    the index of one of the half-edges to split
+
+    Returns
+    -------
+    new_vert : int
+    the index to the new vertex
+    new_edges : int or list of ints
+    index to the new edge(s). For a sheet, returns
+    a single index, for a 3D epithelium, returns
+    the list of all the new parallel edges
+    new_opp_edges : int or list of ints
+    index to the new opposite edge(s). For a sheet, returns
+    a single index, for a 3D epithelium, returns
+    the list of all the new parallel edges
+
+
+    In the simple case whith two half-edge, returns
+    indices to the new edges, with the following convention:
+
+    s    e    t
+      ------>
+    * <------ *
+    oe
+
+    s    e       ne   t
+      ------   ----->
+    * <----- * ------ *
+        oe   nv   noe
+
+    where "e" is the passed edge as argument, "s" its source "t" its
+    target and "oe" its opposite. The returned edges are the ones
+    between the new vertex and the input edge's original target.
     """
 
     srce, trgt = eptm.edge_df.loc[edge, ['srce', 'trgt']]
