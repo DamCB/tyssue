@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('agg')
 import numpy as np
 
 from tyssue.generation import three_faces_sheet
