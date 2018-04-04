@@ -78,3 +78,6 @@ dist/
 
 ## Blender packups
 *.blend[1-9]
+
+## pytest
+.pytest_cache
