@@ -2,13 +2,15 @@ from numpy.testing import assert_array_equal
 import numpy as np
 
 from tyssue.generation import extrude, three_faces_sheet
-from tyssue import Monolayer, config
+from tyssue import Monolayer, config, Sheet
+from tyssue.core.monolayer import MonolayerWithLamina
 
 def test_monolayer():
-    datasets, specs = three_faces_sheet()
-    extruded = extrude(datasets, method='translation')
-    mono = Monolayer('test', extruded,
-                     config.geometry.bulk_spec())
+
+    sheet = Sheet('test', *three_faces_sheet())
+
+    mono = Monolayer.from_flat_sheet(
+        'test', sheet, config.geometry.bulk_spec())
 
     assert_array_equal(mono.apical_verts.values,
                        np.arange(13))
@@ -28,6 +30,15 @@ def test_monolayer():
                        np.arange(3)+3)
     assert_array_equal(mono.sagittal_faces.values,
                        np.arange(18)+6)
+
+
+def test_monolayer_with_lamina():
+
+    sheet_dsets, _ = three_faces_sheet()
+    dsets = extrude(sheet_dsets, method='translation')
+    mono = MonolayerWithLamina('test', dsets,
+                               config.geometry.bulk_spec())
+    assert mono.lamina_edges.shape == (3,)
 
 
 def test_copy():
