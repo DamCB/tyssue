@@ -2,6 +2,7 @@ from tyssue.generation import extrude, three_faces_sheet
 from tyssue import Monolayer, config, Sheet
 
 from tyssue.utils import testing
+
 from tyssue.dynamics.effectors import (
     LengthElasticity,
     FaceAreaElasticity,
@@ -9,7 +10,8 @@ from tyssue.dynamics.effectors import (
     CellAreaElasticity,
     CellVolumeElasticity,
     LineTension,
-    FaceContractility)
+    FaceContractility,
+    BorderElasticity)
 
 sheet_effectors = [
     LengthElasticity,
@@ -20,7 +22,7 @@ sheet_effectors = [
 
 bulk_effectors = [
     CellAreaElasticity,
-    CellVolumeElasticity,]
+    CellVolumeElasticity]
 
 
 def test_effectors():
@@ -31,7 +33,7 @@ def test_effectors():
         'test', sheet, config.geometry.bulk_spec())
 
     for effector in sheet_effectors:
-        testing.effector_test(sheet, effector)
+        testing.effector_tester(sheet, effector)
 
     for effector in bulk_effectors:
-        testing.effector_test(mono, effector)
+        testing.effector_tester(mono, effector)

@@ -1,17 +1,17 @@
 import numpy as np
 
-from ..dynamics.factory import model_factory
-from ..dynamics.effectors import AbstractEffector
-from ..generation import three_faces_sheet
 
+def effector_tester(eptm, effector):
 
-def effector_test(eptm, effector):
+    for u in eptm.ucoords:
+        eptm.edge_df[u] = 0
 
     for elem, spec in effector.specs.items():
 
         for col in spec:
             if col not in eptm.datasets[elem].columns:
                 eptm.datasets[elem][col] = 1.
+
 
     energy = effector.energy(eptm)
     assert energy.shape == (eptm.datasets[effector.element].shape[0],)
@@ -27,8 +27,10 @@ def effector_test(eptm, effector):
         assert np.all(np.isfinite(grad_t))
 
 
+def model_tester(eptm, model):
 
-def model_test(eptm, model):
+    for u in eptm.ucoords:
+        eptm.edge_df[u] = 0
 
     nondim_specs = {elem: {k : 1 for k in spec}
                     for elem, spec in model.specs.items()}

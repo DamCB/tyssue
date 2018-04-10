@@ -431,8 +431,9 @@ class BorderElasticity(AbstractEffector):
             'is_active',
             'length',
             'border_elasticity',
-            'prefered_length'
-            }
+            'prefered_length',
+            'is_border'
+            },
         }
 
     @staticmethod
@@ -442,21 +443,18 @@ class BorderElasticity(AbstractEffector):
 
     @staticmethod
     def energy(eptm):
-        return elastic_energy(eptm.edge_df.loc[eptm.border_es],
+        return elastic_energy(eptm.edge_df,
                               'length',
-                              'border_elasticity * is_active / 2',
+                              'border_elasticity * is_active * is_border / 2',
                               'prefered_length')
 
     @staticmethod
     def gradient(eptm):
 
-        kl_l0 = pd.Series(np.zeros(eptm.Ne),
-                          index=eptm.edge_df.index)
-
-        kl_l0.loc[eptm.border_es] = elastic_force(
-            eptm.edge_df.loc[eptm.border_es],
+        kl_l0 = elastic_force(
+            eptm.edge_df,
             var='length',
-            elasticity='border_elasticity',
+            elasticity='border_elasticity * is_active * is_border',
             prefered='prefered_length')
         grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, eptm.dim)
         grad.columns = ['g'+u for u in eptm.coords]

@@ -7,14 +7,28 @@ from copy import deepcopy
 from tyssue.core.sheet import Sheet
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 from tyssue.dynamics.sheet_vertex_model import SheetModel as model
+from tyssue.dynamics.planar_vertex_model import PlanarModel
+
 from tyssue import config
 from tyssue.stores import stores_dir
 from tyssue.dynamics.sheet_isotropic_model import isotropic_relax
 from tyssue.io.hdf5 import load_datasets
+from tyssue.utils.testing import model_tester
 
 
 TOL = 1e-5
 DECIMAL = 5
+
+
+def test_model():
+
+    h5store = os.path.join(stores_dir, 'small_hexagonal.hf5')
+    datasets = load_datasets(h5store,
+                             data_names=['face', 'vert', 'edge'])
+    specs = config.geometry.cylindrical_sheet()
+    sheet = Sheet('emin', datasets, specs)
+    model_tester(sheet, model)
+    model_tester(sheet, PlanarModel)
 
 
 def test_adim():
@@ -44,6 +58,9 @@ def test_adim():
     assert new_mod_specs['edge']['line_tension'] == 0.
     assert default_mod_specs['edge']['line_tension'] == 0.04
     assert dim_mod_specs['edge']['line_tension'] == 0.04 * 1 * (24*10)**(5/3)
+
+
+
 
 
 def test_compute_energy():
