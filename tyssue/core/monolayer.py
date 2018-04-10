@@ -19,7 +19,6 @@ class Monolayer(Epithelium):
         self.vert_df['is_active'] = 1
         self.cell_df['is_alive'] = 1
         self.face_df['is_alive'] = 1
-
         BulkGeometry.update_all(self)
 
     @classmethod
@@ -89,9 +88,10 @@ class MonolayerWithLamina(Monolayer):
     """
     3D monolayer epithelium with a lamina meshing
     """
-    def __init__(self, name, datasets, specs):
+    def __init__(self, name, datasets, specs, coords=None):
 
-        super().__init__(name, datasets, specs)
+        super().__init__(name, datasets,
+                         specs, coords)
 
         BulkGeometry.update_all(self)
         self.reset_index()
@@ -113,7 +113,7 @@ class MonolayerWithLamina(Monolayer):
         subdiv_verts = self.vert_df[self.vert_df['subdiv'] == 1].index
         focal_adhesions = self.vert_df.loc[subdiv_verts]
 
-        max_dist = self.edge_df.length.dropna().median() * 1.7
+        max_dist = self.edge_df.length.dropna().median() * 1.74
         lamina_tree = cKDTree(focal_adhesions[self.coords].values)
         lamina_edges = pd.DataFrame([[i, j] for i, j in
                                     lamina_tree.query_pairs(max_dist,
@@ -143,16 +143,3 @@ class MonolayerWithLamina(Monolayer):
     @property
     def lamina_edges(self):
         return self.segment_index('lamina', 'edge')
-
-
-def set_model(basale, model, specs, modifiers):
-
-    apical_spec = model.dimentionalize(specs)
-    basale.update_specs(apical_spec, reset=True)
-
-    for segment, spec in modifiers.items():
-        for element, parameters in spec.items():
-            idx = basale.segment_index(segment, element)
-            for param_name, param_value in parameters.items():
-                new_val = param_value * basale.specs[element][param_name]
-                basale.datasets[element].loc[idx, param_name] = new_val

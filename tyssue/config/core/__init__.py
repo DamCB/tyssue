@@ -1,4 +1,3 @@
-
 from ..json_parser import load_spec
 import os
 

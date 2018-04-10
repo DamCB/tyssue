@@ -3,16 +3,11 @@
 Hexagonal grids
 ---------------
 """
-import math
 import numpy as np
 import pandas as pd
-from scipy.spatial import Voronoi
 
-from ..config.geometry import flat_sheet, bulk_spec
-from ..geometry.bulk_geometry import BulkGeometry
-from ..core.objects import Epithelium
+from ..config.geometry import flat_sheet
 from .utils import make_df
-from .from_voronoi import from_3d_voronoi
 
 
 def hexa_grid2d(nx, ny, distx, disty, noise=None):
@@ -55,109 +50,6 @@ def hexa_grid3d(nx, ny, nz, distx=1., disty=1., distz=1., noise=None):
         pos_noise = np.random.normal(scale=noise, size=centers.shape)
         centers += pos_noise
     return centers
-
-
-
-def ellipse_rho(theta, a, b):
-    return ((a * math.sin(theta))**2 +
-            (b * math.cos(theta))**2)**0.5
-
-
-def get_ellipsoid_centers(a, b, c, n_zs,
-                          pos_err=0., phase_err=0.):
-    """
-    Creates hexagonaly organized points on the surface of an ellipsoid
-
-    Parameters
-    ----------
-    a, b, c: float
-      ellipsoid radii along the x, y and z axes, respectively
-      i.e the ellipsoid boounding box will be
-      `[[-a, a], [-b, b], [-c, c]]`
-    n_zs :  float
-      number of cells on the z axis, typical
-
-
-
-    """
-    dist = c / (n_zs)
-    theta = -np.pi/2
-    thetas = [theta]
-    while theta < np.pi/2:
-        theta = theta + dist/ellipse_rho(theta, a, c)
-        thetas.append(theta)
-
-    thetas = np.array(thetas).clip(-np.pi/2, np.pi/2)
-    zs = c*np.sin(thetas)
-
-    #np.linspace(-c, c, n_zs, endpoint=False)
-    #thetas = np.arcsin(zs/c)
-    av_rhos = (a + b) * np.cos(thetas) / 2
-    n_cells = np.ceil(av_rhos/dist).astype(np.int)
-
-    phis = np.concatenate(
-        [np.linspace(-np.pi, np.pi, nc, endpoint=False)
-         + (np.pi/nc) * (i%2) for i, nc in enumerate(n_cells)])
-
-    if phase_err > 0:
-        phis += np.random.normal(scale=phase_err*np.pi,
-                                 size=phis.shape)
-
-    zs = np.concatenate(
-        [z * np.ones(nc) for z, nc in zip(zs, n_cells)])
-    thetas = np.concatenate(
-        [theta * np.ones(nc) for theta, nc in zip(thetas, n_cells)])
-
-    xs = a * np.cos(thetas) * np.cos(phis)
-    ys = b * np.cos(thetas) * np.sin(phis)
-
-    if pos_err > 0.:
-        xs += np.random.normal(scale=pos_err,
-                               size=thetas.shape)
-        ys += np.random.normal(scale=pos_err,
-                               size=thetas.shape)
-        zs += np.random.normal(scale=pos_err,
-                               size=thetas.shape)
-    centers = pd.DataFrame.from_dict(
-        {'x': xs, 'y': ys, 'z': zs,
-         'theta': thetas, 'phi': phis})
-    return centers
-
-
-def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
-
-    centers = get_ellipsoid_centers(a, b, c, n_zs,
-                                    **kwargs)
-
-    centers = centers.append(pd.Series(
-        {'x':0, 'y':0, 'z':0,
-         'theta':0, 'phi':0,}),
-         ignore_index=True)
-
-    centers['x'] /= a
-    centers['y'] /= b
-    centers['z'] /= c
-
-    vor3d = Voronoi(centers[list('xyz')].values)
-    vor3d.close()
-    dsets = from_3d_voronoi(vor3d)
-    veptm = Epithelium('v', dsets, config.geometry.bulk_spec())
-    eptm = single_cell(veptm, centers.shape[0]-1)
-
-    eptm.vert_df['rho'] = np.linalg.norm(eptm.vert_df[eptm.coords], axis=1)
-    eptm.vert_df['theta'] = np.arcsin(eptm.vert_df.eval('z/rho'))
-    eptm.vert_df['phi'] = np.arctan2(eptm.vert_df['y'], eptm.vert_df['x'])
-
-    eptm.vert_df['x'] = a * (np.cos(eptm.vert_df['theta'])
-                             * np.cos(eptm.vert_df['phi']))
-    eptm.vert_df['y'] = b * (np.cos(eptm.vert_df['theta'])
-                             * np.sin(eptm.vert_df['phi']))
-    eptm.vert_df['z'] = c * np.sin(eptm.vert_df['theta'])
-    eptm.settings['abc'] = [a, b, c]
-    BulkGeometry.update_all(eptm)
-    return eptm
-
-
 
 """
 

@@ -114,10 +114,12 @@ def extrude(apical_datasets,
     datasets['edge'] = pd.concat([apical_edge,
                                   basal_edge,
                                   sagittal_edge])
-
     datasets['face'] = pd.concat([apical_face,
                                   basal_face,
                                   sagittal_face])
+    for elem in ['vert', 'edge', 'face', 'cell']:
+        datasets[elem].index.name = elem
+
     return datasets
 
 
