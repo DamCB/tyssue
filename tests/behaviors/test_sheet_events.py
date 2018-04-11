@@ -3,12 +3,9 @@ import numpy as np
 import pandas as pd
 
 
-from scipy.spatial import Voronoi
 from tyssue.behaviors import EventManager, wait
 from tyssue.behaviors.sheet_events import division, apoptosis
 from tyssue.core.sheet import Sheet
-from tyssue.generation import hexa_grid2d, from_2d_voronoi
-from tyssue.dynamics.bulk_model import BulkModel
 from tyssue.stores import stores_dir
 from tyssue.io.hdf5 import load_datasets
 from tyssue.config.geometry import cylindrical_sheet
@@ -23,6 +20,7 @@ def test_add_events():
                           (apoptosis, 5, (), {})]
     manager.extend(initial_cell_event)
     manager.execute(None)
+    manager.update()
     assert len(manager.current) == 3
 
 
@@ -48,8 +46,10 @@ def test_execute_apoptosis():
 
     manager.current.append(initial_cell_event)
     manager.execute(sheet)
+    manager.update()
     assert len(manager.current) > 0
     manager.execute(sheet)
+    manager.update()
 
     sheet.settings['apoptosis'] = {'contractile_increase': 2.0,
                                    'critical_area': 2*face_area}
@@ -60,6 +60,7 @@ def test_execute_apoptosis():
 
     manager.current.append(modified_cell_event)
     manager.execute(sheet)
+    manager.update()
     next_nbsides = sheet.face_df.loc[
         sheet.idx_lookup(face_id, 'face'), 'num_sides']
 
