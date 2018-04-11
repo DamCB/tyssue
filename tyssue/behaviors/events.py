@@ -71,6 +71,11 @@ class EventManager():
             extra keywords arguments to the behavior function
 
         """
+        #if (behavior, elem_id) not in self.next:
+        #    self.next.append((behavior, elem_id, args, kwargs))
+        for tuple in self.next:
+            if elem_id in tuple:
+                return
         self.next.append((behavior, elem_id, args, kwargs))
 
     def execute(self, eptm):
@@ -85,9 +90,17 @@ class EventManager():
             logger.info(f'{self.element}: {elem_id}, behavior: {behavior.__name__}')
             behavior(eptm, self, elem_id, *args, **kwargs)
 
+        
+
+    def update(self):
+        """
+        Replaces 'self.current' by 'self.next'
+        and clears 'self.next'.
+        """
         random.shuffle(self.next)
         self.current = self.next.copy()
         self.next.clear()
+
 
 
 def wait(eptm, manager, elem_id, n_steps):

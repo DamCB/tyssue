@@ -422,6 +422,7 @@ class Epithelium:
                 # with altered datasets but to no avail
                 # Leaving it included in coverage.
                 log.warning('Face is not closed')
+                log.warning(face)
                 return np.nan
             return np.array([self.vert_df.loc[idx[0], coords]
                              for idx in edges])
