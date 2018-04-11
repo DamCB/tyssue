@@ -42,7 +42,8 @@ class AbstractEffector:
 
     label = 'Abstract effector'
     element = None  # cell, face, edge or vert
-    specs = {}
+    specs = {'cell': {}, 'face': {},
+             'edge': {}, 'vert': {}}
 
     @staticmethod
     def energy(eptm):
@@ -76,10 +77,14 @@ class LengthElasticity(AbstractEffector):
     element = 'edge'
     spatial_ref = 'prefered_length', units.length
 
-    specs = {'is_active',
-             'length',
-             'length_elasticity',
-             'prefered_length'}
+    specs = {
+        'edge': {
+            'is_active',
+            'length',
+            'length_elasticity',
+            'prefered_length',
+            'ux', 'uy', 'uz'},
+        }
 
     @staticmethod
     def get_nrj_norm(specs):
@@ -111,10 +116,16 @@ class FaceAreaElasticity(AbstractEffector):
     magnitude = 'area_elasticity'
     label = 'Area elasticity'
     element = 'face'
-    specs = {'is_alive',
-             'area',
-             'area_elasticity',
-             'prefered_area'}
+    specs = {
+        'face': {
+            'is_alive',
+            'area',
+            'area_elasticity',
+            'prefered_area'},
+        'edge': {
+            'sub_area'
+            }
+        }
 
     spatial_ref = 'prefered_area', units.area
 
@@ -159,10 +170,20 @@ class FaceVolumeElasticity(AbstractEffector):
     magnitude = 'vol_elasticity'
     label = 'Volume elasticity'
     element = 'face'
-    specs = {'is_alive',
-             'vol',
-             'vol_elasticity',
-             'prefered_vol'}
+    specs = {
+        'face': {
+            'is_alive',
+            'vol',
+            'vol_elasticity',
+            'prefered_vol'
+            },
+        'vert': {
+            'height'
+            },
+        'edge': {
+            'sub_area'
+            }
+        }
 
     spatial_ref = 'prefered_vol', units.vol
 
@@ -209,11 +230,14 @@ class CellAreaElasticity(AbstractEffector):
     magnitude = 'area_elasticity'
     label = 'Area elasticity'
     element = 'cell'
-    specs = {'is_alive',
-             'area',
-             'area_elasticity',
-             'prefered_area'}
-
+    specs = {
+        'cell': {
+            'is_alive',
+            'area',
+            'area_elasticity',
+            'prefered_area'
+            }
+        }
     spatial_ref = 'prefered_area', units.area
 
     @staticmethod
@@ -255,10 +279,14 @@ class CellVolumeElasticity(AbstractEffector):
     element = 'cell'
     spatial_ref = 'prefered_vol', units.vol
 
-    specs = {'is_alive',
-             'vol',
-             'vol_elasticity',
-             'prefered_vol'}
+    specs = {
+        'cell': {
+            'is_alive',
+            'vol',
+            'vol_elasticity',
+            'prefered_vol'
+            }
+        }
 
     @staticmethod
     def get_nrj_norm(specs):
@@ -297,8 +325,12 @@ class LineTension(AbstractEffector):
     magnitude = 'line_tension'
     label = 'Line tension'
     element = 'edge'
-    specs = {'is_active',
-             'line_tension'}
+    specs = {
+        'edge': {
+            'is_active',
+            'line_tension'
+            }
+        }
 
     spatial_ref = 'mean_length', units.length
 
@@ -323,9 +355,13 @@ class FaceContractility(AbstractEffector):
     magnitude = 'contractility'
     label = 'Contractility'
     element = 'face'
-    specs = {'is_alive',
-             'perimeter',
-             'contractility'}
+    specs = {
+        'face': {
+            'is_alive',
+            'perimeter',
+            'contractility'
+            }
+        }
 
     spatial_ref = 'mean_perimeter', units.length
 
@@ -347,6 +383,8 @@ class FaceContractility(AbstractEffector):
         grad_trgt = - grad_srce
         return grad_srce, grad_trgt
 
+
+# TODO: fix specs bellow
 
 class SurfaceTension(AbstractEffector):
 
@@ -388,10 +426,15 @@ class BorderElasticity(AbstractEffector):
     element = 'edge'
     spatial_ref = 'prefered_length', units.length
 
-    specs = {'is_active',
-             'length',
-             'border_elasticity',
-             'prefered_length'}
+    specs = {
+        "edge": {
+            'is_active',
+            'length',
+            'border_elasticity',
+            'prefered_length',
+            'is_border'
+            },
+        }
 
     @staticmethod
     def get_nrj_norm(specs):
@@ -400,21 +443,18 @@ class BorderElasticity(AbstractEffector):
 
     @staticmethod
     def energy(eptm):
-        return elastic_energy(eptm.edge_df.loc[eptm.border_es],
+        return elastic_energy(eptm.edge_df,
                               'length',
-                              'border_elasticity * is_active / 2',
+                              'border_elasticity * is_active * is_border / 2',
                               'prefered_length')
 
     @staticmethod
     def gradient(eptm):
 
-        kl_l0 = pd.Series(np.zeros(eptm.Ne),
-                          index=eptm.edge_df.index)
-
-        kl_l0.loc[eptm.border_es] = elastic_force(
-            eptm.edge_df.loc[eptm.border_es],
+        kl_l0 = elastic_force(
+            eptm.edge_df,
             var='length',
-            elasticity='border_elasticity',
+            elasticity='border_elasticity * is_active * is_border',
             prefered='prefered_length')
         grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, eptm.dim)
         grad.columns = ['g'+u for u in eptm.coords]

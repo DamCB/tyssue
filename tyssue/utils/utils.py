@@ -64,6 +64,8 @@ def set_data_columns(datasets, specs, reset=False):
         logger.warn('Reseting datasets values with new specs')
 
     for name, spec in specs.items():
+        if not len(spec):
+            continue
         if 'setting' in name:
             continue
         df = datasets[name]

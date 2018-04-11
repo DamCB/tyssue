@@ -75,7 +75,15 @@ def get_division_vertices(eptm,
 
 @do_undo
 # @validate
-def cell_division(eptm, mother, geom, vertices):
+def cell_division(eptm, mother, geom, vertices=None):
+
+    if vertices is None:
+        vertices = get_division_vertices(
+            eptm,
+            division_edges=None,
+            mother=mother,
+            plane_normal=None,
+            plane_center=None)
 
     cell_cols = eptm.cell_df.loc[mother]
     eptm.cell_df = eptm.cell_df.append(cell_cols,

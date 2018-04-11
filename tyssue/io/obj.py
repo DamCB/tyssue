@@ -40,7 +40,7 @@ def write_splitted_cells(*args, **kwargs):
     save_splitted_cells(*args, **kwargs)
 
 
-def save_splitted_cells(sheet, fname, epsilon=0.1):
+def save_splitted_cells(fname, sheet, epsilon=0.1):
 
     coords = sheet.coords
     up_srce = sheet.upcast_srce(sheet.vert_df[coords])
