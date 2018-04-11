@@ -92,27 +92,30 @@ class Sheet(Epithelium):
         return neighbors.reset_index(drop=True).loc[1:]
 
     def sheet_extract(self, face_mask, coords=['x', 'y', 'z']):
-        """ Extract a new sheet from the embryo sheet
+        """ Extract a new sheet from the sheet
         that correspond to a key word that define a face.
+
         Parameters
         ----------
+
         sheet: a :class:Sheet object
         face_mask : column name in face composed by boolean value
         coords
+
         Returns
         -------
         sheet_fold_patch_extract :
             subsheet corresponding to the fold patch area.
 
         """
-        x, y, z = coords
+
         datasets = {}
 
         datasets['face'] = self.face_df[
-            self.face_df[face_mask] == True].copy()
+            self.face_df[face_mask]].copy()
         datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
             datasets['face'].index)].copy()
-        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()]
+        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()].copy()
 
         subsheet = Sheet('subsheet', datasets, self.specs)
         subsheet.reset_index()
