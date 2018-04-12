@@ -140,8 +140,12 @@ def generate_ring(Nf, R_in, R_out, R_vit=None, apical='in'):
     datasets = {'vert': vert_df,
                 'edge': edge_df,
                 'face': face_df}
-    return AnnularSheet('ring', datasets,
+    ring = AnnularSheet('ring', datasets,
                         specs, coords=['x', 'y'])
+
+    ring.reset_topo()
+    return ring
+
 
 """
 Ellipsoid 2.5D sheet
