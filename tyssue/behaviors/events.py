@@ -49,7 +49,7 @@ class EventManager():
             self.append(*event)
 
     def append(self, behavior, elem_id=-1,
-               args=(), kwargs={}):
+               args=None, kwargs=None):
         """Add an event to the manager's next deque
 
         behavior is a function whose signature is
@@ -65,12 +65,21 @@ class EventManager():
         elem_id : int, default -1
             the id of the affected element, leave to
             to -1 if the behavior is not element specific
-        args : tuple, default ()
+        args : tuple, defaults to ()
             extra arguments to the behavior function
-        kwargs : dict default {}
+        kwargs : dict defaults to {}
             extra keywords arguments to the behavior function
 
         """
+        #if (behavior, elem_id) not in self.next:
+        #    self.next.append((behavior, elem_id, args, kwargs))
+        for tup in self.next:
+            if elem_id in tup:
+                return
+        if args is None:
+            args = ()
+        if kwargs is None:
+            kwargs = {}
         self.next.append((behavior, elem_id, args, kwargs))
 
     def execute(self, eptm):
@@ -85,9 +94,15 @@ class EventManager():
             logger.info(f'{self.element}: {elem_id}, behavior: {behavior.__name__}')
             behavior(eptm, self, elem_id, *args, **kwargs)
 
+    def update(self):
+        """
+        Replaces 'self.current' by 'self.next'
+        and clears 'self.next'.
+        """
         random.shuffle(self.next)
         self.current = self.next.copy()
         self.next.clear()
+
 
 
 def wait(eptm, manager, elem_id, n_steps):

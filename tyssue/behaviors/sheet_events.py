@@ -23,20 +23,33 @@ def division(sheet, manager, face_id,
              critical_vol=2.,
              geom=SheetGeometry):
     """Cell division happens through cell growth up to a critical volume,
-    follow by actual division of the face.
+    followed by actual division of the face.
+
+    Parameters
+    ----------
+    sheet : a `Sheet` object
+    manager : an `EventManager` instance
+    face_id : int,
+      index of the mother face
+    growth_rate : float, default 0.1
+      rate of increase of the prefered volume
+    critical_vol : float, default 2.
+      volume at which the cells stops to grow and devides
+
     """
 
     face = sheet.idx_lookup(face_id, 'face')
     if face is None:
         return
-    critical_vol *= sheet.specs['prefered_vol']
-    if sheet.face_df['vol'] < critical_vol:
+    critical_vol *= sheet.specs['face']['prefered_vol']
+    print(sheet.face_df.loc[face, 'vol'], critical_vol)
+    if sheet.face_df.loc[face, 'vol'] < critical_vol:
         grow(sheet, face, growth_rate)
         manager.append(division, face_id,
                        args=(growth_rate, critical_vol, geom))
     else:
         daughter = cell_division(sheet, face, geom)
-        sheet.face_df.loc[daughter, 'id'] = sheet.face_df.id.max()+1
+        sheet.face_df.loc[daughter, 'id'] = sheet.face_df.id.max() + 1
 
 
 def apoptosis(sheet, manager, face_id,
@@ -89,7 +102,8 @@ def apoptosis(sheet, manager, face_id,
         neighbors = sheet.get_neighborhood(face, contract_span).dropna()
         neighbors['id'] = sheet.face_df.loc[neighbors.face, 'id'].values
         manager.extend([
-            (contraction, neighbor['id'], (contractile_increase/neighbor['order'],))
+            (contraction, neighbor['id'],
+             (contractile_increase / neighbor['order'],))
             for _, neighbor in neighbors.iterrows()])
         done = False
     else:
@@ -113,26 +127,26 @@ def contraction(sheet, manager, face_id,
     if face is None:
         return
     if ((sheet.face_df.loc[face, 'area'] < critical_area)
-        or (sheet.face_df.loc[face, 'contractility'] > max_contractility)):
+            or (sheet.face_df.loc[face, 'contractility'] > max_contractility)):
         return
     contract(sheet, face, contractile_increase)
 
 
 def grow(sheet, face, growth_rate):
-    """Multiplies the equilibrium volume of face face by a
+    """Multiplies the equilibrium volume of face by a
     a factor (1+growth_rate)
     """
-    sheet.face_df.loc[face, 'prefered_vol'] *= (1+growth_rate)
+    sheet.face_df.loc[face, 'prefered_vol'] *= (1 + growth_rate)
 
 
 def shrink(sheet, face, shrink_rate):
     """Devides the equilibrium volume of face face by a
     a factor 1+shrink_rate
     """
-    sheet.face_df.loc[face, 'prefered_vol'] /= (1+shrink_rate)
+    sheet.face_df.loc[face, 'prefered_vol'] /= (1 + shrink_rate)
 
 
-def type1_at_shorter(sheet, face, geom):
+def type1_at_shorter(sheet, face, geom, remove_tri_faces=True):
     """
     Execute a type1 transition on the shorter edge of a face.
 
@@ -144,7 +158,8 @@ def type1_at_shorter(sheet, face, geom):
     """
     edges = sheet.edge_df[sheet.edge_df['face'] == face]
     shorter = edges.length.idxmin()
-    type1_transition(sheet, shorter)
+    #type1_transition(sheet, shorter, 2 * min(edges.length), remove_tri_faces)
+    type1_transition(sheet, shorter, 0.1, remove_tri_faces)
     geom.update_all(sheet)
 
 
@@ -162,7 +177,7 @@ def type3(sheet, face, geom):
     geom.update_all(sheet)
 
 
-def contract(sheet, face, contractile_increase):
+def contract(sheet, face, contractile_increase, multiple=False):
     """
     Contract the face by increasing the 'contractility' parameter
     by contractile_increase
@@ -172,12 +187,18 @@ def contract(sheet, face, contractile_increase):
     face : id face
 
     """
-    new_contractility = contractile_increase
-    sheet.face_df.loc[face, 'contractility'] += new_contractility
+    if multiple:
+        sheet.face_df.loc[face, 'contractility'] *= contractile_increase
+    else:
+        new_contractility = contractile_increase
+        sheet.face_df.loc[face, 'contractility'] += new_contractility
 
 
-def ab_pull(sheet, face, radial_tension):
+def ab_pull(sheet, face, radial_tension, distributed=False):
     """ Adds radial_tension to the face's vertices radial_tension
     """
     verts = sheet.edge_df[sheet.edge_df['face'] == face]['srce'].unique()
+    if distributed:
+        radial_tension = radial_tension / len(verts)
+
     sheet.vert_df.loc[verts, 'radial_tension'] += radial_tension

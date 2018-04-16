@@ -98,7 +98,7 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
     draw_spec.update(**draw_spec_kw)
 
     x, y = coords
-    dx, dy = ('d'+c for c in coords)
+    dx, dy = ('d' + c for c in coords)
     app_length = np.hypot(sheet.edge_df[dx],
                           sheet.edge_df[dy])
 
@@ -149,7 +149,7 @@ def quick_edge_draw(sheet, coords=['x', 'y'], ax=None, **draw_spec_kw):
     trgt_x = sheet.upcast_trgt(sheet.vert_df[x]).values
     trgt_y = sheet.upcast_trgt(sheet.vert_df[y]).values
 
-    lines_x, lines_y = np.zeros(2*sheet.Ne), np.zeros(2*sheet.Ne)
+    lines_x, lines_y = np.zeros(2 * sheet.Ne), np.zeros(2 * sheet.Ne)
     lines_x[::2] = srce_x
     lines_x[1::2] = trgt_x
     lines_y[::2] = srce_y
@@ -173,12 +173,12 @@ def plot_forces(sheet, geom, model,
     """
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
-    gcoords = ['g'+c for c in coords]
+    gcoords = ['g' + c for c in coords]
     if approx_grad is not None:
         app_grad = approx_grad(sheet, geom, model)
         grad_i = pd.DataFrame(index=sheet.vert_idx,
                               data=app_grad.reshape((-1, len(sheet.coords))),
-                              columns=['g'+c for c in sheet.coords]) * scaling
+                              columns=['g' + c for c in sheet.coords]) * scaling
 
     else:
         grad_i = model.compute_gradient(sheet, components=False) * scaling
@@ -223,9 +223,6 @@ def plot_scaled_energies(sheet, geom, model, scales, ax=None):
         ax.plot(scales, e, label=label)
     ax.legend()
     return fig, ax
-
-
-
 
 
 def plot_analytical_to_numeric_comp(sheet, model, geom,
@@ -285,10 +282,10 @@ def get_arc_data(sheet):
     e_x = sheet.edge_df['dx'] / sheet.edge_df['length']
     e_y = sheet.edge_df['dy'] / sheet.edge_df['length']
 
-    center_x = ((srce_pos.x + trgt_pos.x)/2 -
+    center_x = ((srce_pos.x + trgt_pos.x) / 2 -
                 e_y * (radius - sheet.edge_df['sagitta']))
 
-    center_y = ((srce_pos.y + trgt_pos.y)/2 -
+    center_y = ((srce_pos.y + trgt_pos.y) / 2 -
                 e_x * (radius - sheet.edge_df['sagitta']))
 
     alpha = sheet.edge_df['arc_chord_angle']
@@ -296,17 +293,17 @@ def get_arc_data(sheet):
 
     # Ok, I admit a fair amount of trial and
     # error to get to the stuff below :-p
-    rot = beta - np.sign(alpha) * np.pi/2
+    rot = beta - np.sign(alpha) * np.pi / 2
     theta1 = (-alpha + rot) * np.sign(alpha)
     theta2 = (alpha + rot) * np.sign(alpha)
 
     center_data = pd.DataFrame.from_dict({
-            'radius': np.abs(radius),
-            'x': center_x,
-            'y': center_y,
-            'theta1': theta1,
-            'theta2': theta2
-            })
+        'radius': np.abs(radius),
+        'x': center_x,
+        'y': center_y,
+        'theta1': theta1,
+        'theta2': theta2
+    })
     return center_data
 
 
@@ -324,10 +321,10 @@ def curved_view(sheet, radius_cutoff=1e3):
             patch = PathPatch(Path(xy))
         else:
             patch = Arc(edge[['x', 'y']],
-                        2*edge['radius'],
-                        2*edge['radius'],
-                        theta1=edge['theta1']*180/np.pi,
-                        theta2=edge['theta2']*180/np.pi)
+                        2 * edge['radius'],
+                        2 * edge['radius'],
+                        theta1=edge['theta1'] * 180 / np.pi,
+                        theta2=edge['theta2'] * 180 / np.pi)
         curves.append(patch)
     ax.add_collection(PatchCollection(curves, False,
                                       **{'facecolors': 'none'}))
