@@ -84,9 +84,7 @@ class EventManager():
 
     def execute(self, eptm):
         """
-        Executes the events present in the `self.current` deque,
-        then replaces  `self.current` by `self.next`
-        and clears `self.next`.
+        Executes the events present in the `self.current` deque.
         """
 
         while self.current:
@@ -96,8 +94,7 @@ class EventManager():
 
     def update(self):
         """
-        Replaces 'self.current' by 'self.next'
-        and clears 'self.next'.
+        Replaces `self.current` by `self.next` and clears `self.next`.
         """
         random.shuffle(self.next)
         self.current = self.next.copy()
