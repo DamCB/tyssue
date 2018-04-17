@@ -1,6 +1,6 @@
 {
     "face": {
-        "is_alive": true,
+        "is_alive": 1,
          },
     "edge": {
         "face": 0,
@@ -8,6 +8,6 @@
         "trgt": 0
          },
     "vert": {
-        "is_active": true,
+        "is_active": 1,
          }
 }

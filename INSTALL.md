@@ -2,7 +2,7 @@
 
 If you already have a conda environment ready:
 ```
-conda install -c glyg tyssue
+conda install -c conda-forge tyssue
 ```
 
 ## From the beginnig
@@ -12,15 +12,12 @@ debian-like linux distribution. If you allready have a basic
 scientific python stack, use it, don't install anaconda.
 
 
-### Get and intall Anaconda
+### Get and install Anaconda
 
-Go to http://continuum.io/downloads and grab anaconda for your architecture.
+Go to http://continuum.io/downloads and grab anaconda for your
+architecture, and follow up to date instructions there.x
 
 
-```bash
-bash Anaconda3-2.2.0-Linux-x86_64.sh
-source .bashrc # update your PATH
-```
 
 If you don't want the whole distrib, you can alternatively download
 [miniconda](http://conda.pydata.org/miniconda.html)
@@ -28,18 +25,13 @@ If you don't want the whole distrib, you can alternatively download
 ### Create a virtual environment with `conda`
 
 ```bash
-conda create -n tyssue python=3.4 numpy scipy vispy matplotlib pytest tables numexpr
+conda env create -f environment.yml # installs the dependencies
 ## activate the new environment
 source activate tyssue
 ```
 
-### Install with conda
 
-```
-conda install -c glyg tyssue
-```
-
-### Alternative: Download and install `tyssue` from source
+### Download and install `tyssue` from source
 
 If you want to do that, I assume you allready know how to manage
 dependencies on your platform.
@@ -55,17 +47,9 @@ If all went well, you have successfully installed tyssue.
 A `Makefile` provides some utility function. Try :
 
 ```sh
-make flake8  # Check PEP8 on the code
 make tests  # Run tests with nose
 make coverage  # Run tests with coverage
-```
-
-### Conda build
-
-You can build a conda binary :
-
-```sh
-conda build conda-recipe/
+make flake8  # Check PEP8 on the code
 ```
 
 ### Building the documentation

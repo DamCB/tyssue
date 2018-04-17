@@ -67,15 +67,22 @@ def from_3d_voronoi(voro):
     vert_df = make_df(vert_idx,
                       specs3d['vert'])
     vert_df[coords] = voro.vertices
+    included_verts = edge_df['srce'].unique()
+    vert_df = vert_df.loc[included_verts].copy()
 
     cell_idx = pd.Index(range(voro.points.shape[0]), name='cell')
     cell_df = make_df(cell_idx,
                       specs3d['cell'])
     cell_df[coords] = voro.points
+    included_cells = edge_df['cell'].unique()
+    cell_df = cell_df.loc[included_cells].copy()
 
     nfaces = len(voro.ridge_vertices)
     face_idx = pd.Index(np.arange(nfaces), name='face')
     face_df = make_df(face_idx, specs3d['face'])
+    included_faces = edge_df['face'].unique()
+    face_df = face_df.loc[included_faces].copy()
+
     edge_df.sort_values(by='cell', inplace=True)
 
     datasets = {

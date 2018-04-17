@@ -29,10 +29,11 @@ def model_factory(effectors, ref_effector):
                  'face': set(),
                  'edge': set(),
                  'vert': set(),
-                 'settings': set()}
+                 'settings': {'nrj_norm_factor'}}
         for f in effectors:
             labels.append(f.label)
-            specs[f.element] = specs[f.element].union(f.specs)
+            for k in specs.keys():
+                specs[k] = specs[k].union(f.specs.get(k, {}))
 
         __doc__ = """Dynamical model with the following effectors:\n"""
         __doc__ = __doc__+'\n'.join(labels)
