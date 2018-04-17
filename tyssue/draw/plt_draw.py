@@ -85,8 +85,11 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
                         closed=True)
         patches.append(patch)
     collection_specs = parse_face_specs(draw_spec)
-    ax.add_collection(PatchCollection(patches, False,
-                                      **collection_specs))
+    p = PatchCollection(patches, False,
+                        **collection_specs)
+    ax.add_collection(p)
+
+    #fig.colorbar(p, ax=ax)
     return ax
 
 
