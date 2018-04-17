@@ -29,6 +29,18 @@ def test_add_events():
     manager.update()
     assert len(manager.current) == 3
 
+def test_add_only_once():
+    manager = EventManager('face')
+    initial_cell_event = [(division, 1, (), {'geom': geom}),
+                          (wait, 3, (4,), {}),
+                          (apoptosis, 3, (), {})]
+
+    manager.extend(initial_cell_event)
+    manager.execute(None)
+    manager.update()
+    assert len(manager.current) == 2
+    assert apoptosis not in [tup[0] for tup in manager.current]
+
 
 def test_execute_apoptosis():
     h5store = os.path.join(stores_dir, 'small_hexagonal.hf5')
