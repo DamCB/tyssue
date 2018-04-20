@@ -9,7 +9,7 @@ from tyssue.generation import hexa_grid3d, from_3d_voronoi
 from numpy.testing import assert_almost_equal, assert_allclose
 from tyssue import Monolayer, config
 from tyssue.topology.base_topology import close_face
-from tyssue.core.objects import get_opposite
+from tyssue.core.sheet import get_opposite
 
 
 def test_to_nd():

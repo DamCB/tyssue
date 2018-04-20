@@ -1,13 +1,3 @@
-import numpy as np
-import pandas as pd
-from collections import deque
-
-from ..utils.utils import set_data_columns, spec_updater
-from tyssue.utils.decorators import do_undo, validate
-import warnings
-import logging
-log = logging.getLogger(name=__name__)
-
 '''
 Core definitions
 
@@ -57,6 +47,17 @@ default values is allways infered from the python parsed type. Thus
         }
 '''
 
+
+import warnings
+import logging
+import numpy as np
+import pandas as pd
+from collections import deque
+
+from ..utils.utils import set_data_columns, spec_updater
+log = logging.getLogger(name=__name__)
+
+
 class Epithelium:
     '''
     The whole tissue.
@@ -85,18 +86,6 @@ class Epithelium:
         # backup container
         # TODO: pass the max backup number as a config argument
         self._backups = deque(maxlen=5)
-        if coords is None:
-            coords = ['x', 'y', 'z']
-        self.coords = coords
-        # edge's dx, dy, dz
-        self.dcoords = ['d'+c for c in self.coords]
-        # edge's unit length vector
-        self.ucoords = ['u'+c for c in self.coords]
-
-        self.dim = len(self.coords)
-        # edge's normals
-        if self.dim == 3:
-            self.ncoords = ['n'+c for c in self.coords]
 
         # each of those has a separate dataframe, as well as entries in
         # the specification files
@@ -110,6 +99,20 @@ class Epithelium:
         self.data_names = list(datasets.keys())
         self.element_names = ['srce', 'trgt',
                               'face', 'cell'][:len(self.data_names)]
+        if coords is None:
+            coords = [c for c in 'xyz' if c in datasets['vert'].columns]
+
+        self.coords = coords
+        # edge's dx, dy, dz
+        self.dcoords = ['d'+c for c in self.coords]
+        # edge's unit length vector
+        self.ucoords = ['u'+c for c in self.coords]
+
+        self.dim = len(self.coords)
+        # edge's normals
+        if self.dim == 3:
+            self.ncoords = ['n'+c for c in self.coords]
+
         if specs is None:
             specs = {name: {} for name in self.data_names}
         if 'settings' not in specs:
@@ -119,8 +122,6 @@ class Epithelium:
         self.update_specs(specs, reset=False)
         self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
                                                      names=self.element_names)
-        # # Topology (geometry independant)
-        # self.reset_topo()
         self.bbox = None
         self.set_bbox()
 
@@ -229,13 +230,6 @@ class Epithelium:
         self.update_mindex()
         if 'cell' in self.data_names:
             self.update_num_faces()
-        if ('opposite' in self.edge_df.columns) and (
-                'cell' not in self.data_names):
-            try:
-                self.edge_df['opposite'] = get_opposite(self.edge_df)
-            except ValueError:
-                warnings.warn('Opposites could not be computed, are you sure '
-                              'you are using a sheet-like topology?')
 
     @property
     def face_idx(self):
@@ -368,9 +362,6 @@ class Epithelium:
     def sum_cell(self, df):
         return self._lvl_sum(df, 'cell')
 
-    def get_opposite(self):
-        self.edge_df['opposite'] = get_opposite(self.edge_df)
-
     def get_orbits(self, center, periph):
         """Returns a dataframe with a `(center, edge)` MultiIndex with `periph`
         elements.
@@ -428,112 +419,6 @@ class Epithelium:
                              for idx in edges])
         polys = self.edge_df.groupby('face').apply(_get_verts_pos).dropna()
         return polys
-
-    def get_extra_indices(self):
-        """Computes extra indices:
-
-        - `self.free_edges`: half-edges at the epithelium boundary
-        - `self.dble_edges`: half-edges inside the epithelium,
-          with an opposite
-        - `self.east_edges`: half of the `dble_edges`, pointing east
-          (figuratively)
-        - `self.west_edges`: half of the `dble_edges`, pointing west
-           (the order of the east and west edges is conserved, so that
-           the ith west half-edge is the opposite of the ith east half-edge)
-        - `self.sgle_edges`: joint index over free and east edges, spanning
-           the entire graph without double edges
-        - `self.wrpd_edges`: joint index over free edges followed by the
-           east edges twice, such that a vector over the whole half-edge
-            dataframe is wrapped over the single edges
-        - `self.srtd_edges`: index over the whole half-edge sorted such that
-           the free edges come first, then the east, then the west
-
-        Also computes:
-        - `self.Ni`: the number of inside full edges
-          (i.e. `len(self.east_edges)`)
-        - `self.No`: the number of outside full edges
-          (i.e. `len(self.free_edges)`)
-        - `self.Nd`: the number of double half edges
-          (i.e. `len(self.dble_edges)`)
-        - `self.anti_sym`: `pd.Series` with shape `(self.Ne,)`
-          with 1 at the free and east half-edges and -1
-          at the opposite half-edges.
-
-        Notes
-        -----
-
-        - East and west is resepctive to some orientation at the
-          moment the indices are computed the partition stays valid as
-          long as there are no changes in the topology, so due to vertex
-          displacement, 'east' and 'west' might not stay valid. This is
-          just a practical naming convention.
-
-        - As the name suggest, this method is not working for edges in
-          3D pointing *exactly* north or south, ie iff `edge['dx'] ==
-          edge['dy'] == 0`. Until we need or find a better solution,
-          we'll just assert it worked.
-        """
-
-        if 'opposite' not in self.edge_df.columns:
-            self.edge_df['opposite'] = get_opposite(self.edge_df)
-
-        self.dble_edges = self.edge_df[self.edge_df['opposite'] >= 0].index
-        theta = np.arctan2(self.edge_df.loc[self.dble_edges, 'dy'],
-                           self.edge_df.loc[self.dble_edges, 'dx'])
-
-        self.east_edges = self.edge_df.loc[self.dble_edges][
-            (theta >= 0) & (theta < np.pi)].index
-        self.west_edges = pd.Index(self.edge_df.loc[
-            self.east_edges, 'opposite'].astype(np.int), name='edge')
-
-        self.free_edges = self.edge_df[self.edge_df['opposite'] == -1].index
-        self.sgle_edges = self.free_edges.append(self.east_edges)
-        self.srtd_edges = self.sgle_edges.append(self.west_edges)
-
-        # Index over the east and free edges, then the opposite indexed
-        # by their east counterpart
-        self.wrpd_edges = self.sgle_edges.append(self.east_edges)
-
-        self.Ni = self.east_edges.size  # number of inside (east) edges
-        self.Nd = self.dble_edges.size  # number of non free half edges
-        self.No = self.free_edges.size  # number of free halfedges
-        try:
-            assert (2*self.Ni + self.No) == self.Ne
-            assert self.west_edges.size == self.Ni
-            assert self.Nd == 2*self.Ni
-        # - BC -#
-        # Not sure how to build
-        # input data so the partition
-        # fails (so we can see
-        # if the exception is
-        # correctly raised).
-        # Leaving it in the coverage
-        # anyway.
-        except AssertionError:
-            raise AssertionError('''
-            Inconsistent partition:
-            total half-edges: %s
-            number of free: %s
-            number of east: %s
-            number of west: %s''' % (self.Ne, self.No, self.Ni,
-                                     self.west_edges.size))
-
-        # Anti symetric vector (1 at east and free edges, -1 at opposite)
-        self.anti_sym = pd.Series(np.ones(self.Ne),
-                                  index=self.edge_df.index)
-        self.anti_sym.loc[self.west_edges] = -1
-
-    def sort_edges_eastwest(self):
-        """reorder edges such the free edges are first,
-        then the first half of the double edges, then the other half of
-        the double edges, this way, each subset of the edges dataframe
-        are contiguous.
-        """
-        self.get_extra_indices()
-        self.edge_df = self.edge_df.loc[self.srtd_edges]
-        self.reset_index()
-        self.reset_topo()
-        self.get_extra_indices()
 
     def validate(self):
         """returns True if the mesh is validated
@@ -775,21 +660,6 @@ def _test_valid(face):
     s1 = set(face['srce'])
     s2 = set(face['trgt'])
     return s1 == s2
-
-
-def get_opposite(edge_df):
-    """
-    Returns the indices opposite to the edges in `edge_df`
-    """
-    st_indexed = edge_df[['srce', 'trgt']].reset_index().set_index(
-        ['srce', 'trgt'], drop=False)
-    flipped = st_indexed.index.swaplevel(0, 1)
-    flipped.names = ['srce', 'trgt']
-
-    opposite = st_indexed.loc[flipped, 'edge'].values
-    opposite[np.isnan(opposite)] = -1
-
-    return opposite.astype(np.int)
 
 
 def get_opposite_faces(eptm):

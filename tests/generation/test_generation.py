@@ -6,7 +6,7 @@ from tyssue.generation import hexa_grid2d, from_2d_voronoi
 from tyssue.generation import extrude, subdivide_faces
 from tyssue import Epithelium, BulkGeometry, config
 
-from tyssue.core.objects import get_opposite
+from tyssue.core.sheet import get_opposite
 
 from pytest import raises
 
@@ -111,12 +111,14 @@ def test_anchors():
     assert res_srce_trgt_anchors.equals(expected_res)
 
 
-def test_sheet_extract():
+def test_extract():
     datasets, specs = generation.three_faces_sheet()
     sheet = Sheet('test_sheet_extract_coordinate', datasets, specs)
-    subsheet = sheet.sheet_extract('is_alive')
-    assert subsheet.face_df['is_alive'].all() == True
+    sheet.face_df.loc[0, 'is_alive'] = False
+    subsheet = sheet.extract('is_alive')
 
+    assert subsheet.face_df['is_alive'].all()
+    assert subsheet.Nf == 2
 
 def test_sheet_extract_coordinate():
     grid = hexa_grid2d(6, 4, 3, 3)
