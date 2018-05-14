@@ -87,6 +87,8 @@ class EventManager():
             extra keywords arguments to the behavior function
 
         """
+        #if (behavior, elem_id) not in self.next:
+        #    self.next.append((behavior, elem_id, args, kwargs))
         for tup in self.next:
             if (elem_id == tup[1]) and (behavior.__name__ == tup[0].__name__):
                 return
@@ -103,7 +105,7 @@ class EventManager():
 
         while self.current:
             (behavior, elem_id, args, kwargs) = self.current.popleft()
-            logger.info(f'{self.clock}, {elem_id}, {behavior.__name__}')
+            logger.info(f'{self.element}: {elem_id}, behavior: {behavior.__name__}')
             behavior(eptm, self, elem_id, *args, **kwargs)
 
     def update(self):
@@ -115,9 +117,11 @@ class EventManager():
         self.next.clear()
 
 
+
 def wait(eptm, manager, elem_id, n_steps):
     """Does nothing for a number of steps n_steps
     """
     if n_steps > 1:
         manager.next.append('wait', elem_id,
                             (n_steps - 1,), {})
+    logger.info(f'Doing nothing for {n_steps} steps')
