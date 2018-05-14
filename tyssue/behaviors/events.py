@@ -21,6 +21,7 @@ class EventManager():
 
 
     """
+
     def __init__(self, element):
         """Creates an events class
 
@@ -33,7 +34,6 @@ class EventManager():
         self.next = deque()
         self.element = element
         self.current.append((wait, -1, (1,), {}))
-
 
     def extend(self, events):
         """
@@ -71,10 +71,10 @@ class EventManager():
             extra keywords arguments to the behavior function
 
         """
-        #if (behavior, elem_id) not in self.next:
+        # if (behavior, elem_id) not in self.next:
         #    self.next.append((behavior, elem_id, args, kwargs))
         for tup in self.next:
-            if elem_id == tup[1]:
+            if (elem_id == tup[1] & behavior.__name__ == tup[0].__name__):
                 return
         if args is None:
             args = ()
@@ -101,11 +101,10 @@ class EventManager():
         self.next.clear()
 
 
-
 def wait(eptm, manager, elem_id, n_steps):
     """Does nothing for a number of steps n_steps
     """
     if n_steps > 1:
         manager.next.append('wait', elem_id,
-                            (n_steps-1,), {})
+                            (n_steps - 1,), {})
     logger.info(f'Doing nothing for {n_steps} steps')
