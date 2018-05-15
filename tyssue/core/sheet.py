@@ -286,12 +286,12 @@ class Sheet(Epithelium):
         datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
             datasets['face'].index)].copy()
 
-        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()]
+        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()].copy()
 
         subsheet = Sheet('subsheet', datasets, self.specs)
         subsheet.reset_index()
         subsheet.reset_topo()
-        return (subsheet)
+        return subsheet
 
     @classmethod
     def planar_sheet_2d(cls, identifier,

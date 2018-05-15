@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('agg')
+matplotlib.use('Agg')
 import numpy as np
 
 from tyssue.generation import three_faces_sheet
@@ -10,11 +10,13 @@ import matplotlib.pyplot as plt
 draw_specs = config.draw.sheet_spec()
 
 def test_quick_edge_draw():
+    matplotlib.use('Agg')
     sheet = Sheet('test', *three_faces_sheet())
     fig, ax = quick_edge_draw(sheet)
     assert ax.lines[0].get_xydata().shape == (54, 2)
 
 def test_sheet_view():
+    matplotlib.use('Agg')
     sheet = Sheet('test', *three_faces_sheet())
     sheet.vert_df['rand'] = np.linspace(0.0, 1.0, num=sheet.vert_df.shape[0])
     cmap = plt.cm.get_cmap('viridis')

@@ -404,17 +404,7 @@ class Epithelium:
 
     def face_polygons(self, coords):
         def _get_verts_pos(face):
-            try:
-                edges = _ordered_edges(face)
-            except IndexError:
-                #- BC -#
-                # I'm still trying to figure
-                # out a way to raise this exception
-                # with altered datasets but to no avail
-                # Leaving it included in coverage.
-                log.warning('Face is not closed')
-                log.warning(face)
-                return np.nan
+            edges = _ordered_edges(face)
             return np.array([self.vert_df.loc[idx[0], coords]
                              for idx in edges])
         polys = self.edge_df.groupby('face').apply(_get_verts_pos).dropna()
@@ -617,7 +607,7 @@ class Epithelium:
 
 def _ordered_edges(face_edges):
     """Returns "srce", "trgt" and "face" indices
-    organized clockwise for each edge.
+    organized clockwise for each face.
 
     Parameters
     ----------
@@ -629,7 +619,8 @@ def _ordered_edges(face_edges):
     edges: list of 3 ints
         srce, trgt, face indices, ordered
     """
-    srces, trgts, faces = face_edges[['srce', 'trgt', 'face']].values.T
+
+    srces, trgts, faces = (face_edges[col].values for col in ['srce', 'trgt', 'face'])
     srce, trgt, face_ = srces[0], trgts[0], faces[0]
     edges = [[srce, trgt, face_]]
     for face_ in faces[1:]:

@@ -17,6 +17,31 @@ COORDS = ['x', 'y']
 def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
     """ Base view function, parametrizable
     through draw_secs
+
+    The default sheet_spec specification is:
+
+    {'edge': {
+      'visible': True,
+      'width': 0.5,
+      'head_width': 0.2, # arrow head width for the edges
+      'length_includes_head': True, # see matplotlib Arrow artist doc
+      'shape': 'right',
+      'color': '#2b5d0a', # can be an array
+      'alpha': 0.8,
+      'zorder': 1,
+      'colormap': 'viridis'},
+     'vert': {
+      'visible': True,
+      's': 100,
+      'color': '#000a4b',
+      'alpha': 0.3,
+      'zorder': 2},
+     'face': {
+      'visible': False,
+      'color': '#8aa678',
+      'alpha': 1.0,
+      'zorder': -1}
+      }
     """
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
@@ -136,7 +161,8 @@ def parse_edge_specs(edge_draw_specs):
     return arrow_specs, collection_specs
 
 
-def quick_edge_draw(sheet, coords=['x', 'y'], ax=None, **draw_spec_kw):
+def quick_edge_draw(sheet, coords=['x', 'y'],
+                    ax=None, **draw_spec_kw):
 
     if ax is None:
         fig, ax = plt.subplots()

@@ -8,7 +8,10 @@
 
 [![Coverage Status](https://coveralls.io/repos/DamCB/tyssue/badge.svg)](https://coveralls.io/r/DamCB/tyssue)
 
-[![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/)
+[![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/
+)
+
+[![DOI](https://zenodo.org/badge/32533164.svg)](https://zenodo.org/badge/latestdoi/32533164)
 
 
 The `tyssue` library seeks to provide a unified interface to implement
