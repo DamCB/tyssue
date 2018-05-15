@@ -74,7 +74,7 @@ class EventManager():
         # if (behavior, elem_id) not in self.next:
         #    self.next.append((behavior, elem_id, args, kwargs))
         for tup in self.next:
-            if (elem_id == tup[1] & behavior.__name__ == tup[0].__name__):
+            if (elem_id == tup[1]) and (behavior.__name__ == tup[0].__name__):
                 return
         if args is None:
             args = ()

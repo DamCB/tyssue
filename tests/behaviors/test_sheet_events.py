@@ -29,17 +29,17 @@ def test_add_events():
     manager.update()
     assert len(manager.current) == 3
 
+
 def test_add_only_once():
     manager = EventManager('face')
     initial_cell_event = [(division, 1, (), {'geom': geom}),
-                          (wait, 3, (4,), {}),
+                          (apoptosis, 3, (4,), {}),
                           (apoptosis, 3, (), {})]
 
     manager.extend(initial_cell_event)
     manager.execute(None)
     manager.update()
     assert len(manager.current) == 2
-    assert apoptosis not in [tup[0] for tup in manager.current]
 
 
 def test_execute_apoptosis():
@@ -70,11 +70,11 @@ def test_execute_apoptosis():
     manager.update()
 
     sheet.settings['apoptosis'] = {'contractile_increase': 2.0,
-                                   'critical_area': 2*face_area}
+                                   'critical_area': 2 * face_area}
     manager.current.clear()
 
     modified_cell_event = (apoptosis, face_id, (),
-                          sheet.settings['apoptosis'])
+                           sheet.settings['apoptosis'])
 
     manager.current.append(modified_cell_event)
     manager.execute(sheet)
@@ -148,8 +148,8 @@ def test_ab_pull():
     ab_pull(sheet, 0, 1., distributed=False)
     np.testing.assert_array_equal(
         sheet.vert_df.loc[0:5, 'radial_tension'],
-        np.ones(6)*2.)
+        np.ones(6) * 2.)
     ab_pull(sheet, 0, 3., distributed=True)
     np.testing.assert_array_equal(
         sheet.vert_df.loc[0:5, 'radial_tension'],
-        np.ones(6)*2.5)
+        np.ones(6) * 2.5)
