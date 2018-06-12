@@ -110,8 +110,6 @@ def draw_edge(sheet, coords, **edge_specs):
 def draw_face(sheet, coords, **face_draw_specs):
 
     epsilon = face_draw_specs.get('epsilon', 0)
-
-    coords = sheet.coords
     up_srce = sheet.upcast_srce(sheet.vert_df[coords])
     up_trgt = sheet.upcast_trgt(sheet.vert_df[coords])
 
