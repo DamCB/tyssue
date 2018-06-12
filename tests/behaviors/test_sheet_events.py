@@ -1,4 +1,6 @@
 import os
+import tempfile
+
 import numpy as np
 import pandas as pd
 
@@ -16,7 +18,6 @@ from tyssue.behaviors.sheet_events import (division,
                                            type3,
                                            contract,
                                            ab_pull)
-
 
 def test_add_events():
 
@@ -40,6 +41,23 @@ def test_add_only_once():
     manager.execute(None)
     manager.update()
     assert len(manager.current) == 2
+
+
+def test_logging():
+
+    tf = tempfile.mktemp()
+    manager = EventManager('face', tf)
+    initial_cell_event = [(division, 1, (), {'geom': geom}),
+                          (apoptosis, 3, (4,), {}),
+                          (apoptosis, 3, (), {})]
+
+    manager.extend(initial_cell_event)
+    manager.execute(None)
+    manager.update()
+    with open(tf, 'r') as fh:
+        l0, l1, l2 = fh.readlines()
+
+    assert l2 == '0, -1, wait\n'
 
 
 def test_execute_apoptosis():
