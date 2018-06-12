@@ -219,7 +219,25 @@ def get_ellipsoid_centers(a, b, c, n_zs,
 
 
 def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
+    """Creates an ellipsoidal apical mesh.
 
+    Parameters
+    ----------
+    a, b, c : floats
+       Size of the ellipsoid half axes in
+       the x, y, and z directions, respectively
+    n_zs : int
+       The (approximate) number of faces along the z axis.
+
+    Returns
+    -------
+    eptm : a :class:`Epithelium` object
+
+    The mesh returned is an `Epithelium` and not a simpler `Sheet`
+    so that a unique cell data can hold information on the
+    whole volume of the ellipsoid.
+
+    """
     centers = get_ellipsoid_centers(a, b, c, n_zs,
                                     **kwargs)
 

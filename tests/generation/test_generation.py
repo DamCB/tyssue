@@ -78,7 +78,7 @@ def test_subdivide():
 
 def test_extrude_invalid_method():
     datasets, specs = generation.three_faces_sheet()
-    with raises(ValueError, msg='Expecting a ValueError : method should be \'translation\' or \'homothecy\''):
+    with raises(ValueError):
         datasets_3d = extrude(datasets, method='invalid_method')
 
 

@@ -12,7 +12,6 @@ from ..utils.decorators import do_undo, validate
 logger = logging.getLogger(name=__name__)
 
 
-
 def get_division_edges(eptm, mother,
                        plane_normal,
                        plane_center=None):
@@ -296,9 +295,9 @@ def IH_transition(eptm, e_1011):
 
     # Removing the remaining edges and vertices
     todel_edges = eptm.edge_df[(eptm.edge_df['srce'] == v10) |
-                               (eptm.edge_df['srce'] == v10) |
+                               (eptm.edge_df['trgt'] == v10) |
                                (eptm.edge_df['srce'] == v11) |
-                               (eptm.edge_df['srce'] == v11)].index
+                               (eptm.edge_df['trgt'] == v11)].index
 
     eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
     eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v10, v11])]
