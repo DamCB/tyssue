@@ -1,13 +1,15 @@
 """
 Matplotlib based plotting
 """
-
+import warnings
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+
+from matplotlib import cm
 from matplotlib.path import Path
 from matplotlib.patches import Polygon, FancyArrow, Arc, PathPatch
 from matplotlib.collections import PatchCollection
-import pandas as pd
-import numpy as np
 from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater
 
@@ -84,7 +86,7 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
                         fill=True,
                         closed=True)
         patches.append(patch)
-    collection_specs = parse_face_specs(draw_spec)
+    collection_specs = parse_face_specs(draw_spec, sheet)
     p = PatchCollection(patches, False,
                         **collection_specs)
     ax.add_collection(p)
@@ -93,15 +95,46 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
     return ax
 
 
-def parse_face_specs(face_draw_specs):
+def parse_face_specs(face_draw_specs, sheet):
 
     collection_specs = {}
-    if "color" in face_draw_specs:
-        collection_specs['facecolors'] = face_draw_specs['color']
+    color = face_draw_specs.get('color')
+    if color is None:
+        return
+    elif isinstance(color, str):
+        collection_specs['facecolors'] = color
+
+    elif hasattr(color, '__len__'):
+        collection_specs['facecolors'] = _face_color_from_sequence(
+            face_draw_specs, sheet)
     if "alpha" in face_draw_specs:
         collection_specs['alpha'] = face_draw_specs['alpha']
 
     return collection_specs
+
+
+def _face_color_from_sequence(face_spec, sheet):
+    color_ = face_spec['color']
+    cmap = cm.get_cmap(face_spec.get('colormap', 'viridis'))
+    color_min, color_max = face_spec.get(
+        'color_range', (color_.min(), color_.max()))
+
+    if color_.shape in [(sheet.Nf, 3), (sheet.Nf, 4)]:
+        return color_
+
+    elif color_.shape == (sheet.Nf,):
+        if color_.ptp() < 1e-10:
+            warnings.warn('Attempting to draw a colormap '
+                          'with a uniform value')
+            return np.ones((sheet.Nf, 3))*0.5
+
+        normed = (color_ - color_min)/(color_max - color_min)
+        return cmap(normed)
+
+    else:
+        warnings.warn("shape of `face_spec['color']` must be either (Nf, 3), (Nf, 4) or (Nf,)")
+        return face_spec["color"]
+
 
 
 def draw_vert(sheet, coords, ax, **draw_spec_kw):
@@ -131,7 +164,7 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
                           sheet.edge_df[dy])
 
     patches = []
-    arrow_specs, collections_specs = parse_edge_specs(draw_spec)
+    arrow_specs, collections_specs = parse_edge_specs(draw_spec, sheet)
 
     for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows():
         srce = int(edge['srce'])
@@ -147,7 +180,7 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
     return ax
 
 
-def parse_edge_specs(edge_draw_specs):
+def parse_edge_specs(edge_draw_specs, sheet):
 
     arrow_keys = ['head_width',
                   'length_includes_head',
@@ -156,12 +189,46 @@ def parse_edge_specs(edge_draw_specs):
                    if key in arrow_keys}
     collection_specs = {}
     if "color" in edge_draw_specs:
-        collection_specs['edgecolors'] = edge_draw_specs['color']
+        if isinstance(edge_draw_specs['color'], str):
+            collection_specs['edgecolors'] = edge_draw_specs['color']
+        elif hasattr(edge_draw_specs['color'], '__len__'):
+            collection_specs['edgecolors'] = _wire_color_from_sequence(
+                edge_draw_specs, sheet)
+
     if "width" in edge_draw_specs:
         collection_specs['linewidths'] = edge_draw_specs['width']
     if "alpha" in edge_draw_specs:
         collection_specs['alpha'] = edge_draw_specs['alpha']
     return arrow_specs, collection_specs
+
+
+def _wire_color_from_sequence(edge_spec, sheet):
+    """
+    """
+    color_ = edge_spec['color']
+    color_min, color_max = edge_spec.get(
+        'color_range', (color_.min(), color_.max()))
+    cmap = cm.get_cmap(edge_spec.get('colormap', 'viridis'))
+    if color_.shape in [(sheet.Nv, 3), (sheet.Nv, 4)]:
+        return (sheet.upcast_srce(color_)
+                + sheet.upcast_trgt(color_)) / 2
+    elif color_.shape == (sheet.Nv,):
+        if color_.ptp() < 1e-10:
+            warnings.warn('Attempting to draw a colormap '
+                          'with a uniform value')
+            return np.ones((sheet.Nv, 3))*0.7
+        color_ = (sheet.upcast_srce(color_)
+                  + sheet.upcast_trgt(color_)) / 2
+        return cmap((color_ - color_min)/(color_max - color_min))
+
+    elif color_.shape in [(sheet.Ne, 3), (sheet.Ne, 4)]:
+        return color_
+    elif color_.shape == (sheet.Ne,):
+        if color_.ptp() < 1e-10:
+            warnings.warn('Attempting to draw a colormap '
+                          'with a uniform value')
+            return np.ones((sheet.Nv, 3))*0.7
+        return cmap((color_ - color_min)/(color_max - color_min))
 
 
 def quick_edge_draw(sheet, coords=['x', 'y'],

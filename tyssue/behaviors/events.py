@@ -10,9 +10,10 @@ import pandas as pd
 import warnings
 import random
 from collections import deque, namedtuple
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.INFO)
 
 class EventManager():
     """
@@ -22,18 +23,33 @@ class EventManager():
 
     """
 
-    def __init__(self, element):
+    def __init__(self, element, logfile=None):
         """Creates an events class
 
         Parameters
         ----------
         element : str
            element on which the events occur, e.g face or cell
+        logfile : str, default None
+           if logfile is not None, will create a logging handler
+           for this file where each event will be logged
+
+
+
         """
         self.current = deque()
         self.next = deque()
         self.element = element
         self.current.append((wait, -1, (1,), {}))
+        self.clock = 0
+        if logfile is not None:
+            fh = logging.FileHandler(logfile)
+            fh.setLevel(logging.INFO)
+            logger.addHandler(fh)
+            logger.info('# Started logging at %s',
+                        datetime.now().isoformat())
+            logger.info(f'time, {self.element} index, event')
+
 
     def extend(self, events):
         """
@@ -71,8 +87,6 @@ class EventManager():
             extra keywords arguments to the behavior function
 
         """
-        # if (behavior, elem_id) not in self.next:
-        #    self.next.append((behavior, elem_id, args, kwargs))
         for tup in self.next:
             if (elem_id == tup[1]) and (behavior.__name__ == tup[0].__name__):
                 return
@@ -89,7 +103,7 @@ class EventManager():
 
         while self.current:
             (behavior, elem_id, args, kwargs) = self.current.popleft()
-            logger.info(f'{self.element}: {elem_id}, behavior: {behavior.__name__}')
+            logger.info(f'{self.clock}, {elem_id}, {behavior.__name__}')
             behavior(eptm, self, elem_id, *args, **kwargs)
 
     def update(self):
@@ -107,4 +121,3 @@ def wait(eptm, manager, elem_id, n_steps):
     if n_steps > 1:
         manager.next.append('wait', elem_id,
                             (n_steps - 1,), {})
-    logger.info(f'Doing nothing for {n_steps} steps')
