@@ -114,7 +114,7 @@ def test_anchors():
 def test_extract():
     datasets, specs = generation.three_faces_sheet()
     sheet = Sheet('test_sheet_extract_coordinate', datasets, specs)
-    sheet.face_df.loc[0, 'is_alive'] = False
+    sheet.face_df.loc[0, 'is_alive'] = 0
     subsheet = sheet.extract('is_alive')
 
     assert subsheet.face_df['is_alive'].all()

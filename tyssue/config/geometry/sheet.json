@@ -6,7 +6,7 @@
     "num_sides": 6,
     "area": 1.0,
     "perimeter": 1.0,
-    "is_alive": true
+    "is_alive": 1
     },
  "vert": {
      "x": 0.0,

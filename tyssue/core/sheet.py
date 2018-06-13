@@ -230,9 +230,8 @@ class Sheet(Epithelium):
         """
 
         datasets = {}
-
-        datasets['face'] = self.face_df[
-            self.face_df[face_mask]].copy()
+        mask = self.face_df[face_mask].astype(bool)
+        datasets['face'] = self.face_df[mask].copy()
         datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
             datasets['face'].index)].copy()
         datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()].copy()
