@@ -8,6 +8,7 @@ from tyssue.generation import hexa_grid2d, from_2d_voronoi
 from tyssue.generation import hexa_grid3d, from_3d_voronoi
 from numpy.testing import assert_almost_equal, assert_allclose
 from tyssue import Monolayer, config
+from tyssue import SheetGeometry as geom
 from tyssue.topology.base_topology import close_face
 from tyssue.core.sheet import get_opposite
 
@@ -33,12 +34,16 @@ def test_spec_updater():
 
 
 def test_data_at_opposite():
-    grid = hexa_grid2d(6, 4, 3, 3)
-    datasets = from_2d_voronoi(Voronoi(grid))
-    sheet = Sheet('test', datasets)
-    sheet.edge_df['opposite'] = get_opposite(sheet.edge_df)
-    opposite = utils.data_at_opposite(sheet, pd.DataFrame(sheet.edge_df.index))
-    assert opposite[0].all() == sheet.edge_df['opposite'].all()
+    sheet = Sheet('emin', *three_faces_sheet())
+    geom.update_all(sheet)
+    sheet.get_opposite()
+    opp = utils.data_at_opposite(sheet, sheet.edge_df['length'], free_value=None)
+
+    assert opp.shape == (sheet.Ne,)
+    assert opp.loc[0] == 1.0
+    assert ~np.isfinite(opp.loc[1])
+    opp = utils.data_at_opposite(sheet, sheet.edge_df['length'], free_value=-1)
+    assert opp.loc[1] == -1.0
 
 
 def test_single_cell():
