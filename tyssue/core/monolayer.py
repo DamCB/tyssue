@@ -136,7 +136,7 @@ class MonolayerWithLamina(Monolayer):
         lamina_edges.index += self.edge_df.index.max()+1
         lamina_edges['segment'] = 'lamina'
         lamina_edges['subdiv'] = 0
-        self.edge_df = pd.concat([self.edge_df, lamina_edges])
+        self.edge_df = pd.concat([self.edge_df, lamina_edges], sort=True)
         self.reset_topo()
         BulkGeometry.update_all(self)
 

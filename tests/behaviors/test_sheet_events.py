@@ -108,6 +108,7 @@ def test_execute_apoptosis():
 def test_execute_division():
 
     sheet = Sheet('emin', *three_faces_sheet())
+    geom.update_all(sheet)
     sheet.face_df['vol'] = 1.
     sheet.specs['face']['prefered_vol'] = 1.
     sheet.face_df['prefered_vol'] = 1.

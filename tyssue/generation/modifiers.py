@@ -175,7 +175,7 @@ def create_anchors(sheet):
     anchor_edge_df['face'] = -1
     anchor_edge_df['at_border'] = 0
     sheet.edge_df = pd.concat([sheet.edge_df,
-                               anchor_edge_df])
+                               anchor_edge_df], sort=True)
     sheet.edge_df.index.name = 'edge'
     sheet.reset_topo()
 
