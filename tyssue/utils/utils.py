@@ -61,7 +61,7 @@ def spec_updater(specs, new):
 def set_data_columns(datasets, specs, reset=False):
 
     if reset:
-        logger.warn('Reseting datasets values with new specs')
+        logger.warning('Reseting datasets values with new specs')
 
     for name, spec in specs.items():
         if not len(spec):
@@ -91,11 +91,11 @@ def data_at_opposite(sheet, edge_data, free_value=None):
     """
     if isinstance(edge_data, pd.Series):
         opposite = pd.Series(
-            edge_data.loc[sheet.edge_df['opposite']].values,
+            edge_data.reindex(sheet.edge_df['opposite']).values,
             index=edge_data.index)
     else:
         opposite = pd.DataFrame(
-            edge_data.loc[sheet.edge_df['opposite']].values,
+            edge_data.reindex(sheet.edge_df['opposite']).values,
             index=edge_data.index)
     if free_value is not None:
         opposite = opposite.replace(np.nan, free_value)
