@@ -2,7 +2,7 @@
 "vert": {
     "z": 0.0,
     "x": 0.0,
-    "is_active": true,
+    "is_active": 1,
     "y": 0.0
     },
 "face": {
@@ -11,7 +11,7 @@
     "num_sides": 6,
     "area": 0.0,
     "perimeter": 0.0,
-    "is_alive": true,
+    "is_alive": 1,
     "y": 0.0
     },
 "cell": {
@@ -20,7 +20,7 @@
     "area": 0.0,
     "vol": 0.0,
     "num_faces": 6,
-    "is_alive": true,
+    "is_alive": 1,
     "y": 0.0
     },
 "edge": {
