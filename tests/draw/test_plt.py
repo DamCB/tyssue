@@ -48,3 +48,9 @@ def test_sheet_view():
     assert ax.collections[1].get_edgecolors().shape == (18, 4)
     assert ax.collections[2].get_edgecolors().shape == (0, 4)
     assert ax.collections[2].get_facecolors().shape == (3, 4)
+    draw_specs['face']['color'] = 'red'
+    draw_specs['edge']['color'] = 'k'
+
+    fig, ax = sheet_view(sheet, ['x', 'y'], **draw_specs)
+    assert ax.collections[1].get_edgecolors().shape == (1, 4)
+    assert ax.collections[2].get_facecolors().shape == (1, 4)
