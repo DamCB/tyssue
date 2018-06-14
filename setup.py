@@ -23,8 +23,8 @@ files = ['*.so*', '*.a*', '*.lib*',
 ## Thanks to them!
 MAJOR               = 0
 MINOR               = 2
-MICRO               = 1
-ISRELEASED          = True
+MICRO               = 2
+ISRELEASED          = False
 VERSION             = '%d.%d.%s' % (MAJOR, MINOR, MICRO)
 
 
