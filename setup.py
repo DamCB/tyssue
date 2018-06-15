@@ -61,10 +61,10 @@ def get_version_info():
     elif os.path.exists('tyssue/version.py'):
         # must be a source distribution, use existing version file
         try:
-            from numpy.version import git_revision as GIT_REVISION
+            from tyssue.version import git_revision as GIT_REVISION
         except ImportError:
             raise ImportError("Unable to import git_revision. Try removing " \
-                              "numpy/version.py and the build directory " \
+                              "tyssue/version.py and the build directory " \
                               "before building.")
     else:
         GIT_REVISION = "Unknown"
