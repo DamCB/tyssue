@@ -176,7 +176,7 @@ def get_ellipsoid_centers(a, b, c, n_zs,
     """
     dist = c / (n_zs)
     theta = -np.pi/2
-    thetas = [theta]
+    thetas = []
     while theta < np.pi/2:
         theta = theta + dist/ellipse_rho(theta, a, c)
         thetas.append(theta)
@@ -228,6 +228,8 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
        the x, y, and z directions, respectively
     n_zs : int
        The (approximate) number of faces along the z axis.
+
+    kwargs are passed to `get_ellipsoid_centers`
 
     Returns
     -------

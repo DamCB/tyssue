@@ -32,17 +32,22 @@ def sheet_view(sheet, coords=['x', 'y', 'z'], **draw_specs_kw):
     """
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
+    fig = ipv.gcf()
+
+
     edge_spec = draw_specs['edge']
     if edge_spec['visible']:
-        edge_mesh = draw_edge(sheet, coords, **edge_spec)
+        edges = edge_mesh(sheet, coords, **edge_spec)
+        fig.meshes = fig.meshes + [edges]
     else:
-        edge_mesh = None
+        edges = None
 
     face_spec = draw_specs['face']
     if face_spec['visible']:
-        face_mesh = draw_face(sheet, coords, **face_spec)
+        faces = face_mesh(sheet, coords, **face_spec)
+        fig.meshes = fig.meshes + [faces]
     else:
-        face_mesh = None
+        faces = None
 
     box_size = max(*(sheet.vert_df[u].ptp()
                      for u in sheet.coords))
@@ -50,8 +55,7 @@ def sheet_view(sheet, coords=['x', 'y', 'z'], **draw_specs_kw):
     lim_inf = sheet.vert_df[sheet.coords].min().min() - border
     lim_sup = sheet.vert_df[sheet.coords].max().max() + border
     ipv.xyzlim(lim_inf, lim_sup)
-    fig = ipv.gcf()
-    return fig, (edge_mesh, face_mesh)
+    return fig, (edges, faces)
 
 
 def view_ipv(sheet, coords=['x', 'y', 'z'], **edge_specs):
@@ -67,20 +71,22 @@ def view_ipv(sheet, coords=['x', 'y', 'z'], **edge_specs):
 
     """
     warnings.warn('`view_ipv` is deprecated, use the more generic `sheet_view`')
-    mesh = draw_edge(sheet, coords, **edge_specs)
+    mesh = edge_mesh(sheet, coords, **edge_specs)
+    fig = ipv.gcf()
+    fig.meshes = fig.meshes + [mesh]
     box_size = max(*(sheet.vert_df[u].ptp()
                      for u in sheet.coords))
     border = 0.05 * box_size
     lim_inf = sheet.vert_df[sheet.coords].min().min() - border
     lim_sup = sheet.vert_df[sheet.coords].max().max() + border
     ipv.xyzlim(lim_inf, lim_sup)
-    fig = ipv.gcf()
+
     return fig, mesh
 
 
-def draw_edge(sheet, coords, **edge_specs):
+def edge_mesh(sheet, coords, **edge_specs):
     """
-    Creates a javascript renderer of the edge lines to be displayed
+    Creates a ipyvolume Mesh of the edge lines to be displayed
     in Jupyter Notebooks
 
     Returns
@@ -99,15 +105,15 @@ def draw_edge(sheet, coords, **edge_specs):
         color = _wire_color_from_sequence(spec, sheet)[:, :3]
 
     u, v, w = coords
-    mesh = ipv.plot_trisurf(sheet.vert_df[u],
-                            sheet.vert_df[v],
-                            sheet.vert_df[w],
-                            lines=sheet.edge_df[['srce', 'trgt']],
-                            color=color)
+    mesh = ipv.Mesh(x=sheet.vert_df[u],
+                    y=sheet.vert_df[v],
+                    z=sheet.vert_df[w],
+                    lines=sheet.edge_df[['srce', 'trgt']],
+                    color=color)
     return mesh
 
 
-def draw_face(sheet, coords, **face_draw_specs):
+def face_mesh(sheet, coords, **face_draw_specs):
 
     epsilon = face_draw_specs.get('epsilon', 0)
     up_srce = sheet.upcast_srce(sheet.vert_df[coords])
@@ -127,10 +133,9 @@ def draw_face(sheet, coords, **face_draw_specs):
                            np.arange(Ne)+Ne+Nf]).T
 
     color = _face_color_from_sequence(face_draw_specs, sheet, )
-    mesh = ipv.plot_trisurf(mesh[:, 0], mesh[:, 1], mesh[:, 2],
-                            triangles=triangles, color=color[:, :3])
+    mesh = ipv.Mesh(x=mesh[:, 0], y=mesh[:, 1], z=mesh[:, 2],
+                    triangles=triangles, color=color[:, :3])
     return mesh
-
 
 
 def _wire_color_from_sequence(edge_spec, sheet):
@@ -189,5 +194,4 @@ def _face_color_from_sequence(face_spec, sheet):
         return cmap(np.concatenate([normed, up_color, up_color]))
 
     else:
-        warnings.warn("shape of `face_spec['color']` must be either (Nf, 3), (Nf, 4) or (Nf,)")
-        return face_spec["color"]
+        raise ValueError("shape of `face_spec['color']` must be either (Nf, 3), (Nf, 4) or (Nf,)")
