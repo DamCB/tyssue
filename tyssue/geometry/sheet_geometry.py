@@ -38,10 +38,10 @@ class SheetGeometry(PlanarGeometry):
         center of mass.
         '''
         coords = sheet.coords
-        face_pos = sheet.upcast_face(sheet.face_df[coords]).values
-        srce_pos = sheet.upcast_srce(sheet.vert_df[coords]).values
-        normals = np.cross(srce_pos - face_pos,
-                           sheet.edge_df[sheet.dcoords].values)
+        face_pos = sheet.edge_df[['f'+c for c in coords]].values
+        srce_pos = sheet.edge_df[['s'+c for c in coords]].values
+        trgt_pos = sheet.edge_df[['t'+c for c in coords]].values
+        normals = np.cross(srce_pos - face_pos, trgt_pos - srce_pos)
         sheet.edge_df[sheet.ncoords] = normals
 
     @staticmethod
@@ -225,6 +225,7 @@ class SheetGeometry(PlanarGeometry):
         rot_pos = pd.DataFrame(np.dot(rel_pos, rotation.T),
                                index=face_orbit, columns=sheet.coords)
         return rot_pos
+
 
 class EllipsoidGeometry(SheetGeometry):
 

@@ -31,17 +31,21 @@ class BulkGeometry(SheetGeometry):
         cls.update_vol(eptm)
 
     @staticmethod
+    def update_dcoords(eptm):
+        SheetGeometry.update_dcoords(eptm)
+
+
+    @staticmethod
     def update_vol(eptm):
         '''
 
         '''
-        face_pos = eptm.upcast_face(eptm.face_df[eptm.coords])
-        cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords])
+        face_pos = eptm.edge_df[['f'+c for c in eptm.coords]].values
+        cell_pos = eptm.edge_df[['c'+c for c in eptm.coords]].values
 
         eptm.edge_df['sub_vol'] = np.sum(
             (face_pos - cell_pos) *
             eptm.edge_df[eptm.ncoords].values, axis=1) / 6
-
         eptm.cell_df['vol'] = eptm.sum_cell(eptm.edge_df['sub_vol'])
 
     @staticmethod
@@ -50,19 +54,25 @@ class BulkGeometry(SheetGeometry):
         SheetGeometry.update_areas(eptm)
         eptm.cell_df['area'] = eptm.sum_cell(eptm.edge_df['sub_area'])
 
-
     @staticmethod
     def update_centroid(eptm):
+        scoords = ['s'+c for c in eptm.coords]
+        eptm.face_df[eptm.coords] = eptm.edge_df.groupby('face')[scoords].mean()
+        face_pos = eptm.upcast_face(eptm.face_df[eptm.coords]).values
+        eptm.edge_df[['f'+c for c in eptm.coords]] = face_pos
 
-        upcast_pos = eptm.upcast_srce(eptm.vert_df[eptm.coords])
-        upcast_pos = upcast_pos.set_index(eptm.edge_mindex)
-        eptm.face_df[eptm.coords] = upcast_pos.mean(level='face')
-        eptm.cell_df[eptm.coords] = upcast_pos.mean(level='cell')
+        eptm.cell_df[eptm.coords] = eptm.edge_df.groupby('cell')[scoords].mean()
+        cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords]).values
+        eptm.edge_df[['c'+c for c in eptm.coords]] = cell_pos
 
     @staticmethod
     def validate_face_norms(eptm):
-        face_pos = eptm.upcast_face(eptm.face_df[eptm.coords])
-        cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords])
+
+        fcoords = ['f'+c for c in eptm.coords]
+        ccoords = ['c'+c for c in eptm.coords]
+
+        face_pos = eptm.edge_df[fcoords].values
+        cell_pos = eptm.edge_df[ccoords].values
 
         r_cf = (face_pos - cell_pos)
         r_cf['face'] = eptm.edge_df['face']
@@ -78,16 +88,23 @@ class RNRGeometry(BulkGeometry):
 
     @staticmethod
     def update_centroid(eptm):
+        scoords = ['s'+c for c in eptm.coords]
+        tcoords = ['t'+c for c in eptm.coords]
 
-        srce_pos = eptm.upcast_srce(eptm.vert_df[eptm.coords])
-        trgt_pos = eptm.upcast_trgt(eptm.vert_df[eptm.coords])
+        srce_pos = eptm.edge_df[scoords].values
+        trgt_pos = eptm.edge_df[tcoords].values
         mid_pos = (srce_pos + trgt_pos)/2
         weighted_pos =  eptm.sum_face(mid_pos * _to_3d(eptm.edge_df['length']))
         eptm.face_df[eptm.coords] = (
             weighted_pos.values /
             eptm.face_df['perimeter'].values[:, np.newaxis])
-        srce_pos['cell'] = eptm.edge_df['cell']
-        eptm.cell_df[eptm.coords] = srce_pos.groupby('cell').mean()
+
+        face_pos = eptm.upcast_face(eptm.face_df[eptm.coords]).values
+        eptm.edge_df[['f'+c for c in eptm.coords]] = face_pos
+
+        eptm.cell_df[eptm.coords] = eptm.edge_df.groupby('cell')[scoords].mean()
+        cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords]).values
+        eptm.edge_df[['c'+c for c in eptm.coords]] = cell_pos
 
 
 class MonoLayerGeometry(RNRGeometry):

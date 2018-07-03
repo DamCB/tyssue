@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 class BaseGeometry():
     """
     """
@@ -23,11 +22,15 @@ class BaseGeometry():
         `coords` basis (`default_coords` by default).
         Modifies the corresponding
         columns (i.e `['dx', 'dy', 'dz']`) in sheet.edge_df.
+
+        Also updates the upcasted coordinates of the source and target
+        vertices
         '''
         data = sheet.vert_df[sheet.coords]
         srce_pos = sheet.upcast_srce(data).values
         trgt_pos = sheet.upcast_trgt(data).values
-
+        sheet.edge_df[['s'+c for c in sheet.coords]] = srce_pos
+        sheet.edge_df[['t'+c for c in sheet.coords]] = trgt_pos
         sheet.edge_df[sheet.dcoords] = (trgt_pos - srce_pos)
 
     @staticmethod
@@ -39,15 +42,26 @@ class BaseGeometry():
                                                  axis=1)
 
     @staticmethod
+    def update_perimeters(sheet):
+        '''
+        Updates the perimeter of each face.
+        '''
+        sheet.face_df['perimeter'] = sheet.sum_face(sheet.edge_df['length'])
+
+    @staticmethod
     def update_centroid(sheet):
         '''
         Updates the face_df `coords` columns as the face's vertices
-        center of mass.
+        center of mass. Also updates the edge_df fx, fy, fz columns
+        with their upcasted values
         '''
         upcast_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
         upcast_pos.set_index(sheet.edge_df['face'],
                              append=True, inplace=True)
         sheet.face_df[sheet.coords] = upcast_pos.mean(level='face')
+        face_pos = sheet.upcast_face(sheet.face_df[sheet.coords])
+        sheet.edge_df[['f'+c for c in sheet.coords]] = face_pos
+
 
     @staticmethod
     def center(eptm):

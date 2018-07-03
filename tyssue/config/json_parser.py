@@ -8,8 +8,8 @@ import warnings
 
 logger = logging.getLogger(__name__)
 
-
 def load_spec(fname):
+
     with open(fname, 'r+') as config_file:
         spec = json.load(config_file)
     return spec

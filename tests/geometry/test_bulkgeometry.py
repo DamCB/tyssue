@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_array_almost_equal
 
 from tyssue import config
 from tyssue.core import Epithelium
@@ -11,15 +11,15 @@ from tyssue.geometry.bulk_geometry import BulkGeometry, MonoLayerGeometry
 
 
 def test_bulk_update_vol():
-    
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
-    datasets = extrude(datasets_2d, method='translation')
 
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
+    datasets = extrude(datasets_2d, method='translation')
+    specs = config.geometry.bulk_spec()
     eptm = Epithelium('test_volume',datasets, specs, coords=['x','y','z'])
-    
+
     BulkGeometry.update_all(eptm)
 
-    
+
     expected_cell_df = pd.DataFrame.from_dict({'cell':[0,1,2],\
                                                'x':[0.5, -1.0, 0.5],\
                                                'y':[8.660000e-01,-6.167906e-18,-8.6600000e-01],\
@@ -49,23 +49,23 @@ def test_bulk_update_vol():
                                                             -0.5, -0.5, -0.5, -0.5, -0.5, \
                                                             -0.5, -0.5, -0.5, -0.5, -0.5, \
                                                             -0.5, -0.5, -0.5]}).set_index('face')
-                                                
 
-    
+
+
     ## only update class methods in BulkGeometry : update_vol, update_centroids
     tolerance = 1e-16
-    
+
     ## check volumes
     assert all( (expected_cell_df['vol'] - eptm.cell_df['vol'])**2 < tolerance)
-    
+
     ## check centroids
     assert all( (expected_face_centroids - eptm.face_df.loc[:, ['x','y','z']])**2 < tolerance )
-    
+
 
 def test_mono_update_perimeters():
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d, method='translation')
-
+    specs = config.geometry.bulk_spec()
     eptm = Epithelium('test_volume',datasets, specs, coords=['x','y','z'])
 
     # This method requires a column 'subdiv' in the edge_df.
@@ -73,5 +73,3 @@ def test_mono_update_perimeters():
     # to be found in this column by the method ?
 
     #MonoLayerGeometry.update_all(eptm)
-
-    

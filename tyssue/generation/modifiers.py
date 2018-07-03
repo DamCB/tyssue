@@ -52,13 +52,13 @@ def extrude(apical_datasets,
 
     cell_df = apical_face[coords].copy()
     cell_df.index.name = 'cell'
-    cell_df['is_alive'] = True
+    cell_df['is_alive'] = 1
 
     basal_face = apical_face.copy()
     basal_face.index = basal_face.index + Nf
     basal_face[coords] = basal_face[coords] * 1/3.
     basal_face['segment'] = 'basal'
-    basal_face['is_alive'] = True
+    basal_face['is_alive'] = 1
 
     apical_edge['cell'] = apical_edge['face']
     basal_edge = apical_edge.copy()
@@ -71,7 +71,7 @@ def extrude(apical_datasets,
     sagittal_face = pd.DataFrame(index=apical_edge.index + 2*Nf,
                                  columns=apical_face.columns)
     sagittal_face['segment'] = 'sagittal'
-    sagittal_face['is_alive'] = True
+    sagittal_face['is_alive'] = 1
 
     sagittal_edge = pd.DataFrame(index=np.arange(2*Ne, 6*Ne),
                                  columns=apical_edge.columns)
@@ -117,6 +117,7 @@ def extrude(apical_datasets,
     datasets['face'] = pd.concat([apical_face,
                                   basal_face,
                                   sagittal_face])
+    datasets['edge']['is_active'] = 1
     for elem in ['vert', 'edge', 'face', 'cell']:
         datasets[elem].index.name = elem
 

@@ -28,7 +28,9 @@ class Monolayer(Epithelium):
                            method='translation',
                            vector=[0, 0, -thickness])
 
-        return cls(name, datasets, specs)
+        mono = cls(name, datasets, specs)
+        mono.reset_topo()
+        return mono
 
     def segment_index(self, segment, element):
         df = getattr(self, '{}_df'.format(element))
