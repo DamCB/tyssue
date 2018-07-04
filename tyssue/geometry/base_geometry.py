@@ -26,12 +26,17 @@ class BaseGeometry():
         Also updates the upcasted coordinates of the source and target
         vertices
         '''
-        data = sheet.vert_df[sheet.coords]
-        srce_pos = sheet.upcast_srce(data).values
-        trgt_pos = sheet.upcast_trgt(data).values
-        sheet.edge_df[['s'+c for c in sheet.coords]] = srce_pos
-        sheet.edge_df[['t'+c for c in sheet.coords]] = trgt_pos
-        sheet.edge_df[sheet.dcoords] = (trgt_pos - srce_pos)
+        if sheet.settings.get('boundaries') is None:
+            data = sheet.vert_df[sheet.coords]
+            srce_pos = sheet.upcast_srce(data).values
+            trgt_pos = sheet.upcast_trgt(data).values
+            sheet.edge_df[['s'+c for c in sheet.coords]] = srce_pos
+            sheet.edge_df[['t'+c for c in sheet.coords]] = trgt_pos
+            sheet.edge_df[sheet.dcoords] = (trgt_pos - srce_pos)
+        else:
+            update_periodic_dcoords(sheet)
+
+
 
     @staticmethod
     def update_length(sheet):
@@ -99,3 +104,36 @@ class BaseGeometry():
         """
         return sum(((vert_df[c] - u)**2 for
                     c, u in zip(coords, point)))**0.5
+
+
+def update_periodic_dcoords(sheet):
+    """ Updates the coordinates for periodic boundary conditions.
+
+    """
+    for u, boundary in sheet.settings['boundaries'].items():
+        period = boundary[1] - boundary[0]
+        shift = period * (-(sheet.vert_df[u] >  boundary[1]).astype(float)
+                          +(sheet.vert_df[u] <= boundary[0]).astype(float))
+        sheet.vert_df[u] = sheet.vert_df[u] + shift
+
+    srce_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
+    trgt_pos = sheet.upcast_trgt(sheet.vert_df[sheet.coords])
+    sheet.edge_df[['s'+u for u in sheet.coords]] = srce_pos
+    sheet.edge_df[['t'+u for u in sheet.coords]] = trgt_pos
+    sheet.edge_df[sheet.dcoords] = (trgt_pos - srce_pos)
+    for u, boundary in sheet.settings['boundaries'].items():
+        period = boundary[1] - boundary[0]
+        center = boundary[1] - period/2
+        shift = period * (-(sheet.edge_df['d'+u] >= period/2).astype(float)
+                          +(sheet.edge_df['d'+u] < -period/2).astype(float))
+        sheet.edge_df['d'+u] = sheet.edge_df['d'+u] + shift
+        sheet.edge_df[f'at_{u}_boundary'] = (shift != 0)
+
+        sheet.face_df[f'at_{u}_boundary'] = sheet.edge_df.groupby('face')[
+            f'at_{u}_boundary'].apply(any)
+        f_at_boundary = sheet.upcast_face(sheet.face_df[f'at_{u}_boundary']).astype(int)
+        period = (boundary[1] - boundary[0])
+        srce_shift = f_at_boundary * (sheet.edge_df['s'+u] < center) * period
+        trgt_shift = f_at_boundary * (sheet.edge_df['t'+u] < center) * period
+        sheet.edge_df['s'+u] += srce_shift
+        sheet.edge_df['t'+u] += trgt_shift
