@@ -28,14 +28,13 @@ class BaseGeometry():
         '''
         if sheet.settings.get('boundaries') is None:
             data = sheet.vert_df[sheet.coords]
-            srce_pos = sheet.upcast_srce(data).values
-            trgt_pos = sheet.upcast_trgt(data).values
+            srce_pos = sheet.upcast_srce(data)
+            trgt_pos = sheet.upcast_trgt(data)
             sheet.edge_df[['s'+c for c in sheet.coords]] = srce_pos
             sheet.edge_df[['t'+c for c in sheet.coords]] = trgt_pos
             sheet.edge_df[sheet.dcoords] = (trgt_pos - srce_pos)
         else:
             update_periodic_dcoords(sheet)
-
 
 
     @staticmethod
