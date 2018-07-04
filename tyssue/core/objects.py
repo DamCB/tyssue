@@ -343,7 +343,10 @@ class Epithelium:
 
     def _lvl_sum(self, df, lvl):
         df_ = df
-        if isinstance(df, pd.Series):
+        if isinstance(df, np.ndarray):
+            df_ = pd.DataFrame(df, index=self.edge_df.index)
+            df_[lvl] = self.edge_df[lvl]
+        elif isinstance(df, pd.Series):
             df_ = df.to_frame()
         elif lvl not in df.columns:
             df_ = df.copy()

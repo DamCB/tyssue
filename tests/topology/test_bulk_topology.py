@@ -59,7 +59,8 @@ def test_HI_transition():
 def test_monolayer_division():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d, method='translation')
-    eptm = Monolayer('test_volume',datasets, specs, coords=['x','y','z'])
+    eptm = Monolayer('test_volume',datasets, bulk_spec(),
+                     coords=['x','y','z'])
     MonoLayerGeometry.update_all(eptm)
     for orientation in ['vertical', 'horizontal']:
         daughter = cell_division(eptm, 0,

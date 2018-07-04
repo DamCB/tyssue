@@ -25,20 +25,12 @@ class PlanarGeometry(BaseGeometry):
         cls.update_perimeters(sheet)
 
     @staticmethod
-    def update_perimeters(sheet):
-        '''
-        Updates the perimeter of each face.
-        '''
-        sheet.face_df['perimeter'] = sheet.sum_face(sheet.edge_df['length'])
-
-    @staticmethod
     def update_normals(sheet):
 
         coords = sheet.coords
-        face_pos = sheet.upcast_face(sheet.face_df[coords]).values
-        srce_pos = sheet.upcast_srce(sheet.vert_df[coords]).values
-        trgt_pos = sheet.upcast_trgt(sheet.vert_df[coords]).values
-
+        face_pos = sheet.edge_df[['f'+c for c in coords]].values
+        srce_pos = sheet.edge_df[['s'+c for c in coords]].values
+        trgt_pos = sheet.edge_df[['t'+c for c in coords]].values
         normals = np.cross(srce_pos - face_pos, trgt_pos - srce_pos)
         sheet.edge_df["nz"] = normals
 

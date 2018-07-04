@@ -8,9 +8,9 @@ def area_grad(sheet):
     coords = sheet.coords
     inv_area = sheet.edge_df.eval('1 / (4 * sub_area)')
 
-    face_pos = sheet.upcast_face(sheet.face_df[coords])
-    srce_pos = sheet.upcast_srce(sheet.vert_df[coords])
-    trgt_pos = sheet.upcast_trgt(sheet.vert_df[coords])
+    face_pos = sheet.edge_df[['f'+c for c in coords]]
+    srce_pos = sheet.edge_df[['s'+c for c in coords]]
+    trgt_pos = sheet.edge_df[['t'+c for c in coords]]
 
     r_ak = srce_pos - face_pos
     r_aj = trgt_pos - face_pos
