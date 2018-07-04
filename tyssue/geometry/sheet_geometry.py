@@ -40,8 +40,9 @@ class SheetGeometry(PlanarGeometry):
         coords = sheet.coords
         face_pos = sheet.edge_df[['f'+c for c in coords]].values
         srce_pos = sheet.edge_df[['s'+c for c in coords]].values
-        trgt_pos = sheet.edge_df[['t'+c for c in coords]].values
-        normals = np.cross(srce_pos - face_pos, trgt_pos - srce_pos)
+        r_ij = sheet.edge_df[['d'+c for c in coords]].values
+        r_ai = (srce_pos - face_pos)
+        normals = np.cross(r_ai, r_ij)
         sheet.edge_df[sheet.ncoords] = normals
 
     @staticmethod
