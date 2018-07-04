@@ -60,10 +60,8 @@ class BaseGeometry():
         center of mass. Also updates the edge_df fx, fy, fz columns
         with their upcasted values
         '''
-        upcast_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
-        upcast_pos.set_index(sheet.edge_df['face'],
-                             append=True, inplace=True)
-        sheet.face_df[sheet.coords] = upcast_pos.mean(level='face')
+        scoords = ["s"+c for c in sheet.coords]
+        sheet.face_df[sheet.coords] = sheet.edge_df.groupby('face')[scoords].mean()
         face_pos = sheet.upcast_face(sheet.face_df[sheet.coords])
         sheet.edge_df[['f'+c for c in sheet.coords]] = face_pos
 

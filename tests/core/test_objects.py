@@ -655,7 +655,6 @@ def test_remove():
     sft_after = pd.DataFrame.from_dict(dict_after)
 
     eptm.remove([0])
-    eptm.update_mindex()
 
     assert eptm.edge_df[['srce','trgt','face']].equals(sft_after[['srce','trgt','face']])
 
