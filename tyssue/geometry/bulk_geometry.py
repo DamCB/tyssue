@@ -96,8 +96,7 @@ class RNRGeometry(BulkGeometry):
         mid_pos = (srce_pos + trgt_pos)/2
         weighted_pos =  eptm.sum_face(mid_pos * _to_3d(eptm.edge_df['length']))
         eptm.face_df[eptm.coords] = (
-            weighted_pos.values /
-            eptm.face_df['perimeter'].values[:, np.newaxis])
+            weighted_pos.values / eptm.face_df['perimeter'].values[:, np.newaxis])
 
         face_pos = eptm.upcast_face(eptm.face_df[eptm.coords]).values
         eptm.edge_df[['f'+c for c in eptm.coords]] = face_pos
