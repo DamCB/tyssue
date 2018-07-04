@@ -1,8 +1,5 @@
 
 def planar_sheet():
-    return planar_spec()
-
-def planar_spec():
     """
     Specification for a 2D sheet in the plane
     """
@@ -37,6 +34,22 @@ def planar_spec():
         }
     }
     return spec
+
+
+def planar_spec():
+    return planar_sheet()
+
+
+def planar_periodic_sheet():
+    spec = planar_sheet()
+    spec['settings'] = {
+        'boundaries': {
+            'x': [-1, 1],
+            'y': [-1, 1]
+            }
+        }
+    return spec
+
 
 def sheet_spec():
 
@@ -86,6 +99,17 @@ def sheet_spec():
             "height_axis": "z"
         }
     }
+    return spec
+
+
+def periodic_sheet():
+    spec = flat_sheet()
+    spec['settings'].update({
+        'boundaries': {
+            'x': [-1, 1],
+            'y': [-1, 1]
+            }
+        })
     return spec
 
 

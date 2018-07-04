@@ -89,8 +89,7 @@ class Epithelium:
 
         # each of those has a separate dataframe, as well as entries in
         # the specification files
-        _frame_types = {'edge', 'vert', 'face',
-                       'cell'}
+        _frame_types = {'edge', 'vert', 'face', 'cell'}
         self.identifier = identifier
         if not set(datasets).issubset(_frame_types):
             raise ValueError('The `datasets` dictionnary should'
@@ -99,6 +98,15 @@ class Epithelium:
         self.data_names = list(datasets.keys())
         self.element_names = ['srce', 'trgt',
                               'face', 'cell'][:len(self.data_names)]
+        # Infer specs from the first rows of the datasets
+        if specs is None:
+            specs = {elem : df.iloc[0].to_dict() for elem, df in datasets.items()}
+        if 'settings' not in specs:
+            specs['settings'] = {}
+
+        self.specs = specs
+        self.update_specs(specs, reset=False)
+
         if coords is None:
             coords = [c for c in 'xyz' if c in datasets['vert'].columns]
 
@@ -113,17 +121,13 @@ class Epithelium:
         if self.dim == 3:
             self.ncoords = ['n'+c for c in self.coords]
 
-        if specs is None:
-            specs = {name: {} for name in self.data_names}
-        if 'settings' not in specs:
-            specs['settings'] = {}
-
-        self.specs = specs
-        self.update_specs(specs, reset=False)
-        self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
-                                                     names=self.element_names)
         self.bbox = None
         self.set_bbox()
+
+    @property
+    def edge_mindex(self):
+        return pd.MultiIndex.from_arrays(self.edge_idx.values.T,
+                                         names=self.element_names)
 
     @property
     def face_df(self):
@@ -221,13 +225,8 @@ class Epithelium:
         self.cell_df['num_faces'] = self.edge_df.groupby('cell').apply(
             lambda df: df['face'].unique().size)
 
-    def update_mindex(self):
-        self.edge_mindex = pd.MultiIndex.from_arrays(self.edge_idx.values.T,
-                                                     names=self.element_names)
-
     def reset_topo(self):
         self.update_num_sides()
-        self.update_mindex()
         if 'cell' in self.data_names:
             self.update_num_faces()
 
