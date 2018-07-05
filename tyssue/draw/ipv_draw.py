@@ -115,31 +115,40 @@ def edge_mesh(sheet, coords, **edge_specs):
 
 def face_mesh(sheet, coords, **face_draw_specs):
 
+    Ne, Nf = sheet.Ne, sheet.Nf
     if isinstance(face_draw_specs['color'], str):
         color = face_draw_specs['color']
 
     elif hasattr(face_draw_specs['color'], '__len__'):
-        color = _face_color_from_sequence(face_draw_specs, sheet, )[:, :3]
+        color = _face_color_from_sequence(face_draw_specs, sheet)[:, :3]
 
     if 'visible' in sheet.face_df.columns:
         edges = sheet.edge_df[sheet.upcast_face(sheet.face_df['visible'])].index
         sheet = get_sub_eptm(sheet, edges)
         if isinstance(color, np.ndarray):
-            color = color.take(sheet.face_df[sheet.face_df['visible']].index.values)
+            print(color.shape)
+            faces = sheet.face_df['face_o'].values.astype(np.uint32)
+            edges = edges.values.astype(np.uint32)
+            indexer = np.concatenate([faces, edges + Nf, edges + Ne+Nf])
+            color = color.take(indexer, axis=0)
+            print(color.shape, sheet.Nf + 2*sheet.Ne)
+
 
     epsilon = face_draw_specs.get('epsilon', 0)
     up_srce = sheet.edge_df[['s'+c for c in coords]]
     up_trgt = sheet.edge_df[['t'+c for c in coords]]
+
+    Ne, Nf = sheet.Ne, sheet.Nf
 
     if epsilon > 0:
         up_face = sheet.edge_df[['f'+c for c in coords]].values
         up_srce = (up_srce - up_face) * (1 - epsilon) + up_face
         up_trgt = (up_trgt - up_face) * (1 - epsilon) + up_face
 
+
     mesh_ = np.concatenate([sheet.face_df[coords].values,
                             up_srce.values, up_trgt.values])
 
-    Ne, Nf = sheet.Ne, sheet.Nf
     triangles = np.vstack([sheet.edge_df['face'],
                            np.arange(Ne)+Nf,
                            np.arange(Ne)+Ne+Nf]).T.astype(dtype=np.uint32)
