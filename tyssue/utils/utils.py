@@ -103,7 +103,7 @@ def data_at_opposite(sheet, edge_data, free_value=None):
     return opposite
 
 
-def get_sub_eptm(eptm, edges):
+def get_sub_eptm(eptm, edges, copy=False):
     """
     Define sub-epithelium corresponding to the edges.
 
@@ -118,47 +118,52 @@ def get_sub_eptm(eptm, edges):
     """
     from ..core.objects import Epithelium
 
-    edge_df = eptm.edge_df.loc[edges]
-    vert_df = eptm.vert_df.loc[set(edge_df['srce'])]  # .copy()
-    face_df = eptm.face_df.loc[set(edge_df['face'])]  # .copy()
-    cell_df = eptm.cell_df.loc[set(edge_df['cell'])]  # .copy()
+    datasets = {}
+    edge_df  = eptm.edge_df.loc[edges]
+    datasets['edge'] = edge_df
+    datasets['vert'] = eptm.vert_df.loc[set(edge_df['srce'])]
+    datasets['face'] = eptm.face_df.loc[set(edge_df['face'])]
+    if 'cell' in eptm.datasets:
+        datasets['cell'] = eptm.cell_df.loc[set(edge_df['cell'])]
 
-    datasets = {'edge': edge_df,
-                'face': face_df,
-                'vert': vert_df,
-                'cell': cell_df}
+    if copy:
+        for elem, df in datasets.items():
+            datasets[elem] = df.copy()
 
     sub_eptm = Epithelium('sub', datasets, eptm.specs)
     sub_eptm.datasets['edge']['edge_o'] = edges
     sub_eptm.datasets['edge']['srce_o'] = edge_df['srce']
     sub_eptm.datasets['edge']['trgt_o'] = edge_df['trgt']
     sub_eptm.datasets['edge']['face_o'] = edge_df['face']
-    sub_eptm.datasets['edge']['cell_o'] = edge_df['cell']
+    if 'cell' in eptm.datasets:
+        sub_eptm.datasets['edge']['cell_o'] = edge_df['cell']
 
     sub_eptm.datasets['vert']['srce_o'] = set(edge_df['srce'])
     sub_eptm.datasets['face']['face_o'] = set(edge_df['face'])
-    sub_eptm.datasets['cell']['cell_o'] = set(edge_df['cell'])
+    if 'cell' in eptm.datasets:
+        sub_eptm.datasets['cell']['cell_o'] = set(edge_df['cell'])
 
     sub_eptm.reset_index()
     sub_eptm.reset_topo()
     return sub_eptm
 
 
-def single_cell(eptm, cell):
+def single_cell(eptm, cell, copy=False):
     """
     Define epithelium instance for all element to a define cell.
 
     Parameters
     ----------
-    eptm: a :class:`Epithelium` instance
-    cell: identifier of a cell
+    eptm : a :class:`Epithelium` instance
+    cell : identifier of a cell
+    copy : bool, default `False`
 
     Returns
     -------
     sub_etpm: class:'Epithelium' instance corresponding to the cell
     """
     edges = eptm.edge_df[eptm.edge_df['cell'] == cell].index
-    return get_sub_eptm(eptm, edges)
+    return get_sub_eptm(eptm, edges, copy)
 
 
 def scaled_unscaled(func, scale, eptm, geom,
