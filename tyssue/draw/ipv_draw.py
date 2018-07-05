@@ -6,7 +6,7 @@ import pandas as pd
 from matplotlib import cm
 
 from ..config.draw import sheet_spec
-from ..utils.utils import spec_updater
+from ..utils.utils import spec_updater, get_sub_eptm
 
 try:
     import ipyvolume as ipv
@@ -115,12 +115,24 @@ def edge_mesh(sheet, coords, **edge_specs):
 
 def face_mesh(sheet, coords, **face_draw_specs):
 
+    if isinstance(face_draw_specs['color'], str):
+        color = face_draw_specs['color']
+
+    elif hasattr(face_draw_specs['color'], '__len__'):
+        color = _face_color_from_sequence(face_draw_specs, sheet, )[:, :3]
+
+    if 'visible' in sheet.face_df.columns:
+        edges = sheet.edge_df[sheet.upcast_face(sheet.face_df['visible'])].index
+        sheet = get_sub_eptm(sheet, edges)
+        if isinstance(color, np.ndarray):
+            color = color.take(sheet.face_df[sheet.face_df['visible']].index.values)
+
     epsilon = face_draw_specs.get('epsilon', 0)
-    up_srce = sheet.upcast_srce(sheet.vert_df[coords])
-    up_trgt = sheet.upcast_trgt(sheet.vert_df[coords])
+    up_srce = sheet.edge_df[['s'+c for c in coords]]
+    up_trgt = sheet.edge_df[['t'+c for c in coords]]
 
     if epsilon > 0:
-        up_face = sheet.upcast_face(sheet.face_df[coords])
+        up_face = sheet.edge_df[['f'+c for c in coords]].values
         up_srce = (up_srce - up_face) * (1 - epsilon) + up_face
         up_trgt = (up_trgt - up_face) * (1 - epsilon) + up_face
 
@@ -132,9 +144,9 @@ def face_mesh(sheet, coords, **face_draw_specs):
                            np.arange(Ne)+Nf,
                            np.arange(Ne)+Ne+Nf]).T.astype(dtype=np.uint32)
 
-    color = _face_color_from_sequence(face_draw_specs, sheet, )
+
     mesh = ipv.Mesh(x=mesh_[:, 0], y=mesh_[:, 1], z=mesh_[:, 2],
-                    triangles=triangles, color=color[:, :3])
+                    triangles=triangles, color=color)
     return mesh
 
 

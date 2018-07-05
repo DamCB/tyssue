@@ -37,3 +37,36 @@ def sheet_view(sheet, coords=['x', 'y', 'z'],
         return ValueError("""
 Argument `mode` not understood,
 should be either '2D', '3D' or 'quick', got %s""", mode)
+
+
+def highlight_cells(eptm, cells, reset_visible=False):
+    """Sets a column 'visible' to True for all the faces of the
+    cells passed as argument (for a 3D tyssue).
+
+    If no such column exists in eptm.face_df, creates it.
+
+    """
+    if reset_visible:
+        eptm.face_df['visible'] = False
+
+    if not hasattr(cells, '__iter__'):
+        cells = [cells,]
+
+    for cell in cells:
+        cell_faces = eptm.edge_df[eptm.edge_df['cell']==cell]['face']
+        highlight_faces(eptm.face_df, cell_faces,
+                        reset_visible=False)
+
+
+def highlight_faces(face_df, faces,
+                    reset_visible=False):
+    """
+    Sets the faces visibility to 1
+
+    If `reset_visible` is `True`, sets all the other faces
+    to `visible = False`
+    """
+    if ('visible' not in face_df.columns) or reset_visible:
+        face_df['visible'] = False
+
+    face_df.loc[faces, 'visible'] = True
