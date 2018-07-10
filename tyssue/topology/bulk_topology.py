@@ -492,12 +492,11 @@ def _get_vertex_pairs_IH(eptm, e_1011):
 def _set_new_pos_HI(eptm, fa, fb, v10, v11):
 
     r0 = eptm.face_df.loc[fa, eptm.coords].values
+
     norm_a = eptm.edge_df[eptm.edge_df['face'] == fa][
         eptm.ncoords].mean(axis=0).values
-    norm_b = eptm.edge_df[eptm.edge_df['face'] == fb][
-        eptm.ncoords].mean(axis=0).values
     norm_a = norm_a / np.linalg.norm(norm_a)
-    norm_b = norm_b / np.linalg.norm(norm_b)
+    norm_b = - norm_a
     Dl_th = eptm.settings['threshold_length']
     eptm.vert_df.loc[v10, eptm.coords] = r0 + Dl_th/2 * norm_b
     eptm.vert_df.loc[v11, eptm.coords] = r0 + Dl_th/2 * norm_a

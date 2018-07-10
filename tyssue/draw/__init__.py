@@ -26,10 +26,10 @@ def sheet_view(sheet, coords=['x', 'y', 'z'],
     """
 
     if mode == '2D':
-        return sheet_view_2d(sheet, coords, ax, **draw_specs_kw)
+        return sheet_view_2d(sheet, coords[:2], ax, **draw_specs_kw)
     elif mode == 'quick':
         edge_kw = draw_specs_kw.get('edge', {})
-        return quick_edge_draw(sheet, coords, ax, **edge_kw)
+        return quick_edge_draw(sheet, coords[:2], ax, **edge_kw)
     elif mode == '3D':
         return sheet_view_3d(sheet, coords, **draw_specs_kw)
 

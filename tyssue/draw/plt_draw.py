@@ -305,17 +305,15 @@ def plot_scaled_energies(sheet, geom, model, scales, ax=None):
 
         return energies
 
-    energies = np.array([scaled_unscaled(get_energies, scale,
-                                         sheet, geom)
+    energies = np.array([scaled_unscaled(get_energies, scale, sheet, geom)
                          for scale in scales])
-    print(energies.shape)
     if ax is None:
         fig, ax = plt.subplots()
     else:
         fig = ax.get_figure()
     ax.plot(scales, energies.sum(axis=1),
             'k-', lw=4, alpha=0.3, label='total')
-    for e, label in zip(energies.T, model.energy_labels):
+    for e, label in zip(energies.T, model.labels):
         ax.plot(scales, e, label=label)
     ax.legend()
     return fig, ax
