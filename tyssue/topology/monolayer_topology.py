@@ -136,7 +136,7 @@ def type1_transition(monolayer, apical_edge, epsilon=0.1):
         basal_edge, ['srce', 'trgt', 'face', 'cell']]
     if monolayer.face_df.loc[fb_a, 'num_sides'] < 4:
         logger.warning('''Face %s has 3 sides,
-type 1 transition is not allowed''' % fb_a)
+type 1 transition is not allowed''', fb_a)
         return
 
 

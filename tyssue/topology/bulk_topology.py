@@ -73,7 +73,6 @@ def get_division_vertices(eptm,
 
 
 @do_undo
-# @validate
 def cell_division(eptm, mother, geom, vertices=None):
 
     if vertices is None:
@@ -188,7 +187,6 @@ def find_rearangements(eptm):
 
 
 @do_undo
-@validate
 def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
@@ -307,7 +305,6 @@ def IH_transition(eptm, e_1011):
 
 
 @do_undo
-@validate
 def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013
@@ -320,7 +317,7 @@ def HI_transition(eptm, face):
         raise ValueError('Only three sided faces can undergo a H-I transition')
 
     fa = face
-    f_edges = eptm.edge_df[eptm.edge_df['face'] == fa]
+    f_edges = eptm.edge_df[eptm.edge_df['face'] == face]
     v7 = f_edges.iloc[0]['srce']
     v8 = f_edges.iloc[0]['trgt']
     v9 = f_edges[f_edges['srce'] == v8]['trgt'].iloc[0]
@@ -328,7 +325,7 @@ def HI_transition(eptm, face):
     cA = f_edges['cell'].iloc[0]
 
     get_opposite_faces(eptm)
-    fb = eptm.face_df['opposite'].loc[fa]
+    fb = eptm.face_df['opposite'].loc[face]
     if fb > 0:
         cB = eptm.edge_df[eptm.edge_df['face'] == fb]['cell'].iloc[0]
     else:
@@ -340,7 +337,7 @@ def HI_transition(eptm, face):
 
     eptm.vert_df.index.name = 'vert'
     v10, v11 = eptm.vert_df.index[-2:]
-    _set_new_pos_HI(eptm, fa, fb, v10, v11)
+    _set_new_pos_HI(eptm, fa, v10, v11)
 
     v_pairs = []
     for vk in (v7, v8, v9):
@@ -489,7 +486,7 @@ def _get_vertex_pairs_IH(eptm, e_1011):
     return v_pairs
 
 
-def _set_new_pos_HI(eptm, fa, fb, v10, v11):
+def _set_new_pos_HI(eptm, fa, v10, v11):
 
     r0 = eptm.face_df.loc[fa, eptm.coords].values
 
