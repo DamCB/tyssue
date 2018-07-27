@@ -76,24 +76,23 @@ edges**.
 
 ```python
 ## Core object
-from tyssue import Sheet
+from tyssue.core.sheet import Sheet
 ## Simple 2D geometry
-from tyssue.geometry import PlanarGeometry
-## Visualisation (matplotlib or ipyvolume based)
-from tyssue.draw import sheet_view
+from tyssue.geometry.planar_geometry import PlanarGeometry
+## Visualisation (matplotlib based)
+from tyssue.draw.plt_draw import sheet_view
 
 sheet = Sheet.planar_sheet_2d('basic2D', nx=6, ny=7,
                               distx=1, disty=1)
 PlanarGeometry.update_all(sheet)
 sheet.sanitize()
-sheet_view(sheet, mode='2D', coords=['x', 'y'])
-
 ```
 
 ### Features
 
 * Easy data manipulation.
-* Multiple geometries (Sheets in 2D and 3D, monolayers, bulk).
+* Multiple geometries (Sheets in 2D and 3D, monolayers, bulk, cell
+centered models...).
 * Easy to extend.
 * 2D (matplotlib) and 3D (vispy) customisable visualisation.
 
@@ -116,7 +115,6 @@ Unsubscribe ➙ https://framalistes.org/sympa/sigrequest/tyssue
 * Cyprien Gay - @cypriengay
 * Guillaume Gay (maintainer) - @glyg
 * Hadrien Mary (build wizard) - @hadim
-* Sophie Theis - @sophietheis
 * François Molino
 * Magali Suzanne
 
@@ -127,10 +125,14 @@ As all the dependencies are already completely supported in
 python 3.x, **we won't be maintaining a python 2.x version**, because
 it's time to move on...
 
+*Notes*:
+* You'll need the development version of vispy for certain features.
+* We started using [pythreejs](https://github.com/jovyan/pythreejs) for
+embeded 3D visualisation in the notebook.
 
 ### Core
 
-- Python >= 3.6
+- Python >= 3.4
 - numpy >= 1.8
 - scipy >= 0.12
 - pandas >= 0.13
@@ -138,6 +140,7 @@ it's time to move on...
 - vispy >= 0.5
 - pandas >= 0.16
 - tables >= 3.2.2
+
 
 ### Tests
 - pytest >= 3.0
@@ -148,12 +151,6 @@ it's time to move on...
 
 See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary python environment.
 
-Fastest way to install tyssue is through conda
-
-```bash
-conda install -c conda-forge tyssue
-```
-
 In a nutshell, install from github goes like that:
 
 ```bash
@@ -161,6 +158,13 @@ git clone https://github.com/CellModels/tyssue.git
 cd tyssue/
 python setup.py install
 ```
+
+You can also install the library with the conda package manager
+(though it's only build for 64-bits linux atm):
+
+```bash conda install -c glyg tyssue ```
+
+This is kind of an early release though, so you're better off installing from source.
 
 ## Similar softwares
 
