@@ -221,8 +221,7 @@ class SheetGeometry(PlanarGeometry):
                                        full_matrices=False)
         # rotation = cls.face_rotation(sheet, face, psi=psi)
         if psi != 0:
-            rotation = np.dot(rotation_matrix(psi, [0, 0, 1]),
-                              rotation)
+            rotation = np.dot(rotation_matrix(psi, [0, 0, 1]), rotation)
         rot_pos = pd.DataFrame(np.dot(rel_pos, rotation.T),
                                index=face_orbit, columns=sheet.coords)
         return rot_pos

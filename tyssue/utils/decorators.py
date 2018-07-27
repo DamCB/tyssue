@@ -1,5 +1,6 @@
 import time
 
+from functools import wraps
 
 def do_undo(func):
     """Decorator that creates a copy of the first argument
@@ -7,6 +8,7 @@ def do_undo(func):
 
     The first argument in `*args` should have `backup()` and `restore()` methods.
     """
+    @wraps(func)
     def with_bckup(*args, **kwargs):
         eptm = args[0]
         eptm.backup()
@@ -25,6 +27,7 @@ def validate(func):
     of `func` should be an epithelium instance, and
     is at least assumed to have a `validate` method.
     """
+    @wraps(func)
     def with_validate(*args, **kwargs):
         eptm = args[0]
         result = func(*args, **kwargs)

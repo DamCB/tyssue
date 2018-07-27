@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.path import Path
 from matplotlib.patches import Polygon, FancyArrow, Arc, PathPatch
-from matplotlib.collections import PatchCollection
+from matplotlib.collections import PatchCollection, PolyCollection
 from ..config.draw import sheet_spec
-from ..utils.utils import spec_updater
+from ..utils.utils import spec_updater, get_sub_eptm
 
 COORDS = ['x', 'y']
 
@@ -78,20 +78,20 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
 
     draw_spec = sheet_spec()['face']
     draw_spec.update(**draw_spec_kw)
+    collection_specs = parse_face_specs(draw_spec, sheet)
+
+    if 'visible' in sheet.face_df.columns:
+        edges = sheet.edge_df[sheet.upcast_face(sheet.face_df['visible'])].index
+        sheet = get_sub_eptm(sheet, edges)
+        color = collection_specs['facecolors']
+        if isinstance(color, np.ndarray):
+            faces = sheet.face_df['face_o'].values.astype(np.uint32)
+            collection_specs['facecolors'] = color.take(faces, axis=0)
 
     polys = sheet.face_polygons(coords)
-    patches = []
-    for idx, poly in polys.items():
-        patch = Polygon(poly,
-                        fill=True,
-                        closed=True)
-        patches.append(patch)
-    collection_specs = parse_face_specs(draw_spec, sheet)
-    p = PatchCollection(patches, False,
-                        **collection_specs)
+    polys = polys.reindex(sheet.face_df.sort_values('z').index)
+    p = PolyCollection(polys, closed=True, **collection_specs)
     ax.add_collection(p)
-
-    #fig.colorbar(p, ax=ax)
     return ax
 
 
@@ -103,7 +103,6 @@ def parse_face_specs(face_draw_specs, sheet):
         return
     elif isinstance(color, str):
         collection_specs['facecolors'] = color
-
     elif hasattr(color, '__len__'):
         collection_specs['facecolors'] = _face_color_from_sequence(
             face_draw_specs, sheet)
@@ -174,7 +173,6 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
                            sheet.edge_df.loc[idx, dy],
                            **arrow_specs)
         patches.append(arrow)
-
     ax.add_collection(PatchCollection(patches, False,
                                       **collections_specs))
     return ax
@@ -305,17 +303,15 @@ def plot_scaled_energies(sheet, geom, model, scales, ax=None):
 
         return energies
 
-    energies = np.array([scaled_unscaled(get_energies, scale,
-                                         sheet, geom)
+    energies = np.array([scaled_unscaled(get_energies, scale, sheet, geom)
                          for scale in scales])
-    print(energies.shape)
     if ax is None:
         fig, ax = plt.subplots()
     else:
         fig = ax.get_figure()
     ax.plot(scales, energies.sum(axis=1),
             'k-', lw=4, alpha=0.3, label='total')
-    for e, label in zip(energies.T, model.energy_labels):
+    for e, label in zip(energies.T, model.labels):
         ax.plot(scales, e, label=label)
     ax.legend()
     return fig, ax

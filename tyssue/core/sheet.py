@@ -57,11 +57,7 @@ class Sheet(Epithelium):
     def reset_topo(self):
         super().reset_topo()
         if 'opposite' in self.edge_df.columns:
-            try:
-                self.edge_df['opposite'] = get_opposite(self.edge_df)
-            except ValueError:
-                warnings.warn('Opposites could not be computed, are you sure '
-                              'you are using a sheet-like topology?')
+            self.edge_df['opposite'] = get_opposite(self.edge_df)
 
     def get_opposite(self):
         self.edge_df['opposite'] = get_opposite(self.edge_df)
@@ -360,12 +356,20 @@ def get_opposite(edge_df):
     """
     Returns the indices opposite to the edges in `edge_df`
     """
+
+
     st_indexed = edge_df[['srce', 'trgt']].reset_index().set_index(
         ['srce', 'trgt'], drop=False)
     flipped = st_indexed.index.swaplevel(0, 1)
     flipped.names = ['srce', 'trgt']
-
-    opposite = st_indexed.reindex(flipped)['edge'].values
+    try:
+        opposite = st_indexed.reindex(flipped)['edge'].values
+    except Exception as e: # Non specific exception in pandas
+        dup = flipped.duplicated
+        if dup.all:
+            raise e
+        else:
+            warnings.warn('Duplicated (`srce`, `trgt`) values in edge_df, maybe sanitize your input')
+            opposite = st_indexed.reindex(flipped[~dup])['edge'].values
     opposite[np.isnan(opposite)] = -1
-
     return opposite.astype(np.int)
