@@ -192,9 +192,8 @@ def get_division_edges(sheet, mother, geom,
 
 def face_division(sheet, mother, vert_a, vert_b):
     """
-    Divides the face associated with edges
-    indexed by `edge_a` and `edge_b`, splitting it
-    in the middle of those edes.
+    Divides the face indexed by mother by adding edges between vertices
+    vert_a and vert_b.
     """
     # mother = sheet.edge_df.loc[edge_a, 'face']
 
