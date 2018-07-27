@@ -142,10 +142,10 @@ def face_mesh(sheet, coords, **face_draw_specs):
         up_srce = (up_srce - up_face) * (1 - epsilon) + up_face
         up_trgt = (up_trgt - up_face) * (1 - epsilon) + up_face
 
-
     mesh_ = np.concatenate([sheet.face_df[coords].values,
                             up_srce.values, up_trgt.values])
 
+    Ne, Nf = sheet.Ne, sheet.Nf
     triangles = np.vstack([sheet.edge_df['face'],
                            np.arange(Ne)+Nf,
                            np.arange(Ne)+Ne+Nf]).T.astype(dtype=np.uint32)
