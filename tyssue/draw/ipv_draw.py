@@ -126,19 +126,10 @@ def face_mesh(sheet, coords, **face_draw_specs):
         edges = sheet.edge_df[sheet.upcast_face(sheet.face_df['visible'])].index
         sheet = get_sub_eptm(sheet, edges)
         if isinstance(color, np.ndarray):
-<<<<<<< HEAD
-=======
-            print(color.shape)
->>>>>>> ab101cbca2d855fc45821b8496afa94a67c26fc3
             faces = sheet.face_df['face_o'].values.astype(np.uint32)
             edges = edges.values.astype(np.uint32)
             indexer = np.concatenate([faces, edges + Nf, edges + Ne+Nf])
             color = color.take(indexer, axis=0)
-<<<<<<< HEAD
-=======
-            print(color.shape, sheet.Nf + 2*sheet.Ne)
-
->>>>>>> ab101cbca2d855fc45821b8496afa94a67c26fc3
 
     epsilon = face_draw_specs.get('epsilon', 0)
     up_srce = sheet.edge_df[['s'+c for c in coords]]
