@@ -31,6 +31,9 @@ def planar_sheet():
             "area": 0.0,
             "x": 0.0,
             "num_sides": 6
+        },
+        "settings": {
+            "geometry": "planar",
         }
     }
     return spec
