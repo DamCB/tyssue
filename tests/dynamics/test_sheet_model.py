@@ -31,7 +31,8 @@ def test_model():
     sheet = Sheet('emin', datasets, specs)
     model_tester(sheet, model)
     model_tester(sheet, PlanarModel)
-    flat = Sheet('flat', *three_faces_sheet())
+    three, _ = three_faces_sheet()
+    flat = Sheet('flat', three, config.geometry.planar_sheet())
     PlanarGeometry.update_all(flat)
     model_tester(flat, PlanarModel)
 
