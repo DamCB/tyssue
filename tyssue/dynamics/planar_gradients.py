@@ -12,16 +12,16 @@ def area_grad(sheet):
     srce_pos = sheet.edge_df[['s'+c for c in coords]]
     trgt_pos = sheet.edge_df[['t'+c for c in coords]]
 
-    r_ak = srce_pos - face_pos
-    r_aj = trgt_pos - face_pos
+    r_ak = srce_pos - face_pos.values
+    r_aj = trgt_pos - face_pos.values
     grad_a_srce = pd.DataFrame(index=sheet.edge_df.index,
                                columns=['gx', 'gy'])
-    grad_a_srce['gx'] = r_aj['y'] * sheet.edge_df['nz']
-    grad_a_srce['gy'] = -r_aj['x'] * sheet.edge_df['nz']
+    grad_a_srce['gx'] = r_aj['ty'] * sheet.edge_df['nz']
+    grad_a_srce['gy'] = -r_aj['tx'] * sheet.edge_df['nz']
     grad_a_trgt = pd.DataFrame(index=sheet.edge_df.index,
                                columns=['gx', 'gy'])
-    grad_a_trgt['gx'] = -r_ak['y'] * sheet.edge_df['nz']
-    grad_a_trgt['gy'] = r_ak['x'] * sheet.edge_df['nz']
+    grad_a_trgt['gx'] = -r_ak['sy'] * sheet.edge_df['nz']
+    grad_a_trgt['gy'] = r_ak['sx'] * sheet.edge_df['nz']
 
     grad_a_srce = _to_2d(inv_area) * grad_a_srce
     grad_a_trgt = _to_2d(inv_area) * grad_a_trgt

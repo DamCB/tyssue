@@ -5,9 +5,11 @@ from numpy.testing import assert_almost_equal
 from copy import deepcopy
 
 from tyssue.core.sheet import Sheet
+from tyssue.geometry.planar_geometry import PlanarGeometry
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 from tyssue.dynamics.sheet_vertex_model import SheetModel as model
 from tyssue.dynamics.planar_vertex_model import PlanarModel
+from tyssue.generation import three_faces_sheet
 
 from tyssue import config
 from tyssue.stores import stores_dir
@@ -29,7 +31,9 @@ def test_model():
     sheet = Sheet('emin', datasets, specs)
     model_tester(sheet, model)
     model_tester(sheet, PlanarModel)
-
+    flat = Sheet('flat', *three_faces_sheet())
+    PlanarGeometry.update_all(flat)
+    model_tester(flat, PlanarModel)
 
 def test_adim():
 
