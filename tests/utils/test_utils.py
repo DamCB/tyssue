@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 from scipy.spatial import Voronoi
 from tyssue.utils import utils
 from tyssue import Sheet, SheetGeometry
@@ -31,6 +32,27 @@ def test_spec_updater():
     utils.spec_updater(specs, new_specs)
     print(specs)
     assert specs['face']['geometry'] == new_specs['face']['geometry']
+
+
+def test_set_data_columns():
+    dsets, _ = three_faces_sheet()
+    specs = {"cell": {'nope': 0},
+             "vert": {'new': 100},
+             "edge": {'new': 'r'}}
+    with pytest.warns(UserWarning):
+        utils.set_data_columns(dsets, specs, reset=False)
+        assert dsets['vert']['new'].loc[0] == 100
+        assert dsets['edge']['new'].loc[0] == 'r'
+
+    specs = {"vert": {'new': 10},
+             "edge": {'new': 'v'}}
+    utils.set_data_columns(dsets, specs, reset=False)
+    assert dsets['edge']['new'].loc[0] == 'r'
+    assert dsets['vert']['new'].loc[0] == 100
+
+    utils.set_data_columns(dsets, specs, reset=True)
+    assert dsets['vert']['new'].loc[0] == 10
+    assert dsets['edge']['new'].loc[0] == 'v'
 
 
 def test_data_at_opposite():
