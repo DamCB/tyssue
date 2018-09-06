@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 import logging
 import pandas as pd
@@ -59,20 +60,39 @@ def spec_updater(specs, new):
 
 
 def set_data_columns(datasets, specs, reset=False):
+    """Sets the columns of the dataframes in the datasets dictionnary to
+    the uniform values in the specs sub-dictionnaries.
 
-    if reset:
-        logger.warning('Reseting datasets values with new specs')
+    Parameters
+    ----------
+    datasets : dict of dataframes
+    specs : dict of dicts
+    reset : bool, default False
+
+    For each key in specs, the value is a dictionnary whose
+    keys are column names for the corresponding dataframe in
+    datasets. If there is no such column in the dataframe,
+    it is created. If the columns allready exists and  reset is `True`,
+    the new value is used.
+    """
+
 
     for name, spec in specs.items():
         if not len(spec):
             continue
         if 'setting' in name:
             continue
-        df = datasets[name]
+        df = datasets.get(name)
+        if df is None:
+            warnings.warn(f"There is no {name} dataset, so the {name}"
+                          " spec have no effect.")
+            continue
         for col, default in spec.items():
+            if col in df.columns and reset:
+                logger.warning('Reseting column %s of the %s'
+                               ' dataset with new specs', [col, name])
             if col not in df.columns or reset:
                 df[col] = default
-
 
 def data_at_opposite(sheet, edge_data, free_value=None):
     """
