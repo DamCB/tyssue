@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_equal
@@ -49,6 +50,18 @@ def test_opposite():
                          12., 11., -1., -1.,
                          -1., -1., 0.])
     assert_array_equal(true_opp, opposites)
+
+    edge_df = datasets['edge'].append(datasets['edge'].loc[0],
+                                      ignore_index=True)
+    edge_df.index.name = 'edge'
+    with pytest.warns(UserWarning):
+        opposites = get_opposite(edge_df)
+        true_opp = np.array([17., -1., -1.,
+                             -1., -1., 6., 5.,
+                             -1., -1., -1., -1.,
+                             12., 11., -1., -1.,
+                             -1., -1., 0., 17])
+        assert_array_equal(true_opp, opposites)
 
 
 def test_extra_indices():
@@ -463,8 +476,9 @@ def test_face_polygons_exception():
     specs = config.geometry.planar_spec()
     eptm = Epithelium('valid', datasets, specs, coords=['x', 'y'])
     PlanarGeometry.update_all(eptm)
-
     eptm.face_polygons(['x','y'])
+
+
 
 def test_invalid_valid_sanitize():
     # get_invalid and get_valid
