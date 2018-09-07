@@ -100,7 +100,7 @@ def parse_face_specs(face_draw_specs, sheet):
     collection_specs = {}
     color = face_draw_specs.get('color')
     if color is None:
-        return
+        return {}
     elif isinstance(color, str):
         collection_specs['facecolors'] = color
     elif hasattr(color, '__len__'):
@@ -122,7 +122,7 @@ def _face_color_from_sequence(face_spec, sheet):
         return color_
 
     elif color_.shape == (sheet.Nf,):
-        if color_.ptp() < 1e-10:
+        if np.ptp(color_) < 1e-10:
             warnings.warn('Attempting to draw a colormap '
                           'with a uniform value')
             return np.ones((sheet.Nf, 3))*0.5
@@ -211,7 +211,7 @@ def _wire_color_from_sequence(edge_spec, sheet):
         return (sheet.upcast_srce(color_)
                 + sheet.upcast_trgt(color_)) / 2
     elif color_.shape == (sheet.Nv,):
-        if color_.ptp() < 1e-10:
+        if np.ptp(color_) < 1e-10:
             warnings.warn('Attempting to draw a colormap '
                           'with a uniform value')
             return np.ones((sheet.Nv, 3))*0.7
@@ -222,7 +222,7 @@ def _wire_color_from_sequence(edge_spec, sheet):
     elif color_.shape in [(sheet.Ne, 3), (sheet.Ne, 4)]:
         return color_
     elif color_.shape == (sheet.Ne,):
-        if color_.ptp() < 1e-10:
+        if np.ptp(color_) < 1e-10:
             warnings.warn('Attempting to draw a colormap '
                           'with a uniform value')
             return np.ones((sheet.Nv, 3))*0.7
