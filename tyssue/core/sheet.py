@@ -364,13 +364,9 @@ def get_opposite(edge_df):
     flipped.names = ['srce', 'trgt']
     try:
         opposite = st_indexed.reindex(flipped)['edge'].values
-<<<<<<< HEAD
     #except ValueError: # see https://github.com/pandas-dev/pandas/issues/21770, will be fixed in
                         # pandas 0.24
     except Exception :
-=======
-    except ValueError:
->>>>>>> Better opposite management and validation for Sheet, closes #72
         dup = flipped.duplicated()
         warnings.warn('Duplicated (`srce`, `trgt`) values in edge_df, maybe sanitize your input')
         opposite = st_indexed[~dup].reindex(flipped)['edge'].values
