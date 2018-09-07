@@ -639,20 +639,24 @@ def ordered_vert_idxs(face):
 
 
 def _test_invalid(face):
-    """ Returns true iff the source and target sets of the faces polygon
-    are different
+    """ Returns True if the source and target sets of the faces polygon
+    are different or if the face polygon is not closed
     """
+
     s1 = set(face['srce'])
     s2 = set(face['trgt'])
-    return s1 != s2
+    if s1 != s2:
+        return True
+    ordered = np.array(_ordered_edges(face))
+    if not np.all(ordered[:, 0] == np.roll(ordered[:, 1], 1)):
+        return True
+    return False
 
 
 def _test_valid(face):
     """ Returns true iff all sources are also targets for the faces polygon
     """
-    s1 = set(face['srce'])
-    s2 = set(face['trgt'])
-    return s1 == s2
+    return ~_test_invalid(face)
 
 
 def get_opposite_faces(eptm):
