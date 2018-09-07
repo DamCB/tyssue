@@ -256,8 +256,8 @@ def modify_segments(eptm, modifiers):
 
 def _compute_ar(df, coords):
     u, v = coords
-    major = df[u].ptp()
-    minor = df[v].ptp()
+    major = np.ptp(df[u].values)
+    minor = np.ptp(df[v].values)
     if major < minor:
         minor, major = major, minor
     return 0 if minor == 0 else major / minor

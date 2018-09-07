@@ -49,7 +49,7 @@ def sheet_view(sheet, coords=['x', 'y', 'z'], **draw_specs_kw):
     else:
         faces = None
 
-    box_size = max(*(sheet.vert_df[u].ptp()
+    box_size = max(*(np.ptp(sheet.vert_df[u])
                      for u in sheet.coords))
     border = 0.05 * box_size
     lim_inf = sheet.vert_df[sheet.coords].min().min() - border
@@ -74,7 +74,7 @@ def view_ipv(sheet, coords=['x', 'y', 'z'], **edge_specs):
     mesh = edge_mesh(sheet, coords, **edge_specs)
     fig = ipv.gcf()
     fig.meshes = fig.meshes + [mesh]
-    box_size = max(*(sheet.vert_df[u].ptp()
+    box_size = max(*(np.ptp(sheet.vert_df[u])
                      for u in sheet.coords))
     border = 0.05 * box_size
     lim_inf = sheet.vert_df[sheet.coords].min().min() - border
@@ -164,11 +164,11 @@ def _wire_color_from_sequence(edge_spec, sheet):
     if color_.shape in [(sheet.Nv, 3), (sheet.Nv, 4)]:
         return np.asarray(color_)
     elif color_.shape == (sheet.Nv,):
-        if color_.ptp() < 1e-10:
+        if np.ptp(color_) < 1e-10:
             warnings.warn('Attempting to draw a colormap '
                           'with a uniform value')
             return np.ones((sheet.Nv, 3))*0.7
-        return cmap((color_ - color_.min())/color_.ptp())
+        return cmap((color_ - color_.min())/np.ptp(color_))
 
     elif color_.shape in [(sheet.Ne, 3), (sheet.Ne, 4)]:
         color_ = pd.DataFrame(color_.values,
@@ -181,11 +181,11 @@ def _wire_color_from_sequence(edge_spec, sheet):
                               index=sheet.edge_df.index)
         color_['srce'] = sheet.edge_df['srce']
         color_ = color_.groupby('srce').mean().values.ravel()
-        if color_.ptp() < 1e-10:
+        if np.ptp(color_) < 1e-10:
             warnings.warn('Attempting to draw a colormap '
                           'with a uniform value')
             return np.ones((sheet.Nv, 3))*0.7
-        return cmap((color_ - color_.min())/color_.ptp())
+        return cmap((color_ - color_.min())/np.ptp(color_))
 
 
 
@@ -202,7 +202,7 @@ def _face_color_from_sequence(face_spec, sheet):
         return np.concatenate([color_, color_, color_])
 
     elif color_.shape == (sheet.Nf,):
-        if color_.ptp() < 1e-10:
+        if np.ptp(color_) < 1e-10:
             warnings.warn('Attempting to draw a colormap '
                           'with a uniform value')
             return np.ones((face_mesh_shape, 3))*0.5
