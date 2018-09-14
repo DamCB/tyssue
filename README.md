@@ -132,7 +132,7 @@ embeded 3D visualisation in the notebook.
 
 ### Core
 
-- Python >= 3.4
+- Python >= 3.6
 - numpy >= 1.8
 - scipy >= 0.12
 - pandas >= 0.13
@@ -149,6 +149,13 @@ embeded 3D visualisation in the notebook.
 
 ## Install
 
+You can install the library with the conda package manager
+
+```bash
+conda install -c conda-forge tyssue
+```
+
+
 See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary python environment.
 
 In a nutshell, install from github goes like that:
@@ -158,28 +165,6 @@ git clone https://github.com/CellModels/tyssue.git
 cd tyssue/
 python setup.py install
 ```
-
-You can also install the library with the conda package manager
-(though it's only build for 64-bits linux atm):
-
-```bash conda install -c glyg tyssue ```
-
-This is kind of an early release though, so you're better off installing from source.
-
-## Similar softwares
-
-* See
-  [this publication](http://bioinformatics.oxfordjournals.org.gate1.inist.fr/content/32/2/219/F2.expansion.html)
-  by Jereky's lab, software available
-  [here](http://www.biocenter.helsinki.fi/salazar/software.html)
-
-* Chaste is a quite generic and well maintained simulation software for biological tissues:
-  http://www.cs.ox.ac.uk/chaste/
-
-* GGH
-
-- [https://sourceforge.net/projects/tst/](Tissue Simulation Toolkit)
-
 
 
 ## Licence
@@ -202,6 +187,3 @@ This project is distributed under the terms of the [Modzilla Public Licence](htt
 [Tamulonis2013]: Tamulonis, C. Cell-based models. (Universiteit ven Amsterdam, 2013). doi:10.1177/1745691612459060.
 
 [Tlili2013]: Tlili,S. et al. Mechanical formalism for tissue dynamics. 6, 23 (2013).
-
-[1]: The fact that the LCC model uses the term `cell` as it's core
-  concept is unfortunate. This will be hidden in the python API of the project.
