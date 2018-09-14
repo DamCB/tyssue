@@ -21,7 +21,7 @@ class MonoLayerEvents(SheetEvents):
             'grow': self.grow,
             'contract': self.contract,
             'ab_pull': self.ab_pull,
-            }
+        }
 
     def shrink(self, cell, *args):
 
@@ -31,7 +31,7 @@ class MonoLayerEvents(SheetEvents):
         new_vol = self.monolayer.cell_df.loc[cell, 'prefered_vol'] * factor
         self.monolayer.cell_df.loc[cell, 'prefered_vol'] = new_vol
         new_areas = self.monolayer.face_df.loc[
-            faces, 'prefered_area'] * factor**(2/3)
+            faces, 'prefered_area'] * factor**(2 / 3)
         self.monolayer.face_df.loc[faces, 'prefered_area'] = new_areas
 
     def grow(self, cell, *args):
@@ -41,18 +41,18 @@ class MonoLayerEvents(SheetEvents):
 
         cell_edges = self.monolayer.edge_df[
             self.monolayer.edge_df['cell'] == cell]
-        sagittal_edges = cell_edges[
-            cell_edges['segment'] == 'sagittal']
+        lateral_edges = cell_edges[
+            cell_edges['segment'] == 'lateral']
         srce_segment = self.monolayer.upcast_srce(
-            self.monolayer.vert_df['segment']).loc[sagittal_edges.index]
+            self.monolayer.vert_df['segment']).loc[lateral_edges.index]
         trgt_segment = self.monolayer.upcast_trgt(
             self.monolayer.vert_df['segment']).loc[
-                sagittal_edges.index]
+                lateral_edges.index]
 
-        ab_edges = sagittal_edges[(srce_segment == 'apical') &
-                                  (trgt_segment == 'basal')].index
-        ba_edges = sagittal_edges[(trgt_segment == 'apical') &
-                                  (srce_segment == 'basal')].index
+        ab_edges = lateral_edges[(srce_segment == 'apical') &
+                                 (trgt_segment == 'basal')].index
+        ba_edges = lateral_edges[(trgt_segment == 'apical') &
+                                 (srce_segment == 'basal')].index
         factor = args[0]
         new_tension = self.monolayer.specs['edge']['line_tension'] * factor
         self.monolayer.edge_df.loc[ab_edges, 'line_tension'] += new_tension
