@@ -44,6 +44,7 @@ def test_set_data_columns():
         assert dsets['vert']['new'].loc[0] == 100
         assert dsets['edge']['new'].loc[0] == 'r'
 
+
     specs = {"vert": {'new': 10},
              "edge": {'new': 'v'}}
     utils.set_data_columns(dsets, specs, reset=False)
