@@ -3,9 +3,10 @@
 import pandas as pd
 import numpy as np
 
+
 def extrude(apical_datasets,
             method='homotecy',
-            scale=1/3.,
+            scale=1 / 3.,
             vector=[0, 0, -1]):
     """Extrude a sheet to form a single layer epithelium
 
@@ -56,7 +57,7 @@ def extrude(apical_datasets,
 
     basal_face = apical_face.copy()
     basal_face.index = basal_face.index + Nf
-    basal_face[coords] = basal_face[coords] * 1/3.
+    basal_face[coords] = basal_face[coords] * 1 / 3.
     basal_face['segment'] = 'basal'
     basal_face['is_alive'] = 1
 
@@ -68,33 +69,33 @@ def extrude(apical_datasets,
     basal_edge.index = basal_edge.index + Ne
     basal_edge['segment'] = 'basal'
 
-    sagittal_face = pd.DataFrame(index=apical_edge.index + 2*Nf,
-                                 columns=apical_face.columns)
-    sagittal_face['segment'] = 'sagittal'
-    sagittal_face['is_alive'] = 1
+    lateral_face = pd.DataFrame(index=apical_edge.index + 2 * Nf,
+                                columns=apical_face.columns)
+    lateral_face['segment'] = 'lateral'
+    lateral_face['is_alive'] = 1
 
-    sagittal_edge = pd.DataFrame(index=np.arange(2*Ne, 6*Ne),
-                                 columns=apical_edge.columns)
+    lateral_edge = pd.DataFrame(index=np.arange(2 * Ne, 6 * Ne),
+                                columns=apical_edge.columns)
 
-    sagittal_edge['cell'] = np.repeat(apical_edge['cell'].values, 4)
-    sagittal_edge['face'] = np.repeat(sagittal_face.index.values, 4)
-    sagittal_edge['segment'] = 'sagittal'
+    lateral_edge['cell'] = np.repeat(apical_edge['cell'].values, 4)
+    lateral_edge['face'] = np.repeat(lateral_face.index.values, 4)
+    lateral_edge['segment'] = 'lateral'
 
-    sagittal_edge.loc[np.arange(2*Ne, 6*Ne, 4),
-                      ['srce', 'trgt']] = apical_edge[['trgt', 'srce']].values
+    lateral_edge.loc[np.arange(2 * Ne, 6 * Ne, 4),
+                     ['srce', 'trgt']] = apical_edge[['trgt', 'srce']].values
 
-    sagittal_edge.loc[np.arange(2*Ne+1, 6*Ne, 4),
-                      'srce'] = apical_edge['srce'].values
-    sagittal_edge.loc[np.arange(2*Ne+1, 6*Ne, 4),
-                      'trgt'] = basal_edge['trgt'].values
+    lateral_edge.loc[np.arange(2 * Ne + 1, 6 * Ne, 4),
+                     'srce'] = apical_edge['srce'].values
+    lateral_edge.loc[np.arange(2 * Ne + 1, 6 * Ne, 4),
+                     'trgt'] = basal_edge['trgt'].values
 
-    sagittal_edge.loc[np.arange(2*Ne+2, 6*Ne, 4),
-                      ['srce', 'trgt']] = basal_edge[['trgt', 'srce']].values
+    lateral_edge.loc[np.arange(2 * Ne + 2, 6 * Ne, 4),
+                     ['srce', 'trgt']] = basal_edge[['trgt', 'srce']].values
 
-    sagittal_edge.loc[np.arange(2*Ne+3, 6*Ne, 4),
-                      'srce'] = basal_edge['srce'].values
-    sagittal_edge.loc[np.arange(2*Ne+3, 6*Ne, 4),
-                      'trgt'] = apical_edge['trgt'].values
+    lateral_edge.loc[np.arange(2 * Ne + 3, 6 * Ne, 4),
+                     'srce'] = basal_edge['srce'].values
+    lateral_edge.loc[np.arange(2 * Ne + 3, 6 * Ne, 4),
+                     'trgt'] = apical_edge['trgt'].values
 
     if method == 'homotecy':
         basal_vert[coords] = basal_vert[coords] * scale
@@ -113,10 +114,10 @@ def extrude(apical_datasets,
     datasets['vert']['is_active'] = 1
     datasets['edge'] = pd.concat([apical_edge,
                                   basal_edge,
-                                  sagittal_edge])
+                                  lateral_edge])
     datasets['face'] = pd.concat([apical_face,
                                   basal_face,
-                                  sagittal_face])
+                                  lateral_face])
     datasets['edge']['is_active'] = 1
     for elem in ['vert', 'edge', 'face', 'cell']:
         datasets[elem].index.name = elem
@@ -131,16 +132,16 @@ def create_anchors(sheet):
     anchor_specs = {
         "face": {
             "at_border": 0
-            },
+        },
         "vert": {
             "at_border": 0,
             "is_anchor": 0
-             },
+        },
         "edge": {
             "at_border": 0,
             "is_anchor": 0
-             },
-        }
+        },
+    }
 
     sheet.update_specs(anchor_specs)
     # ## Edges with no opposites denote the boundary
@@ -156,7 +157,7 @@ def create_anchors(sheet):
     # ## Make a copy of the boundary vertices
     anchor_vert_df = free_vert.reset_index(drop=True)
     anchor_vert_df[sheet.coords] = anchor_vert_df[sheet.coords] * 1.01
-    anchor_vert_df.index = anchor_vert_df.index+sheet.Nv
+    anchor_vert_df.index = anchor_vert_df.index + sheet.Nv
     anchor_vert_df['is_anchor'] = 1
     anchor_vert_df['at_border'] = 0
     anchor_vert_df['is_active'] = 0
@@ -167,7 +168,7 @@ def create_anchors(sheet):
     anchor_edge_df = pd.DataFrame(
         index=np.arange(sheet.Ne, sheet.Ne + free_vert.shape[0]),
         columns=sheet.edge_df.columns
-        )
+    )
 
     anchor_edge_df['srce'] = free_vert.index
     anchor_edge_df['trgt'] = anchor_vert_df.index
@@ -223,7 +224,7 @@ def subdivide_faces(eptm, faces):
                        name='vert'),
         columns=vert_df.columns)
     new_es = pd.DataFrame(
-        index=pd.Index(np.arange(eptm.Ne, eptm.Ne + 2*Nse),
+        index=pd.Index(np.arange(eptm.Ne, eptm.Ne + 2 * Nse),
                        name='edge'),
         columns=edge_df.columns)
 
@@ -247,7 +248,7 @@ def subdivide_faces(eptm, faces):
         'edge': pd.concat([eptm.edge_df, new_es]),
         'face': eptm.face_df,  # pd.concat([untouched_faces, new_fs]),
         'vert': pd.concat([eptm.vert_df, new_vs])
-        }
+    }
 
     if 'cell' in edge_df.columns:
         new_dset['cell'] = eptm.cell_df

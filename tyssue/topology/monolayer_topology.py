@@ -66,10 +66,10 @@ should be either "horizontal" or "vertical", not {}'''.format(orientation))
 
     # Correct segment assignations for the septum
     septum = monolayer.face_df.index[-2:]
-    septum_edges = monolayer.edge_df.index[-2*len(vertices):]
+    septum_edges = monolayer.edge_df.index[-2 * len(vertices):]
     if orientation == 'vertical':
-        monolayer.face_df.loc[septum, 'segment'] = 'sagittal'
-        monolayer.edge_df.loc[septum_edges, 'segment'] = 'sagittal'
+        monolayer.face_df.loc[septum, 'segment'] = 'lateral'
+        monolayer.edge_df.loc[septum_edges, 'segment'] = 'lateral'
         _assign_vert_segment(monolayer, vertices)
 
     elif orientation == 'horizontal':
@@ -94,7 +94,7 @@ def _assign_vert_segment(monolayer, vertices):
         elif 'basal' in segs:
             monolayer.vert_df.loc[v, 'segment'] = 'basal'
         else:
-            monolayer.vert_df.loc[v, 'segment'] = 'sagittal'
+            monolayer.vert_df.loc[v, 'segment'] = 'lateral'
 
 
 def find_basal_edge(monolayer, apical_edge):
