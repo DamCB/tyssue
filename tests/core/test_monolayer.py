@@ -21,14 +21,14 @@ def test_monolayer():
                        np.arange(18))
     assert_array_equal(mono.basal_edges.values,
                        np.arange(18)+18)
-    assert_array_equal(mono.sagittal_edges.values,
+    assert_array_equal(mono.lateral_edges.values,
                        np.arange(72)+36)
 
     assert_array_equal(mono.apical_faces.values,
                        np.arange(3))
     assert_array_equal(mono.basal_faces.values,
                        np.arange(3)+3)
-    assert_array_equal(mono.sagittal_faces.values,
+    assert_array_equal(mono.lateral_faces.values,
                        np.arange(18)+6)
 
 
