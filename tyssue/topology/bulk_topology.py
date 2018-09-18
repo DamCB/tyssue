@@ -302,6 +302,17 @@ def IH_transition(eptm, e_1011):
         for face in eptm.edge_df[eptm.edge_df["cell"] == cell]["face"]:
             close_face(eptm, face)
 
+    # Verify the segment key word for new faces
+    face_srce_orbits = eptm.get_orbits('face', 'srce')
+    nb_unique_segment_position = len(
+        eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique())
+    if nb_unique_segment_position == 2:
+        new_segment = 'lateral'
+    else:
+        new_segment = eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
+    eptm.face_df.loc[fa, ['segment']] = new_segment
+    eptm.face_df.loc[fb, ['segment']] = new_segment
+
     # Removing the remaining edges and vertices
     todel_edges = eptm.edge_df[
         (eptm.edge_df["srce"] == v10)
