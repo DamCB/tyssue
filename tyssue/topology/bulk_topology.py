@@ -291,6 +291,28 @@ def IH_transition(eptm, e_1011):
         for face in eptm.edge_df[eptm.edge_df['cell'] == cell]['face']:
             close_face(eptm, face)
 
+    # Removing the remaining edges and vertices
+    todel_edges = eptm.edge_df[(eptm.edge_df['srce'] == v10) |
+                               (eptm.edge_df['trgt'] == v10) |
+                               (eptm.edge_df['srce'] == v11) |
+                               (eptm.edge_df['trgt'] == v11)].index
+
+    eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
+    eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v10, v11])]
+    eptm.edge_df.index.name = 'edge'
+
+    # Verify the segment key word for new vertices
+    srce_face_orbits = eptm.get_orbits('srce', 'face')
+    for v in [v7, v8, v9]:
+        if (len(srce_face_orbits[v]) == 12):
+            eptm.vert_df.loc[v, ['segment']] = 'lateral'
+
+        elif ('apical' in
+                eptm.edge_df[eptm.edge_df.srce == v].segment.unique()):
+            eptm.vert_df.loc[v, ['segment']] = 'apical'
+        else:
+            eptm.vert_df.loc[v, ['segment']] = 'basal'
+
     # Verify the segment key word for new faces
     face_srce_orbits = eptm.get_orbits('face', 'srce')
     nb_unique_segment_position = len(
@@ -302,15 +324,6 @@ def IH_transition(eptm, e_1011):
     eptm.face_df.loc[fa, ['segment']] = new_segment
     eptm.face_df.loc[fb, ['segment']] = new_segment
 
-    # Removing the remaining edges and vertices
-    todel_edges = eptm.edge_df[(eptm.edge_df['srce'] == v10) |
-                               (eptm.edge_df['trgt'] == v10) |
-                               (eptm.edge_df['srce'] == v11) |
-                               (eptm.edge_df['trgt'] == v11)].index
-
-    eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
-    eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v10, v11])]
-    eptm.edge_df.index.name = 'edge'
     eptm.reset_index()
     eptm.reset_topo()
 

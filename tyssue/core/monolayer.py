@@ -69,6 +69,10 @@ class Monolayer(Epithelium):
     def basal_verts(self):
         return self.segment_index('basal', 'vert')
 
+    @property
+    def lateral_verts(self):
+        return self.segment_index('lateral', 'vert')
+
     def get_sub_sheet(self, segment):
         """ Returns a :class:`Sheet` object of the corresponding
         segment
