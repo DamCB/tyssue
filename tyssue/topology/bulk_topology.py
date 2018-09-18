@@ -50,7 +50,7 @@ def get_division_edges(eptm, mother,
                             eptm.coords].values
     trgt_pos = vert_pos.loc[division_edges['trgt'],
                             eptm.coords].values
-    centers = (srce_pos + trgt_pos)/2
+    centers = (srce_pos + trgt_pos) / 2
     theta = np.arctan2(centers[:, 1], centers[:, 0])
     return division_edges.iloc[np.argsort(theta)].index
 
@@ -112,7 +112,7 @@ def cell_division(eptm, mother, geom, vertices=None):
     daughter_faces.extend(list(septum))
 
     num_v = len(vertices)
-    num_new_edges = num_v*2
+    num_new_edges = num_v * 2
 
     edge_cols = eptm.edge_df.iloc[-num_new_edges:]
     eptm.edge_df = eptm.edge_df.append(edge_cols,
@@ -176,7 +176,7 @@ def find_rearangements(eptm):
     l_th = eptm.settings['threshold_length']
     up_num_sides = eptm.upcast_face(eptm.face_df['num_sides'])
     shorts = eptm.edge_df[eptm.edge_df['length'] < l_th]
-    non_triangular = up_num_sides[up_num_sides > 4 ].index
+    non_triangular = up_num_sides[up_num_sides > 4].index
     edges_IH = set(shorts.index).intersection(non_triangular)
 
     max_f_length = shorts.groupby('face')['length'].apply(max)
@@ -278,7 +278,7 @@ def IH_transition(eptm, e_1011):
     eptm.face_df = eptm.face_df.append(new_fs,
                                        ignore_index=True)
     fa, fb = eptm.face_df.index[-2:]
-    edges_fa_fb = eptm.edge_df.loc[[e_1011, ]*6].copy()
+    edges_fa_fb = eptm.edge_df.loc[[e_1011, ] * 6].copy()
     eptm.edge_df = eptm.edge_df.append(edges_fa_fb,
                                        ignore_index=True)
     new_es = eptm.edge_df.index[-6:]
@@ -290,6 +290,17 @@ def IH_transition(eptm, e_1011):
     for cell in cells:
         for face in eptm.edge_df[eptm.edge_df['cell'] == cell]['face']:
             close_face(eptm, face)
+
+    # Verify the segment key word for new faces
+    face_srce_orbits = eptm.get_orbits('face', 'srce')
+    nb_unique_segment_position = len(
+        eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique())
+    if nb_unique_segment_position == 2:
+        new_segment = 'lateral'
+    else:
+        new_segment = eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
+    eptm.face_df.loc[fa, ['segment']] = new_segment
+    eptm.face_df.loc[fb, ['segment']] = new_segment
 
     # Removing the remaining edges and vertices
     todel_edges = eptm.edge_df[(eptm.edge_df['srce'] == v10) |
@@ -380,7 +391,6 @@ def HI_transition(eptm, face):
                              (eptm.edge_df['trgt'] == vj)].index
         eptm.edge_df.loc[e_kjs, 'srce'] = v11
 
-
     # Closing the faces with v10 → v11 edges
     for cell in cells:
         for face in eptm.edge_df[eptm.edge_df['cell'] == cell]['face']:
@@ -397,7 +407,8 @@ def HI_transition(eptm, face):
     eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
     eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v7, v8, v9])]
     orphan_faces = set(eptm.face_df.index).difference(eptm.edge_df.face)
-    eptm.face_df = eptm.face_df.loc[eptm.face_df.index.delete(list(orphan_faces))].copy()
+    eptm.face_df = eptm.face_df.loc[
+        eptm.face_df.index.delete(list(orphan_faces))].copy()
     eptm.edge_df.index.name = 'edge'
     eptm.reset_index()
     eptm.reset_topo()
@@ -449,7 +460,7 @@ def _set_new_pos_IH(eptm, e_1011, vertices):
         # eq. 54 - 56
         r0i, r0j = (eptm.vert_df.loc[[vi, vj], eptm.coords].values -
                     r0[np.newaxis, :])
-        w_0k = (r0i/np.linalg.norm(r0i) + r0j/np.linalg.norm(r0j)) / 2
+        w_0k = (r0i / np.linalg.norm(r0i) + r0j / np.linalg.norm(r0j)) / 2
         # eq. 51 - 53
         v_0k = w_0k - (np.dot(w_0k, u_T)) * u_T
         v_0ns.append(v_0k)
@@ -495,5 +506,5 @@ def _set_new_pos_HI(eptm, fa, v10, v11):
     norm_a = norm_a / np.linalg.norm(norm_a)
     norm_b = - norm_a
     Dl_th = eptm.settings['threshold_length']
-    eptm.vert_df.loc[v10, eptm.coords] = r0 + Dl_th/2 * norm_b
-    eptm.vert_df.loc[v11, eptm.coords] = r0 + Dl_th/2 * norm_a
+    eptm.vert_df.loc[v10, eptm.coords] = r0 + Dl_th / 2 * norm_b
+    eptm.vert_df.loc[v11, eptm.coords] = r0 + Dl_th / 2 * norm_a
