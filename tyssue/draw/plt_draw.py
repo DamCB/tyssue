@@ -89,7 +89,7 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
             collection_specs['facecolors'] = color.take(faces, axis=0)
 
     polys = sheet.face_polygons(coords)
-    polys = polys.reindex(sheet.face_df.sort_values('z').index)
+    #polys = polys.reindex(sheet.face_df.sort_values('z').index)
     p = PolyCollection(polys, closed=True, **collection_specs)
     ax.add_collection(p)
     return ax
