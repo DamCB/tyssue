@@ -8,6 +8,7 @@ from tyssue.generation import extrude, three_faces_sheet
 from tyssue.topology.bulk_topology import IH_transition, HI_transition
 from tyssue.topology.monolayer_topology import cell_division
 
+
 def test_IH_transition():
 
     sheet = Sheet.planar_sheet_3d('sheet', 5, 5, 1, 1)
@@ -29,6 +30,8 @@ def test_IH_transition():
     invalid = eptm.get_invalid()
     assert np.alltrue(1 - invalid)
     assert np.alltrue(eptm.edge_df['sub_vol'] > 0)
+    assert len(eptm.face_df[eptm.face_df.segment ==
+                            'apical']) == len(eptm.cell_df)
 
 
 def test_HI_transition():
@@ -59,8 +62,8 @@ def test_HI_transition():
 def test_monolayer_division():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d, method='translation')
-    eptm = Monolayer('test_volume',datasets, bulk_spec(),
-                     coords=['x','y','z'])
+    eptm = Monolayer('test_volume', datasets, bulk_spec(),
+                     coords=['x', 'y', 'z'])
     MonoLayerGeometry.update_all(eptm)
     for orientation in ['vertical', 'horizontal']:
         daughter = cell_division(eptm, 0,
