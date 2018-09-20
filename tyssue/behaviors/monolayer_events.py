@@ -31,12 +31,12 @@ def apoptosis(monolayer, manager, cell_id,
             (monolayer.face_df.segment == 'apical')].index[0]
     except:
         apical_face = None
-    # On a déjà éliminé la face apicale, il faut éliminer des faces laterales
-    # jusqu'à ce qu'on est un cellule à 4 côtés.
+    # Apical face has already been removed.
+    # It needs to eliminate lateral face until obtain a cell with 4 faces.
     if apical_face is None:
         faces_in_cell = monolayer.face_df.loc[cell_to_face[cell].unique()]
         if len(faces_in_cell) > 4:
-            # Elimination d'une face latérale à 3 côté
+            # Remove lateral face with 3 sides
             face_to_eliminate = faces_in_cell[
                 (faces_in_cell.segment == 'lateral') &
                 (faces_in_cell.num_sides == 3)].index[0]
@@ -48,7 +48,7 @@ def apoptosis(monolayer, manager, cell_id,
             monolayer.face_df.loc[prev_nums['face']:, 'contractility'] = 0
             done = False
         elif len(faces_in_cell) == 4:
-            # Réduction du volume
+            # Volume reduction
             if monolayer.cell_df.loc[cell, 'vol'] > critical_volume:
                 shrink(monolayer, cell, shrink_rate)
                 done = False
@@ -61,7 +61,7 @@ def apoptosis(monolayer, manager, cell_id,
             done = False
 
         elif monolayer.face_df.loc[apical_face, 'area'] <= critical_area:
-            # Reduction du nombre de voisin de la face apicale (jusqu'à 3)
+            # Reduce neighbours for the apical face (until 3)
             if monolayer.face_df.loc[apical_face, 'num_sides'] > 3:
                 e_min = monolayer.edge_df[monolayer.edge_df[
                     'face'] == apical_face]['length'].idxmin()
