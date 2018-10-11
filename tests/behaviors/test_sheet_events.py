@@ -1,6 +1,5 @@
 import os
 import tempfile
-
 import numpy as np
 import pandas as pd
 
@@ -19,6 +18,7 @@ from tyssue.behaviors.sheet_events import (division,
                                            contract,
                                            ab_pull)
 
+
 def test_add_events():
 
     manager = EventManager('face')
@@ -29,7 +29,6 @@ def test_add_events():
     manager.execute(None)
     manager.update()
     assert len(manager.current) == 3
-
 
 def test_add_only_once():
     manager = EventManager('face')

@@ -1,5 +1,6 @@
 import logging
-from .sheet_events import SheetEvents
+from ..topology.bulk_topology import (IH_transition,
+                                      HI_transition)
 
 # from ..topology.sheet_topology import (remove_face,
 #                                        type1_transition,
@@ -7,60 +8,151 @@ from .sheet_events import SheetEvents
 logger = logging.getLogger(__name__)
 
 
-class MonoLayerEvents(SheetEvents):
+def apoptosis(monolayer, manager, cell_id,
+              contract_rate=2,
+              critical_area=1e-2,
+              shrink_rate=0.4,
+              critical_volume=0.1):
 
-    def __init__(self, monolayer, model, geom):
-        self.monolayer = monolayer
-        self.model = model
-        self.geom = geom
+    settings = {'contract_rate': contract_rate,
+                'critical_area': critical_area,
+                'shrink_rate': shrink_rate,
+                'critical_volume': critical_volume}
 
-    @property
-    def events(self):
-        return {
-            'shrink': self.shrink,
-            'grow': self.grow,
-            'contract': self.contract,
-            'ab_pull': self.ab_pull,
-            }
+    cell = cell_id
+    if cell is None:
+        return
+    done = False
 
-    def shrink(self, cell, *args):
+    cell_to_face = monolayer.get_orbits('cell', 'face')
+    try:
+        apical_face = monolayer.face_df[
+            (monolayer.face_df.index.isin(cell_to_face[cell])) &
+            (monolayer.face_df.segment == 'apical')].index[0]
+    except:
+        apical_face = None
+    # Apical face has already been removed.
+    # It needs to eliminate lateral face until obtain a cell with 4 faces.
+    if apical_face is None:
+        faces_in_cell = monolayer.face_df.loc[cell_to_face[cell].unique()]
+        if len(faces_in_cell) > 4:
+            # Remove lateral face with 3 sides
+            face_to_eliminate = faces_in_cell[
+                (faces_in_cell.segment == 'lateral') &
+                (faces_in_cell.num_sides == 3)].index[0]
 
-        factor = args[0]
-        faces = self.monolayer.edge_df[
-            self.monolayer.edge_df['cell'] == cell]['face']
-        new_vol = self.monolayer.cell_df.loc[cell, 'prefered_vol'] * factor
-        self.monolayer.cell_df.loc[cell, 'prefered_vol'] = new_vol
-        new_areas = self.monolayer.face_df.loc[
-            faces, 'prefered_area'] * factor**(2/3)
-        self.monolayer.face_df.loc[faces, 'prefered_area'] = new_areas
+            prev_nums = {'edge': monolayer.Ne,
+                         'face': monolayer.Nf,
+                         'vert': monolayer.Nv}
+            HI_transition(monolayer, face_to_eliminate)
+            monolayer.face_df.loc[prev_nums['face']:, 'contractility'] = 0
+            done = False
+        elif len(faces_in_cell) == 4:
+            # Volume reduction
+            if monolayer.cell_df.loc[cell, 'vol'] > critical_volume:
+                shrink(monolayer, cell, shrink_rate)
+                done = False
+            else:
+                done = True
+    else:
+        # Contract apical surface until reached a critical area
+        if monolayer.face_df.loc[apical_face, 'area'] > critical_area:
+            contract(monolayer, apical_face, contract_rate, True)
+            done = False
 
-    def grow(self, cell, *args):
-        self.shrink(cell, *args)
+        elif monolayer.face_df.loc[apical_face, 'area'] <= critical_area:
+            # Reduce neighbours for the apical face (until 3)
+            if monolayer.face_df.loc[apical_face, 'num_sides'] > 3:
+                e_min = monolayer.edge_df[monolayer.edge_df[
+                    'face'] == apical_face]['length'].idxmin()
+                prev_nums = {'edge': monolayer.Ne,
+                             'face': monolayer.Nf,
+                             'vert': monolayer.Nv}
 
-    def ab_pull(self, cell, *args):
+                monolayer.settings['threshold_length'] = 1e-3
+                IH_transition(monolayer, e_min)
+                monolayer.face_df.loc[prev_nums['face']:, 'contractility'] = 0
 
-        cell_edges = self.monolayer.edge_df[
-            self.monolayer.edge_df['cell'] == cell]
-        sagittal_edges = cell_edges[
-            cell_edges['segment'] == 'sagittal']
-        srce_segment = self.monolayer.upcast_srce(
-            self.monolayer.vert_df['segment']).loc[sagittal_edges.index]
-        trgt_segment = self.monolayer.upcast_trgt(
-            self.monolayer.vert_df['segment']).loc[
-                sagittal_edges.index]
+                done = False
 
-        ab_edges = sagittal_edges[(srce_segment == 'apical') &
-                                  (trgt_segment == 'basal')].index
-        ba_edges = sagittal_edges[(trgt_segment == 'apical') &
-                                  (srce_segment == 'basal')].index
-        factor = args[0]
-        new_tension = self.monolayer.specs['edge']['line_tension'] * factor
-        self.monolayer.edge_df.loc[ab_edges, 'line_tension'] += new_tension
-        self.monolayer.edge_df.loc[ba_edges, 'line_tension'] += new_tension
+            elif monolayer.face_df.loc[apical_face, 'num_sides'] == 3:
+                prev_nums = {'edge': monolayer.Ne,
+                             'face': monolayer.Nf,
+                             'vert': monolayer.Nv}
+                HI_transition(monolayer, apical_face)
+                done = False
 
-    def contract(self, face, *args):
+    if not done:
+        manager.append(apoptosis, cell_id, kwargs=settings)
 
-        factor = args[0]
-        new_contractility = self.monolayer.specs['face'][
-            'contractility'] * factor
-        self.monolayer.face_df.loc[face, 'contractility'] += new_contractility
+
+def shrink(monolayer, cell, shrink_rate):
+    """Divides the equilibrium volume of face
+    by a factor (1+shrink_rate)
+    """
+    factor = (1 + shrink_rate)
+    faces = monolayer.edge_df[
+        monolayer.edge_df['cell'] == cell]['face']
+    monolayer.cell_df.loc[cell, 'prefered_vol'] /= factor
+    monolayer.cell_df.loc[cell, 'prefered_area'] /= factor**(2 / 3)
+
+
+def grow(monolayer, cell, grow_rate):
+    """Multiplies the equilibrium volume of face
+    by a factor (1+shrink_rate)
+    """
+    factor = (1 + grow_rate)
+    faces = monolayer.edge_df[
+        monolayer.edge_df['cell'] == cell]['face']
+    monolayer.cell_df.loc[cell, 'prefered_vol'] *= factor
+    monolayer.face_df.loc[faces, 'prefered_area'] *= factor**(2 / 3)
+
+
+def ab_pull(monolayer, cell, *args):
+
+    cell_edges = monolayer.edge_df[
+        monolayer.edge_df['cell'] == cell]
+    lateral_edges = cell_edges[
+        cell_edges['segment'] == 'lateral']
+    srce_segment = monolayer.upcast_srce(
+        monolayer.vert_df['segment']).loc[lateral_edges.index]
+    trgt_segment = monolayer.upcast_trgt(
+        monolayer.vert_df['segment']).loc[
+            lateral_edges.index]
+
+    ab_edges = lateral_edges[(srce_segment == 'apical') &
+                             (trgt_segment == 'basal')].index
+    ba_edges = lateral_edges[(trgt_segment == 'apical') &
+                             (srce_segment == 'basal')].index
+    factor = args[0]
+    new_tension = monolayer.specs['edge']['line_tension'] * factor
+    monolayer.edge_df.loc[ab_edges, 'line_tension'] += new_tension
+    monolayer.edge_df.loc[ba_edges, 'line_tension'] += new_tension
+
+
+def contract(monolayer, face, contractile_increase,
+             multiple=False):
+    """
+    Contract the face by increasing the 'contractility' parameter
+    by contractile_increase
+    """
+    if multiple:
+        monolayer.face_df.loc[face, 'contractility'] *= contractile_increase
+    else:
+        monolayer.face_df.loc[face, 'contractility'] += contractile_increase
+
+
+def contract_apical_face(monolayer, face_id,
+                         contractile_increase=1.,
+                         critical_area=1e-2,
+                         max_contractility=50):
+    """Single step contraction event for apical face only
+    """
+    face = monolayer.idx_lookup(face_id, 'face')
+    if face is None:
+        return
+    if ((monolayer.face_df.loc[face, 'segment'] != 'apical')
+            or (monolayer.face_df.loc[face, 'area'] < critical_area)
+            or (monolayer.face_df.loc[face, 'contractility'] > max_contractility)):
+        return
+    contract(monolayer, face, contractile_increase)

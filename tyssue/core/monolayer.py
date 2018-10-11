@@ -12,6 +12,7 @@ class Monolayer(Epithelium):
     """
     3D monolayer epithelium
     """
+
     def __init__(self, name, datasets, specs, coords=None):
 
         super().__init__(name, datasets,
@@ -37,24 +38,24 @@ class Monolayer(Epithelium):
         return df[df['segment'] == segment].index
 
     @property
-    def sagittal_faces(self):
-        return self.segment_index('sagittal', 'face')
+    def lateral_faces(self):
+        return self.segment_index('lateral', 'face')
 
     @property
     def apical_faces(self):
         return self.segment_index('apical', 'face')
 
     @property
-    def sagittal_edges(self):
-        return self.segment_index('sagittal', 'edge')
+    def basal_faces(self):
+        return self.segment_index('basal', 'face')
+
+    @property
+    def lateral_edges(self):
+        return self.segment_index('lateral', 'edge')
 
     @property
     def apical_edges(self):
         return self.segment_index('apical', 'edge')
-
-    @property
-    def basal_faces(self):
-        return self.segment_index('basal', 'face')
 
     @property
     def basal_edges(self):
@@ -67,6 +68,10 @@ class Monolayer(Epithelium):
     @property
     def basal_verts(self):
         return self.segment_index('basal', 'vert')
+
+    @property
+    def lateral_verts(self):
+        return self.segment_index('lateral', 'vert')
 
     def get_sub_sheet(self, segment):
         """ Returns a :class:`Sheet` object of the corresponding
@@ -83,13 +88,14 @@ class Monolayer(Epithelium):
                     for element in ['edge', 'face', 'vert']}
         specs = {k: self.specs[k] for k in ['face', 'edge',
                                             'vert', 'settings']}
-        return Sheet(self.identifier+'apical', datasets, specs)
+        return Sheet(self.identifier + 'apical', datasets, specs)
 
 
 class MonolayerWithLamina(Monolayer):
     """
     3D monolayer epithelium with a lamina meshing
     """
+
     def __init__(self, name, datasets, specs, coords=None):
 
         super().__init__(name, datasets,
@@ -118,24 +124,24 @@ class MonolayerWithLamina(Monolayer):
         max_dist = self.edge_df.length.dropna().median() * 1.74
         lamina_tree = cKDTree(focal_adhesions[self.coords].values)
         lamina_edges = pd.DataFrame([[i, j] for i, j in
-                                    lamina_tree.query_pairs(max_dist,
-                                                            eps=1e-3)],
+                                     lamina_tree.query_pairs(max_dist,
+                                                             eps=1e-3)],
                                     columns=['srce', 'trgt'])
         lamina_edges.index.name = 'edge'
         lamina_edges['srce'] = focal_adhesions.index[lamina_edges['srce']]
         lamina_edges['trgt'] = focal_adhesions.index[lamina_edges['trgt']]
         # place holder face and cell
-        lamina_face = self.face_df.index.max()+1
+        lamina_face = self.face_df.index.max() + 1
         lamina_edges['face'] = lamina_face
         self.face_df.append(self.face_df.ix[0].copy())
         self.face_df.loc[lamina_face, 'is_alive'] = 0
 
-        lamina_cell = self.cell_df.index.max()+1
+        lamina_cell = self.cell_df.index.max() + 1
         lamina_edges['cell'] = lamina_cell
         self.cell_df.append(self.cell_df.ix[0].copy())
         self.cell_df.loc[lamina_cell, 'is_alive'] = 0
 
-        lamina_edges.index += self.edge_df.index.max()+1
+        lamina_edges.index += self.edge_df.index.max() + 1
         lamina_edges['segment'] = 'lamina'
         lamina_edges['subdiv'] = 0
         self.edge_df = pd.concat([self.edge_df, lamina_edges], sort=True)
