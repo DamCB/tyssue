@@ -384,8 +384,6 @@ class FaceContractility(AbstractEffector):
         return grad_srce, grad_trgt
 
 
-# TODO: fix specs bellow
-
 class SurfaceTension(AbstractEffector):
 
     dimensions = units.area_tension
@@ -422,7 +420,6 @@ class SurfaceTension(AbstractEffector):
         grad_a_trgt.columns = ['g'+u for u in eptm.coords]
 
         return grad_a_srce, grad_a_trgt
-
 
 
 
