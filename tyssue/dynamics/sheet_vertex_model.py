@@ -7,7 +7,10 @@ from . import effectors
 from .factory import model_factory
 
 SheetModel = model_factory(
-    [effectors.LineTension,
-     effectors.FaceContractility,
-     effectors.FaceVolumeElasticity],
-    effectors.FaceVolumeElasticity)
+    [
+        effectors.LineTension,
+        effectors.FaceContractility,
+        effectors.FaceVolumeElasticity,
+    ],
+    effectors.FaceVolumeElasticity,
+)
