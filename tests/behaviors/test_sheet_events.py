@@ -156,10 +156,10 @@ def test_contract():
 
     sheet = Sheet("emin", *three_faces_sheet())
     sheet.face_df["contractility"] = 1.0
-    contract(sheet, 0, 0.5, multiple=False)
+    contract(sheet, 0, 0.5, multiply=False)
     assert sheet.face_df.loc[0, "contractility"] == 1.5
 
-    contract(sheet, 1, 2.0, multiple=True)
+    contract(sheet, 1, 2.0, multiply=True)
     assert sheet.face_df.loc[1, "contractility"] == 2.0
 
 
