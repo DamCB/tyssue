@@ -1,5 +1,5 @@
 import warnings
-
+import numpy as np
 from copy import deepcopy
 
 from .effectors import dimensionalize as dimensionalize
@@ -25,18 +25,20 @@ def model_factory(effectors, ref_effector):
     class NewModel:
 
         labels = []
-        specs = {'cell': set(),
-                 'face': set(),
-                 'edge': set(),
-                 'vert': set(),
-                 'settings': {'nrj_norm_factor'}}
+        specs = {
+            "cell": set(),
+            "face": set(),
+            "edge": set(),
+            "vert": set(),
+            "settings": {"nrj_norm_factor"},
+        }
         for f in effectors:
             labels.append(f.label)
             for k in specs.keys():
                 specs[k] = specs[k].union(f.specs.get(k, {}))
 
         __doc__ = """Dynamical model with the following effectors:\n"""
-        __doc__ = __doc__+'\n'.join(labels)
+        __doc__ = __doc__ + "\n".join(labels)
 
         @staticmethod
         def dimensionalize(nondim_specs):
@@ -44,30 +46,30 @@ def model_factory(effectors, ref_effector):
             for effector in effectors:
                 if effector == ref_effector:
                     continue
-                dimensionalize(nondim_specs, dim_specs,
-                               effector, ref_effector)
+                dimensionalize(nondim_specs, dim_specs, effector, ref_effector)
 
             ref_nrj = ref_effector.get_nrj_norm(dim_specs)
-            dim_specs['settings']['nrj_norm_factor'] = ref_nrj
+            dim_specs["settings"]["nrj_norm_factor"] = ref_nrj
             return dim_specs
 
         @classmethod
         def dimentionalize(cls, nondim_specs):
-            warnings.warn('''This badly worded method is deprecated,
- use dimensionalize instead''')
+            warnings.warn(
+                """This badly worded method is deprecated,
+ use dimensionalize instead"""
+            )
             return cls.dimensionalize(nondim_specs)
 
         @staticmethod
         def normalize(dim_specs):
             nondim_specs = deepcopy(dim_specs)
             for effector in effectors:
-                normalize(dim_specs, nondim_specs,
-                          effector, ref_effector)
+                normalize(dim_specs, nondim_specs, effector, ref_effector)
 
         @staticmethod
         def compute_energy(eptm, full_output=False):
             energies = [f.energy(eptm) for f in effectors]
-            norm_factor = eptm.specs['settings'].get('nrj_norm_factor', 1)
+            norm_factor = eptm.specs["settings"].get("nrj_norm_factor", 1)
             if full_output:
                 return [E / norm_factor for E in energies]
 
@@ -75,36 +77,45 @@ def model_factory(effectors, ref_effector):
 
         @staticmethod
         def compute_gradient(eptm, components=False):
-            norm_factor = eptm.specs['settings'].get('nrj_norm_factor', 1)
+            norm_factor = eptm.specs["settings"].get("nrj_norm_factor", 1)
             if not eptm.ucoords[0] in eptm.edge_df.columns:
-                warnings.warn('setting ucoords in grad computation,'
-                              'please fix your specs')
+                warnings.warn(
+                    "setting ucoords in grad computation," "please fix your specs"
+                )
                 for uc in eptm.ucoords:
                     eptm.edge_df[uc] = 0.0
 
-            eptm.edge_df[eptm.ucoords] = (
-                eptm.edge_df[eptm.dcoords]
-                / to_nd(eptm.edge_df['length'], eptm.dim))
+            eptm.edge_df[eptm.ucoords] = eptm.edge_df[eptm.dcoords] / to_nd(
+                eptm.edge_df["length"], eptm.dim
+            )
 
-            eptm.edge_df['is_active'] = (
-                eptm.upcast_srce(eptm.vert_df['is_active'])
-                * eptm.upcast_face(eptm.face_df['is_alive']))
+            eptm.edge_df["is_active"] = eptm.upcast_srce(
+                eptm.vert_df["is_active"]
+            ) * eptm.upcast_face(eptm.face_df["is_alive"])
 
             grads = [f.gradient(eptm) for f in effectors]
+            grad_s, grad_t, grad_v = None, None, None
+
             if components:
                 return grads
-            srce_grads = (g[0] for g in grads
-                          if g[0].shape[0] == eptm.Ne)
-            trgt_grads = (g[1] for g in grads
-                          if (g[1] is not None)
-                          and (g[1].shape[0] == eptm.Ne))
-            vert_grads = (g[0] for g in grads
-                          if g[0].shape[0] == eptm.Nv)
+            srce_grads = (g[0] for g in grads if g[0].shape[0] == eptm.Ne)
 
-            grad_i = (eptm.sum_srce(sum(srce_grads))
-                      + eptm.sum_trgt(sum(trgt_grads))
-                      + sum(vert_grads)) * to_nd(eptm.vert_df.is_active,
-                                                 eptm.dim)
+            if srce_grads:
+                grad_s = eptm.sum_srce(np.sum(srce_grads))
+
+            trgt_grads = (
+                g[1] for g in grads if (g[1] is not None) and (g[1].shape[0] == eptm.Ne)
+            )
+            if trgt_grads:
+                grad_t = eptm.sum_srce(np.sum(srce_grads))
+
+            vert_grads = (g[0] for g in grads if g[0].shape[0] == eptm.Nv)
+            if vert_grads:
+                grad_v = np.sum(vert_grads)
+
+            grad_i = np.sum(
+                [g for g in (grad_s, grad_t, grad_v) if g is not None]
+            ) * to_nd(eptm.vert_df.is_active, eptm.dim)
 
             return grad_i / norm_factor
 
