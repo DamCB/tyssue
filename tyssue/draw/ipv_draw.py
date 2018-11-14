@@ -34,7 +34,6 @@ def sheet_view(sheet, coords=['x', 'y', 'z'], **draw_specs_kw):
     spec_updater(draw_specs, draw_specs_kw)
     fig = ipv.gcf()
 
-
     edge_spec = draw_specs['edge']
     if edge_spec['visible']:
         edges = edge_mesh(sheet, coords, **edge_spec)

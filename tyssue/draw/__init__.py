@@ -33,8 +33,7 @@ def sheet_view(sheet, coords=['x', 'y', 'z'],
     elif mode == '3D':
         return sheet_view_3d(sheet, coords, **draw_specs_kw)
 
-    else :
-        return ValueError("""
+    return ValueError("""
 Argument `mode` not understood,
 should be either '2D', '3D' or 'quick', got %s""", mode)
 
