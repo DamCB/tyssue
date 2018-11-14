@@ -23,11 +23,11 @@
     "face": 0,
     "dx": 0.0,
     "dy": 0.0,
-    "dz": 0.0,
+    "dz": 1.0,
     "nx": 0.0,
     "ny": 0.0,
     "nz": 1.0,
-    "length": 0.0
+    "length": 1.0
     },
 "settings": {
     "geometry": "flat",

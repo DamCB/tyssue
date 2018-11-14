@@ -94,26 +94,26 @@ def model_factory(effectors, ref_effector):
             ) * eptm.upcast_face(eptm.face_df["is_alive"])
 
             grads = [f.gradient(eptm) for f in effectors]
-            grad_s, grad_t, grad_v = None, None, None
 
             if components:
                 return grads
-            srce_grads = (g[0] for g in grads if g[0].shape[0] == eptm.Ne)
 
+            grad_s, grad_t, grad_v = None, None, None
+            srce_grads = [g[0] for g in grads if g[0].shape[0] == eptm.Ne]
             if srce_grads:
-                grad_s = eptm.sum_srce(np.sum(srce_grads))
+                grad_s = eptm.sum_srce(sum(srce_grads))
 
-            trgt_grads = (
+            trgt_grads = [
                 g[1] for g in grads if (g[1] is not None) and (g[1].shape[0] == eptm.Ne)
-            )
+            ]
             if trgt_grads:
-                grad_t = eptm.sum_srce(np.sum(srce_grads))
+                grad_t = eptm.sum_trgt(sum(trgt_grads))
 
-            vert_grads = (g[0] for g in grads if g[0].shape[0] == eptm.Nv)
+            vert_grads = [g[0] for g in grads if g[0].shape[0] == eptm.Nv]
             if vert_grads:
-                grad_v = np.sum(vert_grads)
+                grad_v = sum(vert_grads)
 
-            grad_i = np.sum(
+            grad_i = sum(
                 [g for g in (grad_s, grad_t, grad_v) if g is not None]
             ) * to_nd(eptm.vert_df.is_active, eptm.dim)
 
