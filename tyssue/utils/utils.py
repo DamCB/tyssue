@@ -202,6 +202,8 @@ def scaled_unscaled(func, scale, eptm, geom,
       to pass to func
     coords: the coordinates on which the scaling applies
 
+    If the execution of function fails, the scaling is still reverted
+
     Returns
     -------
     res: the result of the function func
@@ -210,9 +212,13 @@ def scaled_unscaled(func, scale, eptm, geom,
         coords = eptm.coords
     geom.scale(eptm, scale, coords)
     geom.update_all(eptm)
-    res = func(*args, **kwargs)
-    geom.scale(eptm, 1 / scale, coords)
-    geom.update_all(eptm)
+    try:
+        res = func(*args, **kwargs)
+    except:
+        raise
+    finally:
+        geom.scale(eptm, 1 / scale, coords)
+        geom.update_all(eptm)
     return res
 
 

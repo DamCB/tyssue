@@ -4,13 +4,14 @@ from tyssue import Monolayer, config, Sheet
 from tyssue.utils import testing
 
 from tyssue.dynamics.effectors import (
+    LineTension,
+    SurfaceTension,
     LengthElasticity,
+    FaceContractility,
     FaceAreaElasticity,
     FaceVolumeElasticity,
-    CellAreaElasticity,
     CellVolumeElasticity,
-    LineTension,
-    FaceContractility,
+    CellAreaElasticity,
     BorderElasticity)
 
 sheet_effectors = [
@@ -18,7 +19,8 @@ sheet_effectors = [
     FaceAreaElasticity,
     FaceVolumeElasticity,
     LineTension,
-    FaceContractility]
+    FaceContractility,
+    SurfaceTension]
 
 bulk_effectors = [
     CellAreaElasticity,

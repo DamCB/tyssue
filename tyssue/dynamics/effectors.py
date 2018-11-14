@@ -384,19 +384,43 @@ class FaceContractility(AbstractEffector):
         return grad_srce, grad_trgt
 
 
-# TODO: fix specs bellow
-
 class SurfaceTension(AbstractEffector):
 
     dimensions = units.area_tension
-    magnitude = 'surf_tension'
+    magnitude = 'surface_tension'
 
     spatial_ref = 'prefered_area', units.area
 
     label = 'Surface tension'
     element = 'face'
-    specs = {'is_active',
-             'surf_tension'}
+    specs = {
+        'face': {
+            'is_active',
+            'surface_tension',
+            'area'
+            }
+        }
+
+    @staticmethod
+    def energy(eptm):
+
+        return eptm.face_df.eval('surface_tension * area')
+
+
+    @staticmethod
+    def gradient(eptm):
+
+        G = to_nd(eptm.upcast_face(eptm.face_df['surface_tension']),
+                  len(eptm.coords))
+        grad_a_srce, grad_a_trgt = area_grad(eptm)
+
+        grad_a_srce = G * grad_a_srce
+        grad_a_trgt = G * grad_a_trgt
+        grad_a_srce.columns = ['g'+u for u in eptm.coords]
+        grad_a_trgt.columns = ['g'+u for u in eptm.coords]
+
+        return grad_a_srce, grad_a_trgt
+
 
 
 class LineViscosity(AbstractEffector):
@@ -408,8 +432,12 @@ class LineViscosity(AbstractEffector):
     element = 'edge'
     spatial_ref = 'mean_length', units.length
     temporal_ref = 'dt', units.time
-    specs = {'is_active',
-             'edge_viscosity'}
+    specs = {
+        'edge': {
+            'is_active',
+            'edge_viscosity'
+            }
+        }
 
     @staticmethod
     def gradient(eptm):

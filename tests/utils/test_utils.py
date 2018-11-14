@@ -93,6 +93,15 @@ def test_scaled_unscaled():
     assert post_area == prev_area
     assert_almost_equal(sc_area / post_area, 4.)
 
+    def fails():
+        raise ValueError
+
+    with pytest.raises(ValueError):
+        utils.scaled_unscaled(fails, 2,
+                              sheet, SheetGeometry)
+        post_area = sheet.face_df.area.mean()
+        assert post_area == prev_area
+
 
 def test_modify():
 
