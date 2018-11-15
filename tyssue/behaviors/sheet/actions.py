@@ -7,8 +7,8 @@ Basic event module
 
 import logging
 import numpy as np
-from ..topology.sheet_topology import remove_face, type1_transition
-from ..geometry.sheet_geometry import SheetGeometry
+from ...topology.sheet_topology import remove_face, type1_transition
+from ...geometry.sheet_geometry import SheetGeometry
 
 logger = logging.getLogger(__name__)
 
@@ -75,10 +75,10 @@ def contract(
 
     """
     if multiple:
-        sheet.face_df.loc[face, "contractility"] *= contractile_increase
+        sheet.face_df.loc[face, contraction_column] *= contractile_increase
     else:
         new_contractility = contractile_increase
-        sheet.face_df.loc[face, "contractility"] += new_contractility
+        sheet.face_df.loc[face, contraction_column] += new_contractility
 
 
 def ab_pull(sheet, face, radial_tension, distributed=False):

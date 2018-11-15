@@ -41,7 +41,7 @@ class EventManager:
         self.current = deque()
         self.next = deque()
         self.element = element
-        self.current.append((wait, -1, (1,), {}))
+        self.current.append((wait, {'face_id': -1, 'n_steps': 1}))
         self.clock = 0
         if logfile is not None:
             fh = logging.FileHandler(logfile)
@@ -61,9 +61,9 @@ class EventManager:
 
         """
         for event in events:
-            self.append(*event)
+            self.append(event[0], **event[1])
 
-    def append(self, behavior, elem_id=-1, args=None, kwargs=None):
+    def append(self, behavior, **kwargs):
         """Add an event to the manager's next deque
 
         behavior is a function whose signature is
@@ -85,14 +85,11 @@ class EventManager:
             extra keywords arguments to the behavior function
 
         """
+        elem_id = kwargs['face_id']
         for tup in self.next:
             if (elem_id == tup[1]) and (behavior.__name__ == tup[0].__name__):
                 return
-        if args is None:
-            args = ()
-        if kwargs is None:
-            kwargs = {}
-        self.next.append((behavior, elem_id, args, kwargs))
+        self.next.append((behavior, kwargs))
 
     def execute(self, eptm):
         """
@@ -100,9 +97,10 @@ class EventManager:
         """
 
         while self.current:
-            (behavior, elem_id, args, kwargs) = self.current.popleft()
+            (behavior, kwargs) = self.current.popleft()
+            elem_id = kwargs['face_id']
             logger.info(f"{self.clock}, {elem_id}, {behavior.__name__}")
-            behavior(eptm, self, elem_id, *args, **kwargs)
+            behavior(eptm, self, **kwargs)
 
     def update(self):
         """
@@ -113,8 +111,17 @@ class EventManager:
         self.next.clear()
 
 
-def wait(eptm, manager, elem_id, n_steps):
+# Default dictionary for wait function
+default_wait_spec = {'n_steps': 1}
+
+
+def wait(eptm, manager, **kwargs):
     """Does nothing for a number of steps n_steps
     """
-    if n_steps > 1:
-        manager.next.append("wait", elem_id, (n_steps - 1,), {})
+    wait_spec = default_wait_spec
+    wait_spec.update(**kwargs)
+    elem_id = kwargs['face_id']
+    if kwargs['n_steps'] > 1:
+        kwargs.update({
+                      'n_steps': kwargs['n_steps']-1})
+        manager.next.append(("wait", wait_spec))

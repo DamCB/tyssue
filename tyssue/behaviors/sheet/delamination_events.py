@@ -8,9 +8,10 @@ Mesoderm invagination event module
 import random
 import numpy as np
 
-from ..geometry.sheet_geometry import SheetGeometry
-from ..actions import relax, contract, ab_pull, exchange, remove
-from basic_events import neighbors_contraction
+from ...geometry.sheet_geometry import SheetGeometry
+from ...utils.decorators import face_lookup
+from .actions import relax, contract, ab_pull, exchange, remove
+from .basic_events import neighbors_contraction
 
 
 def delamination(
@@ -123,25 +124,27 @@ def delamination(
     if not done:
         manager.append(delamination, face_id, kwargs=settings)
 
+default_constriction_spec = {
+    'face_id': -1,
+    'face': -1,
+    'contract_rate': 2,
+    'critical_area': 1e-2,
+    'radial_tension': 1.0,
+    'nb_iteration': 0,
+    'nb_iteration_max': 20,
+    'contract_neighbors': True,
+    'critical_area_neighbors': 10,
+    'contract_span': 2,
+    'basal_contract_rate': 1.001,
+    'current_traction': 0,
+    'max_traction': 30,
+    'geom': SheetGeometry,
+    'contraction_column': "contractility"
+}
 
-def constriction(
-    sheet,
-    manager,
-    face_id,
-    contract_rate=2,
-    critical_area=1e-2,
-    radial_tension=1.0,
-    nb_iteration=0,
-    nb_iteration_max=20,
-    contract_neighbors=True,
-    critical_area_neighbors=10,
-    contract_span=2,
-    basal_contract_rate=1.001,
-    current_traction=0,
-    max_traction=30,
-    geom=SheetGeometry,
-    contraction_column="contractility",
-):
+
+@face_lookup
+def constriction(sheet, manager, **kwargs):
     """Constriction process
     This function corresponds to the process called "apical constriction"
     in the manuscript
@@ -174,24 +177,33 @@ def constriction(
        rate for the neighbors is equal to `contract_rate` devided by
        the rank.
     """
-    face = sheet.idx_lookup(face_id, "face")
-    if face is None:
-        return
+    constriction_spec = default_constriction_spec
+    constriction_spec.update(**kwargs)
+
+    # initialiser une variable face
+    # aller chercher la valeur dans le dictionnaire à chaque fois ?
+    face = constriction_spec['face']
+    contract_rate = constriction_spec['contract_rate']
+    current_traction = constriction_spec['current_traction']
 
     if "is_relaxation" in sheet.face_df.columns:
         if sheet.face_df.loc[face, "is_relaxation"]:
-            relax(sheet, face, contract_rate, contraction_column)
+            relax(sheet, face, constriction_spec[
+                  'contract_rate'], constriction_spec['contraction_column'])
 
     else:
         face_area = sheet.face_df.loc[face, "area"]
 
-        if face_area > critical_area:
-            contract(sheet, face, contract_rate, True, contraction_column)
+        if face_area > constriction_spec['critical_area']:
+            contract(sheet, face, constriction_spec[
+                     'contract_rate'], True, constriction_spec['contraction_column'])
             # increase_linear_tension(sheet, face, contract_rate)
 
-            if contract_neighbors & (face_area < critical_area_neighbors):
-                neighbors = sheet.get_neighborhood(face, contract_span).dropna()
-                neighbors["id"] = sheet.face_df.loc[neighbors.face, "id"].values
+            if constriction_spec['contract_neighbors'] & (face_area < constriction_spec['critical_area_neighbors']):
+                neighbors = sheet.get_neighborhood(
+                    face, constriction_spec['contract_span']).dropna()
+                neighbors["id"] = sheet.face_df.loc[
+                    neighbors.face, "id"].values
 
                 # remove cell which are not mesoderm
                 ectodermal_cell = sheet.face_df.loc[neighbors.face][
@@ -206,34 +218,33 @@ def constriction(
                     [
                         (
                             neighbors_contraction,
-                            neighbor["id"],
-                            (
-                                -((contract_rate - basal_contract_rate) / contract_span)
+                            {
+                                'face_id': neighbor["id"],
+                                'contractile_increase': -((contract_rate - constriction_spec['basal_contract_rate']) / constriction_spec['contract_span'])
                                 * neighbor["order"]
                                 + contract_rate,
-                                critical_area,
-                                50,
-                                contraction_column,
-                            ),
+                                'critical_area': constriction_spec['critical_area'],
+                                'max_contractility': 50,
+                                'constraction_column': ['contraction_column']
+                            },
                         )  # TODO: check this
                         for _, neighbor in neighbors.iterrows()
                     ]
                 )
 
-        proba_tension = np.exp(-face_area / critical_area)
+        proba_tension = np.exp(-face_area / constriction_spec['critical_area'])
         aleatory_number = random.uniform(0, 1)
-        if current_traction < max_traction:
+        if constriction_spec['current_traction'] < constriction_spec['max_traction']:
             if aleatory_number < proba_tension:
                 current_traction = current_traction + 1
-                ab_pull(sheet, face, radial_tension, True)
+                ab_pull(sheet, face, constriction_spec['radial_tension'], True)
 
-    delam_kwargs = sheet.settings["delamination"].copy()
-    delam_kwargs.update(
+    #delam_kwargs = sheet.settings["delamination"].copy()
+    constriction_spec.update(
         {
             "contract_rate": contract_rate,
-            "current_traction": current_traction,
-            "max_traction": max_traction,
+            "current_traction": current_traction
         }
     )
 
-    manager.append(constriction, face_id, (), delam_kwargs)
+    manager.append(constriction, **constriction_spec)

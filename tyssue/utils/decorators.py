@@ -76,7 +76,7 @@ def face_lookup(func):
         face = sheet.idx_lookup(face_id, "face")
         if face is None:
             return
-        kwargs['face_id'] = face
+        kwargs['face'] = face
         return func(*args, **kwargs)
 
     return with_face_lookup

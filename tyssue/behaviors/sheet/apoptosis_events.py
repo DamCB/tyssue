@@ -5,10 +5,10 @@ Apoptosis event module
 
 """
 
-from ..geometry.sheet_geometry import SheetGeometry
+from ...geometry.sheet_geometry import SheetGeometry
 
-from ..actions import shrink, ab_pull, exchange, remove
-from basic_events import contraction
+from .actions import shrink, ab_pull, exchange, remove
+from .basic_events import contraction
 
 
 def apoptosis(

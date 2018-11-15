@@ -10,13 +10,12 @@ from tyssue.generation import three_faces_sheet
 from tyssue import config
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 
-from tyssue.behaviors import EventManager, wait
-from tyssue.behaviors.sheet_events import (division,
-                                           apoptosis,
-                                           type1_at_shorter,
-                                           type3,
-                                           contract,
-                                           ab_pull)
+from tyssue.behaviors.event_manager import EventManager, wait
+from tyssue.behaviors.sheet.basic_events import (division)
+from tyssue.behaviors.sheet.actions import (contract, ab_pull)
+from tyssue.behaviors.sheet.actions import remove as type3
+from tyssue.behaviors.sheet.actions import exchange as type1_at_shorter
+from tyssue.behaviors.sheet.apoptosis_events import apoptosis
 
 
 def test_add_events():
@@ -32,7 +31,7 @@ def test_add_events():
 
 def test_add_only_once():
     manager = EventManager('face')
-    initial_cell_event = [(division, 1, (), {'geom': geom}),
+    initial_cell_event = [(division, (1, ), {'geom': geom}),
                           (apoptosis, 3, (4,), {}),
                           (apoptosis, 3, (), {})]
 
