@@ -82,6 +82,22 @@ def contraction(sheet, manager, **kwargs):
              contraction_spec['multiple'],
              contraction_spec['contraction_column'])
 
+default_neighbors_contraction_spec = {
+    'face_id': -1,
+    'face': -1,
+    'contractile_increase': 1.0,
+    'critical_area': 1e-2,
+    'max_contractility': 10,
+    'contraction_column': "contractility"
+}
+
+default_type1_transition_spec = {
+    'face_id': -1,
+    'face': -1,
+    'critical_length': 0.3,
+    'geom': SheetGeometry
+}
+
 
 default_type1_transition_spec = {
     'face_id': -1,
