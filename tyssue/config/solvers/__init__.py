@@ -3,6 +3,7 @@ import os
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 
+
 def minimize_spec():
     """Solver default specification for scipy.optimize.minimize gradient
     descent
@@ -20,5 +21,5 @@ def minimize_spec():
         }
 
     """
-    specfile = os.path.join(CURRENT_DIR, 'minimize.json')
+    specfile = os.path.join(CURRENT_DIR, "minimize.json")
     return load_spec(specfile)

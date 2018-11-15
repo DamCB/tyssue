@@ -11,7 +11,7 @@ class SheetGeometry(PlanarGeometry):
 
     @classmethod
     def update_all(cls, sheet):
-        '''
+        """
         Updates the sheet geometry by updating:
         * the edge vector coordinates
         * the edge lengths
@@ -21,7 +21,7 @@ class SheetGeometry(PlanarGeometry):
         * the vertices heights (depends on geometry)
         * the face volumes (depends on geometry)
 
-        '''
+        """
         cls.update_dcoords(sheet)
         cls.update_length(sheet)
         cls.update_centroid(sheet)
@@ -33,39 +33,39 @@ class SheetGeometry(PlanarGeometry):
 
     @staticmethod
     def update_normals(sheet):
-        '''
+        """
         Updates the face_df `coords` columns as the face's vertices
         center of mass.
-        '''
+        """
         coords = sheet.coords
-        face_pos = sheet.edge_df[['f'+c for c in coords]].values
-        srce_pos = sheet.edge_df[['s'+c for c in coords]].values
-        r_ij = sheet.edge_df[['d'+c for c in coords]].values
-        r_ai = (srce_pos - face_pos)
+        face_pos = sheet.edge_df[["f" + c for c in coords]].values
+        srce_pos = sheet.edge_df[["s" + c for c in coords]].values
+        r_ij = sheet.edge_df[["d" + c for c in coords]].values
+        r_ai = srce_pos - face_pos
         normals = np.cross(r_ai, r_ij)
         sheet.edge_df[sheet.ncoords] = normals
 
     @staticmethod
     def update_areas(sheet):
-        '''
+        """
         Updates the normal coordniate of each (srce, trgt, face) face.
-        '''
-        sheet.edge_df['sub_area'] = np.linalg.norm(
-            sheet.edge_df[sheet.ncoords],
-            axis=1) / 2
-        sheet.face_df['area'] = sheet.sum_face(sheet.edge_df['sub_area'])
+        """
+        sheet.edge_df["sub_area"] = (
+            np.linalg.norm(sheet.edge_df[sheet.ncoords], axis=1) / 2
+        )
+        sheet.face_df["area"] = sheet.sum_face(sheet.edge_df["sub_area"])
 
     @staticmethod
     def update_vol(sheet):
-        '''
+        """
         Note that this is an approximation of the sheet geometry
         module.
 
-        '''
-        sheet.edge_df['sub_vol'] = (
-            sheet.upcast_srce(sheet.vert_df['height']) *
-            sheet.edge_df['sub_area'])
-        sheet.face_df['vol'] = sheet.sum_face(sheet.edge_df['sub_vol'])
+        """
+        sheet.edge_df["sub_vol"] = (
+            sheet.upcast_srce(sheet.vert_df["height"]) * sheet.edge_df["sub_area"]
+        )
+        sheet.face_df["vol"] = sheet.sum_face(sheet.edge_df["sub_vol"])
 
     @classmethod
     def update_height(cls, sheet):
@@ -95,48 +95,41 @@ class SheetGeometry(PlanarGeometry):
         In all the cases, this distance is shifted by an amount of
         `sheet.vert_df['basal_shift']`
         """
-        w = sheet.settings['height_axis']
+        w = sheet.settings["height_axis"]
         u, v = (c for c in sheet.coords if c != w)
-        if sheet.settings['geometry'] == 'cylindrical':
-            sheet.vert_df['rho'] = np.hypot(sheet.vert_df[v],
-                                            sheet.vert_df[u])
+        if sheet.settings["geometry"] == "cylindrical":
+            sheet.vert_df["rho"] = np.hypot(sheet.vert_df[v], sheet.vert_df[u])
 
-        elif sheet.settings['geometry'] == 'flat':
-            sheet.vert_df['rho'] = sheet.vert_df[w]
+        elif sheet.settings["geometry"] == "flat":
+            sheet.vert_df["rho"] = sheet.vert_df[w]
 
-        elif sheet.settings['geometry'] == 'spherical':
-            sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[sheet.coords],
-                                                  axis=1)
-        elif sheet.settings['geometry'] == 'rod':
+        elif sheet.settings["geometry"] == "spherical":
+            sheet.vert_df["rho"] = np.linalg.norm(sheet.vert_df[sheet.coords], axis=1)
+        elif sheet.settings["geometry"] == "rod":
 
-            a, b = sheet.settings['ab']
+            a, b = sheet.settings["ab"]
             w0 = b - a
-            sheet.vert_df['rho'] = np.linalg.norm(sheet.vert_df[[u, v]],
-                                                  axis=1)
-            sheet.vert_df['left_tip'] = sheet.vert_df[w] < -w0
-            sheet.vert_df['right_tip'] = sheet.vert_df[w] > w0
-            l_mask = sheet.vert_df[sheet.vert_df['left_tip'] == 1].index
-            r_mask = sheet.vert_df[sheet.vert_df['right_tip'] == 1].index
+            sheet.vert_df["rho"] = np.linalg.norm(sheet.vert_df[[u, v]], axis=1)
+            sheet.vert_df["left_tip"] = sheet.vert_df[w] < -w0
+            sheet.vert_df["right_tip"] = sheet.vert_df[w] > w0
+            l_mask = sheet.vert_df[sheet.vert_df["left_tip"] == 1].index
+            r_mask = sheet.vert_df[sheet.vert_df["right_tip"] == 1].index
 
-            sheet.vert_df.loc[l_mask, 'rho'] = cls.dist_to_point(
-                sheet.vert_df.loc[l_mask],
-                [0, 0, -w0],
-                [u, v, w])
-            sheet.vert_df.loc[r_mask, 'rho'] = cls.dist_to_point(
-                sheet.vert_df.loc[r_mask],
-                [0, 0, w0],
-                [u, v, w])
+            sheet.vert_df.loc[l_mask, "rho"] = cls.dist_to_point(
+                sheet.vert_df.loc[l_mask], [0, 0, -w0], [u, v, w]
+            )
+            sheet.vert_df.loc[r_mask, "rho"] = cls.dist_to_point(
+                sheet.vert_df.loc[r_mask], [0, 0, w0], [u, v, w]
+            )
 
-        elif sheet.settings['geometry'] == 'surfacic':
-            sheet.vert_df['rho'] = 1.
+        elif sheet.settings["geometry"] == "surfacic":
+            sheet.vert_df["rho"] = 1.0
 
-        sheet.vert_df['height'] = (sheet.vert_df['rho'] -
-                                   sheet.vert_df['basal_shift'])
+        sheet.vert_df["height"] = sheet.vert_df["rho"] - sheet.vert_df["basal_shift"]
 
-        edge_height = sheet.upcast_srce(sheet.vert_df[['height', 'rho']])
-        edge_height.set_index(sheet.edge_df['face'],
-                              append=True, inplace=True)
-        sheet.face_df[['height', 'rho']] = edge_height.mean(level='face')
+        edge_height = sheet.upcast_srce(sheet.vert_df[["height", "rho"]])
+        edge_height.set_index(sheet.edge_df["face"], append=True, inplace=True)
+        sheet.face_df[["height", "rho"]] = edge_height.mean(level="face")
 
     @classmethod
     def reset_scafold(cls, sheet):
@@ -145,16 +138,15 @@ class SheetGeometry(PlanarGeometry):
         a-b parameters and tip masks
         """
 
-        w = sheet.settings['height_axis']
+        w = sheet.settings["height_axis"]
         u, v = (c for c in sheet.coords if c != w)
 
         cls.center(sheet)
-        if sheet.settings['geometry'] == 'rod':
-            rho = np.linalg.norm(sheet.vert_df[[u, v]],
-                                 axis=1)
+        if sheet.settings["geometry"] == "rod":
+            rho = np.linalg.norm(sheet.vert_df[[u, v]], axis=1)
             a = np.percentile(rho, 95)
             b = np.percentile(np.abs(sheet.vert_df[w]), 95)
-            sheet.settings['ab'] = [a, b]
+            sheet.settings["ab"] = [a, b]
 
     @staticmethod
     def face_rotation(sheet, face, psi=0):
@@ -175,14 +167,11 @@ class SheetGeometry(PlanarGeometry):
           The rotation matrix
 
         """
-        normal = sheet.edge_df[
-            sheet.edge_df['face'] == face][sheet.ncoords].mean()
+        normal = sheet.edge_df[sheet.edge_df["face"] == face][sheet.ncoords].mean()
         normal = normal / np.linalg.norm(normal)
-        n_xy = np.linalg.norm(normal[['nx', 'ny']])
+        n_xy = np.linalg.norm(normal[["nx", "ny"]])
         theta = -np.arctan2(n_xy, normal.nz)
-        direction = [normal.ny,
-                     -normal.nx,
-                     0]
+        direction = [normal.ny, -normal.nx, 0]
         r1 = rotation_matrix(theta, direction)
         if psi == 0:
             return r1
@@ -210,40 +199,43 @@ class SheetGeometry(PlanarGeometry):
            The rotated, relative positions of the face's vertices
         """
 
-        face_orbit = sheet.edge_df[sheet.edge_df['face'] == face]['srce']
+        face_orbit = sheet.edge_df[sheet.edge_df["face"] == face]["srce"]
         # n_sides = face_orbit.shape[0]
         # face_pos = np.repeat(
         #     sheet.face_df.loc[face, sheet.coords].values,
         #     n_sides).reshape(len(sheet.coords), n_sides).T
-        rel_pos = (sheet.vert_df.loc[face_orbit.values, sheet.coords].values -
-                   sheet.face_df.loc[face, sheet.coords].values)
-        u, s, rotation = np.linalg.svd(rel_pos.astype(np.float),
-                                       full_matrices=False)
+        rel_pos = (
+            sheet.vert_df.loc[face_orbit.values, sheet.coords].values
+            - sheet.face_df.loc[face, sheet.coords].values
+        )
+        u, s, rotation = np.linalg.svd(rel_pos.astype(np.float), full_matrices=False)
         # rotation = cls.face_rotation(sheet, face, psi=psi)
         if psi != 0:
             rotation = np.dot(rotation_matrix(psi, [0, 0, 1]), rotation)
-        rot_pos = pd.DataFrame(np.dot(rel_pos, rotation.T),
-                               index=face_orbit, columns=sheet.coords)
+        rot_pos = pd.DataFrame(
+            np.dot(rel_pos, rotation.T), index=face_orbit, columns=sheet.coords
+        )
         return rot_pos
 
 
 class EllipsoidGeometry(SheetGeometry):
-
     @staticmethod
     def update_height(eptm):
 
-        a, b, c = eptm.settings['abc']
-        eptm.vert_df['theta'] = np.arcsin((eptm.vert_df.z/c).clip(-1, 1))
-        eptm.vert_df['vitelline_rho'] = a * np.cos(eptm.vert_df['theta'])
-        eptm.vert_df['basal_shift'] = (eptm.vert_df['vitelline_rho'] -
-                                       eptm.specs['vert']['basal_shift'])
-        eptm.vert_df['delta_rho'] = (
-            np.linalg.norm(eptm.vert_df[['x', 'y']], axis=1) -
-            eptm.vert_df['vitelline_rho']).clip(lower=0)
+        a, b, c = eptm.settings["abc"]
+        eptm.vert_df["theta"] = np.arcsin((eptm.vert_df.z / c).clip(-1, 1))
+        eptm.vert_df["vitelline_rho"] = a * np.cos(eptm.vert_df["theta"])
+        eptm.vert_df["basal_shift"] = (
+            eptm.vert_df["vitelline_rho"] - eptm.specs["vert"]["basal_shift"]
+        )
+        eptm.vert_df["delta_rho"] = (
+            np.linalg.norm(eptm.vert_df[["x", "y"]], axis=1)
+            - eptm.vert_df["vitelline_rho"]
+        ).clip(lower=0)
 
         SheetGeometry.update_height(eptm)
 
     @staticmethod
     def scale(eptm, scale, coords):
         SheetGeometry.scale(eptm, scale, coords)
-        eptm.settings['abc'] = [u*scale for u in eptm.settings['abc']]
+        eptm.settings["abc"] = [u * scale for u in eptm.settings["abc"]]

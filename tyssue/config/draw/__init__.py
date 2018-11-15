@@ -3,6 +3,7 @@ import os
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 
+
 def sheet_spec():
     """Default specification for drawing/graphical output
     functions for a sheet - also suitable for general faceted tissue
@@ -41,5 +42,5 @@ def sheet_spec():
         }
 
     """
-    specfile = os.path.join(CURRENT_DIR, 'sheet.json')
+    specfile = os.path.join(CURRENT_DIR, "sheet.json")
     return load_spec(specfile)
