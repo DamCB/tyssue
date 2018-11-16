@@ -87,8 +87,11 @@ class EventManager:
         """
         if 'face_id' in kwargs:
             elem_id = kwargs['face_id']
-        else:
+        elif 'elem_id' in kwargs:
             elem_id = kwargs['elem_id']
+        else:
+            elem_id = -1
+
         for tup in self.next:
             if (elem_id == tup[1]['face_id']) and (behavior.__name__ == tup[0].__name__):
                 return
@@ -101,7 +104,12 @@ class EventManager:
 
         while self.current:
             (behavior, kwargs) = self.current.popleft()
-            elem_id = kwargs['face_id']
+            if 'face_id' in kwargs:
+                elem_id = kwargs['face_id']
+            elif 'elem_id' in kwargs:
+                elem_id = kwargs['elem_id']
+            else:
+                elem_id = -1
             logger.info(f"{self.clock}, {elem_id}, {behavior.__name__}")
             behavior(eptm, self, **kwargs)
 

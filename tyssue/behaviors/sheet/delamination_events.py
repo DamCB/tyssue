@@ -11,7 +11,7 @@ import numpy as np
 from ...geometry.sheet_geometry import SheetGeometry
 from ...utils.decorators import face_lookup
 from .actions import relax, contract, ab_pull, exchange, remove
-from .basic_events import neighbors_contraction
+from .basic_events import contraction
 
 
 def delamination(
@@ -94,7 +94,7 @@ def delamination(
             manager.extend(
                 [
                     (
-                        neighbors_contraction,
+                        contraction,
                         neighbor["id"],
                         (
                             contract_rate ** (1 / 2 ** neighbor["order"]),
@@ -217,7 +217,7 @@ def constriction(sheet, manager, **kwargs):
                 manager.extend(
                     [
                         (
-                            neighbors_contraction,
+                            contraction,
                             {
                                 'face_id': neighbor["id"],
                                 'contractile_increase': -((contract_rate - constriction_spec['basal_contract_rate']) / constriction_spec['contract_span'])
@@ -225,7 +225,8 @@ def constriction(sheet, manager, **kwargs):
                                 + contract_rate,
                                 'critical_area': constriction_spec['critical_area'],
                                 'max_contractility': 50,
-                                'constraction_column': ['contraction_column']
+                                'constraction_column': constriction_spec[
+                                    'contraction_column']
                             },
                         )  # TODO: check this
                         for _, neighbor in neighbors.iterrows()

@@ -59,7 +59,8 @@ default_contraction_spec = {
     'face': -1,
     'contractile_increase': 1.0,
     'critical_area': 1e-2,
-    'max_contractility': 10
+    'max_contractility': 10,
+    'contraction_column': "contractility"
 }
 
 
@@ -72,37 +73,11 @@ def contraction(sheet, manager, **kwargs):
     face = contraction_spec['face']
 
     if (sheet.face_df.loc[face, "area"] < contraction_spec['critical_area']) or (
-        sheet.face_df.loc[face, "contractility"] > contraction_spec[
+        sheet.face_df.loc[face, contraction_spec['contraction_column']] > contraction_spec[
             'max_contractility']
     ):
         return
     contract(sheet, face, contraction_spec['contractile_increase'])
-
-default_neighbors_contraction_spec = {
-    'face_id': -1,
-    'face': -1,
-    'contractile_increase': 1.0,
-    'critical_area': 1e-2,
-    'max_contractility': 10,
-    'contraction_column': "contractility"
-}
-
-
-@face_lookup
-def neighbors_contraction(sheet, manager, **kwargs):
-    """Custom single step contraction event.
-    """
-
-    neighbors_contraction_spec = default_neighbors_contraction_spec
-    neighbors_contraction_spec.update(**kwargs)
-    face = neighbors_contraction_spec['face']
-
-    if (sheet.face_df.loc[face, "area"] < neighbors_contraction_spec['critical_area']) or (
-        sheet.face_df.loc[face, neighbors_contraction_spec[
-            'contraction_column']] > neighbors_contraction_spec['max_contractility']
-    ):
-        return
-    contract(sheet, face, neighbors_contraction_spec['contractile_increase'], True)
 
 
 default_type1_transition_spec = {
@@ -128,7 +103,7 @@ def type1_transition(sheet, manager, **kwargs):
         exchange(sheet, face, type1_transition_spec['geom'])
 
 
-default_face_elimnation_spec = {
+default_face_elimination_spec = {
     'face_id': -1,
     'face': -1,
     'geom': SheetGeometry
@@ -139,12 +114,17 @@ default_face_elimnation_spec = {
 def face_elimination(sheet, manager, **kwargs):
     """Removes the face with if face_id from the sheet
     """
-    face_elimination_spec = default_face_elimnation_spec
+    face_elimination_spec = default_face_elimination_spec
     face_elimination_spec.update(**kwargs)
     remove(sheet, face_elimination_spec['face'], face_elimination_spec['geom'])
 
 
-def check_tri_faces(sheet, manager):
+default_check_tri_face_spec = {
+    'geom': SheetGeometry
+}
+
+
+def check_tri_faces(sheet, manager, **kwargs):
     """Three neighbourghs cell elimination
     Add all cells with three neighbourghs in the manager
     to be eliminated at the next time step.
@@ -153,15 +133,14 @@ def check_tri_faces(sheet, manager):
     sheet : a :class:`tyssue.sheet` object
     manager : a :class:`tyssue.events.EventManager` object
     """
+    check_tri_faces_spec = default_check_tri_face_spec
+    check_tri_faces_spec.update(**kwargs)
 
-    tri_faces = sheet.face_df[
-        (sheet.face_df["num_sides"] < 4) & (
-            sheet.face_df["is_mesoderm"] is False)
-    ]["id"]
+    tri_faces = sheet.face_df[(sheet.face_df["num_sides"] < 4)].id
     manager.extend(
         [
-            (face_elimination, f, (), {
-             "geom": sheet.settings["delamination"]["geom"]})
+            (face_elimination, {'face_id': f,
+                                'geom': check_tri_faces_spec['geom']})
             for f in tri_faces
         ]
     )

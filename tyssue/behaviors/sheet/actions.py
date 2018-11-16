@@ -107,7 +107,7 @@ def relax(sheet, face, contractility_decrease, contraction_column="contractility
 def increase_linear_tension(sheet, face, line_tension, geom=SheetGeometry):
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     for index, edge in edges.iterrows():
-        angle_ = np.arctan2(sheet.edge_df.dx, sheet.edge_df.dy)
+        angle_ = np.arctan2(sheet.edge_df.loc[edge.name, "dx"], sheet.edge_df.loc[edge.name, "dy"])
 
         if np.abs(angle_) < np.pi / 4:
             sheet.edge_df.loc[edge.name, "line_tension"] *= line_tension
