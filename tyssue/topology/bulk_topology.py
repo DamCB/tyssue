@@ -334,8 +334,8 @@ def IH_transition(eptm, e_1011):
         new_segment = "lateral"
     else:
         new_segment = eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
-    eptm.face_df.loc[fa, ['segment']] = new_segment
-    eptm.face_df.loc[fb, ['segment']] = new_segment
+    eptm.face_df.loc[fa, ["segment"]] = new_segment
+    eptm.face_df.loc[fb, ["segment"]] = new_segment
 
     eptm.reset_index()
     eptm.reset_topo()
