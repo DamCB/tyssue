@@ -15,12 +15,11 @@ DECIMAL = 5
 
 def test_solver():
 
-    h5store = os.path.join(stores_dir, 'small_hexagonal.hf5')
-    datasets = load_datasets(h5store,
-                             data_names=['face', 'vert', 'edge'])
+    h5store = os.path.join(stores_dir, "small_hexagonal.hf5")
+    datasets = load_datasets(h5store, data_names=["face", "vert", "edge"])
     specs = config.geometry.cylindrical_sheet()
 
-    sheet = Sheet('emin', datasets, specs)
+    sheet = Sheet("emin", datasets, specs)
     nondim_specs = config.dynamics.quasistatic_sheet_spec()
     dim_model_specs = model.dimensionalize(nondim_specs)
 
@@ -31,14 +30,7 @@ def test_solver():
     # grad_err /= sheet.vert_df.size
     # assert_almost_equal(grad_err, 0.0, DECIMAL)
 
-    settings = {
-        'minimize': {
-            'options': {
-                'disp': False,
-                'ftol': 1e-4,
-                'gtol': 1e-4},
-            }
-        }
+    settings = {"minimize": {"options": {"disp": False, "ftol": 1e-4, "gtol": 1e-4}}}
 
     res = solver.find_energy_min(sheet, geom, model, **settings)
-    assert res['success']
+    assert res["success"]

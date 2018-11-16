@@ -6,10 +6,11 @@ from tyssue.dynamics.apoptosis_model import ApicoBasalTension, SheetApoptosisMod
 
 def test_effector():
     sheet_dsets, specs = three_faces_sheet()
-    sheet = Sheet('test', sheet_dsets, specs)
+    sheet = Sheet("test", sheet_dsets, specs)
     effector_tester(sheet, ApicoBasalTension)
+
 
 def test_model():
     sheet_dsets, specs = three_faces_sheet()
-    sheet = Sheet('test', sheet_dsets, specs)
+    sheet = Sheet("test", sheet_dsets, specs)
     model_tester(sheet, SheetApoptosisModel)
