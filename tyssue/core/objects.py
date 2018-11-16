@@ -553,7 +553,7 @@ class Epithelium:
         self.edge_df.reset_index(drop=True, inplace=True)
         self.edge_df.index.name = "edge"
 
-    def triangular_mesh(self, coords, return_mask=True):
+    def triangular_mesh(self, coords=None, return_mask=True):
         """
         Return a triangulation of an epithelial sheet (2D in a 3D space),
         with added edges between face barycenters and junction vertices.
@@ -578,6 +578,8 @@ class Epithelium:
         face_mask: (self.Nf + self.Nv,) mask with 1 iff the vertex corresponds
            to a face center
         """
+        if coords is None:
+            coords = self.coords
 
         vertices = np.concatenate((self.face_df[coords], self.vert_df[coords]), axis=0)
 

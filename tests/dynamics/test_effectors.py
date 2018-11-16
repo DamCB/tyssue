@@ -12,7 +12,8 @@ from tyssue.dynamics.effectors import (
     FaceVolumeElasticity,
     CellVolumeElasticity,
     CellAreaElasticity,
-    BorderElasticity)
+    BorderElasticity,
+)
 
 sheet_effectors = [
     LengthElasticity,
@@ -20,19 +21,17 @@ sheet_effectors = [
     FaceVolumeElasticity,
     LineTension,
     FaceContractility,
-    SurfaceTension]
+    SurfaceTension,
+]
 
-bulk_effectors = [
-    CellAreaElasticity,
-    CellVolumeElasticity]
+bulk_effectors = [CellAreaElasticity, CellVolumeElasticity]
 
 
 def test_effectors():
 
     sheet_dsets, specs = three_faces_sheet()
-    sheet = Sheet('test', sheet_dsets, specs)
-    mono = Monolayer.from_flat_sheet(
-        'test', sheet, config.geometry.bulk_spec())
+    sheet = Sheet("test", sheet_dsets, specs)
+    mono = Monolayer.from_flat_sheet("test", sheet, config.geometry.bulk_spec())
 
     for effector in sheet_effectors:
         testing.effector_tester(sheet, effector)
