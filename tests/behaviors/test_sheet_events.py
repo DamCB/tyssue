@@ -10,21 +10,22 @@ from tyssue.generation import three_faces_sheet
 from tyssue import config
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 
-from tyssue.behaviors import EventManager, wait
-from tyssue.behaviors.sheet_events import (division,
-                                           apoptosis,
-                                           type1_at_shorter,
-                                           type3,
-                                           contract,
-                                           ab_pull)
+from tyssue.behaviors.event_manager import EventManager, wait
+from tyssue.behaviors.sheet.basic_events import (
+    division, contraction, type1_transition, face_elimination, check_tri_faces)
+from tyssue.behaviors.sheet.actions import (
+    contract, ab_pull, relax, increase_linear_tension, grow, shrink)
+from tyssue.behaviors.sheet.actions import remove as type3
+from tyssue.behaviors.sheet.actions import exchange as type1_at_shorter
+from tyssue.behaviors.sheet.apoptosis_events import apoptosis
 
 
 def test_add_events():
 
     manager = EventManager('face')
-    initial_cell_event = [(division, 1, (), {'geom': geom}),
-                          (wait, 3, (4,), {}),
-                          (apoptosis, 5, (), {})]
+    initial_cell_event = [(division, {'face_id': 1, 'geom': geom}),
+                          (wait, {'face_id': 3, 'n_steps': 4}),
+                          (apoptosis, {'face_id': 5})]
     manager.extend(initial_cell_event)
     manager.execute(None)
     manager.update()
@@ -33,9 +34,9 @@ def test_add_events():
 
 def test_add_only_once():
     manager = EventManager('face')
-    initial_cell_event = [(division, 1, (), {'geom': geom}),
-                          (apoptosis, 3, (4,), {}),
-                          (apoptosis, 3, (), {})]
+    initial_cell_event = [(division, {'face_id': 1, 'geom': geom}),
+                          (apoptosis, {'face_id': 3, 'shrink_rate': 4}),
+                          (apoptosis, {'face_id': 3})]
 
     manager.extend(initial_cell_event)
     manager.execute(None)
@@ -47,9 +48,9 @@ def test_logging():
 
     tf = tempfile.mktemp()
     manager = EventManager('face', tf)
-    initial_cell_event = [(division, 1, (), {'geom': geom}),
-                          (apoptosis, 3, (4,), {}),
-                          (apoptosis, 3, (), {})]
+    initial_cell_event = [(division, {'face_id': 1, 'geom': geom}),
+                          (apoptosis, {'face_id': 3, 'shrink_rate': 4}),
+                          (apoptosis, {'face_id': 3})]
 
     manager.extend(initial_cell_event)
     manager.execute(None)
@@ -77,8 +78,8 @@ def test_execute_apoptosis():
     face_area = sheet.face_df.loc[face_id, 'area']
     initial_nbsides = sheet.face_df.loc[face_id, 'num_sides']
 
-    initial_cell_event = (apoptosis, face_id, (),
-                          sheet.settings['apoptosis'])
+    sheet.settings['apoptosis'].update({'face_id': face_id})
+    initial_cell_event = (apoptosis, sheet.settings['apoptosis'])
 
     manager.current.append(initial_cell_event)
     manager.execute(sheet)
@@ -90,9 +91,8 @@ def test_execute_apoptosis():
     sheet.settings['apoptosis'] = {'contractile_increase': 2.0,
                                    'critical_area': 2 * face_area}
     manager.current.clear()
-
-    modified_cell_event = (apoptosis, face_id, (),
-                           sheet.settings['apoptosis'])
+    sheet.settings['apoptosis'].update({'face_id': face_id})
+    modified_cell_event = (apoptosis, sheet.settings['apoptosis'])
 
     manager.current.append(modified_cell_event)
     manager.execute(sheet)
@@ -116,8 +116,9 @@ def test_execute_division():
     sheet.face_df['id'] = sheet.face_df.index.values
     manager = EventManager('face')
     face_id = 1
-    event = (division, face_id, (),
-             {'growth_rate': 0.2, 'critical_vol': 1.5})
+    event = (division, {'face_id': face_id,
+                        'growth_rate': 0.2,
+                        'critical_vol': 1.5})
     manager.current.append(event)
     V0 = sheet.face_df.loc[1, 'prefered_vol']
     manager.execute(sheet)
