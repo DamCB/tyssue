@@ -9,22 +9,30 @@ from .factory import model_factory
 
 
 BulkModel = model_factory(
-    [effectors.LineTension,
-     effectors.FaceContractility,
-     effectors.CellAreaElasticity,
-     effectors.CellVolumeElasticity],
-    effectors.CellVolumeElasticity)
+    [
+        effectors.LineTension,
+        effectors.FaceContractility,
+        effectors.CellAreaElasticity,
+        effectors.CellVolumeElasticity,
+    ],
+    effectors.CellVolumeElasticity,
+)
 
 
 BulkModelwithFreeBorders = model_factory(
-    [effectors.LineTension,
-     effectors.FaceContractility,
-     effectors.CellAreaElasticity,
-     effectors.BorderElasticity,
-     effectors.CellVolumeElasticity],
-    effectors.CellVolumeElasticity)
+    [
+        effectors.LineTension,
+        effectors.FaceContractility,
+        effectors.CellAreaElasticity,
+        effectors.BorderElasticity,
+        effectors.CellVolumeElasticity,
+    ],
+    effectors.CellVolumeElasticity,
+)
+
 
 class LaminaModel(BulkModel):
     """Not implemented yet
     """
+
     pass

@@ -15,7 +15,8 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-class EventManager():
+
+class EventManager:
     """
     Behavior management class based on two deques, the current and next one.
 
@@ -46,10 +47,8 @@ class EventManager():
             fh = logging.FileHandler(logfile)
             fh.setLevel(logging.INFO)
             logger.addHandler(fh)
-            logger.info('# Started logging at %s',
-                        datetime.now().isoformat())
-            logger.info(f'time, {self.element} index, event')
-
+            logger.info("# Started logging at %s", datetime.now().isoformat())
+            logger.info(f"time, {self.element} index, event")
 
     def extend(self, events):
         """
@@ -64,8 +63,7 @@ class EventManager():
         for event in events:
             self.append(*event)
 
-    def append(self, behavior, elem_id=-1,
-               args=None, kwargs=None):
+    def append(self, behavior, elem_id=-1, args=None, kwargs=None):
         """Add an event to the manager's next deque
 
         behavior is a function whose signature is
@@ -103,7 +101,7 @@ class EventManager():
 
         while self.current:
             (behavior, elem_id, args, kwargs) = self.current.popleft()
-            logger.info(f'{self.clock}, {elem_id}, {behavior.__name__}')
+            logger.info(f"{self.clock}, {elem_id}, {behavior.__name__}")
             behavior(eptm, self, elem_id, *args, **kwargs)
 
     def update(self):
@@ -119,5 +117,4 @@ def wait(eptm, manager, elem_id, n_steps):
     """Does nothing for a number of steps n_steps
     """
     if n_steps > 1:
-        manager.next.append('wait', elem_id,
-                            (n_steps - 1,), {})
+        manager.next.append("wait", elem_id, (n_steps - 1,), {})

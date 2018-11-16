@@ -10,8 +10,7 @@ def effector_tester(eptm, effector):
 
         for col in spec:
             if col not in eptm.datasets[elem].columns:
-                eptm.datasets[elem][col] = 1.
-
+                eptm.datasets[elem][col] = 1.0
 
     energy = effector.energy(eptm)
     assert energy.shape == (eptm.datasets[effector.element].shape[0],)
@@ -32,8 +31,7 @@ def model_tester(eptm, model):
     for u in eptm.ucoords:
         eptm.edge_df[u] = 0
 
-    nondim_specs = {elem: {k : 1 for k in spec}
-                    for elem, spec in model.specs.items()}
+    nondim_specs = {elem: {k: 1 for k in spec} for elem, spec in model.specs.items()}
     dim_specs = model.dimensionalize(nondim_specs)
     for elem, spec in model.specs.items():
         assert set(dim_specs[elem].keys()) == spec

@@ -3,8 +3,7 @@ from .plt_draw import sheet_view as sheet_view_2d
 from .ipv_draw import sheet_view as sheet_view_3d
 
 
-def sheet_view(sheet, coords=['x', 'y', 'z'],
-               ax=None, mode='2D', **draw_specs_kw):
+def sheet_view(sheet, coords=["x", "y", "z"], ax=None, mode="2D", **draw_specs_kw):
     """
 
 
@@ -25,17 +24,20 @@ def sheet_view(sheet, coords=['x', 'y', 'z'],
 
     """
 
-    if mode == '2D':
+    if mode == "2D":
         return sheet_view_2d(sheet, coords[:2], ax, **draw_specs_kw)
-    elif mode == 'quick':
-        edge_kw = draw_specs_kw.get('edge', {})
+    elif mode == "quick":
+        edge_kw = draw_specs_kw.get("edge", {})
         return quick_edge_draw(sheet, coords[:2], ax, **edge_kw)
-    elif mode == '3D':
+    elif mode == "3D":
         return sheet_view_3d(sheet, coords, **draw_specs_kw)
 
-    return ValueError("""
+    return ValueError(
+        """
 Argument `mode` not understood,
-should be either '2D', '3D' or 'quick', got %s""", mode)
+should be either '2D', '3D' or 'quick', got %s""",
+        mode,
+    )
 
 
 def highlight_cells(eptm, cells, reset_visible=False):
@@ -46,26 +48,24 @@ def highlight_cells(eptm, cells, reset_visible=False):
 
     """
     if reset_visible:
-        eptm.face_df['visible'] = False
+        eptm.face_df["visible"] = False
 
-    if not hasattr(cells, '__iter__'):
-        cells = [cells,]
+    if not hasattr(cells, "__iter__"):
+        cells = [cells]
 
     for cell in cells:
-        cell_faces = eptm.edge_df[eptm.edge_df['cell']==cell]['face']
-        highlight_faces(eptm.face_df, cell_faces,
-                        reset_visible=False)
+        cell_faces = eptm.edge_df[eptm.edge_df["cell"] == cell]["face"]
+        highlight_faces(eptm.face_df, cell_faces, reset_visible=False)
 
 
-def highlight_faces(face_df, faces,
-                    reset_visible=False):
+def highlight_faces(face_df, faces, reset_visible=False):
     """
     Sets the faces visibility to 1
 
     If `reset_visible` is `True`, sets all the other faces
     to `visible = False`
     """
-    if ('visible' not in face_df.columns) or reset_visible:
-        face_df['visible'] = False
+    if ("visible" not in face_df.columns) or reset_visible:
+        face_df["visible"] = False
 
-    face_df.loc[faces, 'visible'] = True
+    face_df.loc[faces, "visible"] = True

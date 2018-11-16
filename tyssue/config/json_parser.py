@@ -8,15 +8,15 @@ import warnings
 
 logger = logging.getLogger(__name__)
 
+
 def load_spec(fname):
 
-    with open(fname, 'r+') as config_file:
+    with open(fname, "r+") as config_file:
         spec = json.load(config_file)
     return spec
 
 
-def save_spec(spec, fname,
-              overwrite=False):
+def save_spec(spec, fname, overwrite=False):
     """Saves a specification file to json
 
     Parameters
@@ -32,8 +32,11 @@ def save_spec(spec, fname,
     """
     if not overwrite:
         if os.path.isfile(fname):
-            raise IOError('''%s exists and overwriting is prevented
+            raise IOError(
+                """%s exists and overwriting is prevented
 Please set `overwrite` to True
-''' % fname)
-    with open(fname, 'w+') as config_file:
+"""
+                % fname
+            )
+    with open(fname, "w+") as config_file:
         json.dump(spec, config_file)

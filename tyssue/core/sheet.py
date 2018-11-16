@@ -1,4 +1,4 @@
-'''
+"""
 An epithelial sheet, i.e a 2D mesh in a 2D or 3D space,
 akin to a HalfEdge data structure in CGAL.
 
@@ -14,7 +14,7 @@ A dynamical model derived from Fahradifar et al. 2007 is provided in
 `tyssue.dynamics.sheet_vertex_model`
 
 
-'''
+"""
 
 import warnings
 import numpy as np
@@ -25,7 +25,7 @@ from ..config.geometry import flat_sheet
 
 
 class Sheet(Epithelium):
-    '''
+    """
     An epithelial sheet, i.e a 2D mesh in a 2D or 3D space,
     akin to a HalfEdge data structure in CGAL.
 
@@ -34,11 +34,10 @@ class Sheet(Epithelium):
     `tyssue.dynamics.sheet_vertex_model`
 
 
-    '''
+    """
 
-    def __init__(self, identifier, datasets,
-                 specs=None, coords=None):
-        '''
+    def __init__(self, identifier, datasets, specs=None, coords=None):
+        """
         Creates an epithelium sheet, such as the apical junction network.
 
         Parameters
@@ -47,30 +46,28 @@ class Sheet(Epithelium):
         face_df: `pandas.DataFrame` indexed by the faces indexes
             this df holds the vertices associated with
 
-        '''
+        """
         if specs is None:
             specs = flat_sheet()
-        super().__init__(identifier, datasets,
-                         specs, coords)
-
+        super().__init__(identifier, datasets, specs, coords)
 
     def reset_topo(self):
         super().reset_topo()
-        if 'opposite' in self.edge_df.columns:
-            self.edge_df['opposite'] = get_opposite(self.edge_df)
+        if "opposite" in self.edge_df.columns:
+            self.edge_df["opposite"] = get_opposite(self.edge_df)
 
     def get_opposite(self):
-        self.edge_df['opposite'] = get_opposite(self.edge_df)
+        self.edge_df["opposite"] = get_opposite(self.edge_df)
 
     def get_neighbors(self, face):
         """Returns the faces adjacent to `face`
         """
-        if 'opposite' not in self.edge_df.columns:
-            self.edge_df['opposite'] = get_opposite(self.edge_df)
+        if "opposite" not in self.edge_df.columns:
+            self.edge_df["opposite"] = get_opposite(self.edge_df)
 
-        face_edges = self.edge_df[self.edge_df['face'] == face]
-        op_edges = face_edges['opposite'].dropna().astype(np.int)
-        return self.edge_df.loc[op_edges, 'face'].values
+        face_edges = self.edge_df[self.edge_df["face"] == face]
+        op_edges = face_edges["opposite"].dropna().astype(np.int)
+        return self.edge_df.loc[op_edges, "face"].values
 
     def get_neighborhood(self, face, order):
         """Returns `face` neighborhood up to a degree of `order`
@@ -85,17 +82,16 @@ class Sheet(Epithelium):
 
         """
         # Start with the face so that it's not gathered later
-        neighbors = pd.DataFrame.from_dict({'face': [face],
-                                            'order': [0]})
+        neighbors = pd.DataFrame.from_dict({"face": [face], "order": [0]})
         for k in range(order + 1):
-            for neigh in neighbors[neighbors['order'] == k - 1]['face']:
+            for neigh in neighbors[neighbors["order"] == k - 1]["face"]:
                 new_neighs = self.get_neighbors(neigh)
-                new_neighs = set(new_neighs).difference(neighbors['face'])
+                new_neighs = set(new_neighs).difference(neighbors["face"])
 
                 orders = np.ones(len(new_neighs), dtype=np.int) * k
-                new_neighs = pd.DataFrame.from_dict({'face': list(new_neighs),
-                                                     'order': orders},
-                                                    dtype=np.int)
+                new_neighs = pd.DataFrame.from_dict(
+                    {"face": list(new_neighs), "order": orders}, dtype=np.int
+                )
                 neighbors = pd.concat([neighbors, new_neighs])
 
         return neighbors.reset_index(drop=True).loc[1:]
@@ -145,19 +141,23 @@ class Sheet(Epithelium):
           we'll just assert it worked.
         """
 
-        if 'opposite' not in self.edge_df.columns:
-            self.edge_df['opposite'] = get_opposite(self.edge_df)
+        if "opposite" not in self.edge_df.columns:
+            self.edge_df["opposite"] = get_opposite(self.edge_df)
 
-        self.dble_edges = self.edge_df[self.edge_df['opposite'] >= 0].index
-        theta = np.arctan2(self.edge_df.loc[self.dble_edges, 'dy'],
-                           self.edge_df.loc[self.dble_edges, 'dx'])
+        self.dble_edges = self.edge_df[self.edge_df["opposite"] >= 0].index
+        theta = np.arctan2(
+            self.edge_df.loc[self.dble_edges, "dy"],
+            self.edge_df.loc[self.dble_edges, "dx"],
+        )
 
         self.east_edges = self.edge_df.loc[self.dble_edges][
-            (theta >= 0) & (theta < np.pi)].index
-        self.west_edges = pd.Index(self.edge_df.loc[
-            self.east_edges, 'opposite'].astype(np.int), name='edge')
+            (theta >= 0) & (theta < np.pi)
+        ].index
+        self.west_edges = pd.Index(
+            self.edge_df.loc[self.east_edges, "opposite"].astype(np.int), name="edge"
+        )
 
-        self.free_edges = self.edge_df[self.edge_df['opposite'] == -1].index
+        self.free_edges = self.edge_df[self.edge_df["opposite"] == -1].index
         self.sgle_edges = self.free_edges.append(self.east_edges)
         self.srtd_edges = self.sgle_edges.append(self.west_edges)
 
@@ -169,9 +169,9 @@ class Sheet(Epithelium):
         self.Nd = self.dble_edges.size  # number of non free half edges
         self.No = self.free_edges.size  # number of free halfedges
         try:
-            assert (2*self.Ni + self.No) == self.Ne
+            assert (2 * self.Ni + self.No) == self.Ne
             assert self.west_edges.size == self.Ni
-            assert self.Nd == 2*self.Ni
+            assert self.Nd == 2 * self.Ni
         # - BC -#
         # Not sure how to build
         # input data so the partition
@@ -181,17 +181,18 @@ class Sheet(Epithelium):
         # Leaving it in the coverage
         # anyway.
         except AssertionError:
-            raise AssertionError('''
+            raise AssertionError(
+                """
             Inconsistent partition:
             total half-edges: %s
             number of free: %s
             number of east: %s
-            number of west: %s''' % (self.Ne, self.No, self.Ni,
-                                     self.west_edges.size))
+            number of west: %s"""
+                % (self.Ne, self.No, self.Ni, self.west_edges.size)
+            )
 
         # Anti symetric vector (1 at east and free edges, -1 at opposite)
-        self.anti_sym = pd.Series(np.ones(self.Ne),
-                                  index=self.edge_df.index)
+        self.anti_sym = pd.Series(np.ones(self.Ne), index=self.edge_df.index)
         self.anti_sym.loc[self.west_edges] = -1
 
     def sort_edges_eastwest(self):
@@ -206,9 +207,7 @@ class Sheet(Epithelium):
         self.reset_topo()
         self.get_extra_indices()
 
-
-
-    def extract(self, face_mask, coords=['x', 'y', 'z']):
+    def extract(self, face_mask, coords=["x", "y", "z"]):
         """ Extract a new sheet from the sheet
         that correspond to a key word that define a face.
 
@@ -227,18 +226,20 @@ class Sheet(Epithelium):
 
         datasets = {}
         mask = self.face_df[face_mask].astype(bool)
-        datasets['face'] = self.face_df[mask].copy()
-        datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
-            datasets['face'].index)].copy()
-        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()].copy()
+        datasets["face"] = self.face_df[mask].copy()
+        datasets["edge"] = self.edge_df[
+            self.edge_df["face"].isin(datasets["face"].index)
+        ].copy()
+        datasets["vert"] = self.vert_df.loc[self.edge_df["srce"].unique()].copy()
 
-        subsheet = Sheet('subsheet', datasets, self.specs)
+        subsheet = Sheet("subsheet", datasets, self.specs)
         subsheet.reset_index()
         subsheet.reset_topo()
         return subsheet
 
-    def extract_bounding_box(self, x_boundary=None, y_boundary=None,
-                             z_boundary=None, coords=['x', 'y', 'z']):
+    def extract_bounding_box(
+        self, x_boundary=None, y_boundary=None, z_boundary=None, coords=["x", "y", "z"]
+    ):
         """Extracts a new sheet from the embryo sheet
 
         that correspond to boundary coordinate define by the user.
@@ -258,39 +259,39 @@ class Sheet(Epithelium):
         """
         x, y, z = coords
         datasets = {}
-        datasets['face'] = self.face_df.copy()
+        datasets["face"] = self.face_df.copy()
 
         if x_boundary is not None:
             xmin, xmax = x_boundary
-            datasets['face'] = datasets['face'][
-                (datasets['face'][x] > xmin)
-                & (datasets['face'][x] < xmax)].copy()
+            datasets["face"] = datasets["face"][
+                (datasets["face"][x] > xmin) & (datasets["face"][x] < xmax)
+            ].copy()
 
         if y_boundary is not None:
             ymin, ymax = y_boundary
-            datasets['face'] = datasets['face'][
-                (datasets['face'][y] > ymin)
-                & (datasets['face'][y] < ymax)].copy()
+            datasets["face"] = datasets["face"][
+                (datasets["face"][y] > ymin) & (datasets["face"][y] < ymax)
+            ].copy()
 
         if z_boundary is not None:
             zmin, zmax = z_boundary
-            datasets['face'] = datasets['face'][
-                (datasets['face'][z] > zmin)
-                & (datasets['face'][z] < zmax)].copy()
+            datasets["face"] = datasets["face"][
+                (datasets["face"][z] > zmin) & (datasets["face"][z] < zmax)
+            ].copy()
 
-        datasets['edge'] = self.edge_df[self.edge_df['face'].isin(
-            datasets['face'].index)].copy()
+        datasets["edge"] = self.edge_df[
+            self.edge_df["face"].isin(datasets["face"].index)
+        ].copy()
 
-        datasets['vert'] = self.vert_df.loc[self.edge_df['srce'].unique()].copy()
+        datasets["vert"] = self.vert_df.loc[self.edge_df["srce"].unique()].copy()
 
-        subsheet = Sheet('subsheet', datasets, self.specs)
+        subsheet = Sheet("subsheet", datasets, self.specs)
         subsheet.reset_index()
         subsheet.reset_topo()
         return subsheet
 
     @classmethod
-    def planar_sheet_2d(cls, identifier,
-                        nx, ny, distx, disty, noise=None):
+    def planar_sheet_2d(cls, identifier, nx, ny, distx, disty, noise=None):
         """Creates a planar sheet from an hexagonal grid of cells.
 
         Parameters
@@ -312,15 +313,13 @@ class Sheet(Epithelium):
         from scipy.spatial import Voronoi
         from ..config.geometry import planar_spec
         from ..generation import hexa_grid2d, from_2d_voronoi
+
         grid = hexa_grid2d(nx, ny, distx, disty, noise)
         datasets = from_2d_voronoi(Voronoi(grid))
-        return cls(identifier, datasets,
-                   specs=planar_spec(),
-                   coords=['x', 'y'])
+        return cls(identifier, datasets, specs=planar_spec(), coords=["x", "y"])
 
     @classmethod
-    def planar_sheet_3d(cls, identifier,
-                        nx, ny, distx, disty, noise=None):
+    def planar_sheet_3d(cls, identifier, nx, ny, distx, disty, noise=None):
         """Creates a planar sheet from an hexagonal grid of cells.
 
         Parameters
@@ -341,15 +340,13 @@ class Sheet(Epithelium):
         from scipy.spatial import Voronoi
         from ..config.geometry import flat_sheet
         from ..generation import hexa_grid2d, from_2d_voronoi
-        grid = hexa_grid2d(nx, ny,
-                           distx, disty, noise)
-        datasets = from_2d_voronoi(Voronoi(grid))
-        datasets['vert']['z'] = 0
-        datasets['face']['z'] = 0
 
-        return cls(identifier, datasets,
-                   specs=flat_sheet(),
-                   coords=['x', 'y', 'z'])
+        grid = hexa_grid2d(nx, ny, distx, disty, noise)
+        datasets = from_2d_voronoi(Voronoi(grid))
+        datasets["vert"]["z"] = 0
+        datasets["face"]["z"] = 0
+
+        return cls(identifier, datasets, specs=flat_sheet(), coords=["x", "y", "z"])
 
 
 def get_opposite(edge_df):
@@ -357,18 +354,20 @@ def get_opposite(edge_df):
     Returns the indices opposite to the edges in `edge_df`
     """
 
-
-    st_indexed = edge_df[['srce', 'trgt']].reset_index().set_index(
-        ['srce', 'trgt'], drop=False)
+    st_indexed = (
+        edge_df[["srce", "trgt"]].reset_index().set_index(["srce", "trgt"], drop=False)
+    )
     flipped = st_indexed.index.swaplevel(0, 1)
-    flipped.names = ['srce', 'trgt']
+    flipped.names = ["srce", "trgt"]
     try:
-        opposite = st_indexed.reindex(flipped)['edge'].values
-    #except ValueError: # see https://github.com/pandas-dev/pandas/issues/21770, will be fixed in
-                        # pandas 0.24
-    except Exception :
+        opposite = st_indexed.reindex(flipped)["edge"].values
+    # except ValueError: # see https://github.com/pandas-dev/pandas/issues/21770, will be fixed in
+    # pandas 0.24
+    except Exception:
         dup = flipped.duplicated()
-        warnings.warn('Duplicated (`srce`, `trgt`) values in edge_df, maybe sanitize your input')
-        opposite = st_indexed[~dup].reindex(flipped)['edge'].values
+        warnings.warn(
+            "Duplicated (`srce`, `trgt`) values in edge_df, maybe sanitize your input"
+        )
+        opposite = st_indexed[~dup].reindex(flipped)["edge"].values
     opposite[np.isnan(opposite)] = -1
     return opposite.astype(np.int)

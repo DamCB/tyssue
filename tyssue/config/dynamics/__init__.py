@@ -5,9 +5,8 @@ CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def quasistatic_bulk_spec():
-    specfile = os.path.join(CURRENT_DIR, 'bulk_qs.json')
+    specfile = os.path.join(CURRENT_DIR, "bulk_qs.json")
     return load_spec(specfile)
-
 
 
 def quasistatic_plane_spec():
@@ -38,7 +37,7 @@ def quasistatic_plane_spec():
         }
 
     """
-    specfile = os.path.join(CURRENT_DIR, 'plane_qs.json')
+    specfile = os.path.join(CURRENT_DIR, "plane_qs.json")
     return load_spec(specfile)
 
 
@@ -69,7 +68,7 @@ def quasistatic_sheet_spec():
         }
 
     """
-    specfile = os.path.join(CURRENT_DIR, 'sheet_qs.json')
+    specfile = os.path.join(CURRENT_DIR, "sheet_qs.json")
     return load_spec(specfile)
 
 
@@ -105,5 +104,5 @@ def quasistatic_sheet_spec_anchors():
         }
 
     """
-    specfile = os.path.join(CURRENT_DIR, 'sheet_qs_anchor.json')
+    specfile = os.path.join(CURRENT_DIR, "sheet_qs_anchor.json")
     return load_spec(specfile)

@@ -76,23 +76,25 @@ def set_data_columns(datasets, specs, reset=False):
     the new value is used.
     """
 
-
     for name, spec in specs.items():
         if not len(spec):
             continue
-        if 'setting' in name:
+        if "setting" in name:
             continue
         df = datasets.get(name)
         if df is None:
-            warnings.warn(f"There is no {name} dataset, so the {name}"
-                          " spec have no effect.")
+            warnings.warn(
+                f"There is no {name} dataset, so the {name}" " spec have no effect."
+            )
             continue
         for col, default in spec.items():
             if col in df.columns and reset:
-                logger.warning('Reseting column %s of the %s'
-                               ' dataset with new specs', col, name)
+                logger.warning(
+                    "Reseting column %s of the %s" " dataset with new specs", col, name
+                )
             if col not in df.columns or reset:
                 df[col] = default
+
 
 def data_at_opposite(sheet, edge_data, free_value=None):
     """
@@ -111,12 +113,12 @@ def data_at_opposite(sheet, edge_data, free_value=None):
     """
     if isinstance(edge_data, pd.Series):
         opposite = pd.Series(
-            edge_data.reindex(sheet.edge_df['opposite']).values,
-            index=edge_data.index)
+            edge_data.reindex(sheet.edge_df["opposite"]).values, index=edge_data.index
+        )
     else:
         opposite = pd.DataFrame(
-            edge_data.reindex(sheet.edge_df['opposite']).values,
-            index=edge_data.index)
+            edge_data.reindex(sheet.edge_df["opposite"]).values, index=edge_data.index
+        )
     if free_value is not None:
         opposite = opposite.replace(np.nan, free_value)
 
@@ -139,29 +141,29 @@ def get_sub_eptm(eptm, edges, copy=False):
     from ..core.objects import Epithelium
 
     datasets = {}
-    edge_df  = eptm.edge_df.loc[edges]
-    datasets['edge'] = edge_df
-    datasets['vert'] = eptm.vert_df.loc[set(edge_df['srce'])]
-    datasets['face'] = eptm.face_df.loc[set(edge_df['face'])]
-    if 'cell' in eptm.datasets:
-        datasets['cell'] = eptm.cell_df.loc[set(edge_df['cell'])]
+    edge_df = eptm.edge_df.loc[edges]
+    datasets["edge"] = edge_df
+    datasets["vert"] = eptm.vert_df.loc[set(edge_df["srce"])]
+    datasets["face"] = eptm.face_df.loc[set(edge_df["face"])]
+    if "cell" in eptm.datasets:
+        datasets["cell"] = eptm.cell_df.loc[set(edge_df["cell"])]
 
     if copy:
         for elem, df in datasets.items():
             datasets[elem] = df.copy()
 
-    sub_eptm = Epithelium('sub', datasets, eptm.specs)
-    sub_eptm.datasets['edge']['edge_o'] = edges
-    sub_eptm.datasets['edge']['srce_o'] = edge_df['srce']
-    sub_eptm.datasets['edge']['trgt_o'] = edge_df['trgt']
-    sub_eptm.datasets['edge']['face_o'] = edge_df['face']
-    if 'cell' in eptm.datasets:
-        sub_eptm.datasets['edge']['cell_o'] = edge_df['cell']
+    sub_eptm = Epithelium("sub", datasets, eptm.specs)
+    sub_eptm.datasets["edge"]["edge_o"] = edges
+    sub_eptm.datasets["edge"]["srce_o"] = edge_df["srce"]
+    sub_eptm.datasets["edge"]["trgt_o"] = edge_df["trgt"]
+    sub_eptm.datasets["edge"]["face_o"] = edge_df["face"]
+    if "cell" in eptm.datasets:
+        sub_eptm.datasets["edge"]["cell_o"] = edge_df["cell"]
 
-    sub_eptm.datasets['vert']['srce_o'] = set(edge_df['srce'])
-    sub_eptm.datasets['face']['face_o'] = set(edge_df['face'])
-    if 'cell' in eptm.datasets:
-        sub_eptm.datasets['cell']['cell_o'] = set(edge_df['cell'])
+    sub_eptm.datasets["vert"]["srce_o"] = set(edge_df["srce"])
+    sub_eptm.datasets["face"]["face_o"] = set(edge_df["face"])
+    if "cell" in eptm.datasets:
+        sub_eptm.datasets["cell"]["cell_o"] = set(edge_df["cell"])
 
     sub_eptm.reset_index()
     sub_eptm.reset_topo()
@@ -182,12 +184,11 @@ def single_cell(eptm, cell, copy=False):
     -------
     sub_etpm: class:'Epithelium' instance corresponding to the cell
     """
-    edges = eptm.edge_df[eptm.edge_df['cell'] == cell].index
+    edges = eptm.edge_df[eptm.edge_df["cell"] == cell].index
     return get_sub_eptm(eptm, edges, copy)
 
 
-def scaled_unscaled(func, scale, eptm, geom,
-                    args=(), kwargs={}, coords=None):
+def scaled_unscaled(func, scale, eptm, geom, args=(), kwargs={}, coords=None):
     """Scales the epithelium by an homotetic factor `scale`, applies
     the function `func`, and scales back to original size.
 
@@ -269,7 +270,7 @@ def _compute_ar(df, coords):
     return 0 if minor == 0 else major / minor
 
 
-def ar_calculation(sheet, coords=['x', 'y']):
+def ar_calculation(sheet, coords=["x", "y"]):
     """ Calculates the aspect ratio of each face of the sheet
 
     Parameters
@@ -288,5 +289,5 @@ def ar_calculation(sheet, coords=['x', 'y']):
 
     """
     srce_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
-    srce_pos['face'] = sheet.edge_df['face']
-    return srce_pos.groupby('face').apply(_compute_ar, coords)
+    srce_pos["face"] = sheet.edge_df["face"]
+    return srce_pos.groupby("face").apply(_compute_ar, coords)
