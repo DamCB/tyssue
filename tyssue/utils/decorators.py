@@ -62,7 +62,21 @@ def time_exe(func):
         result = func(*args, **kwargs)
         end = time.time()
 
-        print("function : {} \ttime: {2:2f}sec".format(func.__name__, end - start))
+        print('function : {} \ttime: {2:2f}sec'.format(
+            func.__name__, end - start))
         return result
 
     return with_time_exe
+
+
+def face_lookup(func):
+    def with_face_lookup(*args, **kwargs):
+        sheet = args[0]
+        face_id = kwargs['face_id']
+        face = sheet.idx_lookup(face_id, "face")
+        if face is None:
+            return
+        kwargs['face'] = face
+        return func(*args, **kwargs)
+
+    return with_face_lookup
