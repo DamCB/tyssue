@@ -85,9 +85,12 @@ class EventManager:
             extra keywords arguments to the behavior function
 
         """
-        elem_id = kwargs['face_id']
+        if 'face_id' in kwargs:
+            elem_id = kwargs['face_id']
+        else:
+            elem_id = kwargs['elem_id']
         for tup in self.next:
-            if (elem_id == tup[1]) and (behavior.__name__ == tup[0].__name__):
+            if (elem_id == tup[1]['face_id']) and (behavior.__name__ == tup[0].__name__):
                 return
         self.next.append((behavior, kwargs))
 
@@ -123,5 +126,5 @@ def wait(eptm, manager, **kwargs):
     elem_id = kwargs['face_id']
     if kwargs['n_steps'] > 1:
         kwargs.update({
-                      'n_steps': kwargs['n_steps']-1})
+                      'n_steps': kwargs['n_steps'] - 1})
         manager.next.append(("wait", wait_spec))

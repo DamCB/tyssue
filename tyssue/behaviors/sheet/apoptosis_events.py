@@ -5,23 +5,26 @@ Apoptosis event module
 
 """
 
+from ...utils.decorators import face_lookup
 from ...geometry.sheet_geometry import SheetGeometry
 
 from .actions import shrink, ab_pull, exchange, remove
 from .basic_events import contraction
 
+default_apoptosis_spec = {
+    'face_id': -1,
+    'face': -1,
+    'shrink_rate': 0.1,
+    'critical_area': 1e-2,
+    'radial_tension': 0.1,
+    'contractile_increase': 0.1,
+    'contract_span': 2,
+    'geom': SheetGeometry,
+}
 
-def apoptosis(
-    sheet,
-    manager,
-    face_id,
-    shrink_rate=0.1,
-    critical_area=1e-2,
-    radial_tension=0.1,
-    contractile_increase=0.1,
-    contract_span=2,
-    geom=SheetGeometry,
-):
+
+@face_lookup
+def apoptosis(sheet, manager, **kwargs):
     """Apoptotic behavior
 
     While the cell's apical area is bigger than a threshold, the
@@ -46,32 +49,23 @@ def apoptosis(
     geom : the geometry class used
     """
 
-    settings = {
-        "shrink_rate": shrink_rate,
-        "critical_area": critical_area,
-        "radial_tension": radial_tension,
-        "contractile_increase": contractile_increase,
-        "contract_span": contract_span,
-        "geom": geom,
-    }
+    apoptosis_spec = default_apoptosis_spec
+    apoptosis_spec.update(**kwargs)
+    face = apoptosis_spec['face']
 
-    face = sheet.idx_lookup(face_id, "face")
-    if face is None:
-        return
-
-    if sheet.face_df.loc[face, "area"] > critical_area:
+    if sheet.face_df.loc[face, "area"] > apoptosis_spec['critical_area']:
         # Shrink and pull
-        shrink(sheet, face, shrink_rate)
-        ab_pull(sheet, face, radial_tension)
+        shrink(sheet, face, apoptosis_spec['shrink_rate'])
+        ab_pull(sheet, face, apoptosis_spec['radial_tension'])
         # contract neighbors
-        neighbors = sheet.get_neighborhood(face, contract_span).dropna()
+        neighbors = sheet.get_neighborhood(
+            face, apoptosis_spec['contract_span']).dropna()
         neighbors["id"] = sheet.face_df.loc[neighbors.face, "id"].values
         manager.extend(
             [
                 (
-                    contraction,
-                    neighbor["id"],
-                    (contractile_increase / neighbor["order"],),
+                    contraction, {'face_id': neighbor["id"],
+                                  'contractile_increase':(apoptosis_spec['contractile_increase'] / neighbor["order"],)},
                 )
                 for _, neighbor in neighbors.iterrows()
             ]
@@ -79,10 +73,10 @@ def apoptosis(
         done = False
     else:
         if sheet.face_df.loc[face, "num_sides"] > 3:
-            exchange(sheet, face, geom)
+            exchange(sheet, face, apoptosis_spec['geom'])
             done = False
         else:
-            remove(sheet, face, geom)
+            remove(sheet, face, apoptosis_spec['geom'])
             done = True
     if not done:
-        manager.append(apoptosis, face_id, kwargs=settings)
+        manager.append(apoptosis, **apoptosis_spec)

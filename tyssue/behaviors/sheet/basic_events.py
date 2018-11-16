@@ -48,7 +48,7 @@ def division(sheet, manager, **kwargs):
 
     if sheet.face_df.loc[face, "vol"] < division_spec['critical_vol']:
         grow(sheet, face, division_spec['growth_rate'])
-        manager.append(division, division_spec)
+        manager.append(division, **division_spec)
     else:
         daughter = cell_division(sheet, face, division_spec['geom'])
         sheet.face_df.loc[daughter, "id"] = sheet.face_df.id.max() + 1

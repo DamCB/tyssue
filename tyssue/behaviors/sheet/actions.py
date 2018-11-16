@@ -45,7 +45,8 @@ def exchange(sheet, face, geom, remove_tri_faces=True):
 
 
 def remove(sheet, face, geom):
-    """Removes the face and updates the geometry
+    """
+    Removes the face and updates the geometry
 
     Parameters
     ----------
