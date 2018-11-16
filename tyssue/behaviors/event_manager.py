@@ -63,8 +63,7 @@ class EventManager:
         for event in events:
             self.append(event[0], **event[1])
 
-    def append(self, behavior, elem_id=-1,
-               args=None, kwargs=None):
+    def append(self, behavior, **kwargs):
         """Add an event to the manager's next deque
 
         behavior is a function whose signature is
@@ -104,9 +103,15 @@ class EventManager:
         """
 
         while self.current:
-            (behavior, elem_id, args, kwargs) = self.current.popleft()
-            logger.info(f'{self.clock}, {elem_id}, {behavior.__name__}')
-            behavior(eptm, self, elem_id, *args, **kwargs)
+            (behavior, kwargs) = self.current.popleft()
+            if 'face_id' in kwargs:
+                elem_id = kwargs['face_id']
+            elif 'elem_id' in kwargs:
+                elem_id = kwargs['elem_id']
+            else:
+                elem_id = -1
+            logger.info(f"{self.clock}, {elem_id}, {behavior.__name__}")
+            behavior(eptm, self, **kwargs)
 
     def update(self):
         """
@@ -124,6 +129,10 @@ default_wait_spec = {'n_steps': 1}
 def wait(eptm, manager, **kwargs):
     """Does nothing for a number of steps n_steps
     """
-    if n_steps > 1:
-        manager.next.append('wait', elem_id,
-                            (n_steps - 1,), {})
+    wait_spec = default_wait_spec
+    wait_spec.update(**kwargs)
+    elem_id = kwargs['face_id']
+    if kwargs['n_steps'] > 1:
+        kwargs.update({
+                      'n_steps': kwargs['n_steps'] - 1})
+        manager.next.append(("wait", wait_spec))
