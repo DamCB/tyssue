@@ -5,6 +5,7 @@ from ..io import hdf5
 stores_dir = os.path.abspath(os.path.dirname(__file__))
 stores_list = os.listdir(stores_dir)
 
+
 def load_datasets(store, **kwargs):
     """
     This will soon be deprecated, use the leaner
@@ -14,10 +15,10 @@ def load_datasets(store, **kwargs):
     cur_dir = os.path.abspath(os.path.dirname(__file__))
     # root = os.path.dirname(cur_dir)
     warnings.warn(
-    """
+        """
     This will soon be deprecated, use the leaner
     `tyssue.stores.stores_dir and tyssue.stores.stores_list
     """
-)
+    )
     filename = os.path.join(cur_dir, store)
     return hdf5.load_datasets(filename, **kwargs)

@@ -14,6 +14,7 @@ class EdgeSubdiv:
     Container class to ease discretisation along the edges
 
     """
+
     def __init__(self, edge_df, **kwargs):
         """Creates an indexer and an offset array  to ease
         discretisation along the edges.
@@ -44,8 +45,8 @@ class EdgeSubdiv:
         self.specs.update(**kwargs)
         self.unit_length = edge_df.length.mean()
 
-        if 'density' not in edge_df:
-            self.edge_df['density'] = self.specs['density']
+        if "density" not in edge_df:
+            self.edge_df["density"] = self.specs["density"]
         self.n_points = 0
         self.points = None
         self.offset_lut = None
@@ -67,8 +68,7 @@ class EdgeSubdiv:
 
         """
 
-        subdiv = EdgeSubdiv(eptm.edge_df[['length', 'density']],
-                            **kwargs)
+        subdiv = EdgeSubdiv(eptm.edge_df[["length", "density"]], **kwargs)
         srce_pos = eptm.upcast_srce(eptm.vert_df[eptm.coords])
         r_ij = eptm.edge_df[eptm.dcoords]
         subdiv.edge_point_cloud(srce_pos, r_ij)
@@ -76,7 +76,7 @@ class EdgeSubdiv:
 
     @staticmethod
     def _offset_lut_(num):
-        return np.arange(0.5, num+0.5) / num
+        return np.arange(0.5, num + 0.5) / num
 
     def update_offset_lut(self, offset_lut=None):
         """
@@ -107,13 +107,15 @@ class EdgeSubdiv:
         `num_particles = length * density`
         * Also updates the self.points df
         """
-        self.edge_df['norm_length'] = self.edge_df['length'] / self.unit_length
-        points_per_edges = np.round(
-            self.edge_df.eval('norm_length * density')).astype(np.int)
-        self.edge_df['num_particles'] = points_per_edges
+        self.edge_df["norm_length"] = self.edge_df["length"] / self.unit_length
+        points_per_edges = np.round(self.edge_df.eval("norm_length * density")).astype(
+            np.int
+        )
+        self.edge_df["num_particles"] = points_per_edges
         self.n_points = points_per_edges.sum()
-        self.points = pd.DataFrame(np.zeros((self.n_points, 2)),
-                                   columns=['upcaster', 'offset'])
+        self.points = pd.DataFrame(
+            np.zeros((self.n_points, 2)), columns=["upcaster", "offset"]
+        )
 
     def update_upcaster(self):
         """
@@ -122,30 +124,34 @@ class EdgeSubdiv:
         'upcaster' indexes over self.edge_df repeated to
         upcast data from the edge df to the points df
         """
-        self.points['upcaster'] = np.repeat(
-            np.arange(self.edge_df.shape[0]),
-            self.edge_df['num_particles'])
+        self.points["upcaster"] = np.repeat(
+            np.arange(self.edge_df.shape[0]), self.edge_df["num_particles"]
+        )
 
     def update_offset(self):
-        self.points['offset'] = np.concatenate(
-            [self.offset_lut(num=ns)
-             for ns in self.edge_df['num_particles']])
+        self.points["offset"] = np.concatenate(
+            [self.offset_lut(num=ns) for ns in self.edge_df["num_particles"]]
+        )
 
     def validate(self):
 
-        if not self.points['upcaster'].max() + 1 == self.n_edges:
+        if not self.points["upcaster"].max() + 1 == self.n_edges:
             return False
-        if not self.points['upcaster'].shape[0] == self.n_points:
+        if not self.points["upcaster"].shape[0] == self.n_points:
             return False
-        if not self.points['offset'].shape()[0] == self.n_points:
+        if not self.points["offset"].shape()[0] == self.n_points:
             return False
         return True
 
-    def edge_point_cloud(self, srce_pos, r_ij,
-                         offset_modulation=None,
-                         modulation_kwargs=None,
-                         coords=['x', 'y', 'z'],
-                         dcoords=['dx', 'dy', 'dz']):
+    def edge_point_cloud(
+        self,
+        srce_pos,
+        r_ij,
+        offset_modulation=None,
+        modulation_kwargs=None,
+        coords=["x", "y", "z"],
+        dcoords=["dx", "dy", "dz"],
+    ):
         """Generates a point cloud along the edges of the epithelium.
 
         if a offset_modulation function is provided, it is used to
@@ -173,101 +179,105 @@ class EdgeSubdiv:
         """
         for u, du in zip(coords, dcoords):
             self.edge_df[u] = srce_pos[u]
-            self.edge_df['d'+u] = r_ij[du]
+            self.edge_df["d" + u] = r_ij[du]
         cols = coords + dcoords
-        upcast = self.edge_df.loc[self.points['upcaster'],
-                                  cols]
+        upcast = self.edge_df.loc[self.points["upcaster"], cols]
         if offset_modulation is None:
-            upcast['offset'] = self.points['offset'].values
+            upcast["offset"] = self.points["offset"].values
         else:
-            upcast['offset'] = offset_modulation(self, **modulation_kwargs)
+            upcast["offset"] = offset_modulation(self, **modulation_kwargs)
         for c in coords:
-            self.points[c] = upcast.eval(
-                '{} + offset * {}'.format(c, 'd'+c)).values
-        if self.specs['noise'] > 0.0:
-            self.points[coords] += np.random.normal(scale=self.specs['noise'],
-                                                    size=(self.n_points, 3))
+            self.points[c] = upcast.eval("{} + offset * {}".format(c, "d" + c)).values
+        if self.specs["noise"] > 0.0:
+            self.points[coords] += np.random.normal(
+                scale=self.specs["noise"], size=(self.n_points, 3)
+            )
         return self.points[coords]
 
 
-def get_edge_bases(eptm, base=('face', 'srce', 'trgt')):
+def get_edge_bases(eptm, base=("face", "srce", "trgt")):
 
-    edge_upcast_pos = {element: eptm.upcast_cols(element,
-                                                 eptm.coords)
-                       for element in base}
+    edge_upcast_pos = {
+        element: eptm.upcast_cols(element, eptm.coords) for element in base
+    }
     origin = base[0]
     edge_bases = {}
     for vertex in base[1:]:
-        df = pd.DataFrame(0, columns=eptm.coords+eptm.dcoords+['length', ],
-                          index=eptm.edge_df.index)
-        df[eptm.dcoords] = (edge_upcast_pos[vertex].values -
-                            edge_upcast_pos[origin].values)
+        df = pd.DataFrame(
+            0, columns=eptm.coords + eptm.dcoords + ["length"], index=eptm.edge_df.index
+        )
+        df[eptm.dcoords] = (
+            edge_upcast_pos[vertex].values - edge_upcast_pos[origin].values
+        )
 
-        df['length'] = np.linalg.norm(df[eptm.dcoords].values, axis=1)
+        df["length"] = np.linalg.norm(df[eptm.dcoords].values, axis=1)
         df[eptm.coords] = edge_upcast_pos[origin].values
-        edge_bases['{}_{}'.format(origin, vertex)] = df.copy()
+        edge_bases["{}_{}".format(origin, vertex)] = df.copy()
     return edge_bases
 
 
 class FaceGrid:
-
     def __init__(self, edges_df, base, **kwargs):
 
         self.origin = base[0]
-        self.base = ['{}_{}'.format(base[0], other)
-                     for other in base[1:]]
+        self.base = ["{}_{}".format(base[0], other) for other in base[1:]]
 
         self.specs = bulk_spec()
         self.specs.update(kwargs)
         e_specs = kwargs
-        self.subdivs = {key: EdgeSubdiv(edges_df[key], **e_specs)
-                        for key in self.base}
-        self.n_points = np.product([
-                subdiv.edge_df['num_particles'].values
-                for subdiv in self.subdivs.values()], axis=0).sum()
+        self.subdivs = {key: EdgeSubdiv(edges_df[key], **e_specs) for key in self.base}
+        self.n_points = np.product(
+            [
+                subdiv.edge_df["num_particles"].values
+                for subdiv in self.subdivs.values()
+            ],
+            axis=0,
+        ).sum()
         self.dim = len(self.subdivs)
-        self.up_cols = ['up_{}'.format(key) for key in self.base]
-        self.of_cols = ['of_{}'.format(key) for key in self.base]
+        self.up_cols = ["up_{}".format(key) for key in self.base]
+        self.of_cols = ["of_{}".format(key) for key in self.base]
         self.points = None
 
     def update_grid(self):
         upcasters = {}
         for key, subdiv in self.subdivs.items():
-            upcasters['up_'+key] = subdiv.points['upcaster']
-            upcasters['of_'+key] = subdiv.points['offset']
+            upcasters["up_" + key] = subdiv.points["upcaster"]
+            upcasters["of_" + key] = subdiv.points["offset"]
         upcasters = pd.DataFrame.from_dict(upcasters)
         points = {}
-        u_axis = 'up_{}'.format(self.base[0])
+        u_axis = "up_{}".format(self.base[0])
         upcasters.set_index(u_axis, drop=False, inplace=True)
         for cols in (self.of_cols, self.up_cols):
-            df = upcasters.groupby(
-                level=u_axis).apply(_local_grid, *cols)
+            df = upcasters.groupby(level=u_axis).apply(_local_grid, *cols)
             points.update({col: df[col].values for col in cols})
         self.points = pd.DataFrame.from_dict(points)
 
-    def face_point_cloud(self,
-                         coords=['x', 'y', 'z'],
-                         dcoords=['dx', 'dy', 'dz']):
+    def face_point_cloud(self, coords=["x", "y", "z"], dcoords=["dx", "dy", "dz"]):
         upcast = {}
         offsets = self.points[self.of_cols]
         for key, subdiv in self.subdivs.items():
-            upcast[key] = subdiv.edge_df.loc[self.points['up_{}'.format(key)],
-                                             coords+dcoords+['length']].copy()
+            upcast[key] = subdiv.edge_df.loc[
+                self.points["up_{}".format(key)], coords + dcoords + ["length"]
+            ].copy()
             upcast[key].reset_index(inplace=True)
-            upcast[key]['offset'] = offsets['of_{}'.format(key)].values
+            upcast[key]["offset"] = offsets["of_{}".format(key)].values
 
         for u, du in zip(coords, dcoords):
-            self.points[u] = (
-                upcast[self.base[0]].eval(
-                    '{} + offset * {}'.format(u, du)).values +
-                np.sum([upcast[other].eval('offset * {}'.format(du)).values
-                        for other in self.base[1:]], axis=0))
+            self.points[u] = upcast[self.base[0]].eval(
+                "{} + offset * {}".format(u, du)
+            ).values + np.sum(
+                [
+                    upcast[other].eval("offset * {}".format(du)).values
+                    for other in self.base[1:]
+                ],
+                axis=0,
+            )
 
         in_out = np.zeros(self.points.shape[0], dtype=bool)
         for other in self.base[1:]:
-            xx = upcast[self.base[0]]['offset'].values
-            yy = upcast[other]['offset'].values
-            in_out += (xx + yy) < 1.
+            xx = upcast[self.base[0]]["offset"].values
+            yy = upcast[other]["offset"].values
+            in_out += (xx + yy) < 1.0
 
         self.points = self.points[in_out]
         return self.points[coords]
@@ -276,7 +286,5 @@ class FaceGrid:
 def _local_grid(df, *cols):
 
     grid = np.meshgrid(*(df[col] for col in cols))
-    out = pd.DataFrame.from_dict({col: mm.ravel()
-                                  for col, mm in
-                                  zip(cols, grid)})
+    out = pd.DataFrame.from_dict({col: mm.ravel() for col, mm in zip(cols, grid)})
     return out
