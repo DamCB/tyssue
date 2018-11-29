@@ -70,6 +70,7 @@ def time_exe(func):
 
 
 def face_lookup(func):
+    @wraps(func)
     def with_face_lookup(*args, **kwargs):
         sheet = args[0]
         face_id = kwargs['face_id']
