@@ -189,7 +189,6 @@ def constriction(sheet, manager, **kwargs):
         face_area = sheet.face_df.loc[face, "area"]
 
         if face_area > constriction_spec["critical_area"]:
-            print(face, contract_rate)
             contract(
                 sheet,
                 face,
@@ -211,18 +210,18 @@ def constriction(sheet, manager, **kwargs):
 
                 # remove cell which are not mesoderm
                 ectodermal_cell = sheet.face_df.loc[neighbors.face][
-                    not sheet.face_df.loc[neighbors.face, "is_mesoderm"]
+                    ~sheet.face_df.loc[neighbors.face, "is_mesoderm"]
                 ].id.values
 
                 neighbors = neighbors.drop(
-                    neighbors[neighbors.face.isin(ectodermal_cell)].index
+                    neighbors[neighbors.id.isin(ectodermal_cell)].index
                 )
 
                 manager.extend(
                     [
                         (
                             contraction,
-                            _neighbor_contractilie_increase(
+                            _neighbor_contractile_increase(
                                 neighbor, contract_rate, constriction_spec
                             ),
                         )  # TODO: check this
@@ -246,21 +245,20 @@ def constriction(sheet, manager, **kwargs):
     manager.append(constriction, **constriction_spec)
 
 
-def _neighbor_contractilie_increase(neighbor, contract_rate, constriction_spec):
+def _neighbor_contractile_increase(neighbor, contract_rate, constriction_spec):
 
     increase = (
         -(contract_rate - constriction_spec["basal_contract_rate"])
         / constriction_spec["contract_span"]
     ) * neighbor["order"] + contract_rate
 
-    specs = (
-        {
+    specs = {
             "face_id": neighbor["id"],
             "contractile_increase": increase,
             "critical_area": constriction_spec["critical_area"],
             "max_contractility": 50,
             "contraction_column": constriction_spec["contraction_column"],
             "multiple": True,
-        },
-    )
+        }
+
     return specs

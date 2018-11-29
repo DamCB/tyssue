@@ -91,10 +91,16 @@ class EventManager:
             elem_id = -1
 
         for tup in self.next:
-            if (elem_id == tup[1]["face_id"]) and (
-                behavior.__name__ == tup[0].__name__
-            ):
-                return
+            if "face_id" in tup[1]:
+                if (elem_id == tup[1]["face_id"]) and (
+                    behavior.__name__ == tup[0].__name__ and (behavior.__name__!="contraction")
+                ):
+                    return
+            elif "elem_id" in tup[1]:
+                if (elem_id == tup[1]["elem_id"]) and (
+                    behavior.__name__ == tup[0].__name__ (behavior.__name__!="contraction")
+                ):
+                    return
         self.next.append((behavior, kwargs))
 
     def execute(self, eptm):
