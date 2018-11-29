@@ -118,22 +118,23 @@ def delamination(
     if not done:
         manager.append(delamination, face_id=face_id, **settings)
 
+
 default_constriction_spec = {
-    'face_id': -1,
-    'face': -1,
-    'contract_rate': 2,
-    'critical_area': 1e-2,
-    'radial_tension': 1.0,
-    'nb_iteration': 0,
-    'nb_iteration_max': 20,
-    'contract_neighbors': True,
-    'critical_area_neighbors': 10,
-    'contract_span': 2,
-    'basal_contract_rate': 1.001,
-    'current_traction': 0,
-    'max_traction': 30,
-    'geom': SheetGeometry,
-    'contraction_column': "contractility"
+    "face_id": -1,
+    "face": -1,
+    "contract_rate": 2,
+    "critical_area": 1e-2,
+    "radial_tension": 1.0,
+    "nb_iteration": 0,
+    "nb_iteration_max": 20,
+    "contract_neighbors": True,
+    "critical_area_neighbors": 10,
+    "contract_span": 2,
+    "basal_contract_rate": 1.001,
+    "current_traction": 0,
+    "max_traction": 30,
+    "geom": SheetGeometry,
+    "contraction_column": "contractility",
 }
 
 default_constriction_spec = {
