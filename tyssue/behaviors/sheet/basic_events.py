@@ -60,6 +60,7 @@ default_contraction_spec = {
     'contractile_increase': 1.0,
     'critical_area': 1e-2,
     'max_contractility': 10,
+    'multiple': False,
     'contraction_column': "contractility"
 }
 
@@ -77,7 +78,9 @@ def contraction(sheet, manager, **kwargs):
             'max_contractility']
     ):
         return
-    contract(sheet, face, contraction_spec['contractile_increase'])
+    contract(sheet, face, contraction_spec['contractile_increase'],
+             contraction_spec['multiple'],
+             contraction_spec['contraction_column'])
 
 
 default_type1_transition_spec = {

@@ -188,18 +188,22 @@ def constriction(sheet, manager, **kwargs):
 
     if "is_relaxation" in sheet.face_df.columns:
         if sheet.face_df.loc[face, "is_relaxation"]:
-            relax(sheet, face, constriction_spec[
-                  'contract_rate'], constriction_spec['contraction_column'])
+            relax(sheet, face,
+                  contract_rate, constriction_spec['contraction_column'])
 
-    else:
+    if sheet.face_df.loc[face, "is_mesoderm"]:
         face_area = sheet.face_df.loc[face, "area"]
 
         if face_area > constriction_spec['critical_area']:
-            contract(sheet, face, constriction_spec[
-                     'contract_rate'], True, constriction_spec['contraction_column'])
+            print(face, contract_rate)
+            contract(sheet, face, contract_rate,
+                     True, constriction_spec['contraction_column'])
+            #if sheet.face_df.loc[face, 'prefered_area'] > 6:
+            #    sheet.face_df.loc[face, 'prefered_area'] -= 0.5
             # increase_linear_tension(sheet, face, contract_rate)
 
-            if constriction_spec['contract_neighbors'] & (face_area < constriction_spec['critical_area_neighbors']):
+            if ((constriction_spec['contract_neighbors']) &
+                    (face_area < constriction_spec['critical_area_neighbors'])):
                 neighbors = sheet.get_neighborhood(
                     face, constriction_spec['contract_span']).dropna()
                 neighbors["id"] = sheet.face_df.loc[
@@ -220,13 +224,14 @@ def constriction(sheet, manager, **kwargs):
                             contraction,
                             {
                                 'face_id': neighbor["id"],
-                                'contractile_increase': -((contract_rate - constriction_spec['basal_contract_rate']) / constriction_spec['contract_span'])
-                                * neighbor["order"]
-                                + contract_rate,
-                                'critical_area': constriction_spec['critical_area'],
+                                'contractile_increase': -((contract_rate - constriction_spec['basal_contract_rate']) / constriction_spec['contract_span']) *
+                                neighbor["order"] + contract_rate,
+                                'critical_area': constriction_spec[
+                                    'critical_area'],
                                 'max_contractility': 50,
-                                'constraction_column': constriction_spec[
-                                    'contraction_column']
+                                'contraction_column': constriction_spec[
+                                    'contraction_column'],
+                                'multiple': True
                             },
                         )  # TODO: check this
                         for _, neighbor in neighbors.iterrows()
@@ -240,12 +245,11 @@ def constriction(sheet, manager, **kwargs):
                 current_traction = current_traction + 1
                 ab_pull(sheet, face, constriction_spec['radial_tension'], True)
 
-    #delam_kwargs = sheet.settings["delamination"].copy()
-    constriction_spec.update(
-        {
-            "contract_rate": contract_rate,
-            "current_traction": current_traction
-        }
-    )
+                constriction_spec.update(
+                    {
+                        'contract_rate': contract_rate,
+                        'current_traction': current_traction
+                    }
+                )
 
     manager.append(constriction, **constriction_spec)
