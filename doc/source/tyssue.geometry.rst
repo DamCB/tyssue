@@ -1,34 +1,27 @@
 tyssue.geometry package
 =======================
 
-Subpackages
------------
-
-.. toctree::
-
-    tyssue.geometry.tests
-
 Submodules
 ----------
 
-tyssue.geometry.base_geometry module
-------------------------------------
+tyssue.geometry.base\_geometry module
+-------------------------------------
 
 .. automodule:: tyssue.geometry.base_geometry
     :members:
     :undoc-members:
     :show-inheritance:
 
-tyssue.geometry.bulk_geometry module
-------------------------------------
+tyssue.geometry.bulk\_geometry module
+-------------------------------------
 
 .. automodule:: tyssue.geometry.bulk_geometry
     :members:
     :undoc-members:
     :show-inheritance:
 
-tyssue.geometry.cellcell_geometry module
-----------------------------------------
+tyssue.geometry.cellcell\_geometry module
+-----------------------------------------
 
 .. automodule:: tyssue.geometry.cellcell_geometry
     :members:
@@ -43,18 +36,26 @@ tyssue.geometry.multisheetgeometry module
     :undoc-members:
     :show-inheritance:
 
-tyssue.geometry.planar_geometry module
---------------------------------------
+tyssue.geometry.planar\_geometry module
+---------------------------------------
 
 .. automodule:: tyssue.geometry.planar_geometry
     :members:
     :undoc-members:
     :show-inheritance:
 
-tyssue.geometry.sheet_geometry module
--------------------------------------
+tyssue.geometry.sheet\_geometry module
+--------------------------------------
 
 .. automodule:: tyssue.geometry.sheet_geometry
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.geometry.utils module
+----------------------------
+
+.. automodule:: tyssue.geometry.utils
     :members:
     :undoc-members:
     :show-inheritance:

@@ -129,12 +129,12 @@ class MonolayerWithLamina(Monolayer):
         # place holder face and cell
         lamina_face = self.face_df.index.max() + 1
         lamina_edges["face"] = lamina_face
-        self.face_df.append(self.face_df.ix[0].copy())
+        self.face_df.append(self.face_df.iloc[0].copy())
         self.face_df.loc[lamina_face, "is_alive"] = 0
 
         lamina_cell = self.cell_df.index.max() + 1
         lamina_edges["cell"] = lamina_cell
-        self.cell_df.append(self.cell_df.ix[0].copy())
+        self.cell_df.append(self.cell_df.iloc[0].copy())
         self.cell_df.loc[lamina_cell, "is_alive"] = 0
 
         lamina_edges.index += self.edge_df.index.max() + 1

@@ -4,6 +4,22 @@ tyssue.utils package
 Submodules
 ----------
 
+tyssue.utils.decorators module
+------------------------------
+
+.. automodule:: tyssue.utils.decorators
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.utils.testing module
+---------------------------
+
+.. automodule:: tyssue.utils.testing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tyssue.utils.utils module
 -------------------------
 

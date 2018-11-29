@@ -5,4 +5,5 @@ tyssue
    :maxdepth: 4
 
    setup
+   tests
    tyssue
