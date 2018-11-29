@@ -1,5 +1,5 @@
 import logging
-from ..topology.bulk_topology import IH_transition, HI_transition
+from ...topology.bulk_topology import IH_transition, HI_transition
 
 # from ..topology.sheet_topology import (remove_face,
 #                                        type1_transition,
@@ -11,12 +11,26 @@ def apoptosis(
     monolayer,
     manager,
     cell_id,
-    contract_rate=2,
+    contract_rate=2.0,
     critical_area=1e-2,
     shrink_rate=0.4,
     critical_volume=0.1,
 ):
+    """Apoptotic behavior
 
+    Parameters
+    ----------
+    monolayer : a :cass:`Monolayer` object
+    manager : a :class:`EventManager` object
+    cell_id : int
+       id of the apoptotic cell
+    contract_rate : float, default 2.
+    critical_area : float, default 1e-2,
+    shrink_rate : float, default 0.4,
+    critical_volume : float, default 0.1,
+    """
+    # TODO complete docstring
+    # TODO setup default / kwargs mechanisms
     settings = {
         "contract_rate": contract_rate,
         "critical_area": critical_area,
@@ -35,7 +49,7 @@ def apoptosis(
             (monolayer.face_df.index.isin(cell_to_face[cell]))
             & (monolayer.face_df.segment == "apical")
         ].index[0]
-    except:
+    except Exception:  # TODO fix that
         apical_face = None
     # Apical face has already been removed.
     # It needs to eliminate lateral face until obtain a cell with 4 faces.
@@ -100,11 +114,11 @@ def apoptosis(
 
 
 def shrink(monolayer, cell, shrink_rate):
-    """Divides the equilibrium volume of face
-    by a factor (1+shrink_rate)
+    """Divides the equilibrium volume of the cell
+    by a factor (1+shrink_rate) and its equilibrium area
+    by (1+shrink_rate)^2/3
     """
     factor = 1 + shrink_rate
-    faces = monolayer.edge_df[monolayer.edge_df["cell"] == cell]["face"]
     monolayer.cell_df.loc[cell, "prefered_vol"] /= factor
     monolayer.cell_df.loc[cell, "prefered_area"] /= factor ** (2 / 3)
 
@@ -120,7 +134,9 @@ def grow(monolayer, cell, grow_rate):
 
 
 def ab_pull(monolayer, cell, *args):
-
+    """Adds a linear tension to the apical-to-basal edges
+    of a cell
+    """
     cell_edges = monolayer.edge_df[monolayer.edge_df["cell"] == cell]
     lateral_edges = cell_edges[cell_edges["segment"] == "lateral"]
     srce_segment = monolayer.upcast_srce(monolayer.vert_df["segment"]).loc[
@@ -136,6 +152,8 @@ def ab_pull(monolayer, cell, *args):
     ba_edges = lateral_edges[
         (trgt_segment == "apical") & (srce_segment == "basal")
     ].index
+    # TODO treat factor directly - not as a multiple of
+    # the default line_tension (which might be 0)
     factor = args[0]
     new_tension = monolayer.specs["edge"]["line_tension"] * factor
     monolayer.edge_df.loc[ab_edges, "line_tension"] += new_tension
