@@ -1,28 +1,21 @@
 tyssue.core package
 ===================
 
-Subpackages
------------
-
-.. toctree::
-
-    tyssue.core.tests
-
 Submodules
 ----------
 
-tyssue.core.cellcell module
----------------------------
+tyssue.core.flycheck\_objects module
+------------------------------------
 
-.. automodule:: tyssue.core.cellcell
+.. automodule:: tyssue.core.flycheck_objects
     :members:
     :undoc-members:
     :show-inheritance:
 
-tyssue.core.generation module
------------------------------
+tyssue.core.history module
+--------------------------
 
-.. automodule:: tyssue.core.generation
+.. automodule:: tyssue.core.history
     :members:
     :undoc-members:
     :show-inheritance:

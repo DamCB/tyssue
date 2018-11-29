@@ -12,6 +12,14 @@ tyssue.io.ais module
     :undoc-members:
     :show-inheritance:
 
+tyssue.io.csv module
+--------------------
+
+.. automodule:: tyssue.io.csv
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tyssue.io.hdf5 module
 ---------------------
 
@@ -24,14 +32,6 @@ tyssue.io.obj module
 --------------------
 
 .. automodule:: tyssue.io.obj
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tyssue.io.off module
---------------------
-
-.. automodule:: tyssue.io.off
     :members:
     :undoc-members:
     :show-inheritance:
