@@ -13,6 +13,9 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+# Event that can be add several time for the same cell for the same time step
+EXCEPT_EVENTS = ['contraction_neighbor']
+
 
 class EventManager:
     """
@@ -91,14 +94,17 @@ class EventManager:
             elem_id = -1
 
         for tup in self.next:
+            unique = kwargs.get('unique', True)
             if "face_id" in tup[1]:
                 if (elem_id == tup[1]["face_id"]) and (
-                    behavior.__name__ == tup[0].__name__ and (behavior.__name__!="contraction")
+                    behavior.__name__ == tup[0].__name__ and (
+                        unique)
                 ):
                     return
             elif "elem_id" in tup[1]:
                 if (elem_id == tup[1]["elem_id"]) and (
-                    behavior.__name__ == tup[0].__name__ (behavior.__name__!="contraction")
+                    behavior.__name__ == tup[0].__name__(
+                        unique)
                 ):
                     return
         self.next.append((behavior, kwargs))
