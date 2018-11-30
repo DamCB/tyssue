@@ -163,7 +163,6 @@ def cell_division(eptm, mother, geom, vertices=None):
 
 def find_rearangements(eptm):
     """Finds the candidates for IH and HI transitions
-
     Returns
     -------
     edges_HI: set of indexes of short edges
@@ -187,7 +186,6 @@ def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
     (DOI 10.1007/s10237-012-0430-7).
-
     See tyssue/doc/illus/IH_transition.png for the definition of the
     edges, which follow the one in the above article
     """
@@ -334,43 +332,8 @@ def IH_transition(eptm, e_1011):
         new_segment = "lateral"
     else:
         new_segment = eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
-    eptm.face_df.loc[fa, ["segment"]] = new_segment
-    eptm.face_df.loc[fb, ["segment"]] = new_segment
-
-    # Removing the remaining edges and vertices
-    todel_edges = eptm.edge_df[
-        (eptm.edge_df["srce"] == v10)
-        | (eptm.edge_df["trgt"] == v10)
-        | (eptm.edge_df["srce"] == v11)
-        | (eptm.edge_df["trgt"] == v11)
-    ].index
-
-    eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
-    eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v10, v11])]
-    eptm.edge_df.index.name = "edge"
-
-    # Verify the segment key word for new vertices
-    srce_face_orbits = eptm.get_orbits("srce", "face")
-    for v in [v7, v8, v9]:
-        if len(srce_face_orbits[v]) == 12:
-            eptm.vert_df.loc[v, ["segment"]] = "lateral"
-
-        elif "apical" in eptm.edge_df[eptm.edge_df.srce == v].segment.unique():
-            eptm.vert_df.loc[v, ["segment"]] = "apical"
-        else:
-            eptm.vert_df.loc[v, ["segment"]] = "basal"
-
-    # Verify the segment key word for new faces
-    face_srce_orbits = eptm.get_orbits("face", "srce")
-    nb_unique_segment_position = len(
-        eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
-    )
-    if nb_unique_segment_position == 2:
-        new_segment = "lateral"
-    else:
-        new_segment = eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
-    eptm.face_df.loc[fa, ["segment"]] = new_segment
-    eptm.face_df.loc[fb, ["segment"]] = new_segment
+    eptm.face_df.loc[fa, ['segment']] = new_segment
+    eptm.face_df.loc[fb, ['segment']] = new_segment
 
     eptm.reset_index()
     eptm.reset_topo()
@@ -381,7 +344,6 @@ def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013
     (DOI 10.1007/s10237-012-0430-7).
-
     See tyssue/doc/illus/IH_transition.png for the definition of the
     edges, which follow the one in the above article
     """
@@ -505,7 +467,6 @@ def _add_edge_to_existing(eptm, cell, vi, vj, new_srce, new_trgt):
 
 def _set_new_pos_IH(eptm, e_1011, vertices):
     """Okuda 2013 equations 46 to 56
-
     """
     Dl_th = eptm.settings["threshold_length"]
 
