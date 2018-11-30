@@ -277,6 +277,7 @@ def _neighbor_contractile_increase(neighbor, contract_rate, constriction_spec):
             "max_contractility": 50,
             "contraction_column": constriction_spec["contraction_column"],
             "multiple": True,
+            "unique": False
         }
 
     return specs

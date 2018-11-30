@@ -12,8 +12,7 @@ from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 
 from tyssue.behaviors.event_manager import EventManager, wait
 from tyssue.behaviors.sheet.basic_events import (
-    division, contraction, contraction_neighbor,
-    type1_transition, face_elimination, check_tri_faces)
+    division, contraction, type1_transition, face_elimination, check_tri_faces)
 from tyssue.behaviors.sheet.actions import (
     contract, ab_pull, relax, increase_linear_tension, grow, shrink)
 from tyssue.behaviors.sheet.actions import remove as type3
@@ -48,10 +47,10 @@ def test_add_only_once():
 def test_add_several_time_same_events():
     manager = EventManager('face')
     initial_cell_event = [(division, {'face_id': 1, 'geom': geom}),
-                          (contraction_neighbor, {'face_id': 2}),
-                          (contraction_neighbor, {'face_id': 3}),
+                          (contraction, {'face_id': 2, 'unique': False}),
+                          (contraction, {'face_id': 3, 'unique': False}),
                           (apoptosis, {'face_id': 3, 'shrink_rate': 4}),
-                          (contraction_neighbor, {'face_id': 2})]
+                          (contraction, {'face_id': 2, 'unique': False})]
 
     manager.extend(initial_cell_event)
     manager.execute(None)
@@ -158,23 +157,6 @@ def test_execute_contraction():
     event = (contraction, {'face_id': face_id,
                            'contractile_increase': 0.2,
                            'critical_area': 1e-2})
-    manager.current.append(event)
-    manager.execute(sheet)
-    manager.update()
-    assert sheet.face_df.loc[face_id, 'contractility'] == 1.32
-
-
-def test_execute_contraction_neighbor():
-    sheet = Sheet('emin', *three_faces_sheet())
-    geom.update_all(sheet)
-    sheet.face_df['contractility'] = 1.12
-
-    sheet.face_df['id'] = sheet.face_df.index.values
-    manager = EventManager('face')
-    face_id = 1
-    event = (contraction_neighbor, {'face_id': face_id,
-                                    'contractile_increase': 0.2,
-                                    'critical_area': 1e-2})
     manager.current.append(event)
     manager.execute(sheet)
     manager.update()
