@@ -260,6 +260,5 @@ def _neighbor_contractile_increase(neighbor, contract_rate, constriction_spec):
             "contraction_column": constriction_spec["contraction_column"],
             "multiple": True,
         }
-    )
 
     return specs
