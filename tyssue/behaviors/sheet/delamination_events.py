@@ -46,7 +46,7 @@ def delamination(
     contract_rate : float, default 2
        rate of increase of the face contractility.
     critical_area : float, default 1e-2
-       face's area under which the cell starts loosing sides.
+       face area under which the cell starts loosing sides.
     radial_tension : float, default 1.
        tension applied on the face vertices along the
        apical-basal axis.
@@ -61,6 +61,7 @@ def delamination(
        rate for the neighbors is equal to `contract_rate` devided by
        the rank.
     """
+
     settings = {
         "contract_rate": contract_rate,
         "critical_area": critical_area,
@@ -82,8 +83,6 @@ def delamination(
         relax(sheet, face, contract_rate, contraction_column)
 
     face_area = sheet.face_df.loc[face, "area"]
-    num_sides = sheet.face_df.loc[face, "num_sides"]
-
     if face_area > critical_area:
         contract(sheet, face, contract_rate, True, contraction_column)
 
@@ -137,24 +136,6 @@ default_constriction_spec = {
     "contraction_column": "contractility",
 }
 
-default_constriction_spec = {
-    "face_id": -1,
-    "face": -1,
-    "contract_rate": 2,
-    "critical_area": 1e-2,
-    "radial_tension": 1.0,
-    "nb_iteration": 0,
-    "nb_iteration_max": 20,
-    "contract_neighbors": True,
-    "critical_area_neighbors": 10,
-    "contract_span": 2,
-    "basal_contract_rate": 1.001,
-    "current_traction": 0,
-    "max_traction": 30,
-    "geom": SheetGeometry,
-    "contraction_column": "contractility",
-}
-
 
 @face_lookup
 def constriction(sheet, manager, **kwargs):
@@ -175,7 +156,7 @@ def constriction(sheet, manager, **kwargs):
     contract_rate : float, default 2
        rate of increase of the face contractility.
     critical_area : float, default 1e-2
-       face's area under which the cell starts loosing sides.
+       face area under which the cell starts loosing sides.
     radial_tension : float, default 1.
        tension applied on the face vertices along the
        apical-basal axis.
@@ -214,10 +195,6 @@ def constriction(sheet, manager, **kwargs):
                 True,
                 constriction_spec["contraction_column"],
             )
-            # if sheet.face_df.loc[face, 'prefered_area'] > 6:
-            #    sheet.face_df.loc[face, 'prefered_area'] -= 0.5
-            # increase_linear_tension(sheet, face, contract_rate)
-
             if (constriction_spec["contract_neighbors"]) & (
                 face_area < constriction_spec["critical_area_neighbors"]
             ):
@@ -271,16 +248,13 @@ def _neighbor_contractile_increase(neighbor, contract_rate, constriction_spec):
     ) * neighbor["order"] + contract_rate
 
     specs = {
-            "face_id": neighbor["id"],
-            "contractile_increase": increase,
-            "critical_area": constriction_spec["critical_area"],
-            "max_contractility": 50,
-            "contraction_column": constriction_spec["contraction_column"],
-            "multiple": True,
-<<<<<<< HEAD
-=======
-            "unique": False
->>>>>>> fd798f617223dc7667eac9d54c7248d9d40ab1b9
-        }
+        "face_id": neighbor["id"],
+        "contractile_increase": increase,
+        "critical_area": constriction_spec["critical_area"],
+        "max_contractility": 50,
+        "contraction_column": constriction_spec["contraction_column"],
+        "multiple": True,
+        "unique": False,
+    }
 
     return specs
