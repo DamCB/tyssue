@@ -84,6 +84,10 @@ def contraction(sheet, manager, **kwargs):
              contraction_spec['contraction_column'])
 
 
+def contraction_neighbor(sheet, manager, **kwargs):
+    contraction(sheet, manager, **kwargs)
+
+
 default_type1_transition_spec = {
     'face_id': -1,
     'face': -1,

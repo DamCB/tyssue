@@ -12,7 +12,8 @@ from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 
 from tyssue.behaviors.event_manager import EventManager, wait
 from tyssue.behaviors.sheet.basic_events import (
-    division, contraction, type1_transition, face_elimination, check_tri_faces)
+    division, contraction, contraction_neighbor,
+    type1_transition, face_elimination, check_tri_faces)
 from tyssue.behaviors.sheet.actions import (
     contract, ab_pull, relax, increase_linear_tension, grow, shrink)
 from tyssue.behaviors.sheet.actions import remove as type3
