@@ -12,7 +12,8 @@ from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 
 from tyssue.behaviors.event_manager import EventManager, wait
 from tyssue.behaviors.sheet.basic_events import (
-    division, contraction, type1_transition, face_elimination, check_tri_faces)
+    division, contraction, contraction_neighbor,
+    type1_transition, face_elimination, check_tri_faces)
 from tyssue.behaviors.sheet.actions import (
     contract, ab_pull, relax, increase_linear_tension, grow, shrink)
 from tyssue.behaviors.sheet.actions import remove as type3
@@ -42,6 +43,20 @@ def test_add_only_once():
     manager.execute(None)
     manager.update()
     assert len(manager.current) == 2
+
+
+def test_add_several_time_same_events():
+    manager = EventManager('face')
+    initial_cell_event = [(division, {'face_id': 1, 'geom': geom}),
+                          (contraction, {'face_id': 2, 'unique': False}),
+                          (contraction, {'face_id': 3, 'unique': False}),
+                          (apoptosis, {'face_id': 3, 'shrink_rate': 4}),
+                          (contraction, {'face_id': 2, 'unique': False})]
+
+    manager.extend(initial_cell_event)
+    manager.execute(None)
+    manager.update()
+    assert len(manager.current) == 5
 
 
 def test_logging():
@@ -147,7 +162,6 @@ def test_execute_contraction():
     manager.execute(sheet)
     manager.update()
     assert sheet.face_df.loc[face_id, 'contractility'] == 1.32
-
 
 
 def test_type1_transition():

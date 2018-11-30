@@ -163,7 +163,6 @@ def cell_division(eptm, mother, geom, vertices=None):
 
 def find_rearangements(eptm):
     """Finds the candidates for IH and HI transitions
-
     Returns
     -------
     edges_HI: set of indexes of short edges
@@ -187,7 +186,6 @@ def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
     (DOI 10.1007/s10237-012-0430-7).
-
     See tyssue/doc/illus/IH_transition.png for the definition of the
     edges, which follow the one in the above article
     """
@@ -346,7 +344,6 @@ def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013
     (DOI 10.1007/s10237-012-0430-7).
-
     See tyssue/doc/illus/IH_transition.png for the definition of the
     edges, which follow the one in the above article
     """
@@ -470,7 +467,6 @@ def _add_edge_to_existing(eptm, cell, vi, vj, new_srce, new_trgt):
 
 def _set_new_pos_IH(eptm, e_1011, vertices):
     """Okuda 2013 equations 46 to 56
-
     """
     Dl_th = eptm.settings["threshold_length"]
 
