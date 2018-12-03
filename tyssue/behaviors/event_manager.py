@@ -13,9 +13,6 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# Event that can be add several time for the same cell for the same time step
-EXCEPT_EVENTS = ['contraction_neighbor']
-
 
 class EventManager:
     """
@@ -107,6 +104,7 @@ class EventManager:
                         unique)
                 ):
                     return
+
         self.next.append((behavior, kwargs))
 
     def execute(self, eptm):
