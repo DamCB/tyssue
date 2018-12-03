@@ -5,14 +5,7 @@ Base gradients for sheet like geometries
 import numpy as np
 import pandas as pd
 
-from ..utils.utils import _to_3d, _to_2d
-
-
-def cyl_height_grad(vert_df, coords):
-
-    r_to_rho = vert_df[coords] / _to_3d(vert_df["rho"])
-    r_to_rho[coords[-1]] = 0.0
-    return r_to_rho
+from ..utils.utils import to_nd  # _to_3d, _to_2d
 
 
 def height_grad(sheet):
@@ -22,7 +15,7 @@ def height_grad(sheet):
     coords = [u, v, w]
 
     if sheet.settings["geometry"] == "cylindrical":
-        r_to_rho = sheet.vert_df[coords] / _to_3d(sheet.vert_df["rho"])
+        r_to_rho = sheet.vert_df[coords] / to_nd(sheet.vert_df["rho"], 3)
         r_to_rho[w] = 0.0
 
     elif sheet.settings["geometry"] == "flat":
@@ -31,28 +24,7 @@ def height_grad(sheet):
         r_to_rho[[w]] = 1.0
 
     elif sheet.settings["geometry"] == "spherical":
-        r_to_rho = sheet.vert_df[coords] / _to_3d(sheet.vert_df["rho"])
-
-    elif sheet.settings["geometry"] == "rod":
-
-        r_to_rho = sheet.vert_df[coords].copy()
-
-        r_to_rho[[u, v]] = sheet.vert_df[[u, v]] / _to_2d(sheet.vert_df["rho"])
-        r_to_rho[w] = 0.0
-
-        l_mask = sheet.vert_df[sheet.vert_df["left_tip"].astype(np.bool)].index
-        r_mask = sheet.vert_df[sheet.vert_df["right_tip"].astype(np.bool)].index
-        a, b = sheet.settings["ab"]
-        w0 = a - b
-
-        l_rel_z = sheet.vert_df.loc[l_mask, "z"] - w0
-        r_to_rho.loc[l_mask, w] = l_rel_z / sheet.vert_df["rho"]
-
-        r_rel_z = sheet.vert_df.loc[r_mask, "z"] + w0
-        r_to_rho.loc[r_mask, w] = r_rel_z / sheet.vert_df["rho"]
-
-    elif sheet.settings["geometry"] == "surfacic":
-        r_to_rho = sheet.vert_df[coords] * 0.0
+        r_to_rho = sheet.vert_df[coords] / to_nd(sheet.vert_df["rho"], 3)
 
     return r_to_rho
 
@@ -73,8 +45,9 @@ def area_grad(sheet):
     r_ak = srce_pos - face_pos
     r_aj = trgt_pos - face_pos
 
-    grad_a_srce = _to_3d(inv_area) * np.cross(r_aj, sheet.edge_df[ncoords])
-    grad_a_trgt = _to_3d(inv_area) * np.cross(sheet.edge_df[ncoords], r_ak)
+    inv_area = to_nd(inv_area, 3)
+    grad_a_srce = inv_area * np.cross(r_aj, sheet.edge_df[ncoords])
+    grad_a_trgt = inv_area * np.cross(sheet.edge_df[ncoords], r_ak)
     return (
         pd.DataFrame(grad_a_srce, index=sheet.edge_df.index, columns=sheet.coords),
         pd.DataFrame(grad_a_trgt, index=sheet.edge_df.index, columns=sheet.coords),
