@@ -1,5 +1,5 @@
 import numpy as np
-import c_collisions
+from .cpp import c_collisions
 
 
 def self_intersections(sheet):
