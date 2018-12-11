@@ -18,7 +18,7 @@ LONG_DESCRIPTION = (
 MAINTAINER = "Guillaume Gay"
 MAINTAINER_EMAIL = "guillaume@damcb.com"
 URL = "https://github.com/DamCB/tyssue"
-LICENSE = "MPL-2.0"
+LICENSE = "GPL-3.0"
 DOWNLOAD_URL = "https://github.com/DamCB/tyssue.git"
 
 files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
@@ -27,8 +27,8 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 ## Version management copied form numpy
 ## Thanks to them!
 MAJOR = 0
-MINOR = 2
-MICRO = 4
+MINOR = 3
+MICRO = "rc1"
 ISRELEASED = False
 VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
 
@@ -96,7 +96,7 @@ if not release:
 """
     FULLVERSION, GIT_REVISION = get_version_info()
 
-    a = open(filename, 'w')
+    a = open(filename, "w")
     try:
         a.write(
             cnt

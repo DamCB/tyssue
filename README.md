@@ -117,7 +117,7 @@ Unsubscribe ➙ https://framalistes.org/sympa/sigrequest/tyssue
 * Hadrien Mary (build wizard) - @hadim
 * François Molino
 * Magali Suzanne
-
+* Sophie Theis @sophietheis
 
 ## Dependencies
 
@@ -125,27 +125,28 @@ As all the dependencies are already completely supported in
 python 3.x, **we won't be maintaining a python 2.x version**, because
 it's time to move on...
 
-*Notes*:
-* You'll need the development version of vispy for certain features.
-* We started using [pythreejs](https://github.com/jovyan/pythreejs) for
-embeded 3D visualisation in the notebook.
-
 ### Core
 
+- CGAL > 4.4
 - Python >= 3.6
-- numpy >= 1.8
-- scipy >= 0.12
-- pandas >= 0.13
-- matplotlib >= 1.3
-- vispy >= 0.5
-- pandas >= 0.16
-- tables >= 3.2.2
-
+- numpy
+- scipy
+- matplotlib
+- pandas
+- pytables
+- jupyter
+- notebook
+- quantities
+- ipywidgets
+- pythreejs
+- ipyvolume
+- vispy
 
 ### Tests
-- pytest >= 3.0
-- converage >= 4.2
-- pytest-cov >= 2.3
+
+- pytest
+- coverage
+- pytest-cov
 
 ## Install
 
@@ -161,16 +162,19 @@ See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary
 In a nutshell, install from github goes like that:
 
 ```bash
-git clone https://github.com/CellModels/tyssue.git
+git clone https://github.com/DamCB/tyssue.git
 cd tyssue/
 python setup.py install
 ```
 
-
 ## Licence
 
-This project is distributed under the terms of the [Modzilla Public Licence](https://www.mozilla.org/en-US/MPL/2.0/).
+Since version 0.3, this project is distributed under the terms of the [General Public Licence](https://www.gnu.org/licenses/gpl.html).
 
+
+Versions 2.4 and earlier were distributed under the [Mozilla Public Licence](https://www.mozilla.org/en-US/MPL/2.0/).
+
+If GPL licencing is too restrictive for your intended usage, please contact the authors.
 
 ## Bibliography
 
