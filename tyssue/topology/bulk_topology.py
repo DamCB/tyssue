@@ -358,7 +358,7 @@ def HI_transition(eptm, face):
 
     cA = f_edges["cell"].iloc[0]
 
-    get_opposite_faces(eptm)
+    eptm.get_opposite_faces()
     fb = eptm.face_df["opposite"].loc[face]
     if fb > 0:
         cB = eptm.edge_df[eptm.edge_df["face"] == fb]["cell"].iloc[0]

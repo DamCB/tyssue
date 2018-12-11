@@ -35,7 +35,7 @@ def test_idx_lookup():
 def test_triangular_mesh():
     datasets, specs = three_faces_sheet()
     eptm = Epithelium("3faces_2D", datasets, specs)
-    vertices, faces, _ = eptm.triangular_mesh(["x", "y", "z"])
+    vertices, faces = eptm.triangular_mesh(["x", "y", "z"], False)
     assert vertices.shape == (16, 3)
     assert faces.shape == (18, 3)
 

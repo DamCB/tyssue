@@ -13,7 +13,7 @@ logger = logging.getLogger(name=__name__)
 
 def save_triangulated(filename, eptm):
 
-    vertices, faces, _ = eptm.triangular_mesh(eptm.coords)
+    vertices, faces = eptm.triangular_mesh(eptm.coords, False)
     write_mesh(
         filename,
         vertices=vertices,
