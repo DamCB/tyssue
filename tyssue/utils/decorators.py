@@ -63,12 +63,14 @@ def time_exe(func):
         end = time.time()
 
         print("function : {} \ttime: {2:2f}sec".format(func.__name__, end - start))
+
         return result
 
     return with_time_exe
 
 
 def face_lookup(func):
+    @wraps(func)
     def with_face_lookup(*args, **kwargs):
         sheet = args[0]
         face_id = kwargs['face_id']

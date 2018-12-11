@@ -1,4 +1,6 @@
+import warnings
 import numpy as np
+
 from .sheet_geometry import SheetGeometry
 
 from .utils import rotation_matrix
@@ -107,7 +109,7 @@ class RNRGeometry(BulkGeometry):
         eptm.edge_df[["c" + c for c in eptm.coords]] = cell_pos
 
 
-class MonoLayerGeometry(RNRGeometry):
+class MonolayerGeometry(RNRGeometry):
     @staticmethod
     def basal_apical_axis(eptm, cell):
         """
@@ -145,3 +147,7 @@ class MonoLayerGeometry(RNRGeometry):
         else:
             vert_pos[:] = np.dot(rotation_matrix(psi, [0, 0, 1]), r1)
         return vert_pos
+
+
+class MonoLayerGeometry(MonolayerGeometry):
+    pass

@@ -6,14 +6,15 @@ Event management module
 """
 
 import logging
-import pandas as pd
-import warnings
 import random
-from collections import deque, namedtuple
+from collections import deque
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+# Event that can be add several time for the same cell for the same time step
+EXCEPT_EVENTS = ['contraction_neighbor']
 
 
 class EventManager:
@@ -41,7 +42,7 @@ class EventManager:
         self.current = deque()
         self.next = deque()
         self.element = element
-        self.current.append((wait, {'face_id': -1, 'n_steps': 1}))
+        self.current.append((wait, {"face_id": -1, "n_steps": 1}))
         self.clock = 0
         if logfile is not None:
             fh = logging.FileHandler(logfile)
@@ -85,16 +86,27 @@ class EventManager:
             extra keywords arguments to the behavior function
 
         """
-        if 'face_id' in kwargs:
-            elem_id = kwargs['face_id']
-        elif 'elem_id' in kwargs:
-            elem_id = kwargs['elem_id']
+        if "face_id" in kwargs:
+            elem_id = kwargs["face_id"]
+        elif "elem_id" in kwargs:
+            elem_id = kwargs["elem_id"]
         else:
             elem_id = -1
 
         for tup in self.next:
-            if (elem_id == tup[1]['face_id']) and (behavior.__name__ == tup[0].__name__):
-                return
+            unique = kwargs.get('unique', True)
+            if "face_id" in tup[1]:
+                if (elem_id == tup[1]["face_id"]) and (
+                    behavior.__name__ == tup[0].__name__ and (
+                        unique)
+                ):
+                    return
+            elif "elem_id" in tup[1]:
+                if (elem_id == tup[1]["elem_id"]) and (
+                    behavior.__name__ == tup[0].__name__(
+                        unique)
+                ):
+                    return
         self.next.append((behavior, kwargs))
 
     def execute(self, eptm):
@@ -104,10 +116,10 @@ class EventManager:
 
         while self.current:
             (behavior, kwargs) = self.current.popleft()
-            if 'face_id' in kwargs:
-                elem_id = kwargs['face_id']
-            elif 'elem_id' in kwargs:
-                elem_id = kwargs['elem_id']
+            if "face_id" in kwargs:
+                elem_id = kwargs["face_id"]
+            elif "elem_id" in kwargs:
+                elem_id = kwargs["elem_id"]
             else:
                 elem_id = -1
             logger.info(f"{self.clock}, {elem_id}, {behavior.__name__}")
@@ -123,7 +135,7 @@ class EventManager:
 
 
 # Default dictionary for wait function
-default_wait_spec = {'n_steps': 1}
+default_wait_spec = {"n_steps": 1}
 
 
 def wait(eptm, manager, **kwargs):
@@ -131,8 +143,6 @@ def wait(eptm, manager, **kwargs):
     """
     wait_spec = default_wait_spec
     wait_spec.update(**kwargs)
-    elem_id = kwargs['face_id']
-    if kwargs['n_steps'] > 1:
-        kwargs.update({
-                      'n_steps': kwargs['n_steps'] - 1})
+    if kwargs["n_steps"] > 1:
+        kwargs.update({"n_steps": kwargs["n_steps"] - 1})
         manager.next.append(("wait", wait_spec))

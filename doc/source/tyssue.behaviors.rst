@@ -1,21 +1,21 @@
 tyssue.behaviors package
 ========================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    tyssue.behaviors.monolayer
+    tyssue.behaviors.sheet
+
 Submodules
 ----------
 
-tyssue.behaviors.behaviors module
----------------------------------
+tyssue.behaviors.event\_manager module
+--------------------------------------
 
-.. automodule:: tyssue.behaviors.behaviors
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tyssue.behaviors.sheet_events module
-------------------------------------
-
-.. automodule:: tyssue.behaviors.sheet_events
+.. automodule:: tyssue.behaviors.event_manager
     :members:
     :undoc-members:
     :show-inheritance:

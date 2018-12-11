@@ -4,16 +4,32 @@ tyssue.draw package
 Submodules
 ----------
 
-tyssue.draw.plt_draw module
----------------------------
+tyssue.draw.ipv\_draw module
+----------------------------
+
+.. automodule:: tyssue.draw.ipv_draw
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.draw.plt\_draw module
+----------------------------
 
 .. automodule:: tyssue.draw.plt_draw
     :members:
     :undoc-members:
     :show-inheritance:
 
-tyssue.draw.vispy_draw module
------------------------------
+tyssue.draw.threejs\_draw module
+--------------------------------
+
+.. automodule:: tyssue.draw.threejs_draw
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.draw.vispy\_draw module
+------------------------------
 
 .. automodule:: tyssue.draw.vispy_draw
     :members:

@@ -7,7 +7,7 @@ from tyssue.core import Epithelium
 from tyssue.core.sheet import Sheet, get_opposite
 
 from tyssue.generation import three_faces_sheet
-from tyssue.core.objects import _ordered_edges, ordered_vert_idxs
+from tyssue.core.objects import _ordered_edges, _ordered_vert_idxs
 from tyssue.core.objects import get_next_edges, get_prev_edges
 from tyssue import config
 from tyssue.geometry.planar_geometry import PlanarGeometry
@@ -248,28 +248,10 @@ def test_settings_getter_setter():
     assert eptm.settings["settings1"] == 154
 
 
-def test_idx_getters():
-    datasets_2d, specs = three_faces_sheet()
-    datasets = extrude(datasets_2d)
-    eptm = Epithelium("3faces_3D", datasets)
-    # assert len(eptm.edge_idx.difference(datasets['edge'].index)) == 0
-    assert len(eptm.face_idx.difference(datasets["face"].index)) == 0
-    assert len(eptm.vert_idx.difference(datasets["vert"].index)) == 0
-    assert len(eptm.cell_idx.difference(datasets["cell"].index)) == 0
-    assert len(eptm.e_cell_idx.index.difference(datasets["edge"]["cell"].index)) == 0
-
-    edge_idx_array = np.vstack(
-        (datasets["edge"]["srce"], datasets["edge"]["trgt"], datasets["edge"]["face"])
-    ).T
-
-    assert_array_equal(eptm.edge_idx_array, edge_idx_array)
-
-
 def test_number_getters():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)
     eptm = Epithelium("3faces_3D", datasets, specs)
-    eptm_2d = Epithelium("3faces_2D", datasets_2d, specs)
 
     assert eptm.Nc == datasets["cell"].shape[0]
     assert eptm.Nv == datasets["vert"].shape[0]
@@ -281,48 +263,124 @@ def test_upcast():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)
     eptm = Epithelium("3faces_3D", datasets, specs)
-    eptm_2d = Epithelium("3faces_2D", datasets_2d, specs)
+    eptm.cell_df["test_data"] = eptm.cell_df.index
+    eptm.face_df["test_data"] = eptm.face_df.index
+    eptm.vert_df["test_data"] = eptm.vert_df.index
 
-    expected_res = datasets["vert"].loc[eptm.e_cell_idx]
-    expected_res.index = eptm.edge_df.index
+    assert_array_equal(
+        eptm.upcast_srce(eptm.vert_df["test_data"]), eptm.edge_df["srce"]
+    )
+    assert_array_equal(eptm.upcast_srce("test_data"), eptm.edge_df["srce"])
+    assert_array_equal(
+        eptm.upcast_trgt(eptm.vert_df["test_data"]), eptm.edge_df["trgt"]
+    )
+    assert_array_equal(eptm.upcast_trgt("test_data"), eptm.edge_df["trgt"])
 
-    assert_array_equal(expected_res, eptm.upcast_cell(datasets["vert"]))
+    assert_array_equal(eptm.upcast_face("test_data"), eptm.edge_df["face"])
+    assert_array_equal(eptm.upcast_cell("test_data"), eptm.edge_df["cell"])
 
 
 def test_summation():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)
     eptm = Epithelium("3faces_3D", datasets, specs)
-    eptm_2d = Epithelium("3faces_2D", datasets_2d, specs)
-
-    edge_copy = datasets["edge"].copy()
-    edge_copy.index = eptm.edge_mindex
-
+    data = eptm.edge_df.index.values
     assert_array_equal(
-        edge_copy.sum(level="cell").values[:, 1],
-        eptm.sum_cell(eptm.edge_df).values[:, 1],
+        eptm.sum_cell(data).values.flatten(), np.array([1278, 1926, 2574])
     )
 
-    eptm_2d.edge_df["test_sum"] = np.linspace(1, eptm_2d.Ne, eptm_2d.Ne)
-
-    res_sum_srce = eptm_2d.sum_srce(eptm_2d.edge_df["test_sum"]).values.reshape((-1,))
-    expected_sum_srce = np.array(
-        [21.0, 20.0, 3.0, 4.0, 5.0, 14.0, 9.0, 10.0, 11.0, 26.0, 15.0, 16.0, 17.0]
+    sum_trgt = np.array(
+        [
+            462,
+            302,
+            88,
+            97,
+            106,
+            248,
+            142,
+            151,
+            160,
+            356,
+            196,
+            205,
+            214,
+            501,
+            340,
+            107,
+            116,
+            125,
+            286,
+            161,
+            170,
+            179,
+            394,
+            215,
+            224,
+            233,
+        ]
     )
-    res_sum_trgt = eptm_2d.sum_trgt(eptm_2d.edge_df["test_sum"]).values.reshape((-1,))
-    expected_sum_trgt = np.array(
-        [36.0, 18.0, 2.0, 3.0, 4.0, 12.0, 8.0, 9.0, 10.0, 24.0, 14.0, 15.0, 16.0]
+    assert_array_equal(eptm.sum_trgt(data).values.flatten(), sum_trgt)
+
+    sum_srce = np.array(
+        [
+            441,
+            300,
+            87,
+            96,
+            105,
+            246,
+            141,
+            150,
+            159,
+            354,
+            195,
+            204,
+            213,
+            522,
+            342,
+            108,
+            117,
+            126,
+            288,
+            162,
+            171,
+            180,
+            396,
+            216,
+            225,
+            234,
+        ]
     )
-
-    res_sum_face = eptm_2d.sum_face(eptm_2d.edge_df["test_sum"]).values.reshape((-1,))
-    expected_sum_face = np.array([21.0, 57.0, 93.0])
-
-    for expected, res in zip(
-        [expected_sum_srce, expected_sum_trgt, expected_sum_face],
-        [res_sum_srce, res_sum_trgt, res_sum_face],
-    ):
-
-        assert np.all(expected == res)
+    assert_array_equal(eptm.sum_srce(data).values.flatten(), sum_srce)
+    sum_face = np.array(
+        [
+            15,
+            51,
+            87,
+            123,
+            159,
+            195,
+            150,
+            166,
+            182,
+            198,
+            214,
+            230,
+            246,
+            262,
+            278,
+            294,
+            310,
+            326,
+            342,
+            358,
+            374,
+            390,
+            406,
+            422,
+        ]
+    )
+    assert_array_equal(eptm.sum_face(data).values.flatten(), sum_face)
 
 
 def test_orbits():
@@ -1388,15 +1446,15 @@ def test_ordered_edges():
     ]
     expected_vert_idxs = [idxs[0] for idxs in expected_edges_2d]
     assert res_edges_2d == expected_edges_2d
-    assert expected_vert_idxs == ordered_vert_idxs(
+    assert expected_vert_idxs == _ordered_vert_idxs(
         eptm.edge_df.loc[eptm.edge_df["face"] == 0]
     )
-    res_invalid_face = ordered_vert_idxs(
+    res_invalid_face = _ordered_vert_idxs(
         eptm.edge_df.loc[eptm.edge_df["face"] == 98765]
     )
 
     ## testing the exception case in ordered_vert_idxs :
-    res_invalid_face = ordered_vert_idxs(
+    res_invalid_face = _ordered_vert_idxs(
         eptm.edge_df.loc[eptm.edge_df["face"] == 98765]
     )
     assert np.isnan(res_invalid_face)
