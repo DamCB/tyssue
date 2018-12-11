@@ -25,10 +25,7 @@ def test_detection():
 
 def test_solving():
 
-    sheet = Sheet(
-        "crossed",
-        hdf5.load_datasets("/home/guillaume/Dev/tyssue/tyssue/stores/sheet6x5.hf5"),
-    )
+    sheet = Sheet("crossed", hdf5.load_datasets(Path(stores_dir) / "sheet6x5.hf5"))
     sheet.vert_df.z = 5 * sheet.vert_df.x ** 2
     SheetGeometry.update_all(sheet)
     positions_buffer = sheet.vert_df[sheet.coords].copy()
