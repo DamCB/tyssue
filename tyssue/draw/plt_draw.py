@@ -288,6 +288,20 @@ def plot_forces(
 
 
 def plot_scaled_energies(sheet, geom, model, scales, ax=None):
+    """Plot scaled energies
+
+    Parameters
+    ----------
+    sheet: a:class: Sheet object
+    geom: a :class:`Geometry` class
+    model: a :class:'Model'
+    scales: np.linspace of float
+
+    Returns
+    -------
+    fig: a :class:matplotlib.figure.Figure instance
+    ax: :class:matplotlib.Axes instance, default None
+    """
 
     from ..utils import scaled_unscaled
 
