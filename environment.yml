@@ -16,3 +16,4 @@ dependencies:
 - pythreejs
 - ipyvolume
 - vispy
+- cgal
