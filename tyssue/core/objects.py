@@ -1,91 +1,91 @@
 """
 Core definitions
-
-
-
-The following data is an exemple of the `specs`.
-It is a nested dictionnary with two levels.
-
-The first key designs the element name: ('face', 'edge', 'vert') They will
-correspond to the dataframes attributes of the Epithelium instance,
-(e.g eptm.face_df);
-
-The second level keys design column names of the above dataframes,
-default values is allways infered from the python parsed type. Thus
-`1` will be cast as `int`, `1.` as `float` and `True` as a `bool`.
-
-    specs = {
-        'face': {
-            ## Face Geometry
-            'perimeter': 0.,
-            'area': 0.,
-            ## Coordinates
-            'x': 0.,
-            'y': 0.,
-            'z': 0.,
-            ## Topology
-            'num_sides': 6,
-            ## Masks
-            'is_alive': True},
-        'vert': {
-            ## Coordinates
-            'x': 0.,
-            'y': 0.,
-            'z': 0.,
-            ## Masks
-            'is_active': True},
-        'edge': {
-            ## Coordinates
-            'dx': 0.,
-            'dy': 0.,
-            'dz': 0.,
-            'length': 0.,
-            ### Normals
-            'nx': 0.,
-            'ny': 0.,
-            'nz': 1.}
-        }
 """
-
-
 import warnings
 import logging
+from collections import deque
 import numpy as np
 import pandas as pd
-from collections import deque
-
 from ..utils.utils import set_data_columns, spec_updater
 
 log = logging.getLogger(name=__name__)
 
 
 class Epithelium:
-    """
-    The whole tissue.
-
+    """Base class defining a connective tissue in 2D or 3D.
     """
 
-    def __init__(self, identifier, datasets, specs=None, coords=None):
-        """
-        Creates an epithelium
+    def __init__(self, identifier, datasets, specs=None, coords=None, maxbackup=5):
+        """Creates an epithelium
 
         Parameters
         ----------
         identifier : string
         datasets : dictionary of dataframes
-          the datasets dict specifies the names, data columns
-          and value types of the modeled tyssue
+            The keys correspond to the different geometrical elements
+            constituting the epithelium:
+
+            * `vert` contains a dataframe of vertices,
+            * `edge` contains a dataframe of *oriented* half-edges between vertices,
+            * `face` contains a dataframe of polygonal faces enclosed by half-edges,
+            * `cell` contains a dataframe of polyhedral cells delimited by faces,
+
+        specs : nested dictionnary of specifications
+            The first key designs the element name: (`vert`, `edge`, `face`, `cell`),
+            corresponding to the respective dataframes attribute in the dataset.
+            The second level keys design column names of the above dataframes.
+            For exemple:
+            .. code::
+                specs = {
+                    "face": {
+                        ## Face Geometry
+                        "perimeter": 0.,
+                        "area": 0.,
+                        ## Coordinates
+                        "x": 0.,
+                        "y": 0.,
+                        "z": 0.,
+                        ## Topology
+                        "num_sides": 6,
+                        ## Masks
+                        "is_alive": True},
+                    "vert": {
+                        ## Coordinates
+                        "x": 0.,
+                        "y": 0.,
+                        "z": 0.,
+                        ## Masks
+                        "is_active": True},
+                    "edge": {
+                        ## Connections
+                        "srce": 0,
+                        "trgt": 1,
+                        "face": 0,
+                        "cell": 0,
+                        ## Coordinates
+                        "dx": 0.,
+                        "dy": 0.,
+                        "dz": 0.,
+                        "length": 0.,
+                        ## Normals
+                        "nx": 0.,
+                        "ny": 0.,
+                        "nz": 1.}
+                    "settings":
+                        ## Custom values
+                        "geometry": "flat"
+                    }
 
         Note
         ----
-        For efficiency reasons, we have to maintain monotonous RangeIndex
-        for each dataset. Thus, _the index of an element can change_,
+        For efficiency reasons, we have to maintain a monotonous RangeIndex
+        for each dataset. Thus, **the index of an element can change**,
         and should not be used as an identifier.
 
         """
         # backup container
         # TODO: pass the max backup number as a config argument
-        self._backups = deque(maxlen=5)
+        self._backups = deque(maxlen=maxbackup)
 
         # each of those has a separate dataframe, as well as entries in
         # the specification files
@@ -122,17 +122,26 @@ class Epithelium:
         if self.dim == 3:
             self.ncoords = ["n" + c for c in self.coords]
 
+        self._bad = None
         self.bbox = None
         self.set_bbox()
 
     @property
-    def edge_mindex(self):
-        return pd.MultiIndex.from_arrays(
-            self.edge_idx.values.T, names=self.element_names
-        )
+    def vert_df(self):
+        """The face :class:`pd.DataFrame` containing vertex associated
+        data e.g. the position of each vertex.
+        """
+        return self.datasets["vert"]
+
+    @vert_df.setter
+    def vert_df(self, value):
+        self.datasets["vert"] = value
 
     @property
     def face_df(self):
+        """The face :class:`pd.DataFrame` containing face associated
+        data e.g. the position of their center or their area
+        """
         return self.datasets["face"]
 
     @face_df.setter
@@ -141,6 +150,13 @@ class Epithelium:
 
     @property
     def edge_df(self):
+        """The edge :class:`pd.DataFrame` containing edge associated
+        data e.g. their length.This dataframe also contains the whole
+        connexion of the epithelium through the `"srce", "trgt", "face", "cell"`
+        indices. In 2D, a half-edge is associated with a single (face, srce, trgt)
+        positively oriented triangle. In 3D, the (cell, face, srce, trgt)
+        positively oriented terahedron is also unique.
+        """
         return self.datasets["edge"]
 
     @edge_df.setter
@@ -149,19 +165,14 @@ class Epithelium:
 
     @property
     def cell_df(self):
+        """The cell :class:`pd.DataFrame` containing cell associated
+        data e.g. the position of their center or their volume
+        """
         return self.datasets.get("cell", None)
 
     @cell_df.setter
     def cell_df(self, value):
         self.datasets["cell"] = value
-
-    @property
-    def vert_df(self):
-        return self.datasets["vert"]
-
-    @vert_df.setter
-    def vert_df(self, value):
-        self.datasets["vert"] = value
 
     def copy(self, deep_copy=True):
         """
@@ -169,17 +180,14 @@ class Epithelium:
 
         Parameters
         ----------
-        deep_copy: bool, default True
+        deep_copy : bool, default True
             if True, use a copy of the original object's datasets
             to create the new object. If False, datasets are not copied
         """
         if deep_copy:
             datasets = {element: df.copy() for element, df in self.datasets.items()}
         else:  # pragma: no cover
-            log.info(
-                "New epithelium object from {}"
-                " without deep copy".format(self.identifier)
-            )
+            log.info("New epithelium object from %s without deep copy", self.identifier)
             datasets = self.datasets
 
         identifier = self.identifier + "_copy"
@@ -199,6 +207,8 @@ class Epithelium:
 
         A copy of the current state prior to restoring is kept in the
         `_bad` attribute for inspection.
+        Calling this method multiple times (without calling backup) will
+        go back in the epithelium backups.
         """
 
         log.info("Restoring")
@@ -212,92 +222,80 @@ class Epithelium:
 
     @property
     def settings(self):
+        """ Accesses the `specs['settings']` dictionnary
+        """
         return self.specs["settings"]
 
     def update_specs(self, new, reset=False):
-
+        """Recursively updates the `self.specs` nested dictionnary,
+        and set the new values to the corresponding columns
+        in the datasets. If reset is `True`, existing values
+        will be overwritten.
+        """
         spec_updater(self.specs, new)
         set_data_columns(self.datasets, new, reset)
 
     def update_num_sides(self):
+        """Updates the number of half-edges around the faces.
+        The data is registered in the `"num_sides"` column of
+        `self.face_df`.
+        """
         self.face_df["num_sides"] = self.edge_df.face.value_counts()
 
     def update_num_faces(self):
+        """Updates the number of faces around the cells.
+        The data is registered in the `"num_faces"` column of
+        `self.cell_df`.
+        """
         self.cell_df["num_faces"] = self.edge_df.groupby("cell").apply(
             lambda df: df["face"].unique().size
         )
 
     def reset_topo(self):
+        """Recomputes the number of sides for the faces and the
+        number of faces for the cells.
+        """
         self.update_num_sides()
         if "cell" in self.data_names:
             self.update_num_faces()
 
     @property
-    def face_idx(self):
-        return self.face_df.index
+    def Nv(self):
+        """The number of vertices in the epithelium
+        """
+        return self.vert_df.shape[0]
 
     @property
-    def cell_idx(self):
-        return self.cell_df.index
+    def Ne(self):
+        """The number of edges in the epithelium
+        """
+        return self.edge_df.shape[0]
 
     @property
-    def vert_idx(self):
-        return self.vert_df.index
-
-    @property
-    def edge_idx(self):
-        # Should it return self.edge_df.index instead ?
-        return self.edge_df[self.element_names]
+    def Nf(self):
+        """The number of faces in the epithelium
+        """
+        return self.face_df.shape[0]
 
     @property
     def Nc(self):
+        """The number of cells in the epithelium
+        """
         if "cell" in self.data_names:
             return self.cell_df.shape[0]
         elif "face" in self.data_names:
             return self.face_df.shape[0]
         return None
 
-    @property
-    def Nv(self):
-        return self.vert_df.shape[0]
-
-    @property
-    def Nf(self):
-        return self.face_df.shape[0]
-
-    @property
-    def Ne(self):
-        return self.edge_df.shape[0]
-
-    @property
-    def e_srce_idx(self):
-        return self.edge_df["srce"]
-
-    @property
-    def e_trgt_idx(self):
-        return self.edge_df["trgt"]
-
-    @property
-    def e_face_idx(self):
-        return self.edge_df["face"]
-
-    @property
-    def e_cell_idx(self):
-        return self.edge_df["cell"]
-
-    @property
-    def edge_idx_array(self):
-        return np.vstack((self.e_srce_idx, self.e_trgt_idx, self.e_face_idx)).T
-
     def _upcast(self, idx, df):
+
         ## Assumes a flat index
         upcast = df.take(idx)
         upcast.index = self.edge_df.index
         return upcast
 
     def upcast_cols(self, element, columns):
-        """Syntactic sugar to upcast from the
-        epithelium datasets.
+        """Syntactic sugar to upcast from the epithelium datasets.
 
         Parameters
         ----------
@@ -316,34 +314,86 @@ class Epithelium:
         return self._upcast(self.edge_df[element], self.datasets[dataset][columns])
 
     def upcast_srce(self, df):
-        """ Reindexes input data to self.edge_idx
-        by repeating the values for each source entry
+        """ Reindexes input data to self.edge_df.index
+        by repeating the values for each source entry.
+
+        Parameters
+        ----------
+        df : :class:`pd.DataFrame`, :class:`pd.Series` :class:`np.ndarray` or string
+          The data to be upcasted. If array like, should have `self.Nv` elements.
+          If a string is passed it should be a column of `self.vert_df`
+
+        Returns
+        -------
+        upcast_df : :class:`pd.DataFrame` or :class:`pd.Series`
+          The value repeated like the values of `self.edge_df["srce"]`
         """
+        if isinstance(df, str):
+            df = self.vert_df[df]
         return self._upcast(self.edge_df["srce"], df)
 
     def upcast_trgt(self, df):
-        """ Reindexes input data to self.edge_idx
+        """ Reindexes input data to self.edge_df.index
         by repeating the values for each target entry
+
+        Parameters
+        ----------
+        df : :class:`pd.DataFrame`, :class:`pd.Series` :class:`np.ndarray` or string
+          The data to be upcasted. If array like, should have `self.Nv` elements.
+          If a string is passed it should be a column of `self.vert_df`
+
+        Returns
+        -------
+        upcast_df : :class:`pd.DataFrame` or :class:`pd.Series`
+          The value repeated like the values of `self.edge_df["trgt"]`
         """
+        if isinstance(df, str):
+            df = self.vert_df[df]
         return self._upcast(self.edge_df["trgt"], df)
 
     def upcast_face(self, df):
-        """ Reindexes input data to self.edge_idx
+        """ Reindexes input data to self.edge_df.index
         by repeating the values for each face entry
+
+        Parameters
+        ----------
+        df : :class:`pd.DataFrame`, :class:`pd.Series` :class:`np.ndarray` or string
+          The data to be upcasted. If array like, should have `self.Nf` elements.
+          If a string is passed it should be a column of `self.face_df`
+
+        Returns
+        -------
+        upcast_df : :class:`pd.DataFrame` or :class:`pd.Series`
+          The value repeated like the values of `self.edge_df["face"]`
+
         """
+        if isinstance(df, str):
+            df = self.face_df[df]
         return self._upcast(self.edge_df["face"], df)
 
     def upcast_cell(self, df):
-        """ Reindexes input data to self.edge_idx
+        """ Reindexes input data to self.edge_df.index
         by repeating the values for each cell entry
+
+        Parameters
+        ----------
+        df : :class:`pd.DataFrame`, :class:`pd.Series` :class:`np.ndarray` or string
+          The data to be upcasted. If array like, should have `self.Nc` elements.
+          If a string is passed it should be a column of `self.cell_df`
+
+        Returns
+        -------
+        upcast_df : :class:`pd.DataFrame` or :class:`pd.Series`
+          The value repeated like the values of `self.edge_df["cell"]`
         """
+        if isinstance(df, str):
+            df = self.cell_df[df]
         return self._upcast(self.edge_df["cell"], df)
 
     def _lvl_sum(self, df, lvl):
         df_ = df
         if isinstance(df, np.ndarray):
             df_ = pd.DataFrame(df, index=self.edge_df.index)
-            df_[lvl] = self.edge_df[lvl]
         elif isinstance(df, pd.Series):
             df_ = df.to_frame()
         elif lvl not in df.columns:
@@ -352,15 +402,43 @@ class Epithelium:
         return df_.groupby(lvl).sum()
 
     def sum_srce(self, df):
+        """Sums the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["srce"]`
+
+        Returns
+        -------
+        summed : :class:`pd.DataFrame` the summed data, indexed by the source vertices.
+        """
         return self._lvl_sum(df, "srce")
 
     def sum_trgt(self, df):
+        """Sums the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["trgt"]`
+
+        Returns
+        -------
+        summed : :class:`pd.DataFrame` the summed data, indexed by the source vertices.
+        """
         return self._lvl_sum(df, "trgt")
 
     def sum_face(self, df):
+        """Sums the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["face"]`
+
+        Returns
+        -------
+        summed : :class:`pd.DataFrame` the summed data, indexed by the source vertices.
+        """
         return self._lvl_sum(df, "face")
 
     def sum_cell(self, df):
+        """Sums the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["cell"]`
+
+        Returns
+        -------
+        summed : :class:`pd.DataFrame` the summed data, indexed by the source vertices.
+        """
         return self._lvl_sum(df, "cell")
 
     def get_orbits(self, center, periph):
@@ -392,8 +470,14 @@ class Epithelium:
         return orbits
 
     def idx_lookup(self, elem_id, element):
-        """returns the current index of the element
-        with the 'id' column equal to elem_id
+        """returns the current index of the element with the `"id"` column equal to `elem_id`
+
+        Parameters
+        ----------
+        elem_id : int
+          id of the element to retrieve
+        element : {"vert"|"edge"|"face"|"cell"}
+          the corresponding dataset.
         """
         df = self.datasets[element]["id"]
         idx = df[df == elem_id].index
@@ -423,7 +507,7 @@ class Epithelium:
 
         e.g. has only closed polygons and polyhedra
         """
-        return np.alltrue(~self.get_invalid())
+        return np.alltrue(self.get_valid())
 
     def get_valid(self):
         """Set the 'is_valid' column to true if the faces are all closed polygons,
@@ -433,20 +517,15 @@ class Epithelium:
         is_valid = self.upcast_face(is_valid_face)
         if "cell" in self.data_names:
             is_valid_cell = self.edge_df.groupby("cell").apply(_is_closed_cell)
-            is_valid = is_valid | self.upcast_cell(is_valid_cell)
+            is_valid = np.logical_and(is_valid, self.upcast_cell(is_valid_cell))
         self.edge_df["is_valid"] = is_valid
         return is_valid
 
     def get_invalid(self):
         """Returns a mask over self.edge_df for invalid faces
         """
-        is_invalid_face = self.edge_df.groupby("face").apply(_test_invalid)
-        invalid_edges = self.upcast_face(is_invalid_face)
-        if "cell" in self.data_names:
-            is_invalid_cell = 1 - self.edge_df.groupby("cell").apply(_is_closed_cell)
-            invalid_edges = invalid_edges | self.upcast_cell(is_invalid_cell)
-        self.edge_df["is_valid"] = ~invalid_edges
-        return invalid_edges
+        is_valid = self.get_valid()
+        return ~is_valid
 
     def sanitize(self):
         """Removes invalid faces and associated vertices
@@ -468,7 +547,7 @@ class Epithelium:
             raise ValueError("sanitize would delete the whole epithlium")
 
         fto_rm.sort()
-        log.info("{} {} level elements will be removed".format(len(fto_rm), top_level))
+        log.info("%d %s level elements will be removed", (len(fto_rm), top_level))
 
         edge_df_ = (
             self.edge_df.set_index(top_level, append=True).swaplevel(0, 1).sort_index()
@@ -489,16 +568,13 @@ class Epithelium:
         self.reset_topo()
 
     def cut_out(self, bbox, coords=None):
-        """Returns the index of edges with
-        at least one vertex outside of the
-        bounding box
+        """Returns the index of edges with at least one vertex outside of the bounding box
 
         Parameters
         ----------
         bbox : sequence of shape (dim, 2)
-             the bounding box as (min, max) pairs for
-             each coordinates.
-        coords : list of str of len dim
+             the bounding box as (min, max) pairs for each coordinates.
+        coords : list of str of len dim, default None
              the coords corresponding to the bbox.
         """
         if coords is None:
@@ -511,7 +587,7 @@ class Epithelium:
         edge_out = outs.sum(axis=1).astype(np.bool)
         return self.edge_df[edge_out].index
 
-    def set_bbox(self, margin=1.0):
+    def set_bbox(self, margin=0.0):
         """Sets the attribute `bbox` with pairs of values bellow
         and above the min and max of the vert coords, with a margin.
         """
@@ -523,7 +599,8 @@ class Epithelium:
         )
 
     def reset_index(self):
-
+        """Resets the datasets indices to have continuous indices
+        """
         new_vertidx = pd.Series(
             np.arange(self.vert_df.shape[0]), index=self.vert_df.index
         )
@@ -611,10 +688,8 @@ class Epithelium:
         If `vertex_normals` is True, also returns the normals of each vertex
         (set as the average of the vertex' edges), suitable for .OBJ export
         """
-        # - BC -#
-        # This method only works on 3D-epithelium
         vertices = self.vert_df[coords]
-        faces = self.edge_df.groupby("face").apply(ordered_vert_idxs)
+        faces = self.edge_df.groupby("face").apply(_ordered_vert_idxs)
         faces = faces.dropna()
 
         if vertex_normals:
@@ -628,6 +703,34 @@ class Epithelium:
     def validate_closed_cells(self):
         is_closed = self.edge_df.groupby("cell").apply(_is_closed_cell)
         return is_closed
+
+    def get_opposite_faces(self):
+        """Populates the 'opposite' column of self.face_df with the index of
+        the opposite face or -1 if the face has no opposite.
+
+        """
+        face_v = self.edge_df.groupby("face").apply(lambda df: frozenset(df["srce"]))
+        face_v2 = pd.Series(data=face_v.index, index=face_v.values)
+        grouped = face_v2.groupby(level=0)
+        cardinal = grouped.apply(len)
+        if cardinal.max() > 2:
+            raise ValueError(
+                "Invalid topology," " incorrect faces: {}".format(cardinal.argmax())
+            )
+        self.face_df["opposite"] = -1
+
+        face_pairs = []
+        grouped.apply(
+            lambda s: face_pairs.append(list(s.values)) if len(s) == 2 else np.nan
+        ).dropna()
+        face_pairs = np.array(face_pairs)
+        self.face_df.loc[face_pairs[:, 0], "opposite"] = face_pairs[:, 1]
+        self.face_df.loc[face_pairs[:, 1], "opposite"] = face_pairs[:, 0]
+
+
+def get_opposite_faces(eptm):
+    warnings.warn("Deprecated, use `eptm.get_opposite_faces()` instead")
+    eptm.get_opposite_faces()
 
 
 def _ordered_edges(face_edges):
@@ -654,70 +757,11 @@ def _ordered_edges(face_edges):
     return edges
 
 
-def ordered_vert_idxs(face):
+def _ordered_vert_idxs(face):
     try:
         return [idxs[0] for idxs in _ordered_edges(face)]
     except IndexError:
         return np.nan
-
-
-def _test_invalid(face):
-    """ Returns True if the source and target sets of the faces polygon
-    are different or if the face polygon is not closed
-    """
-
-    s1 = set(face["srce"])
-    s2 = set(face["trgt"])
-    if s1 != s2:
-        return True
-    ordered = np.array(_ordered_edges(face))
-    if not np.all(ordered[:, 0] == np.roll(ordered[:, 1], 1)):
-        return True
-    return False
-
-
-def _test_valid(face):
-    """ Returns true iff all sources are also targets for the faces polygon
-    """
-    return ~_test_invalid(face)
-
-
-def get_opposite_faces(eptm):
-    """Populates the 'opposite' column of eptm.face_df with the index of
-    the opposite face or -1 if the face has no opposite.
-
-    """
-    face_v = eptm.edge_df.groupby("face").apply(lambda df: frozenset(df["srce"]))
-    face_v2 = pd.Series(data=face_v.index, index=face_v.values)
-    grouped = face_v2.groupby(level=0)
-    cardinal = grouped.apply(len)
-    if cardinal.max() > 2:
-        raise ValueError(
-            "Invalid topology," " incorrect faces: {}".format(cardinal.argmax())
-        )
-    eptm.face_df["opposite"] = -1
-
-    face_pairs = []
-    grouped.apply(
-        lambda s: face_pairs.append(list(s.values)) if len(s) == 2 else np.nan
-    ).dropna()
-    face_pairs = np.array(face_pairs)
-    eptm.face_df.loc[face_pairs[:, 0], "opposite"] = face_pairs[:, 1]
-    eptm.face_df.loc[face_pairs[:, 1], "opposite"] = face_pairs[:, 0]
-
-
-def _next_edge(edf):
-
-    edf["edge"] = edf.index
-    next_edge = edf.set_index("srce", append=False).loc[edf["trgt"], "edge"].values
-    return pd.Series(index=edf.index, data=next_edge)
-
-
-def _prev_edge(edf):
-
-    edf["edge"] = edf.index
-    next_edge = edf.set_index("trgt", append=False).loc[edf["srce"], "edge"].values
-    return pd.Series(index=edf.index, data=next_edge)
 
 
 def get_next_edges(sheet):
@@ -740,9 +784,44 @@ def get_prev_edges(sheet):
     return prev_e.sort_index()
 
 
+def _next_edge(edf):
+
+    edf["edge"] = edf.index
+    next_edge = edf.set_index("srce", append=False).loc[edf["trgt"], "edge"].values
+    return pd.Series(index=edf.index, data=next_edge)
+
+
+def _prev_edge(edf):
+
+    edf["edge"] = edf.index
+    next_edge = edf.set_index("trgt", append=False).loc[edf["srce"], "edge"].values
+    return pd.Series(index=edf.index, data=next_edge)
+
+
 def _is_closed_cell(e_df):
     edges = e_df[["srce", "trgt"]]
-    for e, (srce, trgt) in edges.iterrows():
+    for _, (srce, trgt) in edges.iterrows():
         if edges[(edges["srce"] == trgt) & (edges["trgt"] == srce)].index.size != 1:
             return False
     return True
+
+
+def _test_invalid(face):
+    """ Returns True if the source and target sets of the faces polygon
+    are different or if the face polygon is not closed
+    """
+
+    s1 = set(face["srce"])
+    s2 = set(face["trgt"])
+    if s1 != s2:
+        return True
+    ordered = np.array(_ordered_edges(face))
+    if not np.all(ordered[:, 0] == np.roll(ordered[:, 1], 1)):
+        return True
+    return False
+
+
+def _test_valid(face):
+    """ Returns true iff all sources are also targets for the faces polygon
+    """
+    return np.logical_not(_test_invalid(face))

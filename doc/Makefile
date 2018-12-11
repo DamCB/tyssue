@@ -54,7 +54,7 @@ clean:
 
 .PHONY: apidoc
 apidoc:
-	sphinx-apidoc -o source/ ..
+	sphinx-apidoc -o source/ .. setup.py tests
 	@echo "Regenerated the API documentation"
 
 .PHONY: html

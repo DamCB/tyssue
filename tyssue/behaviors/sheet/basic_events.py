@@ -60,7 +60,9 @@ default_contraction_spec = {
     'contractile_increase': 1.0,
     'critical_area': 1e-2,
     'max_contractility': 10,
-    'contraction_column': "contractility"
+    'multiple': False,
+    'contraction_column': "contractility",
+    'unique': True
 }
 
 
@@ -77,7 +79,21 @@ def contraction(sheet, manager, **kwargs):
             'max_contractility']
     ):
         return
-    contract(sheet, face, contraction_spec['contractile_increase'])
+    contract(sheet, face, contraction_spec['contractile_increase'],
+             contraction_spec['multiple'],
+             contraction_spec['contraction_column'])
+
+
+def contraction_neighbor(sheet, manager, **kwargs):
+    contraction(sheet, manager, **kwargs)
+
+
+default_type1_transition_spec = {
+    'face_id': -1,
+    'face': -1,
+    'critical_length': 0.3,
+    'geom': SheetGeometry
+}
 
 
 default_type1_transition_spec = {
