@@ -1,21 +1,20 @@
 import logging
 from ...topology.bulk_topology import IH_transition, HI_transition
+from .actions import shrink, contract
 
-# from ..topology.sheet_topology import (remove_face,
-#                                        type1_transition,
-#                                        cell_division)
 logger = logging.getLogger(__name__)
 
 
-def apoptosis(
-    monolayer,
-    manager,
-    cell_id,
-    contract_rate=2.0,
-    critical_area=1e-2,
-    shrink_rate=0.4,
-    critical_volume=0.1,
-):
+default_apoptosis_spec = {
+    'cell_id': -1,
+    'contract_rate': 2.1,
+    'critical_area': 1e-2,
+    'shrink_rate': 0.4,
+    'critical_volume': 0.1,
+}
+
+
+def apoptosis(monolayer, manager, **kwargs):
     """Apoptotic behavior
 
     Parameters
@@ -31,15 +30,11 @@ def apoptosis(
     """
     # TODO complete docstring
     # TODO setup default / kwargs mechanisms
-    settings = {
-        "contract_rate": contract_rate,
-        "critical_area": critical_area,
-        "shrink_rate": shrink_rate,
-        "critical_volume": critical_volume,
-    }
+    apoptosis_spec = default_apoptosis_spec
+    apoptosis_spec.update(**kwargs)
 
-    cell = cell_id
-    if cell is None:
+    cell = apoptosis_spec['cell_id']
+    if cell == -1:
         return
     done = False
 
@@ -58,7 +53,8 @@ def apoptosis(
         if len(faces_in_cell) > 4:
             # Remove lateral face with 3 sides
             face_to_eliminate = faces_in_cell[
-                (faces_in_cell.segment == "lateral") & (faces_in_cell.num_sides == 3)
+                (faces_in_cell.segment == "lateral") & (
+                    faces_in_cell.num_sides == 3)
             ].index[0]
 
             prev_nums = {
@@ -67,22 +63,23 @@ def apoptosis(
                 "vert": monolayer.Nv,
             }
             HI_transition(monolayer, face_to_eliminate)
-            monolayer.face_df.loc[prev_nums["face"] :, "contractility"] = 0
+            monolayer.face_df.loc[prev_nums["face"]:, "contractility"] = 0
             done = False
         elif len(faces_in_cell) == 4:
             # Volume reduction
-            if monolayer.cell_df.loc[cell, "vol"] > critical_volume:
-                shrink(monolayer, cell, shrink_rate)
+            if monolayer.cell_df.loc[cell, "vol"] > apoptosis_spec['critical_volume']:
+                shrink(monolayer, cell, apoptosis_spec['shrink_rate'])
                 done = False
             else:
                 done = True
     else:
         # Contract apical surface until reached a critical area
-        if monolayer.face_df.loc[apical_face, "area"] > critical_area:
-            contract(monolayer, apical_face, contract_rate, True)
+        if monolayer.face_df.loc[apical_face, "area"] > apoptosis_spec['critical_area']:
+            contract(monolayer, apical_face,
+                     apoptosis_spec['contract_rate'], True)
             done = False
 
-        elif monolayer.face_df.loc[apical_face, "area"] <= critical_area:
+        elif monolayer.face_df.loc[apical_face, "area"] <= apoptosis_spec['critical_area']:
             # Reduce neighbours for the apical face (until 3)
             if monolayer.face_df.loc[apical_face, "num_sides"] > 3:
                 e_min = monolayer.edge_df[monolayer.edge_df["face"] == apical_face][
@@ -96,7 +93,7 @@ def apoptosis(
 
                 monolayer.settings["threshold_length"] = 1e-3
                 IH_transition(monolayer, e_min)
-                monolayer.face_df.loc[prev_nums["face"] :, "contractility"] = 0
+                monolayer.face_df.loc[prev_nums["face"]:, "contractility"] = 0
 
                 done = False
 
@@ -110,9 +107,4 @@ def apoptosis(
                 done = False
 
     if not done:
-        manager.append(apoptosis, cell_id, kwargs=settings)
-
-
-
-
-
+        manager.append(apoptosis, **apoptosis_spec)
