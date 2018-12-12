@@ -58,7 +58,7 @@ class EdgeSubdiv:
         self.update_upcaster()
         self.update_offset()
 
-    @classmethod
+    @staticmethod
     def from_eptm_edges(eptm, **kwargs):
         """Creates an EdgeSubdiv instance and computes the point
         grid allong the edges from the source vertex to its target.

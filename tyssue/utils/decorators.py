@@ -62,8 +62,8 @@ def time_exe(func):
         result = func(*args, **kwargs)
         end = time.time()
 
-        print("function : {} \ttime: {2:2f}sec".format(
-            func.__name__, end - start))
+        print("function : {} \ttime: {2:2f}sec".format(func.__name__, end - start))
+
         return result
 
     return with_time_exe

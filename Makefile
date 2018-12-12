@@ -4,7 +4,7 @@ flake8:
 	flake8 --max-line-length=100 --count --statistics --exit-zero tyssue/
 
 test:
-	pytest tests/
+	cd tests && pytest . && cd ..
 
 coverage:
-	pytest --cov=tyssue --cov-config=.coveragerc tests/
+	cd tests &&  pytest --cov=tyssue --cov-config=../.coveragerc . && mv .coverage .. && cd ..
