@@ -15,7 +15,7 @@ def grow(monolayer, cell, grow_rate):
     by a factor (1+shrink_rate)
     """
     factor = 1 + grow_rate
-    faces = monolayer.edge_df[monolayer.edge_df["cell"] == cell]["face"]
+    faces = monolayer.edge_df[monolayer.edge_df["cell"] == cell]["face"].unique()
     monolayer.cell_df.loc[cell, "prefered_vol"] *= factor
     monolayer.face_df.loc[faces, "prefered_area"] *= factor ** (2 / 3)
 
@@ -26,8 +26,9 @@ def shrink(monolayer, cell, shrink_rate):
     by (1+shrink_rate)^2/3
     """
     factor = 1 + shrink_rate
+    faces = monolayer.edge_df[monolayer.edge_df["cell"] == cell]["face"].unique()
     monolayer.cell_df.loc[cell, "prefered_vol"] /= factor
-    monolayer.cell_df.loc[cell, "prefered_area"] /= factor ** (2 / 3)
+    monolayer.face_df.loc[faces, "prefered_area"] /= factor ** (2 / 3)
 
 
 def contract(
