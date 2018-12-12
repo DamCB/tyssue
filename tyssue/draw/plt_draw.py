@@ -129,10 +129,9 @@ def _face_color_from_sequence(face_spec, sheet):
         return cmap(normed)
 
     else:
-        warnings.warn(
+        raise ValueError(
             "shape of `face_spec['color']` must be either (Nf, 3), (Nf, 4) or (Nf,)"
         )
-        return face_spec["color"]
 
 
 def draw_vert(sheet, coords, ax, **draw_spec_kw):
@@ -210,7 +209,9 @@ def _wire_color_from_sequence(edge_spec, sheet):
     elif color_.shape == (sheet.Nv,):
         if np.ptp(color_) < 1e-10:
             warnings.warn("Attempting to draw a colormap " "with a uniform value")
-            return np.ones((sheet.Nv, 3)) * 0.7
+            return np.ones((sheet.Ne, 3)) * 0.7
+        if not hasattr(color_, "index"):
+            color_ = pd.Series(color_, index=sheet.vert_df.index)
         color_ = (sheet.upcast_srce(color_) + sheet.upcast_trgt(color_)) / 2
         return cmap((color_ - color_min) / (color_max - color_min))
 

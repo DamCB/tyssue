@@ -291,7 +291,13 @@ class Epithelium:
 
         ## Assumes a flat index
         upcast = df.take(idx)
-        upcast.index = self.edge_df.index
+        try:
+            upcast.index = self.edge_df.index
+        except AttributeError:
+            if len(upcast.shape) == 1:
+                upcast = pd.Series(upcast, index=self.edge_df.index)
+            else:
+                upcast = pd.DataFrame(upcast, index=self.edge_df.index)
         return upcast
 
     def upcast_cols(self, element, columns):
