@@ -137,24 +137,6 @@ default_constriction_spec = {
     "contraction_column": "contractility",
 }
 
-default_constriction_spec = {
-    "face_id": -1,
-    "face": -1,
-    "contract_rate": 2,
-    "critical_area": 1e-2,
-    "radial_tension": 1.0,
-    "nb_iteration": 0,
-    "nb_iteration_max": 20,
-    "contract_neighbors": True,
-    "critical_area_neighbors": 10,
-    "contract_span": 2,
-    "basal_contract_rate": 1.001,
-    "current_traction": 0,
-    "max_traction": 30,
-    "geom": SheetGeometry,
-    "contraction_column": "contractility",
-}
-
 
 @face_lookup
 def constriction(sheet, manager, **kwargs):
@@ -201,7 +183,8 @@ def constriction(sheet, manager, **kwargs):
 
     if "is_relaxation" in sheet.face_df.columns:
         if sheet.face_df.loc[face, "is_relaxation"]:
-            relax(sheet, face, contract_rate, constriction_spec["contraction_column"])
+            relax(sheet, face, contract_rate,
+                  constriction_spec["contraction_column"])
 
     if sheet.face_df.loc[face, "is_mesoderm"]:
         face_area = sheet.face_df.loc[face, "area"]
@@ -224,7 +207,8 @@ def constriction(sheet, manager, **kwargs):
                 neighbors = sheet.get_neighborhood(
                     face, constriction_spec["contract_span"]
                 ).dropna()
-                neighbors["id"] = sheet.face_df.loc[neighbors.face, "id"].values
+                neighbors["id"] = sheet.face_df.loc[
+                    neighbors.face, "id"].values
 
                 # remove cell which are not mesoderm
                 ectodermal_cell = sheet.face_df.loc[neighbors.face][
@@ -240,7 +224,7 @@ def constriction(sheet, manager, **kwargs):
                         (
                             contraction,
                             _neighbor_contractile_increase(
-                                neighbor, contract_rate, constriction_spec
+                                neighbor, constriction_spec
                             ),
                         )  # TODO: check this
                         for _, neighbor in neighbors.iterrows()
@@ -249,13 +233,12 @@ def constriction(sheet, manager, **kwargs):
 
         proba_tension = np.exp(-face_area / constriction_spec["critical_area"])
         aleatory_number = random.uniform(0, 1)
-        if constriction_spec["current_traction"] < constriction_spec["max_traction"]:
+        if current_traction < constriction_spec["max_traction"]:
             if aleatory_number < proba_tension:
                 current_traction = current_traction + 1
                 ab_pull(sheet, face, constriction_spec["radial_tension"], True)
                 constriction_spec.update(
                     {
-                        "contract_rate": contract_rate,
                         "current_traction": current_traction,
                     }
                 )
@@ -263,21 +246,23 @@ def constriction(sheet, manager, **kwargs):
     manager.append(constriction, **constriction_spec)
 
 
-def _neighbor_contractile_increase(neighbor, contract_rate, constriction_spec):
+def _neighbor_contractile_increase(neighbor, constriction_spec):
 
-    increase = (
-        -(contract_rate - constriction_spec["basal_contract_rate"])
-        / constriction_spec["contract_span"]
-    ) * neighbor["order"] + contract_rate
+    contract = constriction_spec["contract_rate"]
+    basal_contract = constriction_spec["basal_contract_rate"]
+
+    increase = (-(contract - basal_contract)
+                / constriction_spec["contract_span"]
+                ) * neighbor["order"] + contract
 
     specs = {
-            "face_id": neighbor["id"],
-            "contractile_increase": increase,
-            "critical_area": constriction_spec["critical_area"],
-            "max_contractility": 50,
-            "contraction_column": constriction_spec["contraction_column"],
-            "multiple": True,
-            "unique": False
-        }
+        "face_id": neighbor["id"],
+        "contractile_increase": increase,
+        "critical_area": constriction_spec["critical_area"],
+        "max_contractility": 50,
+        "contraction_column": constriction_spec["contraction_column"],
+        "multiple": True,
+        "unique": False
+    }
 
     return specs
