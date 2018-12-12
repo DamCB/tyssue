@@ -5,7 +5,6 @@ from tyssue.dynamics.sheet_vertex_model import SheetModel as model
 from tyssue import config
 from tyssue.io.hdf5 import load_datasets
 from tyssue.stores import stores_dir
-from tyssue.dynamics.sheet_isotropic_model import isotropic_relax
 from tyssue.solvers.sheet_vertex_solver import Solver as solver
 
 
@@ -24,7 +23,6 @@ def test_solver():
     dim_model_specs = model.dimensionalize(nondim_specs)
 
     sheet.update_specs(dim_model_specs)
-    isotropic_relax(sheet, nondim_specs)
     # sheet.vert_df.is_active = 1
     # grad_err = solver.check_grad(sheet, geom, model)
     # grad_err /= sheet.vert_df.size

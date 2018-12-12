@@ -12,7 +12,6 @@ from tyssue.dynamics.planar_vertex_model import PlanarModel
 
 from tyssue import config
 from tyssue.stores import stores_dir
-from tyssue.dynamics.sheet_isotropic_model import isotropic_relax
 from tyssue.io.hdf5 import load_datasets
 from tyssue.utils.testing import model_tester
 
@@ -68,15 +67,14 @@ def test_compute_energy():
     sheet.update_specs(dim_model_specs, reset=True)
 
     geom.update_all(sheet)
-    isotropic_relax(sheet, nondim_specs)
 
     Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
-    assert_almost_equal(Et.mean(), 0.026126171269835349, decimal=DECIMAL)
-    assert_almost_equal(Ec.mean(), 0.097547859436179621, decimal=DECIMAL)
-    assert_almost_equal(Ev.mean(), 0.11478185003186218, decimal=DECIMAL)
+    assert_almost_equal(Et.mean(), 0.02458566846202479, decimal=DECIMAL)
+    assert_almost_equal(Ec.mean(), 0.08638339061549484, decimal=DECIMAL)
+    assert_almost_equal(Ev.mean(), 0.06277441190064434, decimal=DECIMAL)
 
     energy = model.compute_energy(sheet, full_output=False)
-    assert_almost_equal(energy, 18.996782315605557, decimal=DECIMAL)
+    assert_almost_equal(energy, 15.040138762574534, decimal=DECIMAL)
 
 
 def test_compute_gradient():
@@ -90,7 +88,6 @@ def test_compute_gradient():
     sheet.update_specs(dim_model_specs)
 
     geom.update_all(sheet)
-    isotropic_relax(sheet, nondim_specs)
 
     nrj_norm_factor = sheet.specs["settings"]["nrj_norm_factor"]
     print("Norm factor: ", nrj_norm_factor)
@@ -104,7 +101,7 @@ def test_compute_gradient():
     assert_almost_equal(grad_c_norm, 0.49692791, decimal=DECIMAL)
 
     grad_vs_norm = np.linalg.norm(grad_v_srce.dropna(), axis=0).sum() / nrj_norm_factor
-    assert_almost_equal(grad_vs_norm, 0.37818943702074725, decimal=DECIMAL)
+    assert_almost_equal(grad_vs_norm, 0.30281367249952407, decimal=DECIMAL)
 
     grad_vt_norm = np.linalg.norm(grad_v_trgt.dropna(), axis=0).sum() / nrj_norm_factor
-    assert_almost_equal(grad_vt_norm, 0.32234408741502257, decimal=DECIMAL)
+    assert_almost_equal(grad_vt_norm, 0.27732035134768285, decimal=DECIMAL)
