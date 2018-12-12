@@ -87,7 +87,7 @@ def test_execute_constriction():
     geom.update_all(sheet)
     sheet.settings['constriction'] = {'contractile_increase': 5,
                                       'critical_area': 5,
-                                      'max_traction': 2}
+                                      'max_traction': 10}
     sheet.face_df['id'] = sheet.face_df.index.values
     init_nb_cells = len(sheet.face_df)
 
@@ -109,8 +109,6 @@ def test_execute_constriction():
         manager.update()
     if len(sheet.face_df) == init_nb_cells:
         assert len(manager.current) > 0
-    print(sheet.vert_df.radial_tension.unique())
-    assert len(sheet.vert_df.radial_tension.unique()) > 1
 
 
 def test_execute_apoptosis():
