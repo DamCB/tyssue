@@ -12,13 +12,13 @@ from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 
 from tyssue.behaviors.event_manager import EventManager, wait
 from tyssue.behaviors.sheet.basic_events import (
-    division, contraction, contraction_neighbor,
-    type1_transition, face_elimination, check_tri_faces)
+    division, contraction, type1_transition, face_elimination, check_tri_faces)
 from tyssue.behaviors.sheet.actions import (
     contract, ab_pull, relax, increase_linear_tension, grow, shrink)
 from tyssue.behaviors.sheet.actions import remove as type3
 from tyssue.behaviors.sheet.actions import exchange as type1_at_shorter
 from tyssue.behaviors.sheet.apoptosis_events import apoptosis
+from tyssue.behaviors.sheet.delamination_events import constriction
 
 
 def test_add_events():
@@ -26,11 +26,12 @@ def test_add_events():
     manager = EventManager('face')
     initial_cell_event = [(division, {'face_id': 1, 'geom': geom}),
                           (wait, {'face_id': 3, 'n_steps': 4}),
-                          (apoptosis, {'face_id': 5})]
+                          (apoptosis, {'face_id': 5}),
+                          (constriction, {'face_id': 2})]
     manager.extend(initial_cell_event)
     manager.execute(None)
     manager.update()
-    assert len(manager.current) == 3
+    assert len(manager.current) == 4
 
 
 def test_add_only_once():
@@ -76,6 +77,42 @@ def test_logging():
     assert l2 == '0, -1, wait\n'
 
 
+def test_execute_constriction():
+    h5store = os.path.join(stores_dir, 'small_hexagonal.hf5')
+    datasets = load_datasets(
+        h5store,
+        data_names=['face', 'vert', 'edge'])
+    specs = config.geometry.cylindrical_sheet()
+    sheet = Sheet('emin', datasets, specs)
+    geom.update_all(sheet)
+    sheet.settings['constriction'] = {'contractile_increase': 5,
+                                      'critical_area': 5,
+                                      'max_traction': 2}
+    sheet.face_df['id'] = sheet.face_df.index.values
+    init_nb_cells = len(sheet.face_df)
+
+    sheet.face_df['is_mesoderm'] = 0
+    sheet.vert_df['radial_tension'] = 0
+    manager = EventManager('face')
+    face_id = 17
+    sheet.face_df.loc[face_id, 'is_mesoderm'] = 1
+
+    sheet.settings['constriction'].update({'face_id': face_id})
+    initial_cell_event = (constriction, sheet.settings['constriction'])
+    manager.current.append(initial_cell_event)
+    manager.execute(sheet)
+    manager.update()
+    assert len(manager.current) > 0
+
+    for i in range(20):
+        manager.execute(sheet)
+        manager.update()
+    if len(sheet.face_df) == init_nb_cells:
+        assert len(manager.current) > 0
+    print(sheet.vert_df.radial_tension.unique())
+    assert len(sheet.vert_df.radial_tension.unique()) > 1
+
+
 def test_execute_apoptosis():
     h5store = os.path.join(stores_dir, 'small_hexagonal.hf5')
     datasets = load_datasets(
@@ -87,7 +124,7 @@ def test_execute_apoptosis():
     sheet.settings['apoptosis'] = {'contractile_increase': 2.0,
                                    'critical_area': 0.1}
     sheet.face_df['id'] = sheet.face_df.index.values
-
+    init_nb_faces = len(sheet.face_df)
     manager = EventManager('face')
     face_id = 17
     face_area = sheet.face_df.loc[face_id, 'area']
@@ -114,10 +151,18 @@ def test_execute_apoptosis():
     manager.update()
     next_nbsides = sheet.face_df.loc[
         sheet.idx_lookup(face_id, 'face'), 'num_sides']
-
-    assert next_nbsides == initial_nbsides - 1
-    if next_nbsides > 3:
+    i = 1
+    while next_nbsides > 4:
+        assert next_nbsides == initial_nbsides - i
         assert len(manager.current) > 0
+        i = i + 1
+        manager.execute(sheet)
+        manager.update()
+        next_nbsides = sheet.face_df.loc[
+            sheet.idx_lookup(face_id, 'face'), 'num_sides']
+    manager.execute(sheet)
+    manager.update()
+    assert len(sheet.face_df) < init_nb_faces
 
 
 def test_execute_division():
