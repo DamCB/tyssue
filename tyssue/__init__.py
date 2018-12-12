@@ -7,5 +7,5 @@ from .core.multisheet import MultiSheet
 from .core.history import History
 from .geometry.planar_geometry import PlanarGeometry
 from .geometry.sheet_geometry import SheetGeometry
-from .geometry.bulk_geometry import BulkGeometry, MonoLayerGeometry, RNRGeometry
+from .geometry.bulk_geometry import BulkGeometry, MonoLayerGeometry, RNRGeometry, ClosedMonolayerGeometry
 from .geometry.multisheetgeometry import MultiSheetGeometry

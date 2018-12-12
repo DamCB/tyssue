@@ -32,7 +32,6 @@ class BulkGeometry(SheetGeometry):
         cls.update_normals(eptm)
         cls.update_areas(eptm)
         cls.update_vol(eptm)
-        cls.update_vol_all(eptm)
 
     @staticmethod
     def update_dcoords(eptm):
@@ -52,28 +51,6 @@ class BulkGeometry(SheetGeometry):
             / 6
         )
         eptm.cell_df["vol"] = eptm.sum_cell(eptm.edge_df["sub_vol"])
-
-    @staticmethod
-    def update_vol_all(eptm):
-        """
-
-        """
-        if "segment" in eptm.edge_df:
-            basal_edges = eptm.edge_df[eptm.edge_df.segment == "basal"].copy()
-            face_pos = basal_edges[["f" + c for c in eptm.coords]].values
-            basal_edges["sub_vol"] = (
-                np.sum((face_pos) * basal_edges[eptm.ncoords].values, axis=1)
-                / 6
-            )
-            eptm.settings["vol"] = eptm.sum_cell(basal_edges["sub_vol"])
-
-        else:
-            face_pos = eptm.edge_df[["f" + c for c in eptm.coords]].values
-            eptm.edge_df["sub_vol"] = (
-                np.sum((face_pos) * eptm.edge_df[eptm.ncoords].values, axis=1)
-                / 6
-            )
-            eptm.settings["vol"] = sum(eptm.edge_df["sub_vol"])
 
     @staticmethod
     def update_areas(eptm):
@@ -182,3 +159,54 @@ class MonolayerGeometry(RNRGeometry):
 
 class MonoLayerGeometry(MonolayerGeometry):
     pass
+
+
+class ClosedMonolayerGeometry(MonolayerGeometry):
+
+    @classmethod
+    def update_all(cls, eptm):
+        """
+        Updates the eptm geometry by updating:
+        * the edge vector coordinates
+        * the edge lengths
+        * the face centroids
+        * the normals to each edge associated face
+        * the face areas
+        * the cell areas
+        * the vertices heights (depends on geometry)
+        * the face volumes (depends on geometry)
+
+        """
+        cls.update_dcoords(eptm)
+        cls.update_length(eptm)
+        cls.update_perimeters(eptm)
+        cls.update_centroid(eptm)
+        cls.update_normals(eptm)
+        cls.update_areas(eptm)
+        cls.update_vol(eptm)
+        cls.update_lumen_vol(eptm)
+
+    @staticmethod
+    def update_lumen_vol(eptm):
+        """
+
+        """
+        if 'lumen_side' in eptm.settings:
+            lumen_edges = eptm.edge_df[
+                eptm.edge_df.segment == eptm.settings["lumen_side"]].copy()
+            lumen_pos_faces = lumen_edges[
+                ["f" + c for c in eptm.coords]].values
+            lumen_edges["lumen_sub_vol"] = (
+                np.sum((lumen_pos_faces) *
+                       lumen_edges[eptm.ncoords].values, axis=1) / 6
+            )
+            eptm.settings["lumen_vol"] = eptm.sum_cell(
+                lumen_edges["lumen_sub_vol"])
+        else:
+            lumen_pos_faces = eptm.edge_df[
+                ["f" + c for c in eptm.coords]].values
+            eptm.edge_df["lumen_sub_vol"] = (
+                np.sum((lumen_pos_faces) *
+                       eptm.edge_df[eptm.ncoords].values, axis=1) / 6
+            )
+            eptm.settings["lumen_vol"] = sum(eptm.edge_df["lumen_sub_vol"])
