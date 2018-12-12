@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 default_apoptosis_spec = {
     'cell_id': -1,
-    'contract_rate': 2.1,
+    'contract_rate': 2.,
     'critical_area': 1e-2,
     'shrink_rate': 0.4,
     'critical_volume': 0.1,
