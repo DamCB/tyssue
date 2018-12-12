@@ -26,9 +26,8 @@ def shrink(monolayer, cell, shrink_rate):
     by (1+shrink_rate)^2/3
     """
     factor = 1 + shrink_rate
-    faces = monolayer.edge_df[monolayer.edge_df["cell"] == cell]["face"].unique()
     monolayer.cell_df.loc[cell, "prefered_vol"] /= factor
-    monolayer.face_df.loc[faces, "prefered_area"] /= factor ** (2 / 3)
+    monolayer.cell_df.loc[cell, "prefered_area"] /= factor ** (2 / 3)
 
 
 def contract(

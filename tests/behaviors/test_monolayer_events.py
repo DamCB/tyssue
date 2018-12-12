@@ -48,14 +48,12 @@ def test_shrink():
     geom.center(mono)
     geom.update_all(mono)
     mono.cell_df['prefered_vol'] = 1.
-    mono.face_df['prefered_area'] = 1.
+    mono.cell_df['prefered_area'] = 1.
 
     shrink(mono, 0, 0.2)
 
     assert round(mono.cell_df.loc[0, 'prefered_vol'], 4) == 0.8333
-    faces = mono.edge_df[mono.edge_df["cell"] == 0]["face"]
-    for f in faces:
-        assert round(mono.face_df.loc[f, "prefered_area"], 4) == 0.8855
+    assert round(mono.cell_df.loc[0, "prefered_area"], 4) == 0.8855
 
 
 def test_ab_pull():
