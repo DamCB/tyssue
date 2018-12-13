@@ -102,25 +102,46 @@ class CollidingBoxes:
             index=pd.Index(colliding_verts, "srce"), columns=self.sheet.coords
         )
         lower_bounds[:] = -np.inf
+        plane_found = False
         for lower, upper in self.get_limits(shyness):
             if lower is None:
                 continue
+            plane_found = True
             sub_lower = lower_bounds.loc[lower.index, lower.columns]
-            lower_bounds.loc[lower.index, lower.columns] = pd.concat(
-                (sub_lower, lower), axis=1
-            ).max(axis=1)
+            lower_bounds.loc[lower.index, lower.columns] = np.maximum(sub_lower, lower)
 
             sub_upper = upper_bounds.loc[upper.index, upper.columns]
-            upper_bounds.loc[upper.index, upper.columns] = pd.concat(
-                (sub_upper, upper), axis=1
-            ).min(axis=1)
+            upper_bounds.loc[upper.index, upper.columns] = np.minimum(sub_upper, upper)
 
-        self.sheet.vert_df.x = pd.concat(
-            (lower_bounds.x, self.sheet.vert_df.x), axis=1
-        ).max(axis=1)
-        self.sheet.vert_df.x = pd.concat(
-            (upper_bounds.x, self.sheet.vert_df.x), axis=1
-        ).min(axis=1)
+        if upper_bounds.shape[0] == 0:
+            plane_found = False
+
+        if not plane_found:
+            return 0
+
+        upper_bounds = (
+            upper_bounds[np.isfinite(upper_bounds.values.astype(float))]
+            .groupby("srce")
+            .apply(min)
+        )
+        lower_bounds = (
+            lower_bounds[np.isfinite(lower_bounds.values.astype(float))]
+            .groupby("srce")
+            .apply(max)
+        )
+
+        correction_upper = np.minimum(
+            self.sheet.vert_df.loc[upper_bounds.index, self.sheet.coords],
+            upper_bounds.values,
+        )
+        correction_lower = np.maximum(
+            self.sheet.vert_df.loc[lower_bounds.index, self.sheet.coords],
+            lower_bounds.values,
+        )
+        corrections = pd.concat((correction_lower, correction_upper), axis=0)
+        self.sheet.vert_df.loc[
+            corrections.index.values, self.sheet.coords
+        ] = corrections
 
     def _collision_plane(self, face_pair, shyness):
 
