@@ -89,6 +89,10 @@ def test_compute_gradient():
 
     geom.update_all(sheet)
 
+    sheet.edge_df["is_active"] = sheet.upcast_srce("is_active") * sheet.upcast_face(
+        "is_alive"
+    )
+
     nrj_norm_factor = sheet.specs["settings"]["nrj_norm_factor"]
     print("Norm factor: ", nrj_norm_factor)
     ((grad_t, _), (grad_c, _), (grad_v_srce, grad_v_trgt)) = model.compute_gradient(

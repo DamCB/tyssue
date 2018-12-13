@@ -2,53 +2,54 @@ import logging
 import numpy as np
 import pandas as pd
 import warnings
+from functools import wraps
 
-from ..solvers.sheet_vertex_solver import Solver
-from . import self_intersections
-
+from .intersection import self_intersections
 
 log = logging.getLogger(__name__)
 
 
-class CollisionSolver(Solver):
-    """Quasistatic solver with collision correction
+def solve_collisions(fun):
+    """Decorator to solve collisions detections after the
+    execution of the decorated function.
+
+    It is assumed that the two first arguments of the decorated
+    function are a :class:`Sheet` object and a geometry class
     """
 
-    @classmethod
-    def opt_energy(cls, pos, pos_idx, sheet, geom, model):
-        # Keep old position safe
-        position_buffer = sheet.vert_df[sheet.coords].copy()
-
-        cls.set_pos(pos, pos_idx, sheet)
-        geom.update_all(sheet)
-
-        intersecting_edges = self_intersections(sheet)
+    @wraps(fun)
+    def with_collision_correction(*args, **kwargs):
+        eptm, geom = args[:2]
+        position_buffer = eptm.vert_df[eptm.coords].copy()
+        res = fun(*args, **kwargs)
+        intersecting_edges = self_intersections(eptm)
         if intersecting_edges.shape[0]:
             log.info("%d intersections where detected", intersecting_edges.shape[0])
-            shyness = sheet.settings.get("shyness", 1e-10)
-            boxes = CollidingBoxes(sheet, position_buffer, intersecting_edges)
+            shyness = eptm.settings.get("shyness", 1e-10)
+            boxes = CollidingBoxes(eptm, position_buffer, intersecting_edges)
             boxes.solve_collisions(shyness)
+        geom.update_all(eptm)
+        return res
 
-        geom.update_all(sheet)
-        return model.compute_energy(sheet, full_output=False)
+    return with_collision_correction
 
 
 class CollidingBoxes:
     """Utility class to manage collisions
     """
 
-    def __init__(self, sheet, position_buffer, intersecting_edges):
-        self.sheet = sheet
+    def __init__(self, eptm, position_buffer, intersecting_edges):
+        self.eptm = eptm
         self.edge_pairs = intersecting_edges
         self.face_pairs = self._get_intersecting_faces()
-        self.edge_buffer = sheet.upcast_srce(position_buffer).copy()
+        self.edge_buffer = eptm.upcast_srce(position_buffer).copy()
         self.edge_buffer.columns = ["sx", "sy", "sz"]
 
     def _get_intersecting_faces(self):
         """Returns unique pairs of intersecting faces
 
         """
-        _face_pairs = self.sheet.edge_df.loc[
+        _face_pairs = self.eptm.edge_df.loc[
             self.edge_pairs.flatten(), "face"
         ].values.reshape((-1, 2))
         return np.array([[f0, f1] for f0, f1 in set(map(frozenset, _face_pairs))])
@@ -75,7 +76,7 @@ class CollidingBoxes:
     def solve_collisions(self, shyness=1e-10):
         """ Solves the collisions by finding the collision plane.
 
-        Modifies the sheet vertex positions inplace such that they
+        Modifies the eptm vertex positions inplace such that they
         rest at a distance ``shyness`` apart on each side of the collision plane.
 
         Parameters
@@ -91,15 +92,15 @@ class CollidingBoxes:
 
         """
 
-        colliding_verts = self.sheet.edge_df[
-            self.sheet.edge_df["face"].isin(self.face_pairs.ravel())
+        colliding_verts = self.eptm.edge_df[
+            self.eptm.edge_df["face"].isin(self.face_pairs.ravel())
         ]["srce"]
         upper_bounds = pd.DataFrame(
-            index=pd.Index(colliding_verts, "srce"), columns=self.sheet.coords
+            index=pd.Index(colliding_verts, "srce"), columns=self.eptm.coords
         )
         upper_bounds[:] = np.inf
         lower_bounds = pd.DataFrame(
-            index=pd.Index(colliding_verts, "srce"), columns=self.sheet.coords
+            index=pd.Index(colliding_verts, "srce"), columns=self.eptm.coords
         )
         lower_bounds[:] = -np.inf
         plane_found = False
@@ -131,26 +132,24 @@ class CollidingBoxes:
         )
 
         correction_upper = np.minimum(
-            self.sheet.vert_df.loc[upper_bounds.index, self.sheet.coords],
+            self.eptm.vert_df.loc[upper_bounds.index, self.eptm.coords],
             upper_bounds.values,
         )
         correction_lower = np.maximum(
-            self.sheet.vert_df.loc[lower_bounds.index, self.sheet.coords],
+            self.eptm.vert_df.loc[lower_bounds.index, self.eptm.coords],
             lower_bounds.values,
         )
         corrections = pd.concat((correction_lower, correction_upper), axis=0)
-        self.sheet.vert_df.loc[
-            corrections.index.values, self.sheet.coords
-        ] = corrections
+        self.eptm.vert_df.loc[corrections.index.values, self.eptm.coords] = corrections
 
     def _collision_plane(self, face_pair, shyness):
 
         f0, f1 = face_pair
 
-        fe0c = self.sheet.edge_df[self.sheet.edge_df["face"] == f0].copy()
-        fe1c = self.sheet.edge_df[self.sheet.edge_df["face"] == f1].copy()
-        fe0p = self.edge_buffer[self.sheet.edge_df["face"] == f0].copy()
-        fe1p = self.edge_buffer[self.sheet.edge_df["face"] == f1].copy()
+        fe0c = self.eptm.edge_df[self.eptm.edge_df["face"] == f0].copy()
+        fe1c = self.eptm.edge_df[self.eptm.edge_df["face"] == f1].copy()
+        fe0p = self.edge_buffer[self.eptm.edge_df["face"] == f0].copy()
+        fe1p = self.edge_buffer[self.eptm.edge_df["face"] == f1].copy()
 
         bb0c = _face_bbox(fe0c)
         bb1c = _face_bbox(fe1c)
@@ -203,8 +202,8 @@ def _face_bbox(face_edges):
     ).T
 
 
-def revert_positions(sheet, position_buffer, intersecting_edges):
+def revert_positions(eptm, position_buffer, intersecting_edges):
 
     unique_edges = np.unique(intersecting_edges)
-    unique_verts = np.unique(sheet.edge_df.loc[unique_edges, ["srce", "trgt"]])
-    sheet.vert_df.loc[unique_verts, sheet.coords] = position_buffer.loc[unique_verts]
+    unique_verts = np.unique(eptm.edge_df.loc[unique_edges, ["srce", "trgt"]])
+    eptm.vert_df.loc[unique_verts, eptm.coords] = position_buffer.loc[unique_verts]

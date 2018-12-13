@@ -21,5 +21,23 @@ def minimize_spec():
         }
 
     """
-    specfile = os.path.join(CURRENT_DIR, "minimize.json")
-    return load_spec(specfile)
+    spec = {
+        "norm_factor": 1,
+        "minimize": {
+            "method": "L-BFGS-B",
+            "options": {"disp": False, "ftol": 1e-6, "gtol": 1e-3},
+        },
+    }
+    return spec
+
+
+def quasistatic():
+    """Solver default specification for scipy.optimize.minimize gradient
+    descent
+
+    """
+    spec = {
+        "method": "L-BFGS-B",
+        "options": {"disp": False, "ftol": 1e-6, "gtol": 1e-3},
+    }
+    return spec

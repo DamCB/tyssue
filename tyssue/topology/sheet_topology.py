@@ -1,13 +1,14 @@
 import logging
 import numpy as np
+from functools import wraps
 
 from .base_topology import add_vert
 from tyssue.utils.decorators import do_undo, validate
 
+
 logger = logging.getLogger(name=__name__)
 
 
-@do_undo
 def type1_transition(sheet, edge01, epsilon=0.1, remove_tri_faces=True):
     """Performs a type 1 transition around the edge edge01
 
@@ -352,6 +353,63 @@ def resolve_t1s(sheet, geom, model, solver, max_iter=60):
         i += 1
         if i > max_iter:
             break
+
+
+def auto_t1(fun):
+    """Decorator to solve type 1 transitions after the execution of
+    the decorated function.
+
+    It is assumed that the two first arguments of the decorated
+    function are a :class:`Sheet` object and a geometry class
+    """
+
+    @wraps(fun)
+    def with_t1(*args, **kwargs):
+        sheet, geom = args[:2]
+        l_th = sheet.settings.get("threshold_length", 1e-6)
+        res = fun(*args, **kwargs)
+        shorts = sheet.edge_df[sheet.edge_df.length < l_th].sort_values("length").index
+        if not len(shorts):
+            return res
+        logger.info("performing %i T1", len(shorts))
+        for edge in shorts:
+            type1_transition(sheet, edge)
+        sheet.reset_index()
+        sheet.reset_topo()
+        geom.update_all(sheet)
+        return res
+
+    return with_t1
+
+
+def auto_t3(fun):
+    """Decorator to solve type 3 transitions after the execution of
+    the decorated function.
+
+    It is assumed that the two first arguments of the decorated
+    function are a :class:`Sheet` object and a geometry class
+    """
+
+    @wraps(fun)
+    def with_t3(*args, **kwargs):
+        sheet, geom = args[:2]
+        a_th = sheet.settings.get("threshold_area", 1e-8)
+        res = fun(*args, **kwargs)
+        tri_faces = sheet.face_df[
+            (sheet.face_df.area < a_th) & (sheet.face_df.num_sides > 3)
+        ]
+        if not len(tri_faces):
+            return res
+        logger.info("performing %i T3", len(tri_faces))
+
+        for face in tri_faces:
+            remove_face(sheet, face)
+        sheet.reset_index()
+        sheet.reset_topo()
+        geom.update_all(sheet)
+        return res
+
+    return with_t3
 
 
 def _cast_to_int(df_value):
