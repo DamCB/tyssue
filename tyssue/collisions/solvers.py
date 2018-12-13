@@ -52,7 +52,9 @@ class CollidingBoxes:
         _face_pairs = self.eptm.edge_df.loc[
             self.edge_pairs.flatten(), "face"
         ].values.reshape((-1, 2))
-        return np.array([[f0, f1] for f0, f1 in set(map(frozenset, _face_pairs))])
+        unique_pairs = set(map(frozenset, _face_pairs))
+
+        return np.array([[*pair] for pair in unique_pairs if len(pair) == 2])
 
     def get_limits(self, shyness=1e-10):
         """ Iterator over the position boundaries avoiding the
@@ -120,14 +122,16 @@ class CollidingBoxes:
         if not plane_found:
             return 0
 
+        upper_bounds.index.name = "vert"
         upper_bounds = (
             upper_bounds[np.isfinite(upper_bounds.values.astype(float))]
-            .groupby("srce")
+            .groupby("vert")
             .apply(min)
         )
+        lower_bounds.index.name = "vert"
         lower_bounds = (
             lower_bounds[np.isfinite(lower_bounds.values.astype(float))]
-            .groupby("srce")
+            .groupby("vert")
             .apply(max)
         )
 
