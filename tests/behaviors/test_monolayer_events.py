@@ -28,14 +28,12 @@ def test_grow():
     geom.center(mono)
     geom.update_all(mono)
     mono.cell_df['prefered_vol'] = 1.
-    mono.face_df['prefered_area'] = 1.
+    mono.cell_df['prefered_area'] = 1.
 
     grow(mono, 0, 0.2)
 
     assert mono.cell_df.loc[0, 'prefered_vol'] == 1.2
-    faces = mono.edge_df[mono.edge_df["cell"] == 0]["face"]
-    for f in faces:
-        assert round(mono.face_df.loc[f, "prefered_area"], 4) == 1.1292
+    assert round(mono.cell_df.loc[0, "prefered_area"], 4) == 1.1292
 
 
 def test_shrink():

@@ -89,12 +89,10 @@ def ab_pull(monolayer, cell, radial_tension, distributed=False):
     ba_edges = lateral_edges[
         (trgt_segment == "apical") & (srce_segment == "basal")
     ].index
-    # TODO treat factor directly - not as a multiple of
-    # the default line_tension (which might be 0)
+
     if distributed:
-        factor = radial_tension / (len(ab_edges) + len(ba_edges))
+        new_tension = radial_tension / (len(ab_edges) + len(ba_edges))
     else:
-        factor = radial_tension
-    new_tension = monolayer.specs["edge"]["line_tension"] * factor
+        new_tension = radial_tension
     monolayer.edge_df.loc[ab_edges, "line_tension"] += new_tension
     monolayer.edge_df.loc[ba_edges, "line_tension"] += new_tension
