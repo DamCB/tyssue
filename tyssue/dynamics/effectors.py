@@ -285,26 +285,26 @@ class LumenVolumeElasticity(AbstractEffector):
     For example the volume of the yolk in the Drosophila embryo
     """
     dimensions = units.vol_elasticity
-    magnitude = "vol_elasticity"
-    label = "Volume elasticity"
+    magnitude = "lumen_vol_elasticity"
+    label = "Lumen volume elasticity"
     element = "settings"
-    spatial_ref = "prefered_vol", units.vol
+    spatial_ref = "lumen_prefered_vol", units.vol
 
-    specs = {"settings": {"vol", "vol_elasticity", "prefered_vol"}}
+    specs = {"settings": {"lumen_vol", "lumen_vol_elasticity", "lumen_prefered_vol"}}
 
     @staticmethod
     def get_nrj_norm(specs):
-        return specs["settings"]["vol_elasticity"] * specs["settings"]["prefered_vol"] ** 2
+        return specs["settings"]["lumen_vol_elasticity"] * specs["settings"]["lumen_prefered_vol"] ** 2
 
     @staticmethod
     def energy(eptm):
 
-        return _elastic_energy(eptm.settings, "vol", "vol_elasticity", "prefered_vol")
+        return _elastic_energy(eptm.settings, "lumen_vol", "lumen_vol_elasticity", "lumen_prefered_vol")
 
     @staticmethod
     def gradient(eptm):
         kv_v0 = _elastic_force(
-            eptm.settings, "vol", "vol_elasticity", "prefered_vol"
+            eptm.settings, "lumen_vol", "lumen_vol_elasticity", "lumen_prefered_vol"
         )
 
         grad_v_srce, grad_v_trgt = all_volume_grad(eptm)

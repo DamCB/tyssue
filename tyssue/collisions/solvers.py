@@ -1,7 +1,7 @@
 import logging
 import numpy as np
 import pandas as pd
-import warnings
+
 
 from ..solvers.sheet_vertex_solver import Solver
 from . import self_intersections
@@ -28,7 +28,7 @@ class CollisionSolver(Solver):
             shyness = sheet.settings.get("shyness", 1e-10)
             boxes = CollidingBoxes(sheet, position_buffer, intersecting_edges)
             boxes.solve_collisions(shyness)
-
+    
         geom.update_all(sheet)
         return model.compute_energy(sheet, full_output=False)
 
@@ -102,9 +102,9 @@ class CollidingBoxes:
             index=pd.Index(colliding_verts, "srce"), columns=self.sheet.coords
         )
         lower_bounds[:] = -np.inf
+
         for lower, upper in self.get_limits(shyness):
-            if lower is None:
-                continue
+
             sub_lower = lower_bounds.loc[lower.index, lower.columns]
             lower_bounds.loc[lower.index, lower.columns] = pd.concat(
                 (sub_lower, lower), axis=1
@@ -159,11 +159,7 @@ class CollidingBoxes:
                 coll_ax
             ]
         else:
-
-            warnings.warn(
-                """The collision was already present or its axis could not be determined"""
-            )
-            return None, None
+            raise ValueError("No collision detected")
 
         for c in coll_ax:
             lower_bound[c] = plane_coords.loc[c] + shyness / 2
