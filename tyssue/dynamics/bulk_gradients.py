@@ -29,7 +29,7 @@ def all_volume_grad(eptm):
 
     coords = eptm.coords
     if "segment" in eptm.edge_df:
-        basal_edges = eptm.edge_df[eptm.edge_df.segment == "basal"].copy()
+        basal_edges = eptm.edge_df[eptm.edge_df.segment == eptm.settings["lumen_side"]].copy()
         face_pos = basal_edges[["f" + c for c in coords]].values
         srce_pos = basal_edges[["s" + c for c in coords]].values
         trgt_pos = basal_edges[["t" + c for c in coords]].values

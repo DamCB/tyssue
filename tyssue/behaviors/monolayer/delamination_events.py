@@ -54,7 +54,7 @@ def constriction(monolayer, manager, **kwargs):
 
         # Find the apical face id of the cell
         list_face_in_cell = monolayer.get_orbits("cell", "face")
-
+        faces_in_cell = monolayer.face_df.loc[list_face_in_cell[cell].unique()]
         apical_face_id = monolayer.face_df[
             (monolayer.face_df.index.isin(list_face_in_cell[cell]))
             & (monolayer.face_df.segment == "apical")
@@ -85,8 +85,11 @@ def constriction(monolayer, manager, **kwargs):
             if aleatory_number < proba_tension:
                 current_traction += 1
 
-                ab_pull(monolayer, cell, constriction_spec[
-                        "radial_tension"], True)
+                if len(faces_in_cell) > 4:
+                    ab_pull(monolayer, cell, constriction_spec[
+                            "radial_tension"], True)
+                if len(faces_in_cell) == 4:
+                    print("need to be coded")
 
                 constriction_spec.update(
                     {"current_traction": current_traction})

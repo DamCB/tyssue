@@ -168,13 +168,7 @@ class ClosedMonolayerGeometry(MonolayerGeometry):
         * the face volumes (depends on geometry)
 
         """
-        cls.update_dcoords(eptm)
-        cls.update_length(eptm)
-        cls.update_perimeters(eptm)
-        cls.update_centroid(eptm)
-        cls.update_normals(eptm)
-        cls.update_areas(eptm)
-        cls.update_vol(eptm)
+        super().update_all(eptm)
         cls.update_lumen_vol(eptm)
 
     @staticmethod
@@ -183,6 +177,7 @@ class ClosedMonolayerGeometry(MonolayerGeometry):
 
         """
         if "lumen_side" in eptm.settings:
+
             lumen_edges = eptm.edge_df[
                 eptm.edge_df.segment == eptm.settings["lumen_side"]
             ].copy()
@@ -190,7 +185,7 @@ class ClosedMonolayerGeometry(MonolayerGeometry):
             lumen_edges["lumen_sub_vol"] = (
                 np.sum((lumen_pos_faces) * lumen_edges[eptm.ncoords].values, axis=1) / 6
             )
-            eptm.settings["lumen_vol"] = eptm.sum_cell(lumen_edges["lumen_sub_vol"])
+            eptm.settings["lumen_vol"] = eptm.sum_cell(lumen_edges["lumen_sub_vol"]).sum().values[0]
         else:
             lumen_pos_faces = eptm.edge_df[["f" + c for c in eptm.coords]].values
             eptm.edge_df["lumen_sub_vol"] = (
