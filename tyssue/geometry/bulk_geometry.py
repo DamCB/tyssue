@@ -46,8 +46,7 @@ class BulkGeometry(SheetGeometry):
         cell_pos = eptm.edge_df[["c" + c for c in eptm.coords]].values
 
         eptm.edge_df["sub_vol"] = (
-            np.sum((face_pos - cell_pos) *
-                   eptm.edge_df[eptm.ncoords].values, axis=1)
+            np.sum((face_pos - cell_pos) * eptm.edge_df[eptm.ncoords].values, axis=1)
             / 6
         )
         eptm.cell_df["vol"] = eptm.sum_cell(eptm.edge_df["sub_vol"])
@@ -61,13 +60,11 @@ class BulkGeometry(SheetGeometry):
     @staticmethod
     def update_centroid(eptm):
         scoords = ["s" + c for c in eptm.coords]
-        eptm.face_df[eptm.coords] = eptm.edge_df.groupby("face")[
-            scoords].mean()
+        eptm.face_df[eptm.coords] = eptm.edge_df.groupby("face")[scoords].mean()
         face_pos = eptm.upcast_face(eptm.face_df[eptm.coords]).values
         eptm.edge_df[["f" + c for c in eptm.coords]] = face_pos
 
-        eptm.cell_df[eptm.coords] = eptm.edge_df.groupby("cell")[
-            scoords].mean()
+        eptm.cell_df[eptm.coords] = eptm.edge_df.groupby("cell")[scoords].mean()
         cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords]).values
         eptm.edge_df[["c" + c for c in eptm.coords]] = cell_pos
 
@@ -91,7 +88,6 @@ class BulkGeometry(SheetGeometry):
 
 
 class RNRGeometry(BulkGeometry):
-
     @staticmethod
     def update_centroid(eptm):
         scoords = ["s" + c for c in eptm.coords]
@@ -102,21 +98,18 @@ class RNRGeometry(BulkGeometry):
         mid_pos = (srce_pos + trgt_pos) / 2
         weighted_pos = eptm.sum_face(mid_pos * _to_3d(eptm.edge_df["length"]))
         eptm.face_df[eptm.coords] = (
-            weighted_pos.values /
-            eptm.face_df["perimeter"].values[:, np.newaxis]
+            weighted_pos.values / eptm.face_df["perimeter"].values[:, np.newaxis]
         )
 
         face_pos = eptm.upcast_face(eptm.face_df[eptm.coords]).values
         eptm.edge_df[["f" + c for c in eptm.coords]] = face_pos
 
-        eptm.cell_df[eptm.coords] = eptm.edge_df.groupby("cell")[
-            scoords].mean()
+        eptm.cell_df[eptm.coords] = eptm.edge_df.groupby("cell")[scoords].mean()
         cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords]).values
         eptm.edge_df[["c" + c for c in eptm.coords]] = cell_pos
 
 
 class MonolayerGeometry(RNRGeometry):
-
     @staticmethod
     def basal_apical_axis(eptm, cell):
         """
@@ -127,8 +120,7 @@ class MonolayerGeometry(RNRGeometry):
         srce_segments.index = edges.index
         trgt_segments = eptm.vert_df.loc[edges["trgt"], "segment"]
         trgt_segments.index = edges.index
-        ba_edges = edges[(srce_segments == "apical") &
-                         (trgt_segments == "basal")]
+        ba_edges = edges[(srce_segments == "apical") & (trgt_segments == "basal")]
         return ba_edges[eptm.dcoords].mean()
 
     @classmethod
@@ -162,7 +154,6 @@ class MonoLayerGeometry(MonolayerGeometry):
 
 
 class ClosedMonolayerGeometry(MonolayerGeometry):
-
     @classmethod
     def update_all(cls, eptm):
         """
@@ -191,22 +182,19 @@ class ClosedMonolayerGeometry(MonolayerGeometry):
         """
 
         """
-        if 'lumen_side' in eptm.settings:
+        if "lumen_side" in eptm.settings:
             lumen_edges = eptm.edge_df[
-                eptm.edge_df.segment == eptm.settings["lumen_side"]].copy()
-            lumen_pos_faces = lumen_edges[
-                ["f" + c for c in eptm.coords]].values
+                eptm.edge_df.segment == eptm.settings["lumen_side"]
+            ].copy()
+            lumen_pos_faces = lumen_edges[["f" + c for c in eptm.coords]].values
             lumen_edges["lumen_sub_vol"] = (
-                np.sum((lumen_pos_faces) *
-                       lumen_edges[eptm.ncoords].values, axis=1) / 6
+                np.sum((lumen_pos_faces) * lumen_edges[eptm.ncoords].values, axis=1) / 6
             )
-            eptm.settings["lumen_vol"] = eptm.sum_cell(
-                lumen_edges["lumen_sub_vol"])
+            eptm.settings["lumen_vol"] = eptm.sum_cell(lumen_edges["lumen_sub_vol"])
         else:
-            lumen_pos_faces = eptm.edge_df[
-                ["f" + c for c in eptm.coords]].values
+            lumen_pos_faces = eptm.edge_df[["f" + c for c in eptm.coords]].values
             eptm.edge_df["lumen_sub_vol"] = (
-                np.sum((lumen_pos_faces) *
-                       eptm.edge_df[eptm.ncoords].values, axis=1) / 6
+                np.sum((lumen_pos_faces) * eptm.edge_df[eptm.ncoords].values, axis=1)
+                / 6
             )
             eptm.settings["lumen_vol"] = sum(eptm.edge_df["lumen_sub_vol"])

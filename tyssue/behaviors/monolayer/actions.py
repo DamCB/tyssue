@@ -30,11 +30,11 @@ def shrink(monolayer, cell, shrink_rate):
 
 
 def contract(
-        monolayer,
-        face,
-        contractile_increase,
-        multiple=False,
-        contraction_column="contractility"
+    monolayer,
+    face,
+    contractile_increase,
+    multiple=False,
+    contraction_column="contractility",
 ):
     """
     Contract the face by increasing the 'contractility' parameter
@@ -46,6 +46,17 @@ def contract(
         monolayer.face_df.loc[face, contraction_column] += contractile_increase
 
 
+def relax(monolayer, face, contractile_decrease, contraction_column="contractility"):
+    initial_contractility = 1.12
+    new_contractility = (
+        monolayer.face_df.loc[face, contraction_column] / contractile_decrease
+    )
+
+    if new_contractility >= (initial_contractility / 2):
+        monolayer.face_df.loc[face, contraction_column] = new_contractility
+        monolayer.face_df.loc[face, "prefered_area"] *= contractile_decrease
+
+
 def contract_apical_face(
     monolayer,
     face_id,
@@ -53,7 +64,7 @@ def contract_apical_face(
     critical_area=1e-2,
     max_contractility=50,
     multiple=False,
-    contraction_column="contractility"
+    contraction_column="contractility",
 ):
     """Single step contraction event for apical face only
     """
@@ -66,8 +77,7 @@ def contract_apical_face(
         or (monolayer.face_df.loc[face, contraction_column] > max_contractility)
     ):
         return
-    contract(monolayer, face, contractile_increase,
-             multiple, contraction_column)
+    contract(monolayer, face, contractile_increase, multiple, contraction_column)
 
 
 def ab_pull(monolayer, cell, radial_tension, distributed=False):

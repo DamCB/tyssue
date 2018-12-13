@@ -71,8 +71,7 @@ def constriction(sheet, manager, **kwargs):
 
     if "is_relaxation" in sheet.face_df.columns:
         if sheet.face_df.loc[face, "is_relaxation"]:
-            relax(sheet, face, contract_rate,
-                  constriction_spec["contraction_column"])
+            relax(sheet, face, contract_rate, constriction_spec["contraction_column"])
 
     if sheet.face_df.loc[face, "is_mesoderm"]:
         face_area = sheet.face_df.loc[face, "area"]
@@ -95,8 +94,7 @@ def constriction(sheet, manager, **kwargs):
                 neighbors = sheet.get_neighborhood(
                     face, constriction_spec["contract_span"]
                 ).dropna()
-                neighbors["id"] = sheet.face_df.loc[
-                    neighbors.face, "id"].values
+                neighbors["id"] = sheet.face_df.loc[neighbors.face, "id"].values
 
                 # remove cell which are not mesoderm
                 ectodermal_cell = sheet.face_df.loc[neighbors.face][
@@ -111,9 +109,7 @@ def constriction(sheet, manager, **kwargs):
                     [
                         (
                             contraction,
-                            _neighbor_contractile_increase(
-                                neighbor, constriction_spec
-                            ),
+                            _neighbor_contractile_increase(neighbor, constriction_spec),
                         )  # TODO: check this
                         for _, neighbor in neighbors.iterrows()
                     ]
@@ -125,11 +121,7 @@ def constriction(sheet, manager, **kwargs):
             if aleatory_number < proba_tension:
                 current_traction = current_traction + 1
                 ab_pull(sheet, face, constriction_spec["radial_tension"], True)
-                constriction_spec.update(
-                    {
-                        "current_traction": current_traction,
-                    }
-                )
+                constriction_spec.update({"current_traction": current_traction})
 
     manager.append(constriction, **constriction_spec)
 
@@ -139,9 +131,9 @@ def _neighbor_contractile_increase(neighbor, constriction_spec):
     contract = constriction_spec["contract_rate"]
     basal_contract = constriction_spec["basal_contract_rate"]
 
-    increase = (-(contract - basal_contract)
-                / constriction_spec["contract_span"]
-                ) * neighbor["order"] + contract
+    increase = (
+        -(contract - basal_contract) / constriction_spec["contract_span"]
+    ) * neighbor["order"] + contract
 
     specs = {
         "face_id": neighbor["id"],
@@ -150,7 +142,7 @@ def _neighbor_contractile_increase(neighbor, constriction_spec):
         "max_contractility": 50,
         "contraction_column": constriction_spec["contraction_column"],
         "multiple": True,
-        "unique": False
+        "unique": False,
     }
 
     return specs

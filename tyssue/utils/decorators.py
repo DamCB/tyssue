@@ -73,11 +73,25 @@ def face_lookup(func):
     @wraps(func)
     def with_face_lookup(*args, **kwargs):
         sheet = args[0]
-        face_id = kwargs['face_id']
+        face_id = kwargs["face_id"]
         face = sheet.idx_lookup(face_id, "face")
         if face is None:
             return
-        kwargs['face'] = face
+        kwargs["face"] = face
         return func(*args, **kwargs)
 
     return with_face_lookup
+
+
+def cell_lookup(func):
+    @wraps(func)
+    def with_cell_lookup(*args, **kwargs):
+        sheet = args[0]
+        cell_id = kwargs["cell_id"]
+        cell = sheet.idx_lookup(cell_id, "cell")
+        if cell is None:
+            return
+        kwargs["cell"] = cell
+        return func(*args, **kwargs)
+
+    return with_cell_lookup
