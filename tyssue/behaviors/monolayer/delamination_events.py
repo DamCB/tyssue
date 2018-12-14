@@ -5,6 +5,9 @@ import numpy as np
 from ...utils.decorators import cell_lookup
 from ...topology.bulk_topology import IH_transition, HI_transition
 from .actions import shrink, contract, relax, ab_pull
+from .basic_events import contraction
+from ..sheet.basic_events import contraction as sheet_contraction
+from ..sheet.basic_events import _neighbor_contractile_increase
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +78,32 @@ def constriction(monolayer, manager, **kwargs):
                 apical_face_area < constriction_spec["critical_area_neighbors"]
             ):
 
-                print("Contract neighbors is not implemented yet")
+                sheet = monolayer.get_sub_sheet("apical")
+
+                neighbors = sheet.get_neighborhood(
+                    apical_face_id, constriction_spec["contract_span"]
+                ).dropna()
+                neighbors["id"] = sheet.face_df.loc[neighbors.face, "id"].values
+
+                # remove cell which are not mesodermal
+                ectodermal_cell = sheet.face_df.loc[neighbors.face][
+                    ~sheet.face_df.loc[neighbors.face, "is_mesoderm"]
+                ].id.values
+
+                neighbors = neighbors.drop(
+                    neighbors[neighbors.id.isin(ectodermal_cell)].index
+                )
+
+                manager.extend(
+                    [
+                        (
+                            sheet_contraction,
+                            _neighbor_contractile_increase(
+                                neighbor, constriction_spec),
+                        )
+                        for _, neighbor in neighbors.iterrows()
+                    ]
+                )
 
         proba_tension = np.exp(-apical_face_area /
                                constriction_spec["critical_area"])
