@@ -365,6 +365,7 @@ def auto_t1(fun):
 
     @wraps(fun)
     def with_t1(*args, **kwargs):
+        logger.debug("checking for T1s")
         sheet, geom = args[:2]
         l_th = sheet.settings.get("threshold_length", 1e-6)
         res = fun(*args, **kwargs)
@@ -394,6 +395,7 @@ def auto_t3(fun):
     def with_t3(*args, **kwargs):
         sheet, geom = args[:2]
         a_th = sheet.settings.get("threshold_area", 1e-8)
+        logger.debug("checking for T3s")
         res = fun(*args, **kwargs)
         tri_faces = sheet.face_df[
             (sheet.face_df.area < a_th) & (sheet.face_df.num_sides > 3)
@@ -401,7 +403,6 @@ def auto_t3(fun):
         if not len(tri_faces):
             return res
         logger.info("performing %i T3", len(tri_faces))
-
         for face in tri_faces:
             remove_face(sheet, face)
         sheet.reset_index()

@@ -178,8 +178,12 @@ def get_ellipsoid_centers(a, b, c, n_zs, pos_err=0.0, phase_err=0.0):
       `[[-a, a], [-b, b], [-c, c]]`
     n_zs :  float
       number of cells on the z axis, typical
-
-
+    pos_err : float, default 0.
+      normaly distributed noise of std. dev. pos_err is added
+      to the centers positions
+    phase_err : float, default 0.
+      normaly distributed noise of std. dev. phase_err is added
+      to the centers angle ϕ
 
     """
     dist = c / (n_zs)
