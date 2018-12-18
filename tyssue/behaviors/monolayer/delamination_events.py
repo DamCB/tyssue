@@ -4,7 +4,7 @@ import numpy as np
 
 from ...utils.decorators import cell_lookup
 from ...topology.bulk_topology import IH_transition, HI_transition
-from .actions import shrink, contract, relax, ab_pull
+from .actions import shrink, contract, relax, ab_pull, ab_pull_edge
 from .basic_events import contraction
 from ..sheet.basic_events import contraction as sheet_contraction
 from ..sheet.delamination_events import _neighbor_contractile_increase
@@ -68,11 +68,55 @@ def constriction(monolayer, manager, **kwargs):
         except Exception:  # TODO fix that
             apical_face_id = None
 
-
         if apical_face_id is None:
-            print("No more apical constriction... ")
+            if constriction_spec["with_rearrangement"]:
+                if len(faces_in_cell) > 4:
+                    # Remove lateral face with 3 sides
+                    face_to_eliminate = faces_in_cell[
+                        (faces_in_cell.segment == "lateral") & (
+                            faces_in_cell.num_sides == 3)
+                    ].index[0]
 
-        else :
+                    prev_nums = {
+                        "edge": monolayer.Ne,
+                        "face": monolayer.Nf,
+                        "vert": monolayer.Nv,
+                    }
+                    HI_transition(monolayer, face_to_eliminate)
+                    monolayer.face_df.loc[
+                        prev_nums["face"]:, "contractility"] = 0
+                elif len(faces_in_cell) == 4:
+                    if monolayer.cell_df.loc[cell, "vol"] > constriction_spec["critical_volume"]:
+                        shrink(monolayer, cell,
+                               constriction_spec["shrink_rate"])
+
+                    if current_traction < constriction_spec["max_traction"]:
+                        list_vert_in_cell = monolayer.get_orbits(
+                            "cell", "srce")
+                        vert_in_cell = monolayer.vert_df.loc[
+                            list_vert_in_cell[4].unique()]
+                        apical_vert = vert_in_cell[
+                            vert_in_cell["segment"] == "apical"].index[0]
+                        list_vert_connected_to_apical = monolayer.edge_df[
+                            monolayer.edge_df["srce"] == apical_vert]["trgt"].unique()
+                        opposite_vert = -1
+                        for v in list_vert_connected_to_apical:
+                            if v not in(vert_in_cell.index):
+                                opposite_vert = v
+                        if opposite_vert > -1:
+                            edges_to_pull = monolayer.edge_df[
+                                ((monolayer.edge_df.trgt == apical_vert) &
+                                 (monolayer.edge_df.srce == opposite_vert)) |
+                                ((monolayer.edge_df.srce == apical_vert) &
+                                 (monolayer.edge_df.trgt == opposite_vert))].index
+
+                            ab_pull_edge(monolayer, edges_to_pull,
+                                         constriction_spec["radial_tension"], True)
+                            current_traction += 1
+                            constriction_spec.update(
+                                {"current_traction": current_traction})
+
+        else:
             apical_face_area = monolayer.face_df.loc[apical_face_id, "area"]
 
             if apical_face_area > constriction_spec["critical_area"]:
@@ -85,7 +129,8 @@ def constriction(monolayer, manager, **kwargs):
                 )
 
                 if (constriction_spec["contract_neighbors"]) & (
-                    apical_face_area < constriction_spec["critical_area_neighbors"]
+                    apical_face_area < constriction_spec[
+                        "critical_area_neighbors"]
                 ):
 
                     sheet = monolayer.get_sub_sheet("apical")
@@ -124,7 +169,7 @@ def constriction(monolayer, manager, **kwargs):
                 if apical_face_area < constriction_spec["critical_area_reduction"]:
                     # Reduce neighbours for the apical face (until 3)
                     if monolayer.face_df.loc[apical_face_id, "num_sides"] > 3:
-                        #"Remove" the shortest edge
+                        # "Remove" the shortest edge
                         e_min = monolayer.edge_df[monolayer.edge_df[
                             "face"] == apical_face_id]["length"].idxmin()
                         prev_nums = {
@@ -146,23 +191,4 @@ def constriction(monolayer, manager, **kwargs):
                         }
                         HI_transition(monolayer, apical_face_id)
 
-
-
-        """proba_tension = np.exp(-apical_face_area /
-                               constriction_spec["critical_area"])
-        aleatory_number = random.uniform(0, 1)
-
-        if current_traction < constriction_spec["max_traction"]:
-            if aleatory_number < proba_tension:
-                current_traction += 1
-
-                if len(faces_in_cell) > 4:
-                    print("No traction when there is still an apical face")
-                    #ab_pull(monolayer, cell, constriction_spec[
-                    #        "radial_tension"], True)
-                if len(faces_in_cell) == 4:
-                    print("need to be coded")
-
-                constriction_spec.update(
-                    {"current_traction": current_traction})"""
     manager.append(constriction, **constriction_spec)

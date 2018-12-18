@@ -77,7 +77,8 @@ def contract_apical_face(
         or (monolayer.face_df.loc[face, contraction_column] > max_contractility)
     ):
         return
-    contract(monolayer, face, contractile_increase, multiple, contraction_column)
+    contract(monolayer, face, contractile_increase,
+             multiple, contraction_column)
 
 
 def ab_pull(monolayer, cell, radial_tension, distributed=False):
@@ -106,3 +107,15 @@ def ab_pull(monolayer, cell, radial_tension, distributed=False):
         new_tension = radial_tension
     monolayer.edge_df.loc[ab_edges, "line_tension"] += new_tension
     monolayer.edge_df.loc[ba_edges, "line_tension"] += new_tension
+
+
+def ab_pull_edge(monolayer, cell_edges, radial_tension, distributed=False):
+    """Adds a linear tension to the apical-to-basal edges
+    of a cell
+    """
+
+    if distributed:
+        new_tension = radial_tension / (len(cell_edges))
+    else:
+        new_tension = radial_tension
+    monolayer.edge_df.loc[cell_edges, "line_tension"] += new_tension
