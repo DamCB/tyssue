@@ -91,17 +91,15 @@ class EventManager:
             elem_id = -1
 
         for tup in self.next:
-            unique = kwargs.get('unique', True)
+            unique = kwargs.get("unique", True)
             if "face_id" in tup[1]:
                 if (elem_id == tup[1]["face_id"]) and (
-                    behavior.__name__ == tup[0].__name__ and (
-                        unique)
+                    behavior.__name__ == tup[0].__name__ and (unique)
                 ):
                     return
             elif "elem_id" in tup[1]:
                 if (elem_id == tup[1]["elem_id"]) and (
-                    behavior.__name__ == tup[0].__name__(
-                        unique)
+                    behavior.__name__ == tup[0].__name__(unique)
                 ):
                     return
         self.next.append((behavior, kwargs))

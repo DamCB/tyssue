@@ -30,7 +30,7 @@ def elastic_energy(element_df, var, elasticity, prefered):
 
 
 def _elastic_energy(element_df, x, elasticity, prefered):
-    energy = 0.5 * element_df[elasticity] * (element_df[x] - element_df[prefered])**2
+    energy = 0.5 * element_df[elasticity] * (element_df[x] - element_df[prefered]) ** 2
     return np.array(energy)
 
 
@@ -97,8 +97,7 @@ class LengthElasticity(AbstractEffector):
     @staticmethod
     def get_nrj_norm(specs):
         return (
-            specs["edge"]["length_elasticity"] *
-            specs["edge"]["prefered_length"] ** 2
+            specs["edge"]["length_elasticity"] * specs["edge"]["prefered_length"] ** 2
         )
 
     @staticmethod
@@ -284,6 +283,7 @@ class LumenVolumeElasticity(AbstractEffector):
     Global volume elasticity of the object.
     For example the volume of the yolk in the Drosophila embryo
     """
+
     dimensions = units.vol_elasticity
     magnitude = "lumen_vol_elasticity"
     label = "Lumen volume elasticity"
@@ -294,12 +294,17 @@ class LumenVolumeElasticity(AbstractEffector):
 
     @staticmethod
     def get_nrj_norm(specs):
-        return specs["settings"]["lumen_vol_elasticity"] * specs["settings"]["lumen_prefered_vol"] ** 2
+        return (
+            specs["settings"]["lumen_vol_elasticity"]
+            * specs["settings"]["lumen_prefered_vol"] ** 2
+        )
 
     @staticmethod
     def energy(eptm):
 
-        return _elastic_energy(eptm.settings, "lumen_vol", "lumen_vol_elasticity", "lumen_prefered_vol")
+        return _elastic_energy(
+            eptm.settings, "lumen_vol", "lumen_vol_elasticity", "lumen_prefered_vol"
+        )
 
     @staticmethod
     def gradient(eptm):
@@ -363,8 +368,7 @@ class FaceContractility(AbstractEffector):
         gamma_ = eptm.face_df.eval("contractility * perimeter * is_alive")
         gamma = eptm.upcast_face(gamma_)
 
-        grad_srce = -eptm.edge_df[eptm.ucoords] * \
-            to_nd(gamma, len(eptm.coords))
+        grad_srce = -eptm.edge_df[eptm.ucoords] * to_nd(gamma, len(eptm.coords))
         grad_srce.columns = ["g" + u for u in eptm.coords]
         grad_trgt = -grad_srce
         return grad_srce, grad_trgt
@@ -389,8 +393,7 @@ class SurfaceTension(AbstractEffector):
     @staticmethod
     def gradient(eptm):
 
-        G = to_nd(eptm.upcast_face(
-            eptm.face_df["surface_tension"]), len(eptm.coords))
+        G = to_nd(eptm.upcast_face(eptm.face_df["surface_tension"]), len(eptm.coords))
         grad_a_srce, grad_a_trgt = area_grad(eptm)
 
         grad_a_srce = G * grad_a_srce
@@ -441,8 +444,7 @@ class BorderElasticity(AbstractEffector):
     @staticmethod
     def get_nrj_norm(specs):
         return (
-            specs["edge"]["border_elasticity"] *
-            specs["edge"]["prefered_length"] ** 2
+            specs["edge"]["border_elasticity"] * specs["edge"]["prefered_length"] ** 2
         )
 
     @staticmethod

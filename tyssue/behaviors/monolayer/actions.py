@@ -15,9 +15,8 @@ def grow(monolayer, cell, grow_rate):
     by a factor (1+shrink_rate)
     """
     factor = 1 + grow_rate
-    faces = monolayer.edge_df[monolayer.edge_df["cell"] == cell]["face"].unique()
     monolayer.cell_df.loc[cell, "prefered_vol"] *= factor
-    monolayer.face_df.loc[faces, "prefered_area"] *= factor ** (2 / 3)
+    monolayer.cell_df.loc[cell, "prefered_area"] *= factor ** (2 / 3)
 
 
 def shrink(monolayer, cell, shrink_rate):
@@ -31,11 +30,11 @@ def shrink(monolayer, cell, shrink_rate):
 
 
 def contract(
-        monolayer,
-        face,
-        contractile_increase,
-        multiple=False,
-        contraction_column="contractility"
+    monolayer,
+    face,
+    contractile_increase,
+    multiple=False,
+    contraction_column="contractility",
 ):
     """
     Contract the face by increasing the 'contractility' parameter
@@ -47,6 +46,17 @@ def contract(
         monolayer.face_df.loc[face, contraction_column] += contractile_increase
 
 
+def relax(monolayer, face, contractile_decrease, contraction_column="contractility"):
+    initial_contractility = 1.12
+    new_contractility = (
+        monolayer.face_df.loc[face, contraction_column] / contractile_decrease
+    )
+
+    if new_contractility >= (initial_contractility / 2):
+        monolayer.face_df.loc[face, contraction_column] = new_contractility
+        monolayer.face_df.loc[face, "prefered_area"] *= contractile_decrease
+
+
 def contract_apical_face(
     monolayer,
     face_id,
@@ -54,7 +64,7 @@ def contract_apical_face(
     critical_area=1e-2,
     max_contractility=50,
     multiple=False,
-    contraction_column="contractility"
+    contraction_column="contractility",
 ):
     """Single step contraction event for apical face only
     """
@@ -90,12 +100,22 @@ def ab_pull(monolayer, cell, radial_tension, distributed=False):
     ba_edges = lateral_edges[
         (trgt_segment == "apical") & (srce_segment == "basal")
     ].index
-    # TODO treat factor directly - not as a multiple of
-    # the default line_tension (which might be 0)
+
     if distributed:
-        factor = radial_tension / (len(ab_edges) + len(ba_edges))
+        new_tension = radial_tension / (len(ab_edges) + len(ba_edges))
     else:
-        factor = radial_tension
-    new_tension = monolayer.specs["edge"]["line_tension"] * factor
+        new_tension = radial_tension
     monolayer.edge_df.loc[ab_edges, "line_tension"] += new_tension
     monolayer.edge_df.loc[ba_edges, "line_tension"] += new_tension
+
+
+def ab_pull_edge(monolayer, cell_edges, radial_tension, distributed=False):
+    """Adds a linear tension to the apical-to-basal edges
+    of a cell
+    """
+
+    if distributed:
+        new_tension = radial_tension / (len(cell_edges))
+    else:
+        new_tension = radial_tension
+    monolayer.edge_df.loc[cell_edges, "line_tension"] += new_tension

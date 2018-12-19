@@ -12,14 +12,14 @@ from .actions import shrink, ab_pull, exchange, remove
 from .basic_events import contraction
 
 default_apoptosis_spec = {
-    'face_id': -1,
-    'face': -1,
-    'shrink_rate': 0.1,
-    'critical_area': 1e-2,
-    'radial_tension': 0.1,
-    'contractile_increase': 0.1,
-    'contract_span': 2,
-    'geom': SheetGeometry,
+    "face_id": -1,
+    "face": -1,
+    "shrink_rate": 0.1,
+    "critical_area": 1e-2,
+    "radial_tension": 0.1,
+    "contractile_increase": 0.1,
+    "contract_span": 2,
+    "geom": SheetGeometry,
 }
 
 
@@ -51,21 +51,27 @@ def apoptosis(sheet, manager, **kwargs):
 
     apoptosis_spec = default_apoptosis_spec
     apoptosis_spec.update(**kwargs)
-    face = apoptosis_spec['face']
+    face = apoptosis_spec["face"]
 
-    if sheet.face_df.loc[face, "area"] > apoptosis_spec['critical_area']:
+    if sheet.face_df.loc[face, "area"] > apoptosis_spec["critical_area"]:
         # Shrink and pull
-        shrink(sheet, face, apoptosis_spec['shrink_rate'])
-        ab_pull(sheet, face, apoptosis_spec['radial_tension'])
+        shrink(sheet, face, apoptosis_spec["shrink_rate"])
+        ab_pull(sheet, face, apoptosis_spec["radial_tension"])
         # contract neighbors
         neighbors = sheet.get_neighborhood(
-            face, apoptosis_spec['contract_span']).dropna()
+            face, apoptosis_spec["contract_span"]
+        ).dropna()
         neighbors["id"] = sheet.face_df.loc[neighbors.face, "id"].values
         manager.extend(
             [
                 (
-                    contraction, {'face_id': neighbor["id"],
-                                  'contractile_increase':(apoptosis_spec['contractile_increase'] / neighbor["order"],)},
+                    contraction,
+                    {
+                        "face_id": neighbor["id"],
+                        "contractile_increase": (
+                            apoptosis_spec["contractile_increase"] / neighbor["order"],
+                        ),
+                    },
                 )
                 for _, neighbor in neighbors.iterrows()
             ]
@@ -73,10 +79,10 @@ def apoptosis(sheet, manager, **kwargs):
         done = False
     else:
         if sheet.face_df.loc[face, "num_sides"] > 3:
-            exchange(sheet, face, apoptosis_spec['geom'])
+            exchange(sheet, face, apoptosis_spec["geom"])
             done = False
         else:
-            remove(sheet, face, apoptosis_spec['geom'])
+            remove(sheet, face, apoptosis_spec["geom"])
             done = True
     if not done:
         manager.append(apoptosis, **apoptosis_spec)

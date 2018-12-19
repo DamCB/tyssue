@@ -8,7 +8,6 @@ Mesoderm invagination event module
 import random
 import numpy as np
 
-from ...geometry.sheet_geometry import SheetGeometry
 from ...utils.decorators import face_lookup
 from .actions import relax, contract, ab_pull
 from .basic_events import contraction
@@ -20,15 +19,12 @@ default_constriction_spec = {
     "contract_rate": 2,
     "critical_area": 1e-2,
     "radial_tension": 1.0,
-    "nb_iteration": 0,
-    "nb_iteration_max": 20,
     "contract_neighbors": True,
     "critical_area_neighbors": 10,
     "contract_span": 2,
     "basal_contract_rate": 1.001,
     "current_traction": 0,
     "max_traction": 30,
-    "geom": SheetGeometry,
     "contraction_column": "contractility",
 }
 
@@ -56,9 +52,6 @@ def constriction(sheet, manager, **kwargs):
     radial_tension : float, default 1.
        tension applied on the face vertices along the
        apical-basal axis.
-    nb_iteration : int, default 0
-       number of extra iterations where the apical-basal force is applied
-       between each type 1 transition
     contract_neighbors : bool, default `False`
        if True, the face contraction triggers contraction of the neighbor
        faces.
@@ -78,8 +71,7 @@ def constriction(sheet, manager, **kwargs):
 
     if "is_relaxation" in sheet.face_df.columns:
         if sheet.face_df.loc[face, "is_relaxation"]:
-            relax(sheet, face, contract_rate,
-                  constriction_spec["contraction_column"])
+            relax(sheet, face, contract_rate, constriction_spec["contraction_column"])
 
     if sheet.face_df.loc[face, "is_mesoderm"]:
         face_area = sheet.face_df.loc[face, "area"]
@@ -102,8 +94,7 @@ def constriction(sheet, manager, **kwargs):
                 neighbors = sheet.get_neighborhood(
                     face, constriction_spec["contract_span"]
                 ).dropna()
-                neighbors["id"] = sheet.face_df.loc[
-                    neighbors.face, "id"].values
+                neighbors["id"] = sheet.face_df.loc[neighbors.face, "id"].values
 
                 # remove cell which are not mesoderm
                 ectodermal_cell = sheet.face_df.loc[neighbors.face][
@@ -118,9 +109,7 @@ def constriction(sheet, manager, **kwargs):
                     [
                         (
                             contraction,
-                            _neighbor_contractile_increase(
-                                neighbor, constriction_spec
-                            ),
+                            _neighbor_contractile_increase(neighbor, constriction_spec),
                         )  # TODO: check this
                         for _, neighbor in neighbors.iterrows()
                     ]
@@ -132,11 +121,7 @@ def constriction(sheet, manager, **kwargs):
             if aleatory_number < proba_tension:
                 current_traction = current_traction + 1
                 ab_pull(sheet, face, constriction_spec["radial_tension"], True)
-                constriction_spec.update(
-                    {
-                        "current_traction": current_traction,
-                    }
-                )
+                constriction_spec.update({"current_traction": current_traction})
 
     manager.append(constriction, **constriction_spec)
 
@@ -146,9 +131,9 @@ def _neighbor_contractile_increase(neighbor, constriction_spec):
     contract = constriction_spec["contract_rate"]
     basal_contract = constriction_spec["basal_contract_rate"]
 
-    increase = (-(contract - basal_contract)
-                / constriction_spec["contract_span"]
-                ) * neighbor["order"] + contract
+    increase = (
+        -(contract - basal_contract) / constriction_spec["contract_span"]
+    ) * neighbor["order"] + contract
 
     specs = {
         "face_id": neighbor["id"],
@@ -157,7 +142,7 @@ def _neighbor_contractile_increase(neighbor, constriction_spec):
         "max_contractility": 50,
         "contraction_column": constriction_spec["contraction_column"],
         "multiple": True,
-        "unique": False
+        "unique": False,
     }
 
     return specs
