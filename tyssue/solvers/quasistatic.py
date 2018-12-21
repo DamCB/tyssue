@@ -71,7 +71,7 @@ class QSSolver:
         settings = config.solvers.quasistatic()
         settings.update(**minimize_kw)
         coords = eptm.coords
-        pos0 = eptm.vert_df[coords].values.ravel()
+        pos0 = eptm.vert_df.loc[eptm.vert_df.is_active, eptm.coords].values.ravel()
         max_length = eptm.edge_df["length"].max() / 2
         bounds = np.vstack([pos0 - max_length, pos0 + max_length]).T
         res = optimize.minimize(
@@ -87,7 +87,9 @@ class QSSolver:
     @staticmethod
     def _set_pos(eptm, geom, pos):
         ndims = len(eptm.coords)
-        eptm.vert_df[eptm.coords] = pos.reshape((pos.size // ndims, ndims))
+        eptm.vert_df.loc[eptm.vert_df.is_active, eptm.coords] = pos.reshape(
+            (pos.size // ndims, ndims)
+        )
         geom.update_all(eptm)
 
     def _opt_energy(self, pos, eptm, geom, model):
@@ -98,7 +100,8 @@ class QSSolver:
     @staticmethod
     def _opt_grad(pos, eptm, geom, model):
         grad_i = model.compute_gradient(eptm)
-        return grad_i.values.ravel()
+
+        return grad_i.loc[eptm.vert_df.is_active].values.ravel()
 
     @classmethod
     def approx_grad(cls, eptm, geom, model):
