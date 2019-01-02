@@ -70,7 +70,6 @@ class QSSolver:
 
         settings = config.solvers.quasistatic()
         settings.update(**minimize_kw)
-        coords = eptm.coords
         pos0 = eptm.vert_df.loc[eptm.vert_df.is_active, eptm.coords].values.ravel()
         max_length = eptm.edge_df["length"].max() / 2
         bounds = np.vstack([pos0 - max_length, pos0 + max_length]).T
