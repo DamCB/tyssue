@@ -67,7 +67,7 @@ class Sheet(Epithelium):
 
         face_edges = self.edge_df[self.edge_df["face"] == face]
         op_edges = face_edges["opposite"].dropna().astype(np.int)
-        return self.edge_df.loc[op_edges, "face"].values
+        return self.edge_df.loc[op_edges[op_edges >= 0], "face"].values
 
     def get_neighborhood(self, face, order):
         """Returns `face` neighborhood up to a degree of `order`

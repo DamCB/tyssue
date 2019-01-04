@@ -70,7 +70,7 @@ class QSSolver:
 
         settings = config.solvers.quasistatic()
         settings.update(**minimize_kw)
-        pos0 = eptm.vert_df.loc[eptm.vert_df.is_active, eptm.coords].values.ravel()
+        pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.ravel()
         max_length = eptm.edge_df["length"].max() / 2
         bounds = np.vstack([pos0 - max_length, pos0 + max_length]).T
         res = optimize.minimize(
@@ -86,7 +86,7 @@ class QSSolver:
     @staticmethod
     def _set_pos(eptm, geom, pos):
         ndims = len(eptm.coords)
-        eptm.vert_df.loc[eptm.vert_df.is_active, eptm.coords] = pos.reshape(
+        eptm.vert_df.loc[eptm.active_verts, eptm.coords] = pos.reshape(
             (pos.size // ndims, ndims)
         )
         geom.update_all(eptm)
@@ -100,18 +100,16 @@ class QSSolver:
     def _opt_grad(pos, eptm, geom, model):
         grad_i = model.compute_gradient(eptm)
 
-        return grad_i.loc[eptm.vert_df.is_active].values.ravel()
+        return grad_i.loc[eptm.active_verts].values.ravel()
 
-    @classmethod
-    def approx_grad(cls, eptm, geom, model):
-        pos0 = eptm.vert_df[eptm.coords].values.ravel()
-        grad = optimize.approx_fprime(pos0, cls._opt_energy, 1e-9, eptm, geom, model)
+    def approx_grad(self, eptm, geom, model):
+        pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.ravel()
+        grad = optimize.approx_fprime(pos0, self._opt_energy, 1e-9, eptm, geom, model)
         return grad
 
-    @classmethod
-    def check_grad(cls, eptm, geom, model):
-        pos0 = eptm.vert_df[eptm.coords].values.ravel()
+    def check_grad(self, eptm, geom, model):
+        pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.ravel()
         grad_err = optimize.check_grad(
-            cls._opt_energy, cls._opt_grad, pos0.flatten(), eptm, geom, model
+            self._opt_energy, self._opt_grad, pos0.flatten(), eptm, geom, model
         )
         return grad_err

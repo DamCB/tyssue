@@ -124,6 +124,8 @@ class Epithelium:
 
         self._bad = None
         self.bbox = None
+        if "is_active" in self.vert_df.columns:
+            self.active_verts = self.vert_df[self.vert_df.is_active == 1].index
         self.set_bbox()
 
     @property
@@ -256,6 +258,8 @@ class Epithelium:
         number of faces for the cells.
         """
         self.update_num_sides()
+        if "is_active" in self.vert_df.columns:
+            self.active_verts = self.vert_df[self.vert_df.is_active == 1].index
         if "cell" in self.data_names:
             self.update_num_faces()
 

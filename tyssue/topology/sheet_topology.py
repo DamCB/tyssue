@@ -378,6 +378,8 @@ def auto_t1(fun):
         sheet.reset_index()
         sheet.reset_topo()
         geom.update_all(sheet)
+        # re-execute with updated topology
+        res = fun(*args, **kwargs)
         return res
 
     return with_t1
@@ -408,6 +410,8 @@ def auto_t3(fun):
         sheet.reset_index()
         sheet.reset_topo()
         geom.update_all(sheet)
+        # re-execute with updated topology
+        res = fun(*args, **kwargs)
         return res
 
     return with_t3
