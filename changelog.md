@@ -1,12 +1,7 @@
 
-* WIP solver refactoring
-* WIP constrained points repartition
-* WIP energy min with collitions and T1
-
-
 # What's new in 0.3
 
-* passed black formatter
+The codebase now uses [black](https://github.com/ambv/black) to format all the code base.
 
 
 ## Licence
@@ -16,36 +11,41 @@ a problem to you, we can offer accomodations.
 
 ## Vizualisation
 
+The use of the top level `draw.sheet_view` function is encouraged. It is now possible to specify visibility at the single face level with a `"visible"` column in the face DataFrame.
 
 ## Behavior
 
-* event management refactoring
-* Add monolayer actions
-* Add option in kwargs to add unique event or not
-* refactored `delamination` to work with the new event API
+###  Event management refactoring
+
+We refactored event management with a keyword arguments only design to make passing complex parameter dictionnaries  easier.
+
+Actions and events where added for monolayer objects
+
+There is now an option in the manager `append` methods kwargs to add unique event or not.
 
 ## Core
 
-* Adds a History class to handle time series of sheet movements
+* Added a `History` class to handle time series of sheet movements
 
 ## Geometry
 
 * Lumen volume calculation on a new geometry class (#110)
 * Create a new segment vertex category : lateral in Monolayer
-* adds finally statement to scale_unscale utils
+* adds `finally` statement to scale_unscale utils
 * Change 'sagittal' key word by 'lateral' key word
 
-## Topology
-
-* Correction of segment category for new faces create in IH transition
 
 
 ## Solvers
 
-* Collisions (#102)
+* Collisions (#102) detection
 
 
 ## Dynamics
+
+### New quasitatic solver class.
+
+### New effectors
 
 * Add LumenVolumeElasticity effector
 * added SurfaceTension effector
@@ -56,6 +56,8 @@ a problem to you, we can offer accomodations.
 * Better opposite management and validation for Sheet, closes #72
 * Correction of color face (#85)
 * fixes reset_specs warning formatting bug
+* Correction of segment category for new faces create in IH transition
+
 
 ## Pruning
 
