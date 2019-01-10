@@ -2,35 +2,36 @@ import logging
 import numpy as np
 import pandas as pd
 import warnings
+from functools import wraps
 
-from ..solvers.sheet_vertex_solver import Solver
-from . import self_intersections
-
+from .intersection import self_intersections
 
 log = logging.getLogger(__name__)
 
 
-class CollisionSolver(Solver):
-    """Quasistatic solver with collision correction
+def solve_collisions(fun):
+    """Decorator to solve collisions detections after the
+    execution of the decorated function.
+
+    It is assumed that the two first arguments of the decorated
+    function are a :class:`Sheet` object and a geometry class
     """
 
-    @classmethod
-    def opt_energy(cls, pos, pos_idx, sheet, geom, model):
-        # Keep old position safe
+    @wraps(fun)
+    def with_collision_correction(*args, **kwargs):
+        sheet, geom = args[:2]
         position_buffer = sheet.vert_df[sheet.coords].copy()
-
-        cls.set_pos(pos, pos_idx, sheet)
-        geom.update_all(sheet)
-
+        res = fun(*args, **kwargs)
         intersecting_edges = self_intersections(sheet)
         if intersecting_edges.shape[0]:
             log.info("%d intersections where detected", intersecting_edges.shape[0])
             shyness = sheet.settings.get("shyness", 1e-10)
             boxes = CollidingBoxes(sheet, position_buffer, intersecting_edges)
             boxes.solve_collisions(shyness)
-
         geom.update_all(sheet)
-        return model.compute_energy(sheet, full_output=False)
+        return res
+
+    return with_collision_correction
 
 
 class CollidingBoxes:

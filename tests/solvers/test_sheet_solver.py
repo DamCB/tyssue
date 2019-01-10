@@ -6,6 +6,7 @@ from tyssue import config
 from tyssue.io.hdf5 import load_datasets
 from tyssue.stores import stores_dir
 from tyssue.solvers.sheet_vertex_solver import Solver as solver
+from tyssue.solvers import QSSolver
 
 
 TOL = 1e-5
@@ -31,4 +32,8 @@ def test_solver():
     settings = {"minimize": {"options": {"disp": False, "ftol": 1e-4, "gtol": 1e-4}}}
 
     res = solver.find_energy_min(sheet, geom, model, **settings)
+    assert res["success"]
+
+    new_solver = QSSolver(with_collisions=True, with_t1=True, with_t3=True)
+    res = new_solver.find_energy_min(sheet, geom, model, **settings["minimize"])
     assert res["success"]

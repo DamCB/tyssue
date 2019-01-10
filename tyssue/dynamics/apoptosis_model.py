@@ -28,7 +28,9 @@ class ApicoBasalTension(effectors.AbstractEffector):
 
     @staticmethod
     def gradient(sheet):
-        grad = to_nd(sheet.vert_df["radial_tension"], 3) * height_grad(sheet)
+        grad = to_nd(sheet.vert_df.eval("radial_tension * is_active"), 3) * height_grad(
+            sheet
+        )
         grad.columns = ["gx", "gy", "gz"]
         return grad, None
 
