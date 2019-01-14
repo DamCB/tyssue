@@ -57,7 +57,7 @@ If you want to do that, I assume you allready know how to manage
 dependencies on your platform.
 
 ```bash
-git clone https://github.com/CellModels/tyssue.git
+git clone --recursive https://github.com/CellModels/tyssue.git
 cd tyssue/
 python setup.py install
 ```
