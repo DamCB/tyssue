@@ -76,25 +76,28 @@ edges**.
 
 ```python
 ## Core object
-from tyssue.core.sheet import Sheet
+from tyssue import Sheet
 ## Simple 2D geometry
-from tyssue.geometry.planar_geometry import PlanarGeometry
+from tyssue import PlanarGeometry
 ## Visualisation (matplotlib based)
-from tyssue.draw.plt_draw import sheet_view
+from tyssue.draw import sheet_view
 
 sheet = Sheet.planar_sheet_2d('basic2D', nx=6, ny=7,
                               distx=1, disty=1)
 PlanarGeometry.update_all(sheet)
 sheet.sanitize()
+fig, ax = sheet_view(sheet)
 ```
 
 ### Features
 
 * Easy data manipulation.
-* Multiple geometries (Sheets in 2D and 3D, monolayers, bulk, cell
-centered models...).
+* Multiple geometries (Sheets in 2D and 3D, monolayers, bulk).
 * Easy to extend.
-* 2D (matplotlib) and 3D (vispy) customisable visualisation.
+* 2D (matplotlib) and 3D (ipyvolume) customisable visualisation.
+* Easy quasistatic model definition.
+* Self collision detection. **new in 0.3**
+
 
 ### Documentation
 
@@ -114,10 +117,10 @@ Unsubscribe ➙ https://framalistes.org/sympa/sigrequest/tyssue
 * Bertrand Caré - @bcare
 * Cyprien Gay - @cypriengay
 * Guillaume Gay (maintainer) - @glyg
-* Hadrien Mary (build wizard) - @hadim
+* Hadrien Mary - @hadim
 * François Molino
 * Magali Suzanne
-* Sophie Theis @sophietheis
+* Sophie Theis - @sophietheis
 
 ## Dependencies
 
@@ -127,7 +130,7 @@ it's time to move on...
 
 ### Core
 
-- CGAL > 4.4
+- CGAL > 4.7
 - Python >= 3.6
 - numpy
 - scipy
@@ -159,13 +162,6 @@ conda install -c conda-forge tyssue
 
 See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary python environment.
 
-In a nutshell, install from github goes like that:
-
-```bash
-git clone https://github.com/DamCB/tyssue.git
-cd tyssue/
-python setup.py install
-```
 
 ## Licence
 
@@ -174,15 +170,13 @@ Since version 0.3, this project is distributed under the terms of the [General P
 
 Versions 2.4 and earlier were distributed under the [Mozilla Public Licence](https://www.mozilla.org/en-US/MPL/2.0/).
 
-If GPL licencing is too restrictive for your intended usage, please contact the authors.
+If GPL licencing is too restrictive for your intended usage, please contact the maintainer.
 
 ## Bibliography
 
-* Here is a [Mendeley group](https://www.mendeley.com/groups/7132031/tyssue/) for the project's
-  bibliography
+* There is a [Bibtex file here](bibliography/tyssue.bib) with collected relevant publications.
 
-* There is also a good old [Bibtex file here](bibliography/tyssue.bib)
-
+The tyssue library stemed from a refactoring of the `leg-joint` code used in [monier2015apico].
 
 
 [monier2015apico]: Monier, B. et al. Apico-basal forces exerted by

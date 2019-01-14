@@ -29,7 +29,7 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 ## Thanks to them!
 MAJOR = 0
 MINOR = 3
-MICRO = "rc2"
+MICRO = 0
 ISRELEASED = True
 VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
 
@@ -64,18 +64,17 @@ def get_version_info():
     FULLVERSION = VERSION
     if os.path.exists(".git"):
         GIT_REVISION = git_version()
-    elif os.path.exists("tyssue/version.py"):
+    if os.path.exists("tyssue/version.py"):
         # must be a source distribution, use existing version file
-        try:
-            from tyssue.version import git_revision as GIT_REVISION
-        except (ImportError, ModuleNotFoundError):
-            warnings.warn(
-                "Unable to import git_revision. Try removing "
-                "tyssue/version.py and the build directory "
-                "before building."
-            )
-            GIT_REVISION = ""
-
+        # read from it instead of importing to avoid importing
+        # the whole package
+        with open("tyssue/version.py", "r") as fh:
+            for line in fh.readlines():
+                if line.startswith("git_revision"):
+                    GIT_REVISION = line.split("=")[-1][2:-2]
+                    break
+            else:
+                GIT_REVISION = "Unknown"
     else:
         GIT_REVISION = "Unknown"
 
