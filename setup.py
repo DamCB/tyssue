@@ -3,6 +3,7 @@ import re
 import sys
 import platform
 import subprocess
+import warnings
 
 from distutils.version import LooseVersion
 from setuptools import setup, find_packages, Extension
@@ -67,12 +68,14 @@ def get_version_info():
         # must be a source distribution, use existing version file
         try:
             from tyssue.version import git_revision as GIT_REVISION
-        except ImportError:
-            raise ImportError(
+        except (ImportError, ModuleNotFoundError):
+            warnings.warn(
                 "Unable to import git_revision. Try removing "
                 "tyssue/version.py and the build directory "
                 "before building."
             )
+            GIT_REVISION = ""
+
     else:
         GIT_REVISION = "Unknown"
 
