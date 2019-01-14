@@ -66,22 +66,17 @@ class EventManager:
 
         behavior is a function whose signature is
         ..code :
-            behavior(sheet, manager, elem_id,
-                     *args, **kwargs)
+            behavior(sheet, manager, **kwargs)
 
         this function itself might populate the managers next deque
 
         Parameters
         ----------
         behavior : function
-        elem_id : int, default -1
-            the id of the affected element, leave to
-            to -1 if the behavior is not element specific
-        args : tuple, defaults to ()
-            extra arguments to the behavior function
         kwargs : dict defaults to {}
-            extra keywords arguments to the behavior function
-
+            keywords arguments to the behavior function
+            if `"face_id"` is in the kwargs dictionnary,
+            the face with this id is used.
         """
         if "face_id" in kwargs:
             elem_id = kwargs["face_id"]

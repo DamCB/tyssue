@@ -1,3 +1,5 @@
+Since version 0.3, tyssue depends on CGAL for collision detection, and thus a c++ compiler toolchain. It is thus advised to use conda for a simple installation procedure.
+
 ## Installing tyssue with conda
 
 If you already have a conda environment ready:
@@ -5,29 +7,47 @@ If you already have a conda environment ready:
 conda install -c conda-forge tyssue
 ```
 
-## From the beginnig
+This will install tyssue and all its dependencies, with the pre-compiled binary parts.
+
+
+## Installing from source
 
 Those are the instructions to install the package from source on a
 debian-like linux distribution. If you allready have a basic
 scientific python stack, use it, don't install anaconda.
 
+### Install a C++ compiler
 
-### Get and install Anaconda
-
-Go to http://continuum.io/downloads and grab anaconda for your
-architecture, and follow up to date instructions there.x
-
-
-
-If you don't want the whole distrib, you can alternatively download
-[miniconda](http://conda.pydata.org/miniconda.html)
-
-### Create a virtual environment with `conda`
+With an Debian like system, this is achieved by:
 
 ```bash
-conda env create -f environment.yml # installs the dependencies
-## activate the new environment
-source activate tyssue
+sudo apt install build-essential cmake g++
+```
+
+
+### Install CGAL
+
+You can use a pre-packaged version for your OS. For Debian:
+```bash
+sudo apt install libcgal-dev
+```
+Note that you need version 4.7 or higher.
+
+If you need to install CGAL from source, here is a `cmake` command sufficient to later compile tyssue:
+
+```bash
+cd CGAL # This is the directory where the CGAL archive was uncompressed
+mkdir build && cd build
+
+# needs qt5 for imageio
+cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_PREFIX_PATH=${PREFIX} \
+  -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+  -DCGAL_INSTALL_LIB_DIR=lib \
+  -DWITH_CGAL_ImageIO=OFF -DWITH_CGAL_Qt5=OFF \
+  ..
+make install -j${CPU_COUNT}
 ```
 
 
