@@ -7,6 +7,7 @@ from scipy import optimize
 from .. import config
 from ..collisions import solve_collisions
 from ..topology.sheet_topology import auto_t1, auto_t3
+from ..topology.bulk_topology import auto_IH, auto_HI
 
 
 class QSSolver:
@@ -22,7 +23,14 @@ class QSSolver:
       by the model
     """
 
-    def __init__(self, with_t1=False, with_t3=False, with_collisions=False):
+    def __init__(
+        self,
+        with_t1=False,
+        with_t3=False,
+        with_collisions=False,
+        with_IH=False,
+        with_HI=False,
+    ):
         """Creates a quasistatic gradient descent solver with optional
         type1, type3 and collision detection and solving routines.
 
@@ -45,8 +53,12 @@ class QSSolver:
         self.set_pos = self._set_pos
         if with_t1:
             self.set_pos = auto_t1(self.set_pos)
+        elif with_IH:
+            self.set_pos = auto_IH(self.set_pos)
         if with_t3:
             self.set_pos = auto_t3(self.set_pos)
+        elif with_HI:
+            self.set_pos = auto_HI(self.set_pos)
         if with_collisions:
             self.set_pos = solve_collisions(self.set_pos)
 

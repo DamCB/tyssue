@@ -18,37 +18,8 @@ def auto_IH(fun):
     the decorated function.
 
     It is assumed that the two first arguments of the decorated
-    function are a :class:`Sheet` object and a geometry class
-    """
-
-    @wraps(fun)
-    def with_IH(*args, **kwargs):
-        logger.debug("checking for HIs")
-        mono, geom = args[:2]
-        l_th = mono.settings.get("threshold_length", 1e-6)
-        res = fun(*args, **kwargs)
-        shorts = mono.edge_df[mono.edge_df.length < l_th].sort_values("length").index
-        if not len(shorts):
-            return res
-        logger.info("performing %i T1", len(shorts))
-        for edge in shorts:
-            IH_transition(mono, edge)
-        mono.reset_index()
-        mono.reset_topo()
-        geom.update_all(mono)
-        # re-execute with updated topology
-        res = fun(*args, **kwargs)
-        return res
-
-    return with_IH
-
-
-def auto_IH(fun):
-    """Decorator to solve type 1 transitions after the execution of
-    the decorated function.
-
-    It is assumed that the two first arguments of the decorated
-    function are a :class:`Sheet` object and a geometry class
+    function are a :class:`Epithelium` or :class:`Monolayer`
+    object and a geometry class
     """
 
     @wraps(fun)

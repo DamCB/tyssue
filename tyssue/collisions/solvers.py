@@ -5,6 +5,8 @@ import warnings
 from functools import wraps
 
 from .intersection import self_intersections
+from ..core.monolayer import Monolayer
+from ..core.sheet import Sheet
 
 log = logging.getLogger(__name__)
 
@@ -15,23 +17,47 @@ def solve_collisions(fun):
 
     It is assumed that the two first arguments of the decorated
     function are a :class:`Sheet` object and a geometry class
+
+    Note
+    ----
+    The function is re-executed with the updated geometry
     """
 
     @wraps(fun)
     def with_collision_correction(*args, **kwargs):
-        sheet, geom = args[:2]
-        position_buffer = sheet.vert_df[sheet.coords].copy()
+        eptm, geom = args[:2]
+        position_buffer = eptm.vert_df[eptm.coords].copy()
         res = fun(*args, **kwargs)
-        intersecting_edges = self_intersections(sheet)
-        if intersecting_edges.shape[0]:
-            log.info("%d intersections where detected", intersecting_edges.shape[0])
-            shyness = sheet.settings.get("shyness", 1e-10)
-            boxes = CollidingBoxes(sheet, position_buffer, intersecting_edges)
-            boxes.solve_collisions(shyness)
-        geom.update_all(sheet)
+        if isinstance(eptm, Monolayer):
+            solve_monolayer_collisions(eptm, position_buffer)
+        elif isinstance(eptm, Sheet):
+            solve_sheet_collisions(eptm, position_buffer)
+        geom.update_all(eptm)
+        ## re-execute with corrected positions
+        res = fun(*args, **kwargs)
         return res
 
     return with_collision_correction
+
+
+def solve_monolayer_collisions(mono, position_buffer):
+
+    for segment in ["apical", "basal"]:
+        seg_idx = mono.segement_index(segment, "vert")
+        sub_sheet = mono.get_sub_sheet(segment)
+        sub_buffer = position_buffer.loc[seg_idx]
+        solve_sheet_collisions(sub_sheet, sub_buffer)
+        mono.vert_df.loc[seg_idx, mono.coords] = sub_sheet.vert_df[mono.coords]
+
+
+def solve_sheet_collisions(sheet, position_buffer):
+
+    intersecting_edges = self_intersections(sheet)
+    if intersecting_edges.shape[0]:
+        log.info("%d intersections where detected", intersecting_edges.shape[0])
+        shyness = sheet.settings.get("shyness", 1e-10)
+        boxes = CollidingBoxes(sheet, position_buffer, intersecting_edges)
+        boxes.solve_collisions(shyness)
 
 
 class CollidingBoxes:
