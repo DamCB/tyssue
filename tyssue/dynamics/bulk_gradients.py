@@ -21,15 +21,21 @@ def volume_grad(eptm):
     )
 
 
-def all_volume_grad(eptm):
+def lumen_volume_grad(eptm):
     """
-    Calculate volume gradient for the all object.
-    For example calculate the yolk volume of the embryo.
+    Calculates the gradient for the volume enclosed by the epithelium.
+
+    For a monolayer, it will by default compute the volume enclosed
+    by the basal side (edges whose 'segment' column is "basal").
+    If the polarity is reversed and the apical side faces the lumen,
+    this can be changed by setting eptm.settings["lumen_side"] to 'apical'
+
     """
 
     coords = eptm.coords
     if "segment" in eptm.edge_df:
-        basal_edges = eptm.edge_df[eptm.edge_df.segment == eptm.settings["lumen_side"]].copy()
+        lumen_side = eptm.settings.get("lumen_side", "basal")
+        basal_edges = eptm.edge_df[eptm.edge_df.segment == lumen_side]
         face_pos = basal_edges[["f" + c for c in coords]].values
         srce_pos = basal_edges[["s" + c for c in coords]].values
         trgt_pos = basal_edges[["t" + c for c in coords]].values

@@ -279,3 +279,15 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
     eptm.settings["abc"] = [a, b, c]
     BulkGeometry.update_all(eptm)
     return eptm
+
+
+def spherical_sheet(radius, Nf, **kwargs):
+    """Returns a spherical sheet with the given radius and (approximately)
+    the given number of cells
+    """
+
+    n_zs = int(np.ceil(np.roots([2, 1.0, -Nf])[-1]))  # determined experimentaly ;p
+    eptm = ellipsoid_sheet(radius, radius, radius, n_zs, **kwargs)
+    eptm.settings.pop("abc")
+    eptm.settings["radius"] = radius
+    return eptm

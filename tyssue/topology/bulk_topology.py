@@ -1,15 +1,112 @@
 import logging
 import itertools
 import numpy as np
+from functools import wraps
+
 from .sheet_topology import face_division
 from .base_topology import add_vert, close_face
 from ..geometry.utils import rotation_matrix
 from ..geometry.bulk_geometry import BulkGeometry
 from ..core.objects import get_opposite_faces
-from ..utils.decorators import do_undo, validate
 
 
 logger = logging.getLogger(name=__name__)
+
+
+def auto_IH(fun):
+    """Decorator to solve type 1 transitions after the execution of
+    the decorated function.
+
+    It is assumed that the two first arguments of the decorated
+    function are a :class:`Sheet` object and a geometry class
+    """
+
+    @wraps(fun)
+    def with_IH(*args, **kwargs):
+        logger.debug("checking for HIs")
+        mono, geom = args[:2]
+        l_th = mono.settings.get("threshold_length", 1e-6)
+        res = fun(*args, **kwargs)
+        shorts = mono.edge_df[mono.edge_df.length < l_th].sort_values("length").index
+        if not len(shorts):
+            return res
+        logger.info("performing %i T1", len(shorts))
+        for edge in shorts:
+            IH_transition(mono, edge)
+        mono.reset_index()
+        mono.reset_topo()
+        geom.update_all(mono)
+        # re-execute with updated topology
+        res = fun(*args, **kwargs)
+        return res
+
+    return with_IH
+
+
+def auto_IH(fun):
+    """Decorator to solve type 1 transitions after the execution of
+    the decorated function.
+
+    It is assumed that the two first arguments of the decorated
+    function are a :class:`Sheet` object and a geometry class
+    """
+
+    @wraps(fun)
+    def with_IH(*args, **kwargs):
+        logger.debug("checking for IHs")
+        mono, geom = args[:2]
+        l_th = mono.settings.get("threshold_length", 1e-6)
+        res = fun(*args, **kwargs)
+        shorts = mono.edge_df[mono.edge_df.length < l_th].sort_values("length").index
+        if not len(shorts):
+            return res
+        logger.info("performing %i IH", len(shorts))
+        for edge in shorts:
+            IH_transition(mono, edge)
+        mono.reset_index()
+        mono.reset_topo()
+        geom.update_all(mono)
+        # re-execute with updated topology
+        res = fun(*args, **kwargs)
+        return res
+
+    return with_IH
+
+
+def auto_HI(fun):
+    """Decorator to solve type 1 transitions after the execution of
+    the decorated function.
+
+    It is assumed that the two first arguments of the decorated
+    function are a :class:`Sheet` object and a geometry class
+    """
+
+    @wraps(fun)
+    def with_HI(*args, **kwargs):
+        logger.debug("checking for HIs")
+        mono, geom = args[:2]
+        a_th = mono.settings.get("threshold_area", 1e-8)
+        res = fun(*args, **kwargs)
+
+        smalls = (
+            mono.face_df[(mono.face_df.area < a_th) & (mono.face_df.num_sides == 3)]
+            .sort_values("area")
+            .index
+        )
+
+        if not len(smalls):
+            return res
+        logger.info("performing %i HI", len(smalls))
+        for face in smalls:
+            HI_transition(mono, face)
+        mono.reset_index()
+        mono.reset_topo()
+        geom.update_all(mono)
+        # re-execute with updated topology
+        res = fun(*args, **kwargs)
+        return res
+
+    return with_HI
 
 
 def get_division_edges(eptm, mother, plane_normal, plane_center=None):
@@ -63,7 +160,6 @@ def get_division_vertices(
     return vertices
 
 
-@do_undo
 def cell_division(eptm, mother, geom, vertices=None):
 
     if vertices is None:
@@ -181,7 +277,6 @@ def find_rearangements(eptm):
     return edges_IH, faces_HI
 
 
-@do_undo
 def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
@@ -339,7 +434,6 @@ def IH_transition(eptm, e_1011):
     eptm.reset_topo()
 
 
-@do_undo
 def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013

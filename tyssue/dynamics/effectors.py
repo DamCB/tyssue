@@ -9,7 +9,7 @@ from . import units
 
 from .planar_gradients import area_grad as area_grad2d
 from .sheet_gradients import height_grad, area_grad
-from .bulk_gradients import volume_grad, all_volume_grad
+from .bulk_gradients import volume_grad, lumen_volume_grad
 
 
 def elastic_force(element_df, var, elasticity, prefered):
@@ -312,7 +312,7 @@ class LumenVolumeElasticity(AbstractEffector):
             eptm.settings, "lumen_vol", "lumen_vol_elasticity", "lumen_prefered_vol"
         )
 
-        grad_v_srce, grad_v_trgt = all_volume_grad(eptm)
+        grad_v_srce, grad_v_trgt = lumen_volume_grad(eptm)
         grad_v_srce = kv_v0 * grad_v_srce
         grad_v_trgt = kv_v0 * grad_v_trgt
 
