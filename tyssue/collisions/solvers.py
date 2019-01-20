@@ -43,11 +43,16 @@ def solve_collisions(fun):
 def solve_monolayer_collisions(mono, position_buffer):
 
     for segment in ["apical", "basal"]:
-        seg_idx = mono.segement_index(segment, "vert")
+        seg_idx = mono.segment_index(segment, "vert")
         sub_sheet = mono.get_sub_sheet(segment)
-        sub_buffer = position_buffer.loc[seg_idx]
+        sub_sheet.reset_index()
+        sub_buffer = pd.DataFrame(
+            position_buffer.loc[seg_idx].values,
+            index=sub_sheet.vert_df.index,
+            columns=sub_sheet.coords,
+        )
         solve_sheet_collisions(sub_sheet, sub_buffer)
-        mono.vert_df.loc[seg_idx, mono.coords] = sub_sheet.vert_df[mono.coords]
+        mono.vert_df.loc[seg_idx, mono.coords] = sub_sheet.vert_df[mono.coords].values
 
 
 def solve_sheet_collisions(sheet, position_buffer):

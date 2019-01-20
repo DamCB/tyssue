@@ -1,6 +1,7 @@
 import numpy as np
-from tyssue import Epithelium, Monolayer
-from tyssue import BulkGeometry, MonoLayerGeometry
+from tyssue.core.objects import Epithelium
+from tyssue.core.monolayer import Monolayer
+from tyssue.geometry.bulk_geometry import BulkGeometry, MonolayerGeometry
 from tyssue import Sheet
 from tyssue.config.geometry import bulk_spec
 
@@ -60,7 +61,7 @@ def test_monolayer_division():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d, method="translation")
     eptm = Monolayer("test_volume", datasets, bulk_spec(), coords=["x", "y", "z"])
-    MonoLayerGeometry.update_all(eptm)
+    MonolayerGeometry.update_all(eptm)
     for orientation in ["vertical", "horizontal"]:
         daughter = cell_division(eptm, 0, orientation=orientation)
         eptm.reset_topo()

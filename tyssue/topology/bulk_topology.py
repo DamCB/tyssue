@@ -261,7 +261,7 @@ def IH_transition(eptm, e_1011):
     try:
         (v1, v4), (v2, v5), (v3, v6) = v_pairs
     except ValueError:
-        print(
+        logger.warning(
             "Edge {} is not a valid junction to"
             " perform IH transition on, aborting".format(e_1011)
         )
@@ -318,6 +318,7 @@ def IH_transition(eptm, e_1011):
             "I - H transition is not possible without cells on either ends"
             "of the edge - would result in a hole"
         )
+        return
 
     if orient < 0:
         v1, v2, v3 = v1, v3, v2
