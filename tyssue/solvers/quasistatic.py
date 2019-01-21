@@ -1,3 +1,4 @@
+# /bin/env python
 """Quasistatic solver for vertex models
 
 """
@@ -6,7 +7,7 @@ import numpy as np
 from scipy import optimize
 from .. import config
 from ..collisions import solve_collisions
-from ..topology.sheet_topology import auto_t1, auto_t3
+from ..topology import auto_t1, auto_t3
 
 
 class QSSolver:
@@ -99,7 +100,6 @@ class QSSolver:
     @staticmethod
     def _opt_grad(pos, eptm, geom, model):
         grad_i = model.compute_gradient(eptm)
-
         return grad_i.loc[eptm.active_verts].values.ravel()
 
     def approx_grad(self, eptm, geom, model):
