@@ -371,3 +371,20 @@ def get_opposite(edge_df):
         opposite = st_indexed[~dup].reindex(flipped)["edge"].values
     opposite[np.isnan(opposite)] = -1
     return opposite.astype(np.int)
+
+
+def get_outer_sheet(eptm):
+    """Return a Sheet object formed by all the faces w/o an opposite
+    face.
+    """
+    eptm.get_opposite_faces()
+    is_free_face = eptm.face_df["opposite"] == -1
+    is_free_edge = eptm.upcast_face(is_free_face)
+    edge_df = eptm.edge_df[is_free_edge].copy()
+    face_df = eptm.face_df[is_free_face].copy()
+    vert_df = eptm.vert_df.loc[edge_df["srce"].unique()].copy()
+
+    datasets = {"edge": edge_df, "face": face_df, "vert": vert_df}
+    specs = {k: eptm.specs[k] for k in ["face", "edge", "vert", "settings"]}
+
+    return Sheet(eptm.identifier + "outer", datasets, specs)

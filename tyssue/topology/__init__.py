@@ -6,7 +6,10 @@ from ..core.sheet import Sheet
 
 from .base_topology import *
 from .sheet_topology import type1_transition, remove_face
-from .bulk_topology import HI_transition, IH_transition
+from .bulk_topology import HI_transition, IH_transition, find_HIs, find_IHs
+
+
+MAX_ITER = 10
 
 
 def auto_t1(fun):
@@ -14,23 +17,29 @@ def auto_t1(fun):
     def with_rearange(*args, **kwargs):
         eptm, geom = args[:2]
         logger.debug("checking for t1s")
-        l_th = eptm.settings.get("threshold_length", 1e-6)
         res = fun(*args, **kwargs)
-        shorts = eptm.edge_df[eptm.edge_df.length < l_th].sort_values("length").index
-        np.random.shuffle(shorts.values)
+        shorts = find_IHs(eptm)
         if not len(shorts):
             return res
-        if isinstance(eptm, Sheet):
-            for edge in shorts:
-                type1_transition(eptm, edge)
-        elif isinstance(eptm, Monolayer):
-            for edge in shorts:
-                IH_transition(eptm, edge)
-        eptm.reset_index()
-        eptm.reset_topo()
-        geom.update_all(eptm)
-        # re-execute with updated topology
-        res = fun(*args, **kwargs)
+        i = 0
+        while len(shorts):
+            shorter_edge = shorts[0]
+            if isinstance(eptm, Sheet):
+                type1_transition(eptm, shorter_edge)
+            else:
+                IH_transition(eptm, shorter_edge)
+            eptm.reset_index()
+            eptm.reset_topo()
+            geom.update_all(eptm)
+            shorts = find_IHs(eptm)
+            if len(shorts) and shorts[0] == shorter_edge:
+                # IH transition did not work, skipping
+                logger.info("removing shorter edge %i", shorter_edge)
+                shorts = shorts[1:]
+            i += 1
+            if i > MAX_ITER:
+                break
+        logger.info("performed %i T1", i)
         return res
 
     return with_rearange
@@ -40,28 +49,38 @@ def auto_t3(fun):
     @wraps(fun)
     def with_rearange(*args, **kwargs):
         eptm, geom = args[:2]
-        logger.debug("checking for t1s")
-        a_th = eptm.settings.get("threshold_area", 1e-8)
+        logger.debug("checking for t3s")
         res = fun(*args, **kwargs)
-        tri_faces = eptm.face_df[
-            (eptm.face_df.area < a_th) & (eptm.face_df.num_sides > 3)
-        ]
-
-        np.random.shuffle(tri_faces.values)
+        tri_faces = find_HIs(eptm)
         if not len(tri_faces):
             return res
-        logger.info("performing %i T3", len(tri_faces))
-        if isinstance(eptm, Sheet):
-            for face in tri_faces:
-                remove_face(eptm, face)
-        elif isinstance(eptm, Monolayer):
-            for face in tri_faces:
-                HI_transition(eptm, face)
+        i = 0
+        while len(tri_faces):
+            smaller_face = tri_faces[0]
+            if isinstance(eptm, Sheet):
+                remove_face(eptm, smaller_face)
+            else:
+                HI_transition(eptm, smaller_face)
+            eptm.reset_index()
+            eptm.reset_topo()
+            geom.update_all(eptm)
+            tri_faces = find_HIs(eptm)
+            i += 1
+            if i > MAX_ITER:
+                break
+
+        logger.info("performed %i T3", i)
         eptm.reset_index()
         eptm.reset_topo()
         geom.update_all(eptm)
-        # re-execute with updated topology
-        res = fun(*args, **kwargs)
         return res
 
     return with_rearange
+
+
+def _get_shorter_edges(eptm, discarded, l_th):
+    shorts = eptm.edge_df[eptm.edge_df.length < 5 * l_th].sort_values("length")
+    shorts = (
+        shorts[["srce", "trgt"]].apply(frozenset, axis=1).drop_duplicates().index.values
+    )
+    return shorts

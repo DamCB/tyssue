@@ -85,7 +85,7 @@ class Monolayer(Epithelium):
             for element in ["edge", "face", "vert"]
         }
         specs = {k: self.specs[k] for k in ["face", "edge", "vert", "settings"]}
-        return Sheet(self.identifier + "apical", datasets, specs)
+        return Sheet(self.identifier + segment, datasets, specs)
 
 
 class MonolayerWithLamina(Monolayer):
