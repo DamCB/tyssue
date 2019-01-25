@@ -368,6 +368,6 @@ def get_outer_sheet(eptm):
     vert_df = eptm.vert_df.loc[edge_df["srce"].unique()].copy()
 
     datasets = {"edge": edge_df, "face": face_df, "vert": vert_df}
-    specs = {k: eptm.specs[k] for k in ["face", "edge", "vert", "settings"]}
+    specs = {k: eptm.specs.get(k, {}) for k in ["face", "edge", "vert", "settings"]}
 
     return Sheet(eptm.identifier + "outer", datasets, specs)
