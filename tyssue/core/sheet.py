@@ -62,12 +62,7 @@ class Sheet(Epithelium):
     def get_neighbors(self, face):
         """Returns the faces adjacent to `face`
         """
-        if "opposite" not in self.edge_df.columns:
-            self.edge_df["opposite"] = get_opposite(self.edge_df)
-
-        face_edges = self.edge_df[self.edge_df["face"] == face]
-        op_edges = face_edges["opposite"].dropna().astype(np.int)
-        return self.edge_df.loc[op_edges[op_edges >= 0], "face"].values
+        return super().get_neighbors(face, elem="face")
 
     def get_neighborhood(self, face, order):
         """Returns `face` neighborhood up to a degree of `order`
@@ -82,19 +77,7 @@ class Sheet(Epithelium):
 
         """
         # Start with the face so that it's not gathered later
-        neighbors = pd.DataFrame.from_dict({"face": [face], "order": [0]})
-        for k in range(order + 1):
-            for neigh in neighbors[neighbors["order"] == k - 1]["face"]:
-                new_neighs = self.get_neighbors(neigh)
-                new_neighs = set(new_neighs).difference(neighbors["face"])
-
-                orders = np.ones(len(new_neighs), dtype=np.int) * k
-                new_neighs = pd.DataFrame.from_dict(
-                    {"face": list(new_neighs), "order": orders}, dtype=np.int
-                )
-                neighbors = pd.concat([neighbors, new_neighs])
-
-        return neighbors.reset_index(drop=True).loc[1:]
+        return super().get_neighborhood(face, order, elem="face")
 
     def get_extra_indices(self):
         """Computes extra indices:

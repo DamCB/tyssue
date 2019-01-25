@@ -496,6 +496,59 @@ class Epithelium:
         else:
             return None
 
+    def get_neighbors(self, elem_id, elem="cell"):
+        """Returns the indexes of the adjacent elements (cells or faces) of
+        the element of index `elem_id`.
+
+        Parameters
+        ----------
+        elem_id : int
+            the index of the central element (a face or a cell)
+        element : {'cell' | 'face'}, default 'cell'
+
+        Returns
+        -------
+        neghbors : set
+            the cells (or faces) sharing an edge with the central cell (face)
+        """
+
+        topo = self.edge_df[["srce", "trgt", elem]]
+        edges = self.edge_df[self.edge_df[elem] == elem_id][["srce", "trgt"]]
+
+        neighbors = set(
+            topo[
+                (topo["srce"].isin(edges["srce"]) & topo["trgt"].isin(edges["trgt"]))
+                | (topo["srce"].isin(edges["trgt"]) & topo["trgt"].isin(edges["srce"]))
+            ][elem]
+        )
+        return neighbors - {elem_id}
+
+    def get_neighborhood(self, elem_id, order, elem="cell"):
+        """Returns `elem_id` neighborhood up to a degree of `order`
+
+        For example, if `order` is 2, it wil return the adjacent cells (or faces)
+        and theses cells neighbors.
+
+        Returns
+        -------
+        neighbors : pd.DataFrame with two colums, the index
+            of the neighboring cell (face), and it's neighboring order
+
+        """
+
+        neighbors = pd.DataFrame.from_dict({elem: [elem_id], "order": [0]})
+
+        for k in range(order + 1):
+            for neigh in neighbors[neighbors["order"] == k - 1][elem]:
+                new_neighs = self.get_neighbors(neigh)
+                new_neighs = set(new_neighs).difference(neighbors[elem])
+                orders = np.ones(len(new_neighs), dtype=np.int) * (k)
+                new_neighs = pd.DataFrame.from_dict(
+                    {elem: list(new_neighs), "order": orders}, dtype=np.int
+                )
+                neighbors = pd.concat([neighbors, new_neighs])
+        return neighbors.reset_index(drop=True).loc[1:]
+
     def face_polygons(self, coords=None):
         """ Returns a pd.Series of arrays with the coordinates the face polygons
 
