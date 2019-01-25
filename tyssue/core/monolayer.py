@@ -13,7 +13,7 @@ class Monolayer(Epithelium):
     3D monolayer epithelium
     """
 
-    def __init__(self, name, datasets, specs, coords=None):
+    def __init__(self, name, datasets, specs=None, coords=None):
 
         super().__init__(name, datasets, specs, coords)
         self.vert_df["is_active"] = 1
@@ -93,7 +93,7 @@ class MonolayerWithLamina(Monolayer):
     3D monolayer epithelium with a lamina meshing
     """
 
-    def __init__(self, name, datasets, specs, coords=None):
+    def __init__(self, name, datasets, specs=None, coords=None):
 
         super().__init__(name, datasets, specs, coords)
 
