@@ -64,7 +64,7 @@ def get_version_info():
     FULLVERSION = VERSION
     if os.path.exists(".git"):
         GIT_REVISION = git_version()
-    if os.path.exists("tyssue/version.py"):
+    elif os.path.exists("tyssue/version.py"):
         # must be a source distribution, use existing version file
         # read from it instead of importing to avoid importing
         # the whole package
