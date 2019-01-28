@@ -218,7 +218,28 @@ class SheetGeometry(PlanarGeometry):
         return rot_pos
 
 
-class EllipsoidGeometry(SheetGeometry):
+class ClosedSheetGeometry(SheetGeometry):
+    """Geometry for a closed 2.5D sheet.
+
+    Apart from the geometry update from a normal sheet, the enclosed
+    volume is also computed. The value is stored in `sheet.settings["lumen_vol"]`
+    """
+
+    @classmethod
+    def update_all(cls, sheet):
+        super().update_all(sheet)
+        cls.update_lumen_vol(sheet)
+
+    @staticmethod
+    def update_lumen_vol(sheet):
+        lumen_pos_faces = sheet.edge_df[["f" + c for c in sheet.coords]].values
+        lumen_sub_vol = (
+            np.sum((lumen_pos_faces) * sheet.edge_df[sheet.ncoords].values, axis=1) / 6
+        )
+        sheet.settings["lumen_vol"] = sum(lumen_sub_vol)
+
+
+class EllipsoidGeometry(ClosedSheetGeometry):
     @staticmethod
     def update_height(eptm):
 

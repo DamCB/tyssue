@@ -2,6 +2,7 @@ import numpy as np
 
 from tyssue.dynamics.base_gradients import length_grad
 from tyssue import generation, Sheet, SheetGeometry
+from tyssue.geometry.sheet_geometry import EllipsoidGeometry
 from tyssue.dynamics.sheet_gradients import height_grad
 
 
@@ -17,6 +18,7 @@ def test_length_grad():
 def test_spherical_grad():
     sheet = generation.ellipsoid_sheet(1, 1, 1, 10)
     sheet.settings["geometry"] = "spherical"
+    EllipsoidGeometry.update_all(sheet)
     np.testing.assert_approx_equal(
-        np.linalg.norm(height_grad(sheet), axis=1).mean(), 2, 2
+        np.linalg.norm(height_grad(sheet), axis=1).mean(), 1, 2
     )

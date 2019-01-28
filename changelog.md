@@ -1,4 +1,11 @@
 
+# What's new in 0.3.1
+
+- Collision detection also works for the outer layers of bulk tissues, i.e. collisions of the apical or basal surfaces are avoided for a monolayer.
+
+- Added `get_neighbors` and `get_neighborhood` method to `Epithelium` to allow local patch queries in bulk epithelia (was initially only possible for 2D sheets).
+
+
 # What's new in 0.3
 
 ## Solvers

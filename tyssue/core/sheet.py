@@ -10,7 +10,7 @@ A dynamical model derived from Fahradifar et al. 2007 is provided in
 
 For 2D in 3D, the geometric properties are defined in
  `tyssue.geometry.sheet_geometry`
-A dynamical model derived from Fahradifar et al. 2007 is provided in
+A dynamical model derived from Monier, Gettings et al. 2015 is provided in
 `tyssue.dynamics.sheet_vertex_model`
 
 
@@ -62,12 +62,7 @@ class Sheet(Epithelium):
     def get_neighbors(self, face):
         """Returns the faces adjacent to `face`
         """
-        if "opposite" not in self.edge_df.columns:
-            self.edge_df["opposite"] = get_opposite(self.edge_df)
-
-        face_edges = self.edge_df[self.edge_df["face"] == face]
-        op_edges = face_edges["opposite"].dropna().astype(np.int)
-        return self.edge_df.loc[op_edges[op_edges >= 0], "face"].values
+        return super().get_neighbors(face, elem="face")
 
     def get_neighborhood(self, face, order):
         """Returns `face` neighborhood up to a degree of `order`
@@ -82,19 +77,7 @@ class Sheet(Epithelium):
 
         """
         # Start with the face so that it's not gathered later
-        neighbors = pd.DataFrame.from_dict({"face": [face], "order": [0]})
-        for k in range(order + 1):
-            for neigh in neighbors[neighbors["order"] == k - 1]["face"]:
-                new_neighs = self.get_neighbors(neigh)
-                new_neighs = set(new_neighs).difference(neighbors["face"])
-
-                orders = np.ones(len(new_neighs), dtype=np.int) * k
-                new_neighs = pd.DataFrame.from_dict(
-                    {"face": list(new_neighs), "order": orders}, dtype=np.int
-                )
-                neighbors = pd.concat([neighbors, new_neighs])
-
-        return neighbors.reset_index(drop=True).loc[1:]
+        return super().get_neighborhood(face, order, elem="face")
 
     def get_extra_indices(self):
         """Computes extra indices:
@@ -371,3 +354,20 @@ def get_opposite(edge_df):
         opposite = st_indexed[~dup].reindex(flipped)["edge"].values
     opposite[np.isnan(opposite)] = -1
     return opposite.astype(np.int)
+
+
+def get_outer_sheet(eptm):
+    """Return a Sheet object formed by all the faces w/o an opposite
+    face.
+    """
+    eptm.get_opposite_faces()
+    is_free_face = eptm.face_df["opposite"] == -1
+    is_free_edge = eptm.upcast_face(is_free_face)
+    edge_df = eptm.edge_df[is_free_edge].copy()
+    face_df = eptm.face_df[is_free_face].copy()
+    vert_df = eptm.vert_df.loc[edge_df["srce"].unique()].copy()
+
+    datasets = {"edge": edge_df, "face": face_df, "vert": vert_df}
+    specs = {k: eptm.specs.get(k, {}) for k in ["face", "edge", "vert", "settings"]}
+
+    return Sheet(eptm.identifier + "outer", datasets, specs)

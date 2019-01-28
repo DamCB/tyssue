@@ -5,11 +5,11 @@ import logging
 logger = logging.getLogger(name=__name__)
 
 
-def load_datasets(h5store, data_names=["face", "vert", "edge"]):
+def load_datasets(h5store, data_names=["face", "vert", "edge", "cell"]):
     if not os.path.isfile(h5store):
         raise FileNotFoundError("file %s not found" % h5store)
     with pd.HDFStore(h5store) as store:
-        data = {name: store[name] for name in data_names}
+        data = {name: store[name] for name in data_names if name in store}
     return data
 
 

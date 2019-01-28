@@ -95,7 +95,7 @@ def close_face(eptm, face):
     trgts = set(face_edges["trgt"])
 
     if srces == trgts:
-        logger.info("Face {} already closed".format(face))
+        logger.debug("Face {} already closed".format(face))
         return
     try:
         single_srce, = srces.difference(trgts)

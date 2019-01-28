@@ -11,10 +11,11 @@ from .geometry.planar_geometry import PlanarGeometry
 from .geometry.sheet_geometry import SheetGeometry
 from .geometry.bulk_geometry import (
     BulkGeometry,
-    MonoLayerGeometry,
+    MonolayerGeometry,
     RNRGeometry,
     ClosedMonolayerGeometry,
 )
+
 from .geometry.multisheetgeometry import MultiSheetGeometry
 
 logger = logging.getLogger('tyssue')
