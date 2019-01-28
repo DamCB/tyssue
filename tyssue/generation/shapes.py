@@ -9,7 +9,7 @@ from ..core.objects import get_prev_edges
 from ..core.objects import Epithelium
 from .from_voronoi import from_3d_voronoi
 from ..geometry.bulk_geometry import BulkGeometry
-from ..geometry.sheet_geometry import ClosedSheetGeometry
+from ..geometry.sheet_geometry import EllipsoidGeometry
 
 from ..utils import single_cell
 
@@ -278,7 +278,7 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
     )
     eptm.vert_df["z"] = c * np.sin(eptm.vert_df["theta"])
     eptm.settings["abc"] = [a, b, c]
-    ClosedSheetGeometry.update_all(eptm)
+    EllipsoidGeometry.update_all(eptm)
     return eptm
 
 
