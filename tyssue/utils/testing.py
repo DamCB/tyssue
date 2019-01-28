@@ -19,11 +19,19 @@ def effector_tester(eptm, effector):
     grad_s, grad_t = effector.gradient(eptm)
     assert np.all(np.isfinite(grad_s))
 
-    if grad_s.shape[0] == eptm.Nv:
+    if grad_s.shape == (eptm.Nv, eptm.dim):
         assert grad_t is None
-    elif grad_s.shape[0] == eptm.Ne:
+    elif grad_s.shape == (eptm.Ne, eptm.dim):
         assert grad_t.shape[0] == eptm.Ne
         assert np.all(np.isfinite(grad_t))
+    else:
+        raise ValueError(
+            f"""
+            The computed gradients for effector {effector.label}
+            should have shape {(eptm.Ne, eptm.dim)} or {(eptm.Nv, eptm.dim)},
+            found {grad_s.shape}.
+            """
+        )
 
 
 def model_tester(eptm, model):

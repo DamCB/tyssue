@@ -5,6 +5,7 @@ from .sheet_geometry import SheetGeometry
 
 from .utils import rotation_matrix
 from ..utils import _to_3d
+from ..core.sheet import Sheet
 
 
 class BulkGeometry(SheetGeometry):
@@ -176,20 +177,21 @@ class ClosedMonolayerGeometry(MonolayerGeometry):
         """
 
         """
-        if "lumen_side" in eptm.settings:
-
-            lumen_edges = eptm.edge_df[
-                eptm.edge_df.segment == eptm.settings["lumen_side"]
-            ].copy()
-            lumen_pos_faces = lumen_edges[["f" + c for c in eptm.coords]].values
-            lumen_edges["lumen_sub_vol"] = (
-                np.sum((lumen_pos_faces) * lumen_edges[eptm.ncoords].values, axis=1) / 6
-            )
-            eptm.settings["lumen_vol"] = eptm.sum_cell(lumen_edges["lumen_sub_vol"]).sum().values[0]
-        else:
+        if isinstance(eptm, Sheet):
             lumen_pos_faces = eptm.edge_df[["f" + c for c in eptm.coords]].values
-            eptm.edge_df["lumen_sub_vol"] = (
+            lumen_sub_vol = (
                 np.sum((lumen_pos_faces) * eptm.edge_df[eptm.ncoords].values, axis=1)
                 / 6
             )
             eptm.settings["lumen_vol"] = sum(eptm.edge_df["lumen_sub_vol"])
+
+        else:
+
+            lumen_edges = eptm.edge_df[
+                eptm.edge_df.segment == eptm.settings.get("lumen_side", "basal")
+            ].copy()
+            lumen_pos_faces = lumen_edges[["f" + c for c in eptm.coords]].values
+            lumen_sub_vol = (
+                np.sum((lumen_pos_faces) * lumen_edges[eptm.ncoords].values, axis=1) / 6
+            )
+            eptm.settings["lumen_vol"] = -lumen_sub_vol.sum()

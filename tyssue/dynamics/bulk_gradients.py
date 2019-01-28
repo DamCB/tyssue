@@ -39,12 +39,18 @@ def lumen_volume_grad(eptm):
         face_pos = basal_edges[["f" + c for c in coords]].values
         srce_pos = basal_edges[["s" + c for c in coords]].values
         trgt_pos = basal_edges[["t" + c for c in coords]].values
-        grad_v_srce = np.cross((trgt_pos), (face_pos)) / 4
-        grad_v_trgt = -np.cross((srce_pos), (face_pos)) / 4
-        return (
-            pd.DataFrame(grad_v_srce, index=basal_edges.index, columns=eptm.coords),
-            pd.DataFrame(grad_v_trgt, index=basal_edges.index, columns=eptm.coords),
+
+        grad_v_srce = pd.DataFrame(
+            np.zeros((eptm.Ne, 3)), index=eptm.edge_df.index, columns=eptm.coords
         )
+        grad_v_trgt = pd.DataFrame(
+            np.zeros((eptm.Ne, 3)), index=eptm.edge_df.index, columns=eptm.coords
+        )
+
+        grad_v_srce.loc[basal_edges.index] = -np.cross((trgt_pos), (face_pos)) / 4
+        grad_v_trgt.loc[basal_edges.index] = np.cross((srce_pos), (face_pos)) / 4
+
+        return grad_v_srce, grad_v_trgt
     else:
         face_pos = eptm.edge_df[["f" + c for c in coords]].values
         srce_pos = eptm.edge_df[["s" + c for c in coords]].values
