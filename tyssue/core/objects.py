@@ -787,6 +787,8 @@ class Epithelium:
             lambda s: face_pairs.append(list(s.values)) if len(s) == 2 else np.nan
         ).dropna()
         face_pairs = np.array(face_pairs)
+        if not face_pairs.shape[0]:
+            return
         self.face_df.loc[face_pairs[:, 0], "opposite"] = face_pairs[:, 1]
         self.face_df.loc[face_pairs[:, 1], "opposite"] = face_pairs[:, 0]
 
