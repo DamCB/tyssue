@@ -177,21 +177,11 @@ class ClosedMonolayerGeometry(MonolayerGeometry):
         """
 
         """
-        if isinstance(eptm, Sheet):
-            lumen_pos_faces = eptm.edge_df[["f" + c for c in eptm.coords]].values
-            lumen_sub_vol = (
-                np.sum((lumen_pos_faces) * eptm.edge_df[eptm.ncoords].values, axis=1)
-                / 6
-            )
-            eptm.settings["lumen_vol"] = sum(eptm.edge_df["lumen_sub_vol"])
-
-        else:
-
-            lumen_edges = eptm.edge_df[
-                eptm.edge_df.segment == eptm.settings.get("lumen_side", "basal")
-            ].copy()
-            lumen_pos_faces = lumen_edges[["f" + c for c in eptm.coords]].values
-            lumen_sub_vol = (
-                np.sum((lumen_pos_faces) * lumen_edges[eptm.ncoords].values, axis=1) / 6
-            )
-            eptm.settings["lumen_vol"] = -lumen_sub_vol.sum()
+        lumen_edges = eptm.edge_df[
+            eptm.edge_df.segment == eptm.settings.get("lumen_side", "basal")
+        ].copy()
+        lumen_pos_faces = lumen_edges[["f" + c for c in eptm.coords]].values
+        lumen_sub_vol = (
+            np.sum((lumen_pos_faces) * lumen_edges[eptm.ncoords].values, axis=1) / 6
+        )
+        eptm.settings["lumen_vol"] = -lumen_sub_vol.sum()
