@@ -66,7 +66,9 @@ class History:
         if sheet.cell_df is not None:
             ccols = extra_cols["cell"]
             self.ccols = _filter_columns(ccols, sheet.cell_df.columns, "cell")
-            self.cell_h = sheet.cell_df[self.ccols].copy()
+            self.cell_h = sheet.cell_df[self.ccols].reset_index(drop=False)
+            if not "t" in self.ccols:
+                self.cell_h["t"] = 0
             self.datasets["cell"] = self.cell_h
             self.columns["cell"] = self.ccols
 

@@ -1,6 +1,28 @@
 import numpy as np
 
 
+def update_spherical(eptm):
+    """ Computes the spherical coordinates (rho, theta, phi)
+    of an epithelium.
+
+    rho is the distance to the coordinate system's origin, theta
+    is the co-latitude (0 ≤ θ < π) and phi is the longitude (0 ≤ ϕ < 2π).
+    """
+    for element in ["vert", "face", "cell"]:
+        if eptm.datasets.get(element) is None:
+            continue
+        eptm.datasets[element]["rho"] = np.linalg.norm(
+            eptm.datasets[element][["x", "y", "z"]], axis=1
+        )
+        eptm.datasets[element]["theta"] = np.arccos(
+            eptm.datasets[element].eval("z / rho")
+        )
+        eptm.datasets[element]["phi"] = np.arctan2(
+            eptm.datasets[element].eval("y / (rho * sin(theta))"),
+            eptm.datasets[element].eval("x / (rho * sin(theta))"),
+        )
+
+
 def rotation_matrix(angle, direction):
     # Copyright (c) 2006-2015, Christoph Gohlke
     # Copyright (c) 2006-2015, The Regents of the University of California

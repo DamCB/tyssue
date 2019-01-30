@@ -1,15 +1,20 @@
 import logging
 import itertools
+from functools import wraps
+
+
 import numpy as np
+import pandas as pd
+
 from .sheet_topology import face_division
 from .base_topology import add_vert, close_face
 from ..geometry.utils import rotation_matrix
 from ..geometry.bulk_geometry import BulkGeometry
 from ..core.objects import get_opposite_faces
-from ..utils.decorators import do_undo, validate
 
 
 logger = logging.getLogger(name=__name__)
+MAX_ITER = 10
 
 
 def get_division_edges(eptm, mother, plane_normal, plane_center=None):
@@ -63,7 +68,6 @@ def get_division_vertices(
     return vertices
 
 
-@do_undo
 def cell_division(eptm, mother, geom, vertices=None):
 
     if vertices is None:
@@ -168,20 +172,53 @@ def find_rearangements(eptm):
     edges_HI: set of indexes of short edges
     faces_IH: set of indexes of small triangular faces
     """
-    l_th = eptm.settings["threshold_length"]
-    up_num_sides = eptm.upcast_face(eptm.face_df["num_sides"])
+    l_th = eptm.settings.get("threshold_length", 1e-6)
     shorts = eptm.edge_df[eptm.edge_df["length"] < l_th]
-    non_triangular = up_num_sides[up_num_sides > 4].index
-    edges_IH = set(shorts.index).intersection(non_triangular)
-
-    max_f_length = shorts.groupby("face")["length"].apply(max)
-    short_faces = max_f_length[max_f_length < l_th].index
-    three_faces = eptm.face_df[eptm.face_df["num_sides"] == 3].index
-    faces_HI = set(three_faces).intersection(short_faces)
+    if not shorts.shape[0]:
+        return []
+    edges_IH = find_IHs(eptm, shorts)
+    faces_HI = find_HIs(eptm, shorts)
     return edges_IH, faces_HI
 
 
-@do_undo
+def find_IHs(eptm, shorts=None):
+
+    l_th = eptm.settings.get("threshold_length", 1e-6)
+    up_num_sides = eptm.upcast_face(eptm.face_df["num_sides"])
+    if shorts is None:
+        shorts = eptm.edge_df[(eptm.edge_df["length"] < l_th) & up_num_sides > 3]
+    else:
+        shorts = shorts[up_num_sides > 3]
+    if not shorts.shape[0]:
+        return []
+
+    edges_IH = shorts.groupby(["srce", "trgt"]).apply(
+        lambda df: pd.Series(
+            {
+                "edge": df.index[0],
+                "length": df["length"].iloc[0],
+                "pair": frozenset(df.iloc[0][["srce", "trgt"]]),
+            }
+        )
+    )
+    # keep only one of the edges per vertex pair and sort by length
+    edges_IH = edges_IH.drop_duplicates("pair").sort_values("length")
+    return edges_IH.index
+
+
+def find_HIs(eptm, shorts=None):
+    l_th = eptm.settings.get("threshold_length", 1e-6)
+    if shorts is None:
+        shorts = eptm.edge_df[(eptm.edge_df["length"] < l_th)]
+    if not shorts.shape[0]:
+        return []
+
+    max_f_length = shorts.groupby("face")["length"].apply(max)
+    short_faces = eptm.face_df.loc[max_f_length[max_f_length < l_th].index]
+    faces_HI = short_faces[short_faces["num_sides"] == 3].sort_values("area").index
+    return faces_HI
+
+
 def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
@@ -194,12 +231,22 @@ def IH_transition(eptm, e_1011):
     v_pairs = _get_vertex_pairs_IH(eptm, e_1011)
     try:
         (v1, v4), (v2, v5), (v3, v6) = v_pairs
-    except ValueError:
-        print(
-            "Edge {} is not a valid junction to"
-            " perform IH transition on, aborting".format(e_1011)
+    except ValueError as err:
+        logger.warning(
+            "Edge %i is not a valid junction to perform IH transition, aborting", e_1011
         )
-        return
+        raise err
+    if len({v1, v4, v2, v5, v3, v6}) != 6:
+        logger.warning(
+            "Edge %i has adjacent triangular faces"
+            " can't perform IH transition, aborting",
+            e_1011,
+        )
+        raise ValueError(
+            f"Edge {e_1011} has adjacent triangular faces"
+            " can't perform IH transition, aborting"
+        )
+
     new_vs = eptm.vert_df.loc[[v1, v2, v3]].copy()
     eptm.vert_df = eptm.vert_df.append(new_vs, ignore_index=True)
     v7, v8, v9 = eptm.vert_df.index[-3:]
@@ -252,6 +299,7 @@ def IH_transition(eptm, e_1011):
             "I - H transition is not possible without cells on either ends"
             "of the edge - would result in a hole"
         )
+        return
 
     if orient < 0:
         v1, v2, v3 = v1, v3, v2
@@ -339,7 +387,6 @@ def IH_transition(eptm, e_1011):
     eptm.reset_topo()
 
 
-@do_undo
 def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013
@@ -468,7 +515,7 @@ def _add_edge_to_existing(eptm, cell, vi, vj, new_srce, new_trgt):
 def _set_new_pos_IH(eptm, e_1011, vertices):
     """Okuda 2013 equations 46 to 56
     """
-    Dl_th = eptm.settings["threshold_length"]
+    Dl_th = eptm.settings["threshold_length"] * 1.01
 
     (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11) = vertices
 
@@ -524,6 +571,6 @@ def _set_new_pos_HI(eptm, fa, v10, v11):
     norm_a = eptm.edge_df[eptm.edge_df["face"] == fa][eptm.ncoords].mean(axis=0).values
     norm_a = norm_a / np.linalg.norm(norm_a)
     norm_b = -norm_a
-    Dl_th = eptm.settings["threshold_length"]
+    Dl_th = eptm.settings["threshold_length"] * 1.01
     eptm.vert_df.loc[v10, eptm.coords] = r0 + Dl_th / 2 * norm_b
     eptm.vert_df.loc[v11, eptm.coords] = r0 + Dl_th / 2 * norm_a

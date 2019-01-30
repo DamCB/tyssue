@@ -21,24 +21,36 @@ def volume_grad(eptm):
     )
 
 
-def all_volume_grad(eptm):
+def lumen_volume_grad(eptm):
     """
-    Calculate volume gradient for the all object.
-    For example calculate the yolk volume of the embryo.
+    Calculates the gradient for the volume enclosed by the epithelium.
+
+    For a monolayer, it will by default compute the volume enclosed
+    by the basal side (edges whose 'segment' column is "basal").
+    If the polarity is reversed and the apical side faces the lumen,
+    this can be changed by setting eptm.settings["lumen_side"] to 'apical'
+
     """
 
     coords = eptm.coords
     if "segment" in eptm.edge_df:
-        basal_edges = eptm.edge_df[eptm.edge_df.segment == eptm.settings["lumen_side"]].copy()
+        lumen_side = eptm.settings.get("lumen_side", "basal")
+        basal_edges = eptm.edge_df[eptm.edge_df.segment == lumen_side]
         face_pos = basal_edges[["f" + c for c in coords]].values
         srce_pos = basal_edges[["s" + c for c in coords]].values
         trgt_pos = basal_edges[["t" + c for c in coords]].values
-        grad_v_srce = np.cross((trgt_pos), (face_pos)) / 4
-        grad_v_trgt = -np.cross((srce_pos), (face_pos)) / 4
-        return (
-            pd.DataFrame(grad_v_srce, index=basal_edges.index, columns=eptm.coords),
-            pd.DataFrame(grad_v_trgt, index=basal_edges.index, columns=eptm.coords),
+
+        grad_v_srce = pd.DataFrame(
+            np.zeros((eptm.Ne, 3)), index=eptm.edge_df.index, columns=eptm.coords
         )
+        grad_v_trgt = pd.DataFrame(
+            np.zeros((eptm.Ne, 3)), index=eptm.edge_df.index, columns=eptm.coords
+        )
+
+        grad_v_srce.loc[basal_edges.index] = -np.cross((trgt_pos), (face_pos)) / 4
+        grad_v_trgt.loc[basal_edges.index] = np.cross((srce_pos), (face_pos)) / 4
+
+        return grad_v_srce, grad_v_trgt
     else:
         face_pos = eptm.edge_df[["f" + c for c in coords]].values
         srce_pos = eptm.edge_df[["s" + c for c in coords]].values

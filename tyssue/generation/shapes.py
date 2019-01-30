@@ -4,11 +4,13 @@ import pandas as pd
 from scipy.spatial import Voronoi
 
 from .. import config
-from ..core.sheet import Sheet
+from ..core.sheet import Sheet, get_outer_sheet
 from ..core.objects import get_prev_edges
 from ..core.objects import Epithelium
 from .from_voronoi import from_3d_voronoi
 from ..geometry.bulk_geometry import BulkGeometry
+from ..geometry.sheet_geometry import EllipsoidGeometry
+
 from ..utils import single_cell
 
 
@@ -263,8 +265,11 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
     vor3d.close()
     dsets = from_3d_voronoi(vor3d)
     veptm = Epithelium("v", dsets, config.geometry.bulk_spec())
-    eptm = single_cell(veptm, centers.shape[0] - 1)
-
+    eptm_ = single_cell(veptm, centers.shape[0] - 1)
+    eptm_.reset_index()
+    eptm = get_outer_sheet(eptm_)
+    eptm.reset_index()
+    eptm.reset_topo()
     eptm.vert_df["rho"] = np.linalg.norm(eptm.vert_df[eptm.coords], axis=1)
     eptm.vert_df["theta"] = np.arcsin(eptm.vert_df.eval("z/rho"))
     eptm.vert_df["phi"] = np.arctan2(eptm.vert_df["y"], eptm.vert_df["x"])
@@ -277,5 +282,17 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
     )
     eptm.vert_df["z"] = c * np.sin(eptm.vert_df["theta"])
     eptm.settings["abc"] = [a, b, c]
-    BulkGeometry.update_all(eptm)
+    EllipsoidGeometry.update_all(eptm)
+    return eptm
+
+
+def spherical_sheet(radius, Nf, **kwargs):
+    """Returns a spherical sheet with the given radius and (approximately)
+    the given number of cells
+    """
+
+    n_zs = int(np.ceil(np.roots([2, 1.0, -Nf])[-1]))  # determined experimentaly ;p
+    eptm = ellipsoid_sheet(radius, radius, radius, n_zs, **kwargs)
+    eptm.settings.pop("abc")
+    eptm.settings["radius"] = radius
     return eptm
