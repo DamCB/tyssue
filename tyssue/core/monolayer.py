@@ -19,6 +19,7 @@ class Monolayer(Epithelium):
         self.vert_df["is_active"] = 1
         self.cell_df["is_alive"] = 1
         self.face_df["is_alive"] = 1
+        self.reset_topo()
         BulkGeometry.update_all(self)
 
     @classmethod
