@@ -184,11 +184,8 @@ def find_rearangements(eptm):
 def find_IHs(eptm, shorts=None):
 
     l_th = eptm.settings.get("threshold_length", 1e-6)
-    up_num_sides = eptm.upcast_face(eptm.face_df["num_sides"])
     if shorts is None:
-        shorts = eptm.edge_df[(eptm.edge_df["length"] < l_th) & (up_num_sides > 3)]
-    else:
-        shorts = shorts[up_num_sides > 3]
+        shorts = eptm.edge_df[eptm.edge_df["length"] < l_th]
     if not shorts.shape[0]:
         return []
 
@@ -197,12 +194,17 @@ def find_IHs(eptm, shorts=None):
             {
                 "edge": df.index[0],
                 "length": df["length"].iloc[0],
+                "num_sides": min(eptm.face_df.loc[df["face"], "num_sides"]),
                 "pair": frozenset(df.iloc[0][["srce", "trgt"]]),
             }
         )
     )
     # keep only one of the edges per vertex pair and sort by length
-    edges_IH = edges_IH.drop_duplicates("pair").sort_values("length")
+    edges_IH = (
+        edges_IH[edges_IH["num_sides"] > 3]
+        .drop_duplicates("pair")
+        .sort_values("length")
+    )
     return edges_IH["edge"].values
 
 
@@ -235,17 +237,15 @@ def IH_transition(eptm, e_1011):
         logger.warning(
             "Edge %i is not a valid junction to perform IH transition, aborting", e_1011
         )
-        raise err
+        return
+
     if len({v1, v4, v2, v5, v3, v6}) != 6:
         logger.warning(
             "Edge %i has adjacent triangular faces"
             " can't perform IH transition, aborting",
             e_1011,
         )
-        raise ValueError(
-            f"Edge {e_1011} has adjacent triangular faces"
-            " can't perform IH transition, aborting"
-        )
+        return
 
     new_vs = eptm.vert_df.loc[[v1, v2, v3]].copy()
     eptm.vert_df = eptm.vert_df.append(new_vs, ignore_index=True)
@@ -295,9 +295,9 @@ def IH_transition(eptm, e_1011):
         r_B = eptm.cell_df.loc[cB, eptm.coords].values
         orient = -np.dot(np.cross(r_45, r_56), (r_456 - r_B))
     else:
-        print(
+        logger.warning(
             "I - H transition is not possible without cells on either ends"
-            "of the edge - would result in a hole"
+            " of the edge - would result in a hole"
         )
         return
 
@@ -354,16 +354,26 @@ def IH_transition(eptm, e_1011):
         | (eptm.edge_df["trgt"] == v10)
         | (eptm.edge_df["srce"] == v11)
         | (eptm.edge_df["trgt"] == v11)
+        | pd.isna(eptm.edge_df["cell"])
     ].index
 
     eptm.edge_df = eptm.edge_df.loc[eptm.edge_df.index.delete(todel_edges)]
-    eptm.vert_df = eptm.vert_df.loc[eptm.vert_df.index.delete([v10, v11])]
+    eptm.vert_df = eptm.vert_df.loc[set(eptm.edge_df.sort_values("srce")["srce"])]
+    eptm.face_df = eptm.face_df.loc[set(eptm.edge_df.sort_values("face")["face"])]
+    eptm.cell_df = eptm.cell_df.loc[set(eptm.edge_df.sort_values("cell")["cell"])]
+
     eptm.edge_df.index.name = "edge"
+
+    if not "segment" in eptm.edge_df.columns:
+        eptm.reset_index()
+        eptm.reset_topo()
+
+        return
 
     # Verify the segment key word for new vertices
     srce_face_orbits = eptm.get_orbits("srce", "face")
     for v in [v7, v8, v9]:
-        if len(srce_face_orbits[v]) == 12:
+        if len(srce_face_orbits.loc[v]) == 12:
             eptm.vert_df.loc[v, ["segment"]] = "lateral"
 
         elif "apical" in eptm.edge_df[eptm.edge_df.srce == v].segment.unique():
@@ -372,6 +382,7 @@ def IH_transition(eptm, e_1011):
             eptm.vert_df.loc[v, ["segment"]] = "basal"
 
     # Verify the segment key word for new faces
+
     face_srce_orbits = eptm.get_orbits("face", "srce")
     nb_unique_segment_position = len(
         eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
@@ -380,9 +391,10 @@ def IH_transition(eptm, e_1011):
         new_segment = "lateral"
     else:
         new_segment = eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
-    eptm.face_df.loc[fa, ["segment"]] = new_segment
-    eptm.face_df.loc[fb, ["segment"]] = new_segment
-
+    if fa in eptm.face_df:
+        eptm.face_df.loc[fa, ["segment"]] = new_segment
+    if fb in eptm.face_df:
+        eptm.face_df.loc[fb, ["segment"]] = new_segment
     eptm.reset_index()
     eptm.reset_topo()
 
@@ -439,6 +451,7 @@ def HI_transition(eptm, face):
         )
 
         cells.append(cell[0] if cell else None)
+
     cA, cB, cC, cD, cE = cells
 
     for vi, vj, vk in zip((v1, v2, v3), (v4, v5, v6), (v7, v8, v9)):
@@ -484,6 +497,8 @@ def HI_transition(eptm, face):
         eptm.face_df.index.delete(list(orphan_faces))
     ].copy()
     eptm.edge_df.index.name = "edge"
+    if np.any(pd.isna(eptm.edge_df["cell"])):
+        raise ValueError("Undefined data in cell column")
     eptm.reset_index()
     eptm.reset_topo()
 
