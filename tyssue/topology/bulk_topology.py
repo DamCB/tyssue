@@ -186,7 +186,7 @@ def find_IHs(eptm, shorts=None):
     l_th = eptm.settings.get("threshold_length", 1e-6)
     up_num_sides = eptm.upcast_face(eptm.face_df["num_sides"])
     if shorts is None:
-        shorts = eptm.edge_df[(eptm.edge_df["length"] < l_th) & up_num_sides > 3]
+        shorts = eptm.edge_df[(eptm.edge_df["length"] < l_th) & (up_num_sides > 3)]
     else:
         shorts = shorts[up_num_sides > 3]
     if not shorts.shape[0]:
@@ -203,7 +203,7 @@ def find_IHs(eptm, shorts=None):
     )
     # keep only one of the edges per vertex pair and sort by length
     edges_IH = edges_IH.drop_duplicates("pair").sort_values("length")
-    return edges_IH.index
+    return edges_IH["edge"].values
 
 
 def find_HIs(eptm, shorts=None):
