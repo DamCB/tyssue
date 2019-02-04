@@ -364,37 +364,6 @@ def IH_transition(eptm, e_1011):
 
     eptm.edge_df.index.name = "edge"
 
-    if not "segment" in eptm.edge_df.columns:
-        eptm.reset_index()
-        eptm.reset_topo()
-
-        return
-
-    # Verify the segment key word for new vertices
-    srce_face_orbits = eptm.get_orbits("srce", "face")
-    for v in [v7, v8, v9]:
-        if len(srce_face_orbits.loc[v]) == 12:
-            eptm.vert_df.loc[v, ["segment"]] = "lateral"
-
-        elif "apical" in eptm.edge_df[eptm.edge_df.srce == v].segment.unique():
-            eptm.vert_df.loc[v, ["segment"]] = "apical"
-        else:
-            eptm.vert_df.loc[v, ["segment"]] = "basal"
-
-    # Verify the segment key word for new faces
-
-    face_srce_orbits = eptm.get_orbits("face", "srce")
-    nb_unique_segment_position = len(
-        eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
-    )
-    if nb_unique_segment_position == 2:
-        new_segment = "lateral"
-    else:
-        new_segment = eptm.vert_df.loc[face_srce_orbits[fa]].segment.unique()
-    if fa in eptm.face_df:
-        eptm.face_df.loc[fa, ["segment"]] = new_segment
-    if fb in eptm.face_df:
-        eptm.face_df.loc[fb, ["segment"]] = new_segment
     eptm.reset_index()
     eptm.reset_topo()
 
@@ -497,8 +466,6 @@ def HI_transition(eptm, face):
         eptm.face_df.index.delete(list(orphan_faces))
     ].copy()
     eptm.edge_df.index.name = "edge"
-    if np.any(pd.isna(eptm.edge_df["cell"])):
-        raise ValueError("Undefined data in cell column")
     eptm.reset_index()
     eptm.reset_topo()
 
@@ -530,7 +497,7 @@ def _add_edge_to_existing(eptm, cell, vi, vj, new_srce, new_trgt):
 def _set_new_pos_IH(eptm, e_1011, vertices):
     """Okuda 2013 equations 46 to 56
     """
-    Dl_th = eptm.settings["threshold_length"] * 1.01
+    Dl_th = eptm.settings["threshold_length"]
 
     (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11) = vertices
 

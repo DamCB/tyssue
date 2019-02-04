@@ -143,6 +143,11 @@ type 1 transition is not allowed""",
         return
 
 
+def guess_segments(monolayer, face):
+
+    pass
+
+
 def layer_t1_transition(monolayer, edge01, epsilon=0.1):
 
     vert0, vert1, face_ba, cell_b = monolayer.edge_df.loc[
