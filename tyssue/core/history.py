@@ -43,25 +43,23 @@ class History:
         self.sheet = sheet
         self.t = 0
 
+        self.datasets = {}
+        self.columns = {}
         vcols = sheet.coords + extra_cols["vert"]
         self.vcols = _filter_columns(vcols, sheet.vert_df.columns, "vertex")
         self.vert_h = sheet.vert_df[self.vcols].reset_index(drop=False)
         if not "t" in self.vcols:
             self.vert_h["t"] = 0
-
-        ecols = ["srce", "trgt", "face"] + extra_cols["edge"]
-        self.ecols = _filter_columns(ecols, sheet.edge_df.columns, "edge")
-        self.edge_h = sheet.edge_df[self.ecols].reset_index(drop=False)
-        if not "t" in self.ecols:
-            self.edge_h["t"] = 0
+        self.datasets["vert"] = self.vert_h
+        self.columns["vert"] = self.vcols
 
         fcols = extra_cols["face"]
         self.fcols = _filter_columns(fcols, sheet.face_df.columns, "face")
         self.face_h = sheet.face_df[self.fcols].reset_index(drop=False)
         if not "t" in self.fcols:
             self.face_h["t"] = 0
-        self.datasets = {"vert": self.vert_h, "edge": self.edge_h, "face": self.face_h}
-        self.columns = {"vert": self.vcols, "edge": self.ecols, "face": self.fcols}
+        self.datasets["face"] = self.face_h
+        self.columns["face"] = self.fcols
 
         if sheet.cell_df is not None:
             ccols = extra_cols["cell"]
@@ -71,6 +69,15 @@ class History:
                 self.cell_h["t"] = 0
             self.datasets["cell"] = self.cell_h
             self.columns["cell"] = self.ccols
+            extra_cols["edge"].append("cell")
+
+        ecols = ["srce", "trgt", "face"] + extra_cols["edge"]
+        self.ecols = _filter_columns(ecols, sheet.edge_df.columns, "edge")
+        self.edge_h = sheet.edge_df[self.ecols].reset_index(drop=False)
+        if not "t" in self.ecols:
+            self.edge_h["t"] = 0
+        self.datasets["edge"] = self.edge_h
+        self.columns["edge"] = self.ecols
 
     def record(self, to_record=["vert"]):
         """Appends a copy of the sheet datasets to the history instance.
