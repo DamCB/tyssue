@@ -24,6 +24,7 @@ def solve_collisions(fun):
 
     @wraps(fun)
     def with_collision_correction(*args, **kwargs):
+        log.debug("checking or collisions")
         eptm, geom = args[:2]
         position_buffer = eptm.vert_df[eptm.coords].copy()
         res = fun(*args, **kwargs)
@@ -47,8 +48,10 @@ def solve_bulk_collisions(eptm, position_buffer):
         index=sub_sheet.vert_df.index,
         columns=sub_sheet.coords,
     )
-    solve_sheet_collisions(sub_sheet, sub_buffer)
-    eptm.vert_df.loc[pos_idx, eptm.coords] = sub_sheet.vert_df[eptm.coords].values
+    changed = solve_sheet_collisions(sub_sheet, sub_buffer)
+    if changed:
+        eptm.vert_df.loc[pos_idx, eptm.coords] = sub_sheet.vert_df[eptm.coords].values
+    return changed
 
 
 def solve_sheet_collisions(sheet, position_buffer):
@@ -58,7 +61,9 @@ def solve_sheet_collisions(sheet, position_buffer):
         log.info("%d intersections were detected", intersecting_edges.shape[0])
         shyness = sheet.settings.get("shyness", 1e-10)
         boxes = CollidingBoxes(sheet, position_buffer, intersecting_edges)
-        boxes.solve_collisions(shyness)
+        success = boxes.solve_collisions(shyness)
+        return success
+    return False
 
 
 class CollidingBoxes:
@@ -147,7 +152,7 @@ class CollidingBoxes:
             plane_found = False
 
         if not plane_found:
-            return 0
+            return False
 
         upper_bounds.index.name = "vert"
         upper_bounds = (
@@ -174,6 +179,7 @@ class CollidingBoxes:
         self.sheet.vert_df.loc[
             corrections.index.values, self.sheet.coords
         ] = corrections
+        return True
 
     def _collision_plane(self, face_pair, shyness):
 

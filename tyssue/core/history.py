@@ -78,8 +78,9 @@ class History:
             self.edge_h["t"] = 0
         self.datasets["edge"] = self.edge_h
         self.columns["edge"] = self.ecols
+        self.times = []
 
-    def record(self, to_record=["vert"]):
+    def record(self, to_record=["vert"], t=None):
         """Appends a copy of the sheet datasets to the history instance.
 
         Parameters
@@ -88,14 +89,17 @@ class History:
             the datasets from self.sheet to be saved
 
         """
-
-        self.t += 1
+        if t is None:
+            self.t += 1
+        else:
+            self.t = t
+        self.times.append(self.t)
         for element in to_record:
             hist = self.datasets[element]
             cols = self.columns[element]
             df = self.sheet.datasets[element][cols].reset_index(drop=False)
             if not "t" in cols:
-                times = pd.Series(np.ones((df.shape[0],), dtype=int) * self.t, name="t")
+                times = pd.Series(np.ones((df.shape[0],)) * self.t, name="t")
                 df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
             hist = pd.concat([hist, df], ignore_index=True, axis=0, sort=False)
             self.datasets[element] = hist
@@ -115,6 +119,14 @@ class History:
             sheet_datasets[element] = df
 
         return sheet_datasets
+
+    def __iter__(self):
+
+        for t in self.times:
+            sheet = type(self.sheet)(
+                f"{self.sheet.identifier}_{t:04d}", self.retrieve(t), self.sheet.specs
+            )
+            yield t, sheet
 
 
 def _retrieve(dset, time):

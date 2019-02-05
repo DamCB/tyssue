@@ -70,9 +70,6 @@ def auto_t3(fun):
                 break
 
         logger.info("performed %i T3", i)
-        eptm.reset_index()
-        eptm.reset_topo()
-        geom.update_all(eptm)
         return res
 
     return with_rearange

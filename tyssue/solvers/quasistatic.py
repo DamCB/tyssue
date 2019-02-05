@@ -10,6 +10,8 @@ from .. import config
 from ..collisions import solve_collisions
 from ..topology import auto_t1, auto_t3
 
+from .base import TopologyChangeError, set_pos
+
 log = logging.getLogger(__name__)
 
 
@@ -32,6 +34,8 @@ class QSSolver:
 
         Parameters
         ----------
+        with_collisions : bool, default False
+            wheter or not to solve collisions
         with_t1 : bool, default False
             whether or not to solve type 1 transitions at each
             iteration.
@@ -39,20 +43,18 @@ class QSSolver:
             whether or not to solve type 3 transitions
             (i.e. elimnation of small triangular faces) at each
             iteration.
-        with_collisions : bool, default False
-            wheter or not to solve collisions
 
         Those corrections are applied in this order: first the type 1, then the
         type 3, then the collisions
 
         """
-        self.set_pos = self._set_pos
-        if with_collisions:
-            self.set_pos = solve_collisions(self.set_pos)
+        self.set_pos = set_pos
         if with_t1:
             self.set_pos = auto_t1(self.set_pos)
         if with_t3:
             self.set_pos = auto_t3(self.set_pos)
+        if with_collisions:
+            self.set_pos = solve_collisions(self.set_pos)
         self.restart = True
         self.rearange = with_t1 or with_t3
 
@@ -76,6 +78,7 @@ class QSSolver:
         log.info("initial number of vertices: %i", eptm.Nv)
         settings = config.solvers.quasistatic()
         settings.update(**minimize_kw)
+
         res = self._minimize(eptm, geom, model, **settings)
         log.info("final number of vertices: %i", eptm.Nv)
 
@@ -95,13 +98,7 @@ class QSSolver:
                 )
                 return res
             except TopologyChangeError as err:
-                log.info(err)
-
-    def _set_pos(self, eptm, geom, pos):
-        ndims = len(eptm.coords)
-        num_p = pos.size // ndims
-        eptm.vert_df.loc[eptm.active_verts, eptm.coords] = pos.reshape((num_p, ndims))
-        geom.update_all(eptm)
+                log.info("TopologyChange")
 
     def _opt_energy(self, pos, eptm, geom, model):
         if self.rearange and pos.size // len(eptm.coords) != eptm.active_verts.size:
@@ -127,11 +124,3 @@ class QSSolver:
             self._opt_energy, self._opt_grad, pos0.flatten(), eptm, geom, model
         )
         return grad_err
-
-
-class TopologyChangeError(ValueError):
-    """ Raised when trying to assign values without
-    the correct length to an epithelium dataset
-    """
-
-    pass

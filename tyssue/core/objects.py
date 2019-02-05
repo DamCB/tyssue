@@ -126,7 +126,10 @@ class Epithelium:
         self.bbox = None
         if "is_active" in self.vert_df.columns:
             self.active_verts = self.vert_df[self.vert_df.is_active == 1].index
+        else:
+            self.active_verts = self.vert_df.index
         self.set_bbox()
+        self.topo_changed = False
 
     @property
     def vert_df(self):
@@ -252,11 +255,13 @@ class Epithelium:
         self.cell_df["num_faces"] = self.edge_df.groupby("cell").apply(
             lambda df: df["face"].unique().size
         )
+        self.cell_df["num_ridges"] = self.edge_df.cell.value_counts()
 
     def reset_topo(self):
         """Recomputes the number of sides for the faces and the
         number of faces for the cells.
         """
+        log.debug("Resetting topology")
         self.update_num_sides()
         if "is_active" in self.vert_df.columns:
             self.active_verts = self.vert_df[self.vert_df.is_active == 1].index
@@ -662,8 +667,11 @@ class Epithelium:
         )
 
     def reset_index(self):
-        """Resets the datasets indices to have continuous indices
+        """Resets the datasets  to have continuous indices
         """
+        log.debug("reseting index")
+        self.topo_changed = True
+
         new_vertidx = pd.Series(
             np.arange(self.vert_df.shape[0]), index=self.vert_df.index
         )
