@@ -10,7 +10,7 @@ from ..core.sheet import Sheet, get_outer_sheet
 log = logging.getLogger(__name__)
 
 
-def solve_collisions(fun):
+def auto_collisions(fun):
     """Decorator to solve collisions detections after the
     execution of the decorated function.
 
@@ -24,7 +24,7 @@ def solve_collisions(fun):
 
     @wraps(fun)
     def with_collision_correction(*args, **kwargs):
-        log.debug("checking or collisions")
+        log.debug("checking for collisions")
         eptm, geom = args[:2]
         position_buffer = eptm.vert_df[eptm.coords].copy()
         res = fun(*args, **kwargs)

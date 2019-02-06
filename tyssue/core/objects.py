@@ -669,7 +669,7 @@ class Epithelium:
     def reset_index(self):
         """Resets the datasets  to have continuous indices
         """
-        log.debug("reseting index")
+        log.debug("reseting index for %s", self.identifier)
         self.topo_changed = True
 
         new_vertidx = pd.Series(

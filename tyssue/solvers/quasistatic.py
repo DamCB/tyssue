@@ -2,17 +2,20 @@
 """Quasistatic solver for vertex models
 
 """
-import numpy as np
+
 import logging
+from itertools import count
 
 from scipy import optimize
 from .. import config
-from ..collisions import solve_collisions
+from ..collisions import auto_collisions
 from ..topology import auto_t1, auto_t3
 
 from .base import TopologyChangeError, set_pos
 
 log = logging.getLogger(__name__)
+
+MAX_ITER = 10
 
 
 class QSSolver:
@@ -54,7 +57,7 @@ class QSSolver:
         if with_t3:
             self.set_pos = auto_t3(self.set_pos)
         if with_collisions:
-            self.set_pos = solve_collisions(self.set_pos)
+            self.set_pos = auto_collisions(self.set_pos)
         self.restart = True
         self.rearange = with_t1 or with_t3
 
@@ -85,8 +88,10 @@ class QSSolver:
         return res
 
     def _minimize(self, eptm, geom, model, **kwargs):
-        while True:
-
+        res = {"success": False, "message": "Not Started"}
+        for i in count():
+            if i == MAX_ITER:
+                return res
             pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.flatten()
             try:
                 res = optimize.minimize(
