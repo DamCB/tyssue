@@ -16,7 +16,7 @@ def test_IH_transition():
     sheet.sanitize()
     datasets = extrude(sheet.datasets, method="translation")
 
-    eptm = Epithelium("test_IHt", datasets, bulk_spec())
+    eptm = Monolayer("test_IHt", datasets, bulk_spec())
     BulkGeometry.update_all(eptm)
     Nc, Nf, Ne, Nv = eptm.Nc, eptm.Nf, eptm.Ne, eptm.Nv
     eptm.settings["threshold_length"] = 1e-3
@@ -30,7 +30,9 @@ def test_IH_transition():
     invalid = eptm.get_invalid()
     assert np.alltrue(1 - invalid)
     assert np.alltrue(eptm.edge_df["sub_vol"] > 0)
-    assert len(eptm.face_df[eptm.face_df.segment == "apical"]) == len(eptm.cell_df)
+    assert (
+        eptm.face_df[eptm.face_df.segment == "apical"].shape[0] == eptm.cell_df.shape[0]
+    )
 
 
 def test_HI_transition():
@@ -39,7 +41,7 @@ def test_HI_transition():
     sheet.sanitize()
     datasets = extrude(sheet.datasets, method="translation")
 
-    eptm = Epithelium("test_HIt", datasets, bulk_spec())
+    eptm = Monolayer("test_HIt", datasets, bulk_spec())
     BulkGeometry.update_all(eptm)
     Nc, Nf, Ne, Nv = eptm.Nc, eptm.Nf, eptm.Ne, eptm.Nv
     eptm.settings["threshold_length"] = 1e-3

@@ -11,7 +11,7 @@ from .base_topology import add_vert, close_face
 from ..geometry.utils import rotation_matrix
 from ..geometry.bulk_geometry import BulkGeometry
 from ..core.objects import get_opposite_faces
-
+from ..core.monolayer import Monolayer
 
 logger = logging.getLogger(name=__name__)
 MAX_ITER = 10
@@ -363,6 +363,11 @@ def IH_transition(eptm, e_1011):
     eptm.cell_df = eptm.cell_df.loc[set(eptm.edge_df.sort_values("cell")["cell"])]
 
     eptm.edge_df.index.name = "edge"
+    if isinstance(eptm, Monolayer):
+        for vert in (v7, v8, v9):
+            eptm.guess_vert_segment(vert)
+        for face in fa, fb:
+            eptm.guess_face_segment(face)
 
     eptm.reset_index()
     eptm.reset_topo()
