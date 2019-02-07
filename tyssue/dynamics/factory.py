@@ -8,12 +8,15 @@ from .effectors import normalize as normalize
 from ..utils import to_nd
 
 
-def model_factory(effectors, ref_effector):
+def model_factory(effectors, ref_effector=None):
     """Produces a Model class with the provided effectors.
 
     Parameters
     ----------
     effectors : list of :class:`.effectors.AbstractEffectors` classes.
+    ref_effector : optional, default None
+        if passed, will be used for normalization,
+        by default, the last effector in the list is used
 
     Returns
     -------
@@ -21,6 +24,8 @@ def model_factory(effectors, ref_effector):
       methods
 
     """
+    if ref_effector is None:
+        ref_effector = effectors[-1]
 
     class NewModel:
 

@@ -3,7 +3,7 @@ channels:
 - conda-forge
 
 dependencies:
-- boost-cpp 1.68
+- boost-cpp
 - mpfr
 - python>=3.6
 - numpy

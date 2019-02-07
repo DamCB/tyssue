@@ -1,3 +1,7 @@
+"""Monolayer epithelium objects
+"""
+
+import logging
 import numpy as np
 import pandas as pd
 
@@ -6,6 +10,8 @@ from .objects import Epithelium
 from .sheet import Sheet
 from ..generation import extrude, subdivide_faces
 from ..geometry.bulk_geometry import BulkGeometry
+
+logger = logging.getLogger(name=__name__)
 
 
 class Monolayer(Epithelium):
@@ -19,6 +25,7 @@ class Monolayer(Epithelium):
         self.vert_df["is_active"] = 1
         self.cell_df["is_alive"] = 1
         self.face_df["is_alive"] = 1
+        self.reset_topo()
         BulkGeometry.update_all(self)
 
     @classmethod
@@ -86,6 +93,40 @@ class Monolayer(Epithelium):
         }
         specs = {k: self.specs[k] for k in ["face", "edge", "vert", "settings"]}
         return Sheet(self.identifier + segment, datasets, specs)
+
+    def guess_vert_segment(self, vert):
+        """Infers the vertex segment from its surrounding edges.
+
+        """
+        v_edges = self.edge_df[self.edge_df["srce"] == vert]
+        if v_edges.shape[0] == 0:
+            logger.info("Vertex %d not found", vert)
+            return
+        if v_edges.shape[0] == 12:
+            self.vert_df.loc[vert, ["segment"]] = "lateral"
+            return
+        intersect = {"apical", "basal"}.intersection(v_edges["segment"])
+        if len(intersect) == 2:
+            logger.info("Segment of vertex %d could not be determined", vert)
+            self.vert_df.loc[vert, ["segment"]] = "unknown"
+        elif not intersect:
+            self.vert_df.loc[vert, ["segment"]] = "lateral"
+        else:  # intersect is {"apical"} or {"basal"}
+            self.vert_df.loc[vert, ["segment"]], = intersect
+
+    def guess_face_segment(self, face):
+        """Infers the face segment from its surrounding edges.
+
+        """
+        face_edges = self.edge_df[self.edge_df.face == face]
+        if face_edges.shape[0] == 0:
+            logger.info("face %d not found", face)
+        v_segments = set(self.vert_df.loc[face_edges["srce"], "segment"])
+        if len(v_segments) == 2:
+            self.face_df.loc[face, "segment"] = "lateral"
+        elif len(v_segments) == 1:
+            new_segment, = v_segments
+            self.face_df.loc[face, "segment"] = new_segment
 
 
 class MonolayerWithLamina(Monolayer):
