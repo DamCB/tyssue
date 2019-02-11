@@ -39,6 +39,20 @@ def auto_collisions(fun):
 
 
 def solve_bulk_collisions(eptm, position_buffer):
+    """Corrects the auto-collisions for the outer surface(s) of a 3D epithelium.
+
+    Parameters
+    ----------
+    eptm : a :class:`Epithelium` object
+    position_buffer : np.array of shape (eptm.Nv, eptm.dim):
+        positions of the vertices prior to the collisions
+
+    Returns
+    -------
+    changed : bool
+        `True` if the positions of some vertices were changed
+
+    """
 
     sub_sheet = get_outer_sheet(eptm)
     pos_idx = sub_sheet.vert_df.index
@@ -55,14 +69,28 @@ def solve_bulk_collisions(eptm, position_buffer):
 
 
 def solve_sheet_collisions(sheet, position_buffer):
+    """Corrects the auto-collisions for the outer surface(s) of a 2.5D sheet.
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    position_buffer : np.array of shape (sheet.Nv, sheet.dim):
+        positions of the vertices prior to the collisions
+
+    Returns
+    -------
+    changed : bool
+        `True` if the positions of some vertices were changed
+
+    """
 
     intersecting_edges = self_intersections(sheet)
     if intersecting_edges.shape[0]:
         log.info("%d intersections were detected", intersecting_edges.shape[0])
         shyness = sheet.settings.get("shyness", 1e-10)
         boxes = CollidingBoxes(sheet, position_buffer, intersecting_edges)
-        success = boxes.solve_collisions(shyness)
-        return success
+        changed = boxes.solve_collisions(shyness)
+        return changed
     return False
 
 
@@ -71,6 +99,18 @@ class CollidingBoxes:
     """
 
     def __init__(self, sheet, position_buffer, intersecting_edges):
+        """Creates a CollidingBoxes instance
+
+        Parameters
+        ----------
+
+        sheet : a :clas:`Sheet` instance
+        position_buffer : np.array of shape (sheet.Nv, sheet.dim):
+            positions of the vertices prior to the collisions
+        intersecting_edges : np.ndarray
+            pairs of indices of the intersecting edges
+
+        """
         self.sheet = sheet
         self.edge_pairs = intersecting_edges
         self.face_pairs = self._get_intersecting_faces()
