@@ -134,7 +134,7 @@ class Sheet(Epithelium):
         )
 
         self.east_edges = self.edge_df.loc[self.dble_edges][
-            (theta >= 0) & (theta < np.pi)
+            (theta > 0) & (theta <= np.pi)
         ].index
         self.west_edges = pd.Index(
             self.edge_df.loc[self.east_edges, "opposite"].astype(np.int), name="edge"
