@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_equal
+from pytest import raises
 
 from tyssue.core import Epithelium
 from tyssue.core.sheet import Sheet, get_opposite
@@ -15,7 +16,7 @@ from tyssue.geometry.sheet_geometry import SheetGeometry
 from tyssue.generation import extrude, hexa_grid3d, hexa_grid2d
 from tyssue.config.dynamics import quasistatic_sheet_spec
 from tyssue.config.geometry import spherical_sheet
-from pytest import raises
+from tyssue.generation import generate_ring
 
 
 def test_3faces():
@@ -152,6 +153,13 @@ def test_extra_indices():
             (eptm.edge_df["srce"] == trgt) & (eptm.edge_df["trgt"] == srce)
         ].index
         assert opp[0] in eptm.east_edges
+
+
+def test_extra_indices_theta_pi():
+
+    ring = generate_ring(3, 1, 2)
+    PlanarGeometry.update_all(ring)
+    ring.get_extra_indices()
 
 
 def test_sort_eastwest():
