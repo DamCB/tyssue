@@ -19,14 +19,18 @@ def _to_3d(df):
 def to_nd(df, ndim):
     """
     Give a new shape to an input data by duplicating its column.
+
     Parameters
     ----------
-    df: input data that will be reshape
-    ndim: dimension of the new reshape data.
+
+    df : input data that will be reshape
+    ndim : dimension of the new reshape data.
 
     Returns
     -------
-    df_nd: return array reshaped in ndim.
+
+    df_nd : return array reshaped in ndim.
+
     """
     df_nd = np.asarray(df).repeat(ndim).reshape((df.size, ndim))
     return df_nd

@@ -264,7 +264,7 @@ def plot_forces(
         app_grad = approx_grad(sheet, geom, model)
         grad_i = (
             pd.DataFrame(
-                index=sheet.vert_idx,
+                index=sheet.active_verts,
                 data=app_grad.reshape((-1, len(sheet.coords))),
                 columns=["g" + c for c in sheet.coords],
             )
