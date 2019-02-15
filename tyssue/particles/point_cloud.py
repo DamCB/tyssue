@@ -3,6 +3,7 @@
 The positions of the points are generated along the architecture
 of the epithelium.
 """
+from collections import abc
 
 import numpy as np
 import pandas as pd
@@ -142,6 +143,25 @@ class EdgeSubdiv:
         if not self.points["offset"].shape()[0] == self.n_points:
             return False
         return True
+
+    def upcast(self, df):
+        if isinstance(df, str) and df in self.edge_df:
+            return self.edge_df.loc[self.points["upcaster"], df]
+        elif (
+            isinstance(df, abc.Iterable)
+            and isinstance(df[0], str)
+            and set(df).issubset(self.edge_df.columns)
+        ):
+            return self.edge_df.loc[self.points["upcaster"], df]
+        elif hasattr(df, "loc"):
+            return df.loc[self.points["upcaster"]]
+        else:
+            raise ValueError(
+                """
+Argument df should be a column name or a sequence of column names
+or a Series or Dataframe indexed like self.edge_df
+                """
+            )
 
     def edge_point_cloud(
         self,

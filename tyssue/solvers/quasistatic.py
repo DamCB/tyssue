@@ -60,6 +60,8 @@ class QSSolver:
             self.set_pos = auto_collisions(self.set_pos)
         self.restart = True
         self.rearange = with_t1 or with_t3
+        self.res = {"success": False, "message": "Not Started"}
+        self.num_restarts = 0
 
     def find_energy_min(self, eptm, geom, model, **minimize_kw):
         """Energy minimization function.
@@ -88,22 +90,22 @@ class QSSolver:
         return res
 
     def _minimize(self, eptm, geom, model, **kwargs):
-        res = {"success": False, "message": "Not Started"}
         for i in count():
             if i == MAX_ITER:
-                return res
+                return self.res
             pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.flatten()
             try:
-                res = optimize.minimize(
+                self.res = optimize.minimize(
                     self._opt_energy,
                     pos0,
                     args=(eptm, geom, model),
                     jac=self._opt_grad,
                     **kwargs
                 )
-                return res
-            except TopologyChangeError as err:
+                return self.res
+            except TopologyChangeError:
                 log.info("TopologyChange")
+                self.num_restarts = i + 1
 
     def _opt_energy(self, pos, eptm, geom, model):
         if self.rearange and pos.size // len(eptm.coords) != eptm.active_verts.size:

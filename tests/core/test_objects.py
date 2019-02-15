@@ -156,7 +156,7 @@ def test_extra_indices():
 
 
 def test_extra_indices_theta_pi():
-
+    # https://github.com/felixquinton/tyssue-taylor/issues/2
     ring = generate_ring(3, 1, 2)
     PlanarGeometry.update_all(ring)
     ring.get_extra_indices()
