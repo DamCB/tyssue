@@ -155,13 +155,6 @@ def test_extra_indices():
         assert opp[0] in eptm.east_edges
 
 
-def test_extra_indices_theta_pi():
-
-    ring = generate_ring(3, 1, 2)
-    PlanarGeometry.update_all(ring)
-    ring.get_extra_indices()
-
-
 def test_sort_eastwest():
     datasets = {}
     tri_verts = [[0, 0], [1, 0], [-0.5, 3 ** 0.5 / 2], [-0.5, -3 ** 0.5 / 2]]
