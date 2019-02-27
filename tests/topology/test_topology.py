@@ -119,3 +119,17 @@ def test_close_face():
 
     close_face(sheet, face)
     assert sheet.Ne == Ne
+
+
+def test_merge_border_edges():
+    sheet = Sheet.planar_sheet_3d("sheet", 5, 6, 1, 1)
+    sheet.get_opposite()
+    sheet.sanitize(trim_borders=True)
+    assert (
+        sheet.edge_df[sheet.edge_df["opposite"] < 0]
+        .groupby("face")["opposite"]
+        .sum()
+        .min()
+        == -1
+    )
+    assert not set(sheet.vert_df.index).difference(sheet.edge_df.srce)

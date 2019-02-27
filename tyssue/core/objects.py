@@ -595,15 +595,25 @@ class Epithelium:
         is_valid = self.get_valid()
         return ~is_valid
 
-    def sanitize(self):
+    def sanitize(self, trim_borders=False):
         """Removes invalid faces and associated vertices
+
+        If trim_borders is True (defaults to False), there will be a single
+        border edge per border face.
         """
         invalid_edges = self.get_invalid()
-        self.remove(invalid_edges)
+        if not len(invalid_edges) and trim_borders:
+            from ..topology.base_topology import merge_border_edges
 
-    def remove(self, edge_out):
+            merge_border_edges(self)
+        self.remove(invalid_edges, trim_borders)
+
+    def remove(self, edge_out, trim_borders=False):
         """Remove the edges indexed by `edge_out` associated with all
         the cells and faces containing those edges
+
+        If trim_borders is True (defaults to False), there will be a single
+        border edge per border face.
         """
         top_level = self.element_names[-1]
         log.info("Removing cells at the %s level", top_level)
@@ -615,7 +625,7 @@ class Epithelium:
             raise ValueError("sanitize would delete the whole epithlium")
 
         fto_rm.sort()
-        log.info("%d %s level elements will be removed", (len(fto_rm), top_level))
+        log.info("%d %s level elements will be removed", len(fto_rm), top_level)
 
         edge_df_ = (
             self.edge_df.set_index(top_level, append=True).swaplevel(0, 1).sort_index()
@@ -634,6 +644,10 @@ class Epithelium:
             self.cell_df = self.cell_df.drop(fto_rm)
         self.reset_index()
         self.reset_topo()
+        if trim_borders:
+            from ..topology.base_topology import merge_border_edges
+
+            merge_border_edges(self)
 
     def cut_out(self, bbox, coords=None):
         """Returns the index of edges with at least one vertex outside of the bounding box
@@ -671,6 +685,9 @@ class Epithelium:
         """
         log.debug("reseting index for %s", self.identifier)
         self.topo_changed = True
+
+        # remove disconnected vertices
+        self.vert_df = self.vert_df.reindex(set(self.edge_df.srce))
 
         new_vertidx = pd.Series(
             np.arange(self.vert_df.shape[0]), index=self.vert_df.index

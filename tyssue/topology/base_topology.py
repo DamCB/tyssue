@@ -162,3 +162,26 @@ def condition_4ii(eptm):
     """
     n_common = get_num_common_edges(eptm)
     return list(n_common[n_common >= 2].index)
+
+
+def merge_border_edges(sheet):
+    """Merge edges at the border of a sheet such that no vertex has only
+    an on-going and an out-going edge.
+
+    """
+
+    single_trgt = sheet.edge_df[
+        sheet.upcast_trgt(sheet.edge_df.groupby("trgt").apply(len) == 1)
+    ]
+    faces = set(single_trgt["face"])
+    single_srce = sheet.edge_df[
+        sheet.upcast_srce(sheet.edge_df.groupby("srce").apply(len) == 1)
+    ]
+    sheet.edge_df.drop(single_srce.index, inplace=True)
+    sheet.edge_df.drop(
+        set(single_trgt.index).difference(single_srce.index), inplace=True
+    )
+    for face in faces:
+        close_face(sheet, face)
+    sheet.reset_index()
+    sheet.reset_topo()
