@@ -132,3 +132,4 @@ def test_merge_border_edges():
         .min()
         == -1
     )
+    assert not set(sheet.vert_df.index).difference(sheet.edge_df.srce)

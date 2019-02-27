@@ -602,6 +602,10 @@ class Epithelium:
         border edge per border face.
         """
         invalid_edges = self.get_invalid()
+        if not len(invalid_edges) and trim_borders:
+            from ..topology.base_topology import merge_border_edges
+
+            merge_border_edges(self)
         self.remove(invalid_edges, trim_borders)
 
     def remove(self, edge_out, trim_borders=False):
@@ -681,6 +685,9 @@ class Epithelium:
         """
         log.debug("reseting index for %s", self.identifier)
         self.topo_changed = True
+
+        # remove disconnected vertices
+        self.vert_df = self.vert_df.reindex(set(self.edge_df.srce))
 
         new_vertidx = pd.Series(
             np.arange(self.vert_df.shape[0]), index=self.vert_df.index

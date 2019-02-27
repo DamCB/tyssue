@@ -1,7 +1,7 @@
 numpy
 scipy
 matplotlib
-pandas
+pandas >= 0.24
 pytables
 jupyter
 notebook
