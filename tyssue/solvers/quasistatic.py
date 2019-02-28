@@ -15,7 +15,7 @@ from .base import TopologyChangeError, set_pos
 
 log = logging.getLogger(__name__)
 
-MAX_ITER = 10
+MAX_ITER = 100
 
 
 class QSSolver:
