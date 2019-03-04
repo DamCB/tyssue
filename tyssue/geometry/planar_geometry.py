@@ -61,3 +61,25 @@ class PlanarGeometry(BaseGeometry):
         ) * np.cos(psi)
 
         return rot_pos
+
+
+# The following classes will probably be included in tyssue at some point
+class AnnularGeometry(PlanarGeometry):
+    """
+    """
+
+    @classmethod
+    def update_all(cls, eptm):
+        PlanarGeometry.update_all(eptm)
+        cls.update_lumen_volume(eptm)
+
+    @staticmethod
+    def update_lumen_volume(eptm):
+        srce_pos = eptm.upcast_srce(eptm.vert_df[["x", "y"]]).loc[eptm.apical_edges]
+        trgt_pos = eptm.upcast_trgt(eptm.vert_df[["x", "y"]]).loc[eptm.apical_edges]
+        apical_edge_pos = (srce_pos + trgt_pos) / 2
+        apical_edge_coords = eptm.edge_df.loc[eptm.apical_edges, ["dx", "dy"]]
+        eptm.settings["lumen_volume"] = (
+            -apical_edge_pos["x"] * apical_edge_coords["dy"]
+            + apical_edge_pos["y"] * apical_edge_coords["dx"]
+        ).values.sum()

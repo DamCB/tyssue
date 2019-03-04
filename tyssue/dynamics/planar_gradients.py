@@ -25,3 +25,19 @@ def area_grad(sheet):
     grad_a_trgt = _to_2d(inv_area) * grad_a_trgt
 
     return grad_a_srce, grad_a_trgt
+
+
+def lumen_area_grad(eptm):
+    apical_pos = eptm.vert_df[["x", "y"]].copy()
+    apical_pos.loc[eptm.basal_verts] = 0
+    srce_pos = eptm.upcast_srce(apical_pos)
+    trgt_pos = eptm.upcast_trgt(apical_pos)
+    grad_srce = srce_pos.copy()
+    grad_srce.columns = ["gx", "gy"]
+    grad_trgt = grad_srce.copy()
+    grad_srce["gx"] = trgt_pos["y"]
+    grad_srce["gy"] = -trgt_pos["x"]
+    grad_trgt["gx"] = -srce_pos["y"]
+    grad_trgt["gy"] = srce_pos["x"]
+    # minus sign due to the backward orientation
+    return -grad_srce, -grad_trgt

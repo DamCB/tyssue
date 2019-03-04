@@ -8,6 +8,7 @@ from ..utils import to_nd
 from . import units
 
 from .planar_gradients import area_grad as area_grad2d
+from .planar_gradients import lumen_area_grad
 from .sheet_gradients import height_grad, area_grad
 from .bulk_gradients import volume_grad, lumen_volume_grad
 
@@ -84,13 +85,13 @@ class LengthElasticity(AbstractEffector):
 
     specs = {
         "edge": {
-            "is_active",
-            "length",
-            "length_elasticity",
-            "prefered_length",
-            "ux",
-            "uy",
-            "uz",
+            "is_active": 1,
+            "length": 1.0,
+            "length_elasticity": 1.0,
+            "prefered_length": 1.0,
+            "ux": (1 / 3) ** 0.5,
+            "uy": (1 / 3) ** 0.5,
+            "uz": (1 / 3) ** 0.5,
         }
     }
 
@@ -124,8 +125,13 @@ class FaceAreaElasticity(AbstractEffector):
     label = "Area elasticity"
     element = "face"
     specs = {
-        "face": {"is_alive", "area", "area_elasticity", "prefered_area"},
-        "edge": {"sub_area"},
+        "face": {
+            "is_alive": 1,
+            "area": 1.0,
+            "area_elasticity": 1.0,
+            "prefered_area": 1.0,
+        },
+        "edge": {"sub_area": 1 / 6.0},
     }
 
     spatial_ref = "prefered_area", units.area
@@ -168,9 +174,9 @@ class FaceVolumeElasticity(AbstractEffector):
     label = "Volume elasticity"
     element = "face"
     specs = {
-        "face": {"is_alive", "vol", "vol_elasticity", "prefered_vol"},
-        "vert": {"height"},
-        "edge": {"sub_area"},
+        "face": {"is_alive": 1, "vol": 1.0, "vol_elasticity": 1.0, "prefered_vol": 1.0},
+        "vert": {"height": 1.0},
+        "edge": {"sub_area": 1 / 6},
     }
 
     spatial_ref = "prefered_vol", units.vol
@@ -214,7 +220,14 @@ class CellAreaElasticity(AbstractEffector):
     magnitude = "area_elasticity"
     label = "Area elasticity"
     element = "cell"
-    specs = {"cell": {"is_alive", "area", "area_elasticity", "prefered_area"}}
+    specs = {
+        "cell": {
+            "is_alive": 1,
+            "area": 1.0,
+            "area_elasticity": 1.0,
+            "prefered_area": 1.0,
+        }
+    }
     spatial_ref = "prefered_area", units.area
 
     @staticmethod
@@ -251,7 +264,9 @@ class CellVolumeElasticity(AbstractEffector):
     element = "cell"
     spatial_ref = "prefered_vol", units.vol
 
-    specs = {"cell": {"is_alive", "vol", "vol_elasticity", "prefered_vol"}}
+    specs = {
+        "cell": {"is_alive": 1, "vol": 1.0, "vol_elasticity": 1.0, "prefered_vol": 1.0}
+    }
 
     @staticmethod
     def get_nrj_norm(specs):
@@ -290,7 +305,13 @@ class LumenVolumeElasticity(AbstractEffector):
     element = "settings"
     spatial_ref = "lumen_prefered_vol", units.vol
 
-    specs = {"settings": {"lumen_vol", "lumen_vol_elasticity", "lumen_prefered_vol"}}
+    specs = {
+        "settings": {
+            "lumen_vol": 1.0,
+            "lumen_vol_elasticity": 1.0,
+            "lumen_prefered_vol": 1.0,
+        }
+    }
 
     @staticmethod
     def get_nrj_norm(specs):
@@ -328,7 +349,7 @@ class LineTension(AbstractEffector):
     magnitude = "line_tension"
     label = "Line tension"
     element = "edge"
-    specs = {"edge": {"is_active", "line_tension"}}
+    specs = {"edge": {"is_active": 1, "line_tension": 1.0}}
 
     spatial_ref = "mean_length", units.length
 
@@ -354,13 +375,13 @@ class FaceContractility(AbstractEffector):
     magnitude = "contractility"
     label = "Contractility"
     element = "face"
-    specs = {"face": {"is_alive", "perimeter", "contractility"}}
+    specs = {"face": {"is_alive": 1, "perimeter": 1.0, "contractility": 1.0}}
 
     spatial_ref = "mean_perimeter", units.length
 
     @staticmethod
     def energy(eptm):
-        return eptm.face_df.eval("0.5 * is_alive" "* contractility" "* perimeter ** 2")
+        return eptm.face_df.eval("0.5 * is_alive * contractility * perimeter ** 2")
 
     @staticmethod
     def gradient(eptm):
@@ -383,7 +404,7 @@ class SurfaceTension(AbstractEffector):
 
     label = "Surface tension"
     element = "face"
-    specs = {"face": {"is_active", "surface_tension", "area"}}
+    specs = {"face": {"is_active": 1, "surface_tension": 1.0, "area": 1.0}}
 
     @staticmethod
     def energy(eptm):
@@ -413,7 +434,7 @@ class LineViscosity(AbstractEffector):
     element = "edge"
     spatial_ref = "mean_length", units.length
     temporal_ref = "dt", units.time
-    specs = {"edge": {"is_active", "edge_viscosity"}}
+    specs = {"edge": {"is_active": 1, "edge_viscosity": 1.0}}
 
     @staticmethod
     def gradient(eptm):
@@ -433,11 +454,11 @@ class BorderElasticity(AbstractEffector):
 
     specs = {
         "edge": {
-            "is_active",
-            "length",
-            "border_elasticity",
-            "prefered_length",
-            "is_border",
+            "is_active": 1,
+            "length": 1.0,
+            "border_elasticity": 1.0,
+            "prefered_length": 1.0,
+            "is_border": 1.0,
         }
     }
 
@@ -468,6 +489,43 @@ class BorderElasticity(AbstractEffector):
         grad = eptm.edge_df[eptm.ucoords] * to_nd(kl_l0, eptm.dim)
         grad.columns = ["g" + u for u in eptm.coords]
         return grad / 2, -grad / 2
+
+
+class LumenAreaElasticity(AbstractEffector):
+    """
+
+    .. math:: \frac{K_Y}{2}(A_{\mathrm{lumen}} - A_{0,\mathrm{lumen}})^2
+
+    """
+
+    dimensions = units.area_elasticity
+    label = "Lumen volume constraint"
+    magnitude = "lumen_elasticity"
+    element = "settings"
+    spatial_ref = "lumen_prefered_vol", units.area
+
+    specs = {
+        "settings": {
+            "lumen_elasticity": 1.0,
+            "lumen_prefered_vol": 1.0,
+            "lumen_vol": 1.0,
+        }
+    }
+
+    @staticmethod
+    def energy(eptm):
+        Ky = eptm.settings["lumen_elasticity"]
+        V0 = eptm.settings["lumen_prefered_vol"]
+        Vy = eptm.settings["lumen_vol"]
+        return np.array([Ky * (Vy - V0) ** 2 / 2])
+
+    @staticmethod
+    def gradient(eptm):
+        Ky = eptm.settings["lumen_elasticity"]
+        V0 = eptm.settings["lumen_prefered_vol"]
+        Vy = eptm.settings["lumen_vol"]
+        grad_srce, grad_trgt = lumen_area_grad(eptm)
+        return (Ky * (Vy - V0) * grad_srce, Ky * (Vy - V0) * grad_trgt)
 
 
 def _exponants(dimensions, ref_dimensions, spatial_unit=None, temporal_unit=None):
