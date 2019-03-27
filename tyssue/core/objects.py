@@ -185,26 +185,20 @@ class Epithelium:
 
         Parameters
         ----------
-        deep_copy: bool, default True
+        deep_copy : bool, default True
             if True, use a copy of the original object's datasets
             to create the new object. If False, datasets are not copied
         """
         if deep_copy:
-            datasets = {element: df.copy()
-                        for element, df in self.datasets.items()}
-            specs = {key: value.copy()
-                     for key, value in self.specs.items()}
+            datasets = {element: df.copy() for element, df in self.datasets.items()}
+            specs = {key: value.copy() for key, value in self.specs.items()}
         else:  # pragma: no cover
-            log.info(
-                "New epithelium object from {}"
-                " without deep copy".format(
-                    self.identifier))
+            log.info("New epithelium object from %s without deep copy", self.identifier)
             datasets = self.datasets
             specs = self.specs
 
-        identifier = self.identifier+'_copy'
-        new = type(self)(identifier, datasets,
-                         specs=specs, coords=self.coords)
+        identifier = self.identifier + '_copy'
+        new = type(self)(identifier, datasets, specs=specs, coords=self.coords)
         return new
 
     def backup(self):
