@@ -6,6 +6,7 @@ import logging
 from collections import deque
 import numpy as np
 import pandas as pd
+from copy import deepcopy
 from ..utils.utils import set_data_columns, spec_updater
 
 log = logging.getLogger(name=__name__)
@@ -191,10 +192,7 @@ class Epithelium:
         """
         if deep_copy:
             datasets = {element: df.copy() for element, df in self.datasets.items()}
-            specs = self.specs.copy()
-            for key, value in self.specs.items():
-                if type(value) in (pd.core.frame.DataFrame, dict):
-                    specs[key] = value.copy()
+            specs = deepcopy(self.specs)
         else:  # pragma: no cover
             log.info("New epithelium object from %s without deep copy", self.identifier)
             datasets = self.datasets
