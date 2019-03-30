@@ -230,8 +230,11 @@ def test_eptm_copy():
     eptm_copy = eptm.copy()
     assert eptm_copy.identifier == eptm.identifier + "_copy"
     assert set(eptm_copy.datasets.keys()).issuperset(eptm.datasets.keys())
+    eptm.settings["deepcopy"] = False
     eptm_deepcopy = eptm.copy(deep_copy=True)
+    eptm_deepcopy.settings["deepcopy"] = True
     assert eptm_deepcopy is not None
+    assert eptm.settings["deepcopy"] is not eptm_deepcopy.settings["deepcopy"]
 
 
 def test_settings_getter_setter():
