@@ -108,14 +108,16 @@ class QSSolver:
                 self.num_restarts = i + 1
 
     def _opt_energy(self, pos, eptm, geom, model):
-        if self.rearange and pos.size // len(eptm.coords) != eptm.active_verts.size:
+        if self.rearange and eptm.topo_changed:
+            # reset switch
+            eptm.topo_changed = False
             raise TopologyChangeError("Topology changed before energy evaluation")
         self.set_pos(eptm, geom, pos)
         return model.compute_energy(eptm)
 
     # The unused arguments bellow are legit, we need the same signature as _opt_energy
     def _opt_grad(self, pos, eptm, geom, model):
-        if self.rearange and pos.size // len(eptm.coords) != eptm.active_verts.size:
+        if self.rearange and eptm.topo_changed:
             raise TopologyChangeError("Topology changed before gradient evaluation")
         grad_i = model.compute_gradient(eptm)
         return grad_i.loc[eptm.active_verts].values.ravel()

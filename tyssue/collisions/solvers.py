@@ -55,7 +55,7 @@ def solve_bulk_collisions(eptm, position_buffer):
     """
 
     sub_sheet = get_outer_sheet(eptm)
-    pos_idx = sub_sheet.vert_df.index
+    pos_idx = sub_sheet.vert_df.index.copy()
     sub_sheet.reset_index()
     sub_buffer = pd.DataFrame(
         position_buffer.loc[pos_idx].values,
@@ -259,7 +259,7 @@ class CollidingBoxes:
             ]
         else:
 
-            warnings.warn(
+            raise ValueError(
                 """The collision was already present or its axis could not be determined"""
             )
             return None, None
