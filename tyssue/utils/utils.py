@@ -146,6 +146,9 @@ def get_sub_eptm(eptm, edges, copy=False):
 
     datasets = {}
     edge_df = eptm.edge_df.loc[edges]
+    if edge_df.empty:
+        warnings.warn("Sub epithelium appears to be empty")
+        return None
     datasets["edge"] = edge_df
     datasets["vert"] = eptm.vert_df.loc[set(edge_df["srce"])]
     datasets["face"] = eptm.face_df.loc[set(edge_df["face"])]

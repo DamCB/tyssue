@@ -82,11 +82,13 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
 
     if "visible" in sheet.face_df.columns:
         edges = sheet.edge_df[sheet.upcast_face(sheet.face_df["visible"])].index
-        sheet = get_sub_eptm(sheet, edges)
-        color = collection_specs["facecolors"]
-        if isinstance(color, np.ndarray):
-            faces = sheet.face_df["face_o"].values.astype(np.uint32)
-            collection_specs["facecolors"] = color.take(faces, axis=0)
+        _sheet = get_sub_eptm(sheet, edges)
+        if _sheet is not None:
+            sheet = _sheet
+            color = collection_specs["facecolors"]
+            if isinstance(color, np.ndarray):
+                faces = sheet.face_df["face_o"].values.astype(np.uint32)
+                collection_specs["facecolors"] = color.take(faces, axis=0)
 
     polys = sheet.face_polygons(coords)
     p = PolyCollection(polys, closed=True, **collection_specs)
