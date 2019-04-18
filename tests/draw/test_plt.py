@@ -75,6 +75,13 @@ class TestsPlt:
         fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
         assert ax.collections[2].get_facecolors().shape == (1, 4)
 
+    def test_sheet_view_color_null_visibility(self):
+        self.draw_specs["face"]["color"] = np.random.rand(3, 4)
+        self.sheet.face_df["visible"] = False
+        with pytest.warns(UserWarning):
+            fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
+        assert ax.collections[2].get_facecolors().shape == (3, 4)
+
     def test_sheet_view_homogenous_color(self):
         with pytest.warns(UserWarning):
             self.draw_specs["face"]["color"] = np.ones(3)

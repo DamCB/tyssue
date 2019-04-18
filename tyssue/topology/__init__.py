@@ -23,7 +23,9 @@ def auto_t1(fun):
             return res
         i = 0
         while len(shorts):
-            shorter_edge = shorts[0]
+            # shorter_edge = shorts[0]
+            shorter_edge = np.random.choice(shorts)
+            logger.info("transition on  edge %i", shorter_edge)
             if isinstance(eptm, Sheet):
                 type1_transition(eptm, shorter_edge)
             else:
@@ -34,7 +36,7 @@ def auto_t1(fun):
             shorts = find_IHs(eptm)
             if len(shorts) and shorts[0] == shorter_edge:
                 # IH transition did not work, skipping
-                logger.info("removing shorter edge %i", shorter_edge)
+                logger.info("removing shorter edge %i from edge list", shorter_edge)
                 shorts = shorts[1:]
             i += 1
             if i > MAX_ITER:
@@ -57,6 +59,7 @@ def auto_t3(fun):
         i = 0
         while len(tri_faces):
             smaller_face = tri_faces[0]
+            logger.debug("Performing t3 on face %d", smaller_face)
             if isinstance(eptm, Sheet):
                 remove_face(eptm, smaller_face)
             else:

@@ -689,16 +689,19 @@ class Epithelium:
         log.debug("reseting index for %s", self.identifier)
         self.topo_changed = True
 
-        # remove disconnected vertices
-        self.vert_df = self.vert_df.reindex(set(self.edge_df.srce))
+        # remove disconnected vertices and faces
+        self.vert_df = self.vert_df.reindex(
+            set(self.edge_df.srce).union(self.edge_df.trgt)
+        )
+        self.face_df = self.face_df.reindex(set(self.edge_df.face))
 
         new_vertidx = pd.Series(
             np.arange(self.vert_df.shape[0]), index=self.vert_df.index
         )
         # Here we use loc and not the take from upcast
 
-        self.edge_df["srce"] = new_vertidx.loc[self.edge_df["srce"]].values
-        self.edge_df["trgt"] = new_vertidx.loc[self.edge_df["trgt"]].values
+        self.edge_df["srce"] = new_vertidx.reindex(self.edge_df["srce"]).values
+        self.edge_df["trgt"] = new_vertidx.reindex(self.edge_df["trgt"]).values
 
         new_fidx = pd.Series(np.arange(self.face_df.shape[0]), index=self.face_df.index)
 

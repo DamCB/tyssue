@@ -117,9 +117,9 @@ type 1 transition is not allowed"""
         raise ValueError("Edge has no neighbour around vertex %d", vert0)
 
     logger.debug("faces a, b, c, d")
-    logger.debug(face_a, face_b, face_c, face_d)
+    logger.debug("%d, %d, %d, %d", face_a, face_b, face_c, face_d)
     logger.debug("vertices 0, 1, 2, 3, 5")
-    logger.debug(vert0, vert1, vert2, vert3, vert5)
+    logger.debug("%d, %d, %d, %d; %d", vert0, vert1, vert2, vert3, vert5)
 
     # Perform the rearangements
     sheet.edge_df.loc[edge01, "face"] = face_c
@@ -148,6 +148,7 @@ type 1 transition is not allowed"""
     )
 
     sheet.edge_df = sheet.edge_df[sheet.edge_df["face"] != -1].copy()
+    sheet.edge_df.index.name = "edge"
     sheet.reset_topo()
     if not remove_tri_faces:
         return 0
