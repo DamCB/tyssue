@@ -129,6 +129,8 @@ class Epithelium:
         else:
             self.active_verts = self.vert_df.index
         self.set_bbox()
+
+        self.position_buffer = None
         self.topo_changed = False
 
     @property

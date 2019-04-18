@@ -26,12 +26,14 @@ def auto_collisions(fun):
     def with_collision_correction(*args, **kwargs):
         log.debug("checking for collisions")
         eptm, geom = args[:2]
-        position_buffer = eptm.vert_df[eptm.coords].copy()
+        eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
         res = fun(*args, **kwargs)
         if isinstance(eptm, Sheet):
-            solve_sheet_collisions(eptm, position_buffer)
+            change = solve_sheet_collisions(eptm, eptm.position_buffer)
         else:
-            solve_bulk_collisions(eptm, position_buffer)
+            change = solve_bulk_collisions(eptm, eptm.position_buffer)
+        if change:
+            print("collision avoided")
         geom.update_all(eptm)
         return res
 
@@ -116,6 +118,7 @@ class CollidingBoxes:
         self.face_pairs = self._get_intersecting_faces()
         self.edge_buffer = sheet.upcast_srce(position_buffer).copy()
         self.edge_buffer.columns = ["sx", "sy", "sz"]
+        self.plane_not_found = False
 
     def _get_intersecting_faces(self):
         """Returns unique pairs of intersecting faces
@@ -258,12 +261,13 @@ class CollidingBoxes:
                 coll_ax
             ]
         else:
-            log.warning("Plane Not Found")
+            log.warning("""Plane Not Found""")
+            self.plane_not_found = True
             lower_bound = pd.DataFrame(
-                index=pd.concat((fe0c.srce, fe1c.srce)), columns=list("xyz")
+                index=set(fe0c.srce).union(fe1c.srce), columns=list("xyz")
             )
             upper_bound = pd.DataFrame(
-                index=pd.concat((fe0c.srce, fe1c.srce)), columns=list("xyz")
+                index=set(fe0c.srce).union(fe1c.srce), columns=list("xyz")
             )
             for c in list("xyz"):
                 b0 = bb0c.loc[c]
@@ -271,11 +275,11 @@ class CollidingBoxes:
                 left, right = (fe0c, fe1c) if (b0.mean() < b1.mean()) else (fe1c, fe0c)
 
                 lim = (left[f"s{c}"].max() + right[f"s{c}"].min()) / 2
+                upper_bound.loc[right.srce, c] = right[f"s{c}"].max()
                 upper_bound.loc[left.srce, c] = lim - shyness / 2
-                upper_bound.loc[right.srce, c] = right.srce.max()
 
+                lower_bound.loc[left.srce, c] = left[f"s{c}"].min()
                 lower_bound.loc[right.srce, c] = lim + shyness / 2
-                lower_bound.loc[left.srce, c] = left.srce.min()
 
             return lower_bound, upper_bound
 
