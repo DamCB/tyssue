@@ -45,7 +45,6 @@ def auto_t1(fun):
             print("out T1 changed buffer")
             eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
         logger.info("performed %i T1", i)
-        print("T1")
         return res
 
     return with_rearange
@@ -78,7 +77,6 @@ def auto_t3(fun):
         if eptm.position_buffer is not None:
             print("out T3 changed buffer")
             eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
-        print("T3")
         logger.info("performed %i T3", i)
         return res
 

@@ -89,23 +89,24 @@ class SheetGeometry(PlanarGeometry):
              before the height update.
                  ---------------
                /                 \
-              |  *            *   |
+               |  *          *   |
                \                 /
                  ---------------
         In all the cases, this distance is shifted by an amount of
         `sheet.vert_df['basal_shift']`
         """
-        w = sheet.settings["height_axis"]
+        w = sheet.settings.get("height_axis", "z")
+        geometry = sheet.settings.get("geometry", "cylindrical")
         u, v = (c for c in sheet.coords if c != w)
-        if sheet.settings["geometry"] == "cylindrical":
+        if geometry == "cylindrical":
             sheet.vert_df["rho"] = np.hypot(sheet.vert_df[v], sheet.vert_df[u])
 
-        elif sheet.settings["geometry"] == "flat":
+        elif geometry == "flat":
             sheet.vert_df["rho"] = sheet.vert_df[w]
 
-        elif sheet.settings["geometry"] == "spherical":
+        elif geometry == "spherical":
             sheet.vert_df["rho"] = np.linalg.norm(sheet.vert_df[sheet.coords], axis=1)
-        elif sheet.settings["geometry"] == "rod":
+        elif geometry == "rod":
 
             a, b = sheet.settings["ab"]
             w0 = b - a
