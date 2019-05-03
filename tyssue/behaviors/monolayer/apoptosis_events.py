@@ -21,6 +21,9 @@ def apoptosis(monolayer, manager, **kwargs):
     ----------
     monolayer : a :cass:`Monolayer` object
     manager : a :class:`EventManager` object
+
+    Optional Parameters
+    -------------------
     cell_id : int
        id of the apoptotic cell
     contract_rate : float, default 2.
@@ -28,8 +31,6 @@ def apoptosis(monolayer, manager, **kwargs):
     shrink_rate : float, default 0.4,
     critical_volume : float, default 0.1,
     """
-    # TODO complete docstring
-    # TODO setup default / kwargs mechanisms
     apoptosis_spec = default_apoptosis_spec
     apoptosis_spec.update(**kwargs)
 

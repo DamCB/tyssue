@@ -232,6 +232,11 @@ def IH_transition(eptm, e_1011):
 
     v10, v11 = eptm.edge_df.loc[e_1011, ["srce", "trgt"]]
     v_pairs = _get_vertex_pairs_IH(eptm, e_1011)
+    if v_pairs is None:
+        logger.warning(
+            "Edge %i is not a valid junction to perform IH transition, aborting", e_1011
+        )
+        return
     try:
         (v1, v4), (v2, v5), (v3, v6) = v_pairs
     except ValueError as err:
@@ -556,7 +561,7 @@ def _get_vertex_pairs_IH(eptm, e_1011):
                 v_pairs.append((vi, vj))
                 break
         else:
-            raise ValueError("No corresponding vertex" " for vertex {}".format(vi))
+            return None
     return v_pairs
 
 

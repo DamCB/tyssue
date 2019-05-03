@@ -9,7 +9,7 @@ from .sheet_topology import type1_transition, remove_face
 from .bulk_topology import HI_transition, IH_transition, find_HIs, find_IHs
 
 
-MAX_ITER = 10
+MAX_ITER = 2
 
 
 def auto_t1(fun):
