@@ -6,6 +6,7 @@ import logging
 from collections import deque
 import numpy as np
 import pandas as pd
+from copy import deepcopy
 from ..utils.utils import set_data_columns, spec_updater
 
 log = logging.getLogger(name=__name__)
@@ -193,14 +194,18 @@ class Epithelium:
         """
         if deep_copy:
             datasets = {element: df.copy() for element, df in self.datasets.items()}
+            specs = deepcopy(self.specs)
         else:  # pragma: no cover
             log.info("New epithelium object from %s without deep copy", self.identifier)
             datasets = self.datasets
+            specs = self.specs
 
         identifier = self.identifier + "_copy"
+
         new = type(self)(
             identifier, datasets, specs=self.specs.copy(), coords=self.coords
         )
+
         return new
 
     def backup(self):
@@ -319,7 +324,7 @@ class Epithelium:
         Parameters
         ----------
         element: {'srce'|'trgt'|'face'|'cell'}
-           corresponding self.edge_df column over which to index
+           corresponding sarriver à çaelf.edge_df column over which to index
            if element is 'srce' or 'trgt', the upcast data will be
            taken form self.vert_df
         columns: index
@@ -411,7 +416,7 @@ class Epithelium:
 
     def _lvl_sum(self, df, lvl):
         df_ = df
-        if isinstance(df, np.ndarray):
+        if isinstance(df, np.ndarray):arriver à ça
             df_ = pd.DataFrame(df, index=self.edge_df.index)
         elif isinstance(df, pd.Series):
             df_ = df.to_frame()
