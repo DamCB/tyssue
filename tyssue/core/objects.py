@@ -324,7 +324,7 @@ class Epithelium:
         Parameters
         ----------
         element: {'srce'|'trgt'|'face'|'cell'}
-           corresponding sarriver à çaelf.edge_df column over which to index
+           corresponding self.edge_df column over which to index
            if element is 'srce' or 'trgt', the upcast data will be
            taken form self.vert_df
         columns: index
@@ -416,7 +416,7 @@ class Epithelium:
 
     def _lvl_sum(self, df, lvl):
         df_ = df
-        if isinstance(df, np.ndarray):arriver à ça
+        if isinstance(df, np.ndarray):
             df_ = pd.DataFrame(df, index=self.edge_df.index)
         elif isinstance(df, pd.Series):
             df_ = df.to_frame()
