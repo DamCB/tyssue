@@ -33,7 +33,7 @@ def auto_collisions(fun):
         else:
             change = solve_bulk_collisions(eptm, eptm.position_buffer)
         if change:
-            print("collision avoided")
+            log.info("collision avoided")
         geom.update_all(eptm)
         return res
 
@@ -261,7 +261,7 @@ class CollidingBoxes:
                 coll_ax
             ]
         else:
-            log.warning("""Plane Not Found""")
+            log.info("""Plane Not Found""")
             self.plane_not_found = True
             lower_bound = pd.DataFrame(
                 index=set(fe0c.srce).union(fe1c.srce), columns=list("xyz")

@@ -42,7 +42,7 @@ def auto_t1(fun):
             if i > MAX_ITER:
                 break
         if eptm.position_buffer is not None:
-            print("out T1 changed buffer")
+            logger.info("out T1 changed buffer")
             eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
         logger.info("performed %i T1", i)
         return res
@@ -75,17 +75,9 @@ def auto_t3(fun):
             if i > MAX_ITER:
                 break
         if eptm.position_buffer is not None:
-            print("out T3 changed buffer")
+            logger.info("out T3 changed buffer")
             eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
         logger.info("performed %i T3", i)
         return res
 
     return with_rearange
-
-
-def _get_shorter_edges(eptm, discarded, l_th):
-    shorts = eptm.edge_df[eptm.edge_df.length < 5 * l_th].sort_values("length")
-    shorts = (
-        shorts[["srce", "trgt"]].apply(frozenset, axis=1).drop_duplicates().index.values
-    )
-    return shorts
