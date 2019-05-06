@@ -195,6 +195,7 @@ class Epithelium:
         if deep_copy:
             datasets = {element: df.copy() for element, df in self.datasets.items()}
             specs = deepcopy(self.specs)
+
         else:  # pragma: no cover
             log.info("New epithelium object from %s without deep copy", self.identifier)
             datasets = self.datasets
@@ -202,9 +203,7 @@ class Epithelium:
 
         identifier = self.identifier + "_copy"
 
-        new = type(self)(
-            identifier, datasets, specs=self.specs.copy(), coords=self.coords
-        )
+        new = type(self)(identifier, datasets, specs=specs, coords=self.coords)
 
         return new
 
