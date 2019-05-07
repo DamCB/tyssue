@@ -1,4 +1,5 @@
 import logging
+import warnings
 import itertools
 from functools import wraps
 
@@ -231,6 +232,11 @@ def IH_transition(eptm, e_1011):
 
     v10, v11 = eptm.edge_df.loc[e_1011, ["srce", "trgt"]]
     v_pairs = _get_vertex_pairs_IH(eptm, e_1011)
+    if v_pairs is None:
+        logger.warning(
+            "Edge %i is not a valid junction to perform IH transition, aborting", e_1011
+        )
+        return
     try:
         (v1, v4), (v2, v5), (v3, v6) = v_pairs
     except ValueError as err:
@@ -399,20 +405,23 @@ def HI_transition(eptm, face):
         cB = None
 
     cA_edges = eptm.edge_df[eptm.edge_df["cell"] == cA]
-    eptm.vert_df = eptm.vert_df.append(eptm.vert_df.loc[[v8, v9]], ignore_index=True)
-
-    eptm.vert_df.index.name = "vert"
-    v10, v11 = eptm.vert_df.index[-2:]
-    _set_new_pos_HI(eptm, fa, v10, v11)
 
     v_pairs = []
     for vk in (v7, v8, v9):
         vis = set(cA_edges[cA_edges["srce"] == vk]["trgt"])
-        vi, = vis.difference({v7, v8, v9})
-
+        try:
+            vi, = vis.difference({v7, v8, v9})
+        except ValueError:
+            warnings.warn("Invalid topology for a HI transition, aborting")
+            return
         vjs = set(eptm.edge_df[eptm.edge_df["srce"] == vk]["trgt"])
-        vj, = vjs.difference({v7, v8, v9, vi})
+        try:
+            vj, = vjs.difference({v7, v8, v9, vi})
+        except ValueError:
+            warnings.warn("Invalid topology for a HI transition, aborting")
+            return
         v_pairs.append((vi, vj))
+
     (v1, v4), (v2, v5), (v3, v6) = v_pairs
 
     srce_cell_orbit = eptm.get_orbits("srce", "cell")
@@ -427,6 +436,11 @@ def HI_transition(eptm, face):
         cells.append(cell[0] if cell else None)
 
     cA, cB, cC, cD, cE = cells
+
+    eptm.vert_df = eptm.vert_df.append(eptm.vert_df.loc[[v8, v9]], ignore_index=True)
+    eptm.vert_df.index.name = "vert"
+    v10, v11 = eptm.vert_df.index[-2:]
+    _set_new_pos_HI(eptm, fa, v10, v11)
 
     for vi, vj, vk in zip((v1, v2, v3), (v4, v5, v6), (v7, v8, v9)):
         e_iks = eptm.edge_df[
@@ -547,7 +561,7 @@ def _get_vertex_pairs_IH(eptm, e_1011):
                 v_pairs.append((vi, vj))
                 break
         else:
-            raise ValueError("No corresponding vertex" " for vertex {}".format(vi))
+            return None
     return v_pairs
 
 

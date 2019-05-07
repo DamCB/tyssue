@@ -173,18 +173,20 @@ def _wire_color_from_sequence(edge_spec, sheet):
         return cmap((color_ - color_.min()) / np.ptp(color_))
 
     elif color_.shape in [(sheet.Ne, 3), (sheet.Ne, 4)]:
-        color_ = pd.DataFrame(color_.values, index=sheet.edge_df.index)
+        color_ = pd.DataFrame(color_, index=sheet.edge_df.index)
         color_["srce"] = sheet.edge_df["srce"]
         color_ = color_.groupby("srce").mean().values
         return color_
     elif color_.shape == (sheet.Ne,):
-        color_ = pd.DataFrame(color_.values, index=sheet.edge_df.index)
+        color_ = pd.DataFrame(color_, index=sheet.edge_df.index)
         color_["srce"] = sheet.edge_df["srce"]
         color_ = color_.groupby("srce").mean().values.ravel()
         if np.ptp(color_) < 1e-10:
             warnings.warn("Attempting to draw a colormap " "with a uniform value")
             return np.ones((sheet.Nv, 3)) * 0.7
         return cmap((color_ - color_.min()) / np.ptp(color_))
+    else:
+        raise ValueError("The 'color' value of the spec doesn't have a correct shape.")
 
 
 def _face_color_from_sequence(face_spec, sheet):

@@ -9,7 +9,7 @@ from .sheet_topology import type1_transition, remove_face
 from .bulk_topology import HI_transition, IH_transition, find_HIs, find_IHs
 
 
-MAX_ITER = 10
+MAX_ITER = 2
 
 
 def auto_t1(fun):
@@ -41,6 +41,9 @@ def auto_t1(fun):
             i += 1
             if i > MAX_ITER:
                 break
+        if eptm.position_buffer is not None:
+            logger.info("out T1 changed buffer")
+            eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
         logger.info("performed %i T1", i)
         return res
 
@@ -71,16 +74,10 @@ def auto_t3(fun):
             i += 1
             if i > MAX_ITER:
                 break
-
+        if eptm.position_buffer is not None:
+            logger.info("out T3 changed buffer")
+            eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
         logger.info("performed %i T3", i)
         return res
 
     return with_rearange
-
-
-def _get_shorter_edges(eptm, discarded, l_th):
-    shorts = eptm.edge_df[eptm.edge_df.length < 5 * l_th].sort_values("length")
-    shorts = (
-        shorts[["srce", "trgt"]].apply(frozenset, axis=1).drop_duplicates().index.values
-    )
-    return shorts

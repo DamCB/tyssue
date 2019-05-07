@@ -4,10 +4,10 @@ tyssue.solvers package
 Submodules
 ----------
 
-tyssue.solvers.cellcell\_solver module
---------------------------------------
+tyssue.solvers.base module
+--------------------------
 
-.. automodule:: tyssue.solvers.cellcell_solver
+.. automodule:: tyssue.solvers.base
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,10 +20,10 @@ tyssue.solvers.isotropic\_solver module
     :undoc-members:
     :show-inheritance:
 
-tyssue.solvers.multisheetsolver module
---------------------------------------
+tyssue.solvers.quasistatic module
+---------------------------------
 
-.. automodule:: tyssue.solvers.multisheetsolver
+.. automodule:: tyssue.solvers.quasistatic
     :members:
     :undoc-members:
     :show-inheritance:
@@ -32,6 +32,14 @@ tyssue.solvers.sheet\_vertex\_solver module
 -------------------------------------------
 
 .. automodule:: tyssue.solvers.sheet_vertex_solver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.solvers.viscous module
+-----------------------------
+
+.. automodule:: tyssue.solvers.viscous
     :members:
     :undoc-members:
     :show-inheritance:

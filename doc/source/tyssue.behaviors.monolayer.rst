@@ -4,10 +4,34 @@ tyssue.behaviors.monolayer package
 Submodules
 ----------
 
-tyssue.behaviors.monolayer.monolayer\_events module
+tyssue.behaviors.monolayer.actions module
+-----------------------------------------
+
+.. automodule:: tyssue.behaviors.monolayer.actions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.behaviors.monolayer.apoptosis\_events module
 ---------------------------------------------------
 
-.. automodule:: tyssue.behaviors.monolayer.monolayer_events
+.. automodule:: tyssue.behaviors.monolayer.apoptosis_events
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.behaviors.monolayer.basic\_events module
+-----------------------------------------------
+
+.. automodule:: tyssue.behaviors.monolayer.basic_events
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tyssue.behaviors.monolayer.delamination\_events module
+------------------------------------------------------
+
+.. automodule:: tyssue.behaviors.monolayer.delamination_events
     :members:
     :undoc-members:
     :show-inheritance:

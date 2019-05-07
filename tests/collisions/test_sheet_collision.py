@@ -52,6 +52,6 @@ def test_already():
     SheetGeometry.update_all(sheet)
     colliding_edges = collisions.self_intersections(sheet)
     boxes = solvers.CollidingBoxes(sheet, positions_buffer, colliding_edges)
-    with pytest.warns(UserWarning):
-        res = boxes.solve_collisions(shyness=0.01)
-        assert res == 0
+    res = boxes.solve_collisions(shyness=0.01)
+    colliding_edges = collisions.self_intersections(sheet)
+    assert len(colliding_edges) == 0

@@ -26,12 +26,14 @@ def auto_collisions(fun):
     def with_collision_correction(*args, **kwargs):
         log.debug("checking for collisions")
         eptm, geom = args[:2]
-        position_buffer = eptm.vert_df[eptm.coords].copy()
+        eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
         res = fun(*args, **kwargs)
         if isinstance(eptm, Sheet):
-            solve_sheet_collisions(eptm, position_buffer)
+            change = solve_sheet_collisions(eptm, eptm.position_buffer)
         else:
-            solve_bulk_collisions(eptm, position_buffer)
+            change = solve_bulk_collisions(eptm, eptm.position_buffer)
+        if change:
+            log.info("collision avoided")
         geom.update_all(eptm)
         return res
 
@@ -55,7 +57,7 @@ def solve_bulk_collisions(eptm, position_buffer):
     """
 
     sub_sheet = get_outer_sheet(eptm)
-    pos_idx = sub_sheet.vert_df.index
+    pos_idx = sub_sheet.vert_df.index.copy()
     sub_sheet.reset_index()
     sub_buffer = pd.DataFrame(
         position_buffer.loc[pos_idx].values,
@@ -116,6 +118,7 @@ class CollidingBoxes:
         self.face_pairs = self._get_intersecting_faces()
         self.edge_buffer = sheet.upcast_srce(position_buffer).copy()
         self.edge_buffer.columns = ["sx", "sy", "sz"]
+        self.plane_not_found = False
 
     def _get_intersecting_faces(self):
         """Returns unique pairs of intersecting faces
@@ -240,7 +243,7 @@ class CollidingBoxes:
         sign_change_l1h0 = np.sign((bb1c.l - bb0c.h) * (bb1p.l - bb0p.h)) < 0
         sign_change_l0h1 = np.sign((bb0c.l - bb1c.h) * (bb0p.l - bb1p.h)) < 0
 
-        # face 0 is to the left of face 0 on the collision axis
+        # face 0 is to the left of face 1 on the collision axis
         if any(sign_change_l1h0):
             lower_bound = pd.DataFrame(index=fe1c.srce)
             upper_bound = pd.DataFrame(index=fe0c.srce)
@@ -258,11 +261,27 @@ class CollidingBoxes:
                 coll_ax
             ]
         else:
-
-            warnings.warn(
-                """The collision was already present or its axis could not be determined"""
+            log.info("""Plane Not Found""")
+            self.plane_not_found = True
+            lower_bound = pd.DataFrame(
+                index=set(fe0c.srce).union(fe1c.srce), columns=list("xyz")
             )
-            return None, None
+            upper_bound = pd.DataFrame(
+                index=set(fe0c.srce).union(fe1c.srce), columns=list("xyz")
+            )
+            for c in list("xyz"):
+                b0 = bb0c.loc[c]
+                b1 = bb1c.loc[c]
+                left, right = (fe0c, fe1c) if (b0.mean() < b1.mean()) else (fe1c, fe0c)
+
+                lim = (left[f"s{c}"].max() + right[f"s{c}"].min()) / 2
+                upper_bound.loc[right.srce, c] = right[f"s{c}"].max()
+                upper_bound.loc[left.srce, c] = lim - shyness / 2
+
+                lower_bound.loc[left.srce, c] = left[f"s{c}"].min()
+                lower_bound.loc[right.srce, c] = lim + shyness / 2
+
+            return lower_bound, upper_bound
 
         for c in coll_ax:
             lower_bound[c] = plane_coords.loc[c] + shyness / 2

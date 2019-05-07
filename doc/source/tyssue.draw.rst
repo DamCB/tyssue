@@ -20,22 +20,6 @@ tyssue.draw.plt\_draw module
     :undoc-members:
     :show-inheritance:
 
-tyssue.draw.threejs\_draw module
---------------------------------
-
-.. automodule:: tyssue.draw.threejs_draw
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tyssue.draw.vispy\_draw module
-------------------------------
-
-.. automodule:: tyssue.draw.vispy_draw
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------

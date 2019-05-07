@@ -130,6 +130,8 @@ class Epithelium:
         else:
             self.active_verts = self.vert_df.index
         self.set_bbox()
+
+        self.position_buffer = None
         self.topo_changed = False
 
     @property
@@ -193,13 +195,16 @@ class Epithelium:
         if deep_copy:
             datasets = {element: df.copy() for element, df in self.datasets.items()}
             specs = deepcopy(self.specs)
+
         else:  # pragma: no cover
             log.info("New epithelium object from %s without deep copy", self.identifier)
             datasets = self.datasets
             specs = self.specs
 
         identifier = self.identifier + "_copy"
+
         new = type(self)(identifier, datasets, specs=specs, coords=self.coords)
+
         return new
 
     def backup(self):
@@ -463,11 +468,11 @@ class Epithelium:
         """Returns a dataframe with a `(center, edge)` MultiIndex with `periph`
         elements.
 
-        Parmeters
-        ---------
-        center: str,
+        Parameters
+        ----------
+        center : str,
             the name of the center element for example 'face', 'srce'
-        periph: str,
+        periph : str,
             the name of the periphery elements, for example 'trgt', 'cell'
 
         Example

@@ -29,8 +29,8 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 ## Thanks to them!
 MAJOR = 0
 MINOR = 3
-MICRO = "3rc1"
-ISRELEASED = True
+MICRO = "3"
+ISRELEASED = False
 VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
 
 

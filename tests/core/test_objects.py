@@ -230,11 +230,11 @@ def test_eptm_copy():
     eptm_copy = eptm.copy()
     assert eptm_copy.identifier == eptm.identifier + "_copy"
     assert set(eptm_copy.datasets.keys()).issuperset(eptm.datasets.keys())
-    eptm.settings["deepcopy"] = False
+    eptm.settings["deepcopy"] = "original"
     eptm_deepcopy = eptm.copy(deep_copy=True)
-    eptm_deepcopy.settings["deepcopy"] = True
+    eptm_deepcopy.settings["deepcopy"] = "copy"
     assert eptm_deepcopy is not None
-    assert eptm.settings["deepcopy"] is not eptm_deepcopy.settings["deepcopy"]
+    assert eptm.settings["deepcopy"] != eptm_deepcopy.settings["deepcopy"]
 
 
 def test_settings_getter_setter():
@@ -403,7 +403,7 @@ def test_orbits():
 
 def test_polygons():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
-    datasets = extrude(datasets_2d)
+    datasets = extrude(datasets_2d, scale=1 / 3.0)
     eptm = Epithelium("3faces_3D", datasets, specs)
     eptm_2d = Epithelium("3faces_2D", datasets_2d, specs)
 

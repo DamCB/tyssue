@@ -52,14 +52,6 @@ tyssue.dynamics.factory module
     :undoc-members:
     :show-inheritance:
 
-tyssue.dynamics.multisheetmodel module
---------------------------------------
-
-.. automodule:: tyssue.dynamics.multisheetmodel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tyssue.dynamics.planar\_gradients module
 ----------------------------------------
 
@@ -80,14 +72,6 @@ tyssue.dynamics.sheet\_gradients module
 ---------------------------------------
 
 .. automodule:: tyssue.dynamics.sheet_gradients
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tyssue.dynamics.sheet\_isotropic\_model module
-----------------------------------------------
-
-.. automodule:: tyssue.dynamics.sheet_isotropic_model
     :members:
     :undoc-members:
     :show-inheritance:
