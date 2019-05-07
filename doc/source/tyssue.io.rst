@@ -4,14 +4,6 @@ tyssue.io package
 Submodules
 ----------
 
-tyssue.io.ais module
---------------------
-
-.. automodule:: tyssue.io.ais
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tyssue.io.csv module
 --------------------
 

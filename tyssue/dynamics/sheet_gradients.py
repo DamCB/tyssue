@@ -10,20 +10,20 @@ from ..utils.utils import to_nd  # _to_3d, _to_2d
 
 def height_grad(sheet):
 
-    w = sheet.settings["height_axis"]
+    w = sheet.settings.get("height_axis", "z")
     u, v = (c for c in sheet.coords if c != w)
     coords = [u, v, w]
 
-    if sheet.settings["geometry"] == "cylindrical":
+    if sheet.settings.get("geometry", "cylindrical") == "cylindrical":
         r_to_rho = sheet.vert_df[coords] / to_nd(sheet.vert_df["rho"], 3)
         r_to_rho[w] = 0.0
 
-    elif sheet.settings["geometry"] == "flat":
+    elif sheet.settings.get("geometry") == "flat":
         r_to_rho = sheet.vert_df[coords].copy()
         r_to_rho[[u, v]] = 0.0
         r_to_rho[[w]] = 1.0
 
-    elif sheet.settings["geometry"] == "spherical":
+    elif sheet.settings.get("geometry") == "spherical":
         r_to_rho = sheet.vert_df[coords] / to_nd(sheet.vert_df["rho"], 3)
 
     return r_to_rho

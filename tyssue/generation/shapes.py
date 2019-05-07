@@ -1,15 +1,18 @@
 import math
+import warnings
 import numpy as np
 import pandas as pd
 from scipy.spatial import Voronoi
+from scipy import interpolate
 
 from .. import config
 from ..core.sheet import Sheet, get_outer_sheet
 from ..core.objects import get_prev_edges
 from ..core.objects import Epithelium
+from ..topology import type1_transition
 from .from_voronoi import from_3d_voronoi
 from ..geometry.bulk_geometry import BulkGeometry
-from ..geometry.sheet_geometry import EllipsoidGeometry
+from ..geometry.sheet_geometry import EllipsoidGeometry, SheetGeometry
 
 from ..utils import single_cell
 
@@ -188,7 +191,13 @@ def get_ellipsoid_centers(a, b, c, n_zs, pos_err=0.0, phase_err=0.0):
       to the centers angle ϕ
 
     """
-    dist = c / (n_zs)
+    if b != a:
+        warnings.warn(
+            "Different half axes length along x and y"
+            " axes are not supported at the moment"
+        )
+
+    dist = c / n_zs
     theta = -np.pi / 2
     thetas = []
     while theta < np.pi / 2:
@@ -223,9 +232,8 @@ def get_ellipsoid_centers(a, b, c, n_zs, pos_err=0.0, phase_err=0.0):
         xs += np.random.normal(scale=pos_err, size=thetas.shape)
         ys += np.random.normal(scale=pos_err, size=thetas.shape)
         zs += np.random.normal(scale=pos_err, size=thetas.shape)
-    centers = pd.DataFrame.from_dict(
-        {"x": xs, "y": ys, "z": zs, "theta": thetas, "phi": phis}
-    )
+
+    centers = np.vstack([xs, ys, zs]).T
     return centers
 
 
@@ -253,34 +261,7 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
     """
     centers = get_ellipsoid_centers(a, b, c, n_zs, **kwargs)
 
-    centers = centers.append(
-        pd.Series({"x": 0, "y": 0, "z": 0, "theta": 0, "phi": 0}), ignore_index=True
-    )
-
-    centers["x"] /= a
-    centers["y"] /= b
-    centers["z"] /= c
-
-    vor3d = Voronoi(centers[list("xyz")].values)
-    vor3d.close()
-    dsets = from_3d_voronoi(vor3d)
-    veptm = Epithelium("v", dsets, config.geometry.bulk_spec())
-    eptm_ = single_cell(veptm, centers.shape[0] - 1)
-    eptm_.reset_index()
-    eptm = get_outer_sheet(eptm_)
-    eptm.reset_index()
-    eptm.reset_topo()
-    eptm.vert_df["rho"] = np.linalg.norm(eptm.vert_df[eptm.coords], axis=1)
-    eptm.vert_df["theta"] = np.arcsin(eptm.vert_df.eval("z/rho"))
-    eptm.vert_df["phi"] = np.arctan2(eptm.vert_df["y"], eptm.vert_df["x"])
-
-    eptm.vert_df["x"] = a * (
-        np.cos(eptm.vert_df["theta"]) * np.cos(eptm.vert_df["phi"])
-    )
-    eptm.vert_df["y"] = b * (
-        np.cos(eptm.vert_df["theta"]) * np.sin(eptm.vert_df["phi"])
-    )
-    eptm.vert_df["z"] = c * np.sin(eptm.vert_df["theta"])
+    eptm = sheet_from_cell_centers(centers)
     eptm.settings["abc"] = [a, b, c]
     EllipsoidGeometry.update_all(eptm)
     return eptm
@@ -295,4 +276,103 @@ def spherical_sheet(radius, Nf, **kwargs):
     eptm = ellipsoid_sheet(radius, radius, radius, n_zs, **kwargs)
     eptm.settings.pop("abc")
     eptm.settings["radius"] = radius
+    return eptm
+
+
+def sheet_from_cell_centers(points, noise=0):
+    """Returns a Sheet object from the Voronoï tessalation
+    of the cell centers.
+
+    The strategy is to project the points on a sphere, get the Voronoï
+    tessalation on this sphere and reproject the vertices on the
+    original (implicit) surface through linear interpolation of the cell centers.
+
+    Works for relatively smooth surfaces (at the very minimum star convex).
+
+    Parameters
+    ----------
+
+    points : np.ndarray of shape (Nf, 3)
+        the x, y, z coordinates of the cell centers
+    noise : float, default 0.0
+        addiditve normal noise stdev
+
+    Returns
+    -------
+    sheet : a :class:`Sheet` object with Nf faces
+
+
+    """
+    points = points.copy()
+    if noise:
+        points += np.random.normal(0, scale=noise, size=points.shape)
+    points -= points.mean(axis=0)
+    bbox = np.ptp(points, axis=0)
+    points /= bbox
+
+    rhos = np.linalg.norm(points, axis=1)
+    thetas = np.arcsin(points[:, 2] / rhos)
+    phis = np.arctan2(points[:, 0], points[:, 1])
+
+    sphere_rad = rhos.max() * 1.1
+
+    points_sphere = np.vstack(
+        (
+            sphere_rad * np.cos(thetas) * np.cos(phis),
+            sphere_rad * np.cos(thetas) * np.sin(phis),
+            sphere_rad * np.sin(thetas),
+        )
+    ).T
+    points_sphere = np.concatenate(([[0, 0, 0]], points_sphere))
+
+    vor3D = Voronoi(points_sphere)
+
+    dsets = from_3d_voronoi(vor3D)
+    eptm_ = Epithelium("v", dsets)
+
+    eptm_ = single_cell(eptm_, 0)
+
+    eptm = get_outer_sheet(eptm_)
+    eptm.reset_index()
+    eptm.reset_topo()
+    eptm.vert_df["rho"] = np.linalg.norm(eptm.vert_df[eptm.coords], axis=1)
+    mean_rho = eptm.vert_df["rho"].mean()
+
+    SheetGeometry.scale(eptm, sphere_rad / mean_rho, ["x", "y", "z"])
+    SheetGeometry.update_all(eptm)
+
+    eptm.face_df["phi"] = np.arctan2(eptm.face_df.y, eptm.face_df.x)
+    eptm.face_df["rho"] = np.linalg.norm(eptm.face_df[["x", "y", "z"]], axis=1)
+    eptm.face_df["theta"] = np.arcsin(eptm.face_df.z / eptm.face_df["rho"])
+    _itrp = interpolate.SmoothSphereBivariateSpline(
+        thetas + np.pi / 2, phis + np.pi, rhos, s=1e-4
+    )
+    eptm.face_df["rho"] = _itrp(
+        eptm.face_df["theta"] + np.pi / 2, eptm.face_df["phi"] + np.pi, grid=False
+    )
+    eptm.face_df["x"] = eptm.face_df.eval("rho * cos(theta) * cos(phi)")
+    eptm.face_df["y"] = eptm.face_df.eval("rho * cos(theta) * sin(phi)")
+    eptm.face_df["z"] = eptm.face_df.eval("rho * sin(theta)")
+
+    eptm.edge_df[["fx", "fy", "fz"]] = eptm.upcast_face(eptm.face_df[["x", "y", "z"]])
+    eptm.vert_df[["x", "y", "z"]] = eptm.edge_df.groupby("srce")[
+        ["fx", "fy", "fz"]
+    ].mean()
+    for i, c in enumerate("xyz"):
+        eptm.vert_df[c] *= bbox[i]
+
+    SheetGeometry.update_all(eptm)
+
+    eptm.sanitize(trim_borders=True)
+
+    eptm.reset_index()
+    eptm.reset_topo()
+    SheetGeometry.update_all(eptm)
+    null_length = eptm.edge_df.query("length == 0")
+
+    while null_length.shape[0]:
+        type1_transition(eptm, null_length.index[0])
+        SheetGeometry.update_all(eptm)
+        null_length = eptm.edge_df.query("length == 0")
+
     return eptm

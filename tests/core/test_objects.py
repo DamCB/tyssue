@@ -403,7 +403,7 @@ def test_orbits():
 
 def test_polygons():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
-    datasets = extrude(datasets_2d)
+    datasets = extrude(datasets_2d, scale=1 / 3.0)
     eptm = Epithelium("3faces_3D", datasets, specs)
     eptm_2d = Epithelium("3faces_2D", datasets_2d, specs)
 

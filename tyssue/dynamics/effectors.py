@@ -63,14 +63,15 @@ class AbstractEffector:
     def get_nrj_norm(specs):
         raise NotImplementedError
 
-    @classmethod
-    @property
-    def __doc__(cls):
-        f"""Effector implementing {cls.label} with a magnitude factor
- {cls.magnitude}.
 
-Works on an `Epithelium` object's {cls.element} elements.
-"""
+#     @classmethod
+#     @property
+#     def __doc__(cls):
+#         f"""Effector implementing {cls.label} with a magnitude factor
+#  {cls.magnitude}.
+
+# Works on an `Epithelium` object's {cls.element} elements.
+# """
 
 
 class LengthElasticity(AbstractEffector):

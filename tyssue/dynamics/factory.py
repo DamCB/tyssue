@@ -42,9 +42,6 @@ def model_factory(effectors, ref_effector=None):
             for k in specs.keys():
                 specs[k] = specs[k].union(f.specs.get(k, {}))
 
-        __doc__ = """Dynamical model with the following effectors:\n"""
-        __doc__ = __doc__ + "\n".join(labels)
-
         @staticmethod
         def dimensionalize(nondim_specs):
             dim_specs = deepcopy(nondim_specs)

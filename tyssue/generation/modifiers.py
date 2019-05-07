@@ -4,17 +4,17 @@ import pandas as pd
 import numpy as np
 
 
-def extrude(apical_datasets, method="homotecy", scale=1 / 3.0, vector=[0, 0, -1]):
-    """Extrude a sheet to form a single layer epithelium
+def extrude(apical_datasets, method="homotecy", scale=0.3, vector=[0, 0, -1]):
+    """Extrude a sheet to form a monlayer epithelium
 
     Parameters
     ----------
     * apical_datasets: dictionnary of three DataFrames,
     'vert', 'edge', 'face'
-    * method: str, optional {'homotecy'|'translation'}
+    * method: str, optional {'homotecy'|'translation'|'normals'}
     default 'homotecy'
     * scale: float, optional
-    the scale factor for homotetic scaling, default 1/3.
+    the scale factor for homotetic scaling, default 0.3.
     * vector: sequence of three floats, optional,
     used for the translation
 
@@ -26,6 +26,10 @@ def extrude(apical_datasets, method="homotecy", scale=1 / 3.0, vector=[0, 0, -1]
 
     if `method == 'translation'`, the basal vertices are translated from
     the apical ones by the vector `vect`
+
+    if `method == 'normals'`, basal vertices are translated from
+    the apical ones along the normal of the surface at each vertex,
+    by a vector whose size is given by `scale`
 
     """
     apical_vert = apical_datasets["vert"]
@@ -107,6 +111,10 @@ def extrude(apical_datasets, method="homotecy", scale=1 / 3.0, vector=[0, 0, -1]
     elif method == "translation":
         for c, u in zip(coords, vector):
             basal_vert[c] = basal_vert[c] + u
+    elif method == "normals":
+        field = apical_edge.groupby("srce")[["nx", "ny", "nz"]].mean()
+        field = -field.values * scale / np.linalg.norm(field, axis=1)[:, None]
+        basal_vert[coords] = basal_vert[coords] + field
     else:
         raise ValueError(
             """

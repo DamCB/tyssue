@@ -468,11 +468,11 @@ class Epithelium:
         """Returns a dataframe with a `(center, edge)` MultiIndex with `periph`
         elements.
 
-        Parmeters
-        ---------
-        center: str,
+        Parameters
+        ----------
+        center : str,
             the name of the center element for example 'face', 'srce'
-        periph: str,
+        periph : str,
             the name of the periphery elements, for example 'trgt', 'cell'
 
         Example

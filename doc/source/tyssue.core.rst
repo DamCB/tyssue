@@ -4,14 +4,6 @@ tyssue.core package
 Submodules
 ----------
 
-tyssue.core.flycheck\_objects module
-------------------------------------
-
-.. automodule:: tyssue.core.flycheck_objects
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tyssue.core.history module
 --------------------------
 

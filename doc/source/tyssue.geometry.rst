@@ -20,14 +20,6 @@ tyssue.geometry.bulk\_geometry module
     :undoc-members:
     :show-inheritance:
 
-tyssue.geometry.cellcell\_geometry module
------------------------------------------
-
-.. automodule:: tyssue.geometry.cellcell_geometry
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tyssue.geometry.multisheetgeometry module
 -----------------------------------------
 

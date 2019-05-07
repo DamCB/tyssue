@@ -8,7 +8,6 @@ import pandas as pd
 from scipy.spatial import cKDTree
 from .objects import Epithelium
 from .sheet import Sheet
-from ..generation import extrude, subdivide_faces
 from ..geometry.bulk_geometry import BulkGeometry
 
 logger = logging.getLogger(name=__name__)
@@ -30,6 +29,8 @@ class Monolayer(Epithelium):
 
     @classmethod
     def from_flat_sheet(cls, name, apical_sheet, specs, thickness=1):
+        from ..generation import extrude
+
         datasets = extrude(
             apical_sheet.datasets, method="translation", vector=[0, 0, -thickness]
         )
@@ -140,6 +141,7 @@ class MonolayerWithLamina(Monolayer):
 
         BulkGeometry.update_all(self)
         self.reset_index()
+        from ..generation import subdivide_faces
 
         subdivided = subdivide_faces(self, self.basal_faces)
         for name, df in subdivided.items():
