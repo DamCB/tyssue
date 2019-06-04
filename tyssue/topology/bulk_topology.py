@@ -176,7 +176,7 @@ def find_rearangements(eptm):
     l_th = eptm.settings.get("threshold_length", 1e-6)
     shorts = eptm.edge_df[eptm.edge_df["length"] < l_th]
     if not shorts.shape[0]:
-        return []
+        return [], []
     edges_IH = find_IHs(eptm, shorts)
     faces_HI = find_HIs(eptm, shorts)
     return edges_IH, faces_HI
