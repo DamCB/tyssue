@@ -34,7 +34,7 @@ def test_condition4ii():
     add_vert(sheet, 0)
     sheet.reset_index()
     sheet.reset_topo()
-    assert len(condition_4ii(sheet)) == 1
+    assert len(condition_4ii(sheet)) == 2
 
 
 def test_division():
