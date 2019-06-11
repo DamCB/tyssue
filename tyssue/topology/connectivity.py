@@ -28,7 +28,9 @@ def face_face_connectivity(eptm, exclude_opposites=False):
     mesh = eptm.edge_df.groupby("srce").apply(_elements_mesh, "face", "face")
 
     ff_connect = sparse.coo_matrix(
-        (np.ones(mesh.shape[0]), (mesh["row"], mesh["col"])), shape=(eptm.Nf, eptm.Nf)
+        (np.ones(mesh.shape[0]), (mesh["row"], mesh["col"])),
+        shape=(eptm.Nf, eptm.Nf),
+        dtype=int,
     ).toarray()
 
     ff_connect[np.arange(eptm.Nf), np.arange(eptm.Nf)] = 0
@@ -41,7 +43,7 @@ def face_face_connectivity(eptm, exclude_opposites=False):
 
 def cell_cell_connectivity(eptm):
     """Returns an array of shape (eptm.Nc, eptm.Nc) with
-    C_ij = n, where n is the number of shared vertices
+    C_ij = n, where n is the number of connections
     between the cells i and j.
 
     """
