@@ -3,23 +3,38 @@ import warnings
 import itertools
 from functools import wraps
 
-
 import numpy as np
 import pandas as pd
 
 from .sheet_topology import face_division
-from .base_topology import add_vert, close_face
+from .base_topology import add_vert, close_face, condition_4i, condition_4ii
 from ..geometry.utils import rotation_matrix
-from ..geometry.bulk_geometry import BulkGeometry
-from ..core.objects import get_opposite_faces
 from ..core.monolayer import Monolayer
 
 logger = logging.getLogger(name=__name__)
 MAX_ITER = 10
 
 
+def check_condition4(func):
+    @wraps(func)
+    def decorated(eptm, *args, **kwargs):
+        eptm.backup()
+        res = func(eptm, *args, **kwargs)
+        if len(condition_4i(eptm)) or len(condition_4ii(eptm)):
+            print("Invalid epithelium produced, restoring")
+            print("4i on", condition_4i(eptm))
+            print("4ii on", condition_4ii(eptm))
+            eptm.restore()
+        return res
+
+    return decorated
+
+
 def get_division_edges(eptm, mother, plane_normal, plane_center=None):
-    """
+    """Returns an index of the mother cell edges crossed by the division plane, ordered
+    clockwize around the division plane normal.
+
+
     """
     plane_normal = np.asarray(plane_normal)
     if plane_center is None:
@@ -34,8 +49,8 @@ def get_division_edges(eptm, mother, plane_normal, plane_center=None):
         rot = rotation_matrix(theta, direction)
     cell_verts = set(eptm.edge_df[eptm.edge_df["cell"] == mother]["srce"])
     vert_pos = eptm.vert_df.loc[cell_verts, eptm.coords]
-    for c in eptm.coords:
-        vert_pos[c] -= plane_center[c]
+    for coord in eptm.coords:
+        vert_pos[coord] -= plane_center[coord]
     if rot is not None:
         vert_pos[:] = np.dot(vert_pos, rot)
 
@@ -69,6 +84,7 @@ def get_division_vertices(
     return vertices
 
 
+@check_condition4
 def cell_division(eptm, mother, geom, vertices=None):
 
     if vertices is None:
@@ -176,7 +192,7 @@ def find_rearangements(eptm):
     l_th = eptm.settings.get("threshold_length", 1e-6)
     shorts = eptm.edge_df[eptm.edge_df["length"] < l_th]
     if not shorts.shape[0]:
-        return []
+        return np.array([]), np.array([])
     edges_IH = find_IHs(eptm, shorts)
     faces_HI = find_HIs(eptm, shorts)
     return edges_IH, faces_HI
@@ -190,7 +206,7 @@ def find_IHs(eptm, shorts=None):
     if not shorts.shape[0]:
         return []
 
-    edges_IH = shorts.groupby(["srce", "trgt"]).apply(
+    edges_IH = shorts.groupby("srce").apply(
         lambda df: pd.Series(
             {
                 "edge": df.index[0],
@@ -222,6 +238,7 @@ def find_HIs(eptm, shorts=None):
     return faces_HI
 
 
+@check_condition4
 def IH_transition(eptm, e_1011):
     """
     I → H transition as defined in Okuda et al. 2013
@@ -236,22 +253,23 @@ def IH_transition(eptm, e_1011):
         logger.warning(
             "Edge %i is not a valid junction to perform IH transition, aborting", e_1011
         )
-        return
+        return -1
+
     try:
         (v1, v4), (v2, v5), (v3, v6) = v_pairs
-    except ValueError as err:
+    except ValueError:
         logger.warning(
             "Edge %i is not a valid junction to perform IH transition, aborting", e_1011
         )
-        return
+        return -1
 
     if len({v1, v4, v2, v5, v3, v6}) != 6:
-        logger.warning(
-            "Edge %i has adjacent triangular faces"
-            " can't perform IH transition, aborting",
+        raise ValueError(
+            """
+        Topology cannot be correctly determined around edge %i
+        """,
             e_1011,
         )
-        return
 
     new_vs = eptm.vert_df.loc[[v1, v2, v3]].copy()
     eptm.vert_df = eptm.vert_df.append(new_vs, ignore_index=True)
@@ -305,7 +323,7 @@ def IH_transition(eptm, e_1011):
             "I - H transition is not possible without cells on either ends"
             " of the edge - would result in a hole"
         )
-        return
+        return -1
 
     if orient < 0:
         v1, v2, v3 = v1, v3, v2
@@ -377,8 +395,10 @@ def IH_transition(eptm, e_1011):
 
     eptm.reset_index()
     eptm.reset_topo()
+    return 0
 
 
+@check_condition4
 def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013
@@ -413,13 +433,13 @@ def HI_transition(eptm, face):
             vi, = vis.difference({v7, v8, v9})
         except ValueError:
             warnings.warn("Invalid topology for a HI transition, aborting")
-            return
+            return -1
         vjs = set(eptm.edge_df[eptm.edge_df["srce"] == vk]["trgt"])
         try:
             vj, = vjs.difference({v7, v8, v9, vi})
         except ValueError:
             warnings.warn("Invalid topology for a HI transition, aborting")
-            return
+            return -1
         v_pairs.append((vi, vj))
 
     (v1, v4), (v2, v5), (v3, v6) = v_pairs
@@ -548,11 +568,28 @@ def _get_vertex_pairs_IH(eptm, e_1011):
 
     srce_face_orbits = eptm.get_orbits("srce", "face")
     v10, v11 = eptm.edge_df.loc[e_1011, ["srce", "trgt"]]
+    common_faces = set(srce_face_orbits.loc[v10]).intersection(
+        srce_face_orbits.loc[v11]
+    )
+    if eptm.face_df.loc[common_faces, "num_sides"].min() < 4:
+        logger.warning(
+            "Edge %i has adjacent triangular faces"
+            " can't perform IH transition, aborting",
+            e_1011,
+        )
+        return None
+
     v10_out = set(eptm.edge_df[eptm.edge_df["srce"] == v10]["trgt"]) - {v11}
-    faces_123 = {v: set(srce_face_orbits.loc[v]) for v in v10_out}
+    faces_123 = {
+        v: set(srce_face_orbits.loc[v])  # .intersection(srce_face_orbits.loc[v10])
+        for v in v10_out
+    }
 
     v11_out = set(eptm.edge_df[eptm.edge_df["srce"] == v11]["trgt"]) - {v10}
-    faces_456 = {v: set(srce_face_orbits.loc[v]) for v in v11_out}
+    faces_456 = {
+        v: set(srce_face_orbits.loc[v])  # .intersection(srce_face_orbits.loc[v11])
+        for v in v11_out
+    }
     v_pairs = []
     for vi in v10_out:
         for vj in v11_out:

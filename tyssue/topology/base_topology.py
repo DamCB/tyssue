@@ -1,6 +1,9 @@
 import logging
+import numpy as np
+
 import pandas as pd
 from itertools import combinations
+from .connectivity import face_face_connectivity
 
 logger = logging.getLogger(name=__name__)
 
@@ -157,11 +160,11 @@ def get_num_common_edges(eptm):
 
 def condition_4ii(eptm):
     """
-    Return a list of face pairs sharing more than one edge, as defined
+    Return an array of face pairs sharing more than two half-edges, as defined
     in Okuda et al. 2013 condition 4 ii
     """
-    n_common = get_num_common_edges(eptm)
-    return list(n_common[n_common >= 2].index)
+    conmat = face_face_connectivity(eptm, exclude_opposites=True)
+    return np.vstack(np.where(conmat > 2)).T
 
 
 def merge_border_edges(sheet):

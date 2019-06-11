@@ -1,7 +1,7 @@
 import logging
 import numpy as np
 
-from ..geometry.bulk_geometry import MonoLayerGeometry
+from ..geometry.bulk_geometry import MonolayerGeometry
 from ..core.sheet import Sheet
 from ..geometry.sheet_geometry import SheetGeometry
 from .bulk_topology import get_division_vertices
@@ -34,7 +34,7 @@ def cell_division(monolayer, mother, orientation="vertical", psi=0):
     * daughter: int, the index of the daughter cell
     """
 
-    ab_axis = MonoLayerGeometry.basal_apical_axis(monolayer, mother)
+    ab_axis = MonolayerGeometry.basal_apical_axis(monolayer, mother)
     plane_normal = np.asarray(ab_axis)
 
     if orientation == "horizontal":
@@ -61,7 +61,7 @@ should be either "horizontal" or "vertical", not {}""".format(
             )
         )
 
-    daughter = bulk_division(monolayer, mother, MonoLayerGeometry, vertices)
+    daughter = bulk_division(monolayer, mother, MonolayerGeometry, vertices)
 
     # Correct segment assignations for the septum
     septum = monolayer.face_df.index[-2:]
@@ -141,97 +141,3 @@ type 1 transition is not allowed""",
             fb_a,
         )
         return
-
-
-def layer_t1_transition(monolayer, edge01, epsilon=0.1):
-
-    vert0, vert1, face_ba, cell_b = monolayer.edge_df.loc[
-        edge01, ["srce", "trgt", "face", "cell"]
-    ].astype(int)
-    segment = monolayer.edge_df.loc[edge01, "segment"]
-    if monolayer.face_df.loc[face_ba, "num_sides"] < 4:
-        logger.warning(
-            """Face %s has 3 sides,
-type 1 transition is not allowed"""
-            % face_ba
-        )
-        return
-    edges01_ = monolayer.edge_df[
-        (monolayer.edge_df["srce"] == vert0) & (monolayer.edge_df["trgt"] == vert1)
-    ]
-    edges10_ = monolayer.edge_df[
-        (monolayer.edge_df["srce"] == vert1) & (monolayer.edge_df["trgt"] == vert0)
-    ]
-    if not len(edges10_.index):
-        raise ValueError(
-            "opposite edge to {} with "
-            "source {} and target {} not found".format(edge01, vert0, vert1)
-        )
-    edges10 = edges10_.index
-    edges01 = edges01_.index
-
-    face_da = edges10_[edges10_["segment"] == segment]["face"]
-    face_ds = edges10_[edges10_["segment"] != segment]["face"]
-    face_bs = edges01_[edges01_["segment"] != segment]["face"]
-
-    if monolayer.face_df.loc[face_da, "num_sides"] < 4:
-        logger.warning(
-            """Face %s has 3 sides,
-        type 1 transition is not allowed"""
-            % face_da
-        )
-        return
-
-    vert5 = monolayer.edge_df[
-        (monolayer.edge_df["srce"] == vert0) & (monolayer.edge_df["face"] == face_da)
-    ]["trgt"]
-    edges05_ = monolayer.edge_df[
-        (monolayer.edge_df["srce"] == vert0) & (monolayer.edge_df["trgt"] == vert5)
-    ]
-    edges05 = edges05_.index
-
-    edges50_ = monolayer.edge_df[
-        (monolayer.edge_df["srce"] == vert5) & (monolayer.edge_df["trgt"] == vert0)
-    ]
-    edges50 = edges50_.index
-    face_aa = edges50_[edges50_["segment"] == segment]["face"]
-    face_as = edges50_[edges50_["segment"] != segment]["face"]
-
-    vert3 = monolayer.edge_df[
-        (monolayer.edge_df["srce"] == vert1) & (monolayer.edge_df["face"] == face_ba)
-    ]["trgt"]
-
-    edges31_ = monolayer.edge_df[
-        (monolayer.edge_df["srce"] == vert3) & (monolayer.edge_df["trgt"] == vert1)
-    ]
-    edges31 = edges31_.index
-    faces_c = edges31_["face"]
-
-    edges13_ = monolayer.edge_df[
-        (monolayer.edge_df["srce"] == vert1) & (monolayer.edge_df["trgt"] == vert3)
-    ]
-    edges13 = edges13_.index
-
-    # rearangements
-    monolayer.edge_df.loc[edge01, "face"] = int(face_c)
-    monolayer.edge_df.loc[edge10, "face"] = int(face_a)
-    monolayer.edge_df.loc[edges13, ["srce", "trgt", "face"]] = vert0, vert3
-    monolayer.edge_df.loc[edges31, ["srce", "trgt", "face"]] = vert3, vert0
-
-    monolayer.edge_df.loc[edges50, ["srce", "trgt", "face"]] = vert5, vert1
-    monolayer.edge_df.loc[edges05, ["srce", "trgt", "face"]] = vert1, vert5
-
-    # Displace the vertices
-    mean_pos = (
-        monolayer.vert_df.loc[vert0, monolayer.coords]
-        + monolayer.vert_df.loc[vert1, monolayer.coords]
-    ) / 2
-    face_b_pos = monolayer.face_df.loc[face_b, monolayer.coords]
-    monolayer.vert_df.loc[vert0, monolayer.coords] = (
-        mean_pos - (mean_pos - face_b_pos) * epsilon
-    )
-    face_d_pos = monolayer.face_df.loc[face_d, monolayer.coords]
-    monolayer.vert_df.loc[vert1, monolayer.coords] = (
-        mean_pos - (mean_pos - face_d_pos) * epsilon
-    )
-    monolayer.reset_topo()
