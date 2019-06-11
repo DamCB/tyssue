@@ -1,7 +1,7 @@
 import warnings
 import pytest
 
-from tyssue import Sheet, History, config, Epithelium
+from tyssue import Sheet, History, config, Epithelium, RNRGeometry
 from tyssue.generation import three_faces_sheet, extrude
 
 
@@ -57,3 +57,13 @@ def test_retrieve():
     assert dsets["face"].loc[0, "area"] == 100
     dsets = history.retrieve(1)
     assert dsets["face"].loc[0, "area"] != 100
+
+
+def test_retrieve_bulk():
+    eptm = Epithelium("3", extrude(three_faces_sheet()[0]))
+    RNRGeometry.update_all(eptm)
+
+    history = History(eptm)
+    dsets = history.retrieve(0)
+    eptm_ = Epithelium("zer", dsets)
+    RNRGeometry.update_all(eptm_)
