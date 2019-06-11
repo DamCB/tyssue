@@ -2,6 +2,7 @@
 """
 import pandas as pd
 import numpy as np
+from ..config.geometry import bulk_spec
 
 
 def extrude(apical_datasets, method="homotecy", scale=0.3, vector=[0, 0, -1]):
@@ -118,8 +119,8 @@ def extrude(apical_datasets, method="homotecy", scale=0.3, vector=[0, 0, -1]):
     else:
         raise ValueError(
             """
-        `method` argument not understood, supported values are 'homotecy'
-        or 'translation'
+`method` argument not understood, supported values are
+'homotecy', 'translation' or 'normals'
         """
         )
 
@@ -129,8 +130,13 @@ def extrude(apical_datasets, method="homotecy", scale=0.3, vector=[0, 0, -1]):
     datasets["edge"] = pd.concat([apical_edge, basal_edge, lateral_edge])
     datasets["face"] = pd.concat([apical_face, basal_face, lateral_face])
     datasets["edge"]["is_active"] = 1
+    specs = bulk_spec()
+
     for elem in ["vert", "edge", "face", "cell"]:
         datasets[elem].index.name = elem
+        for col, value in specs[elem].items():
+            if not col in datasets[elem]:
+                datasets[elem][col] = value
 
     return datasets
 

@@ -4,6 +4,7 @@ Core definitions
 import warnings
 import logging
 from collections import deque
+from itertools import product
 import numpy as np
 import pandas as pd
 from copy import deepcopy
@@ -107,10 +108,18 @@ class Epithelium:
             specs["settings"] = {}
 
         self.specs = specs
-        self.update_specs(specs, reset=False)
-
         if coords is None:
             coords = [c for c in "xyz" if c in datasets["vert"].columns]
+
+        # Add upcast coordinates to specs
+        self.specs["edge"].update(
+            {
+                e + c: 0.0
+                for e, c in product("dustfc"[: len(self.data_names) + 2], coords)
+            }
+        )
+        self.specs["face"].update({c: 0.0 for c in coords})
+        self.update_specs(specs, reset=False)
 
         self.coords = coords
         # edge's dx, dy, dz
@@ -122,6 +131,9 @@ class Epithelium:
         # edge's normals
         if self.dim == 3:
             self.ncoords = ["n" + c for c in self.coords]
+            self.update_specs({"edge": {nc: 0.0 for nc in self.ncoords}}, reset=False)
+        else:
+            self.update_specs({"edge": {"nz": 0.0}}, reset=False)
 
         self._bad = None
         self.bbox = None
