@@ -6,10 +6,40 @@ from ..core.sheet import Sheet
 
 from .base_topology import *
 from .sheet_topology import type1_transition, remove_face
-from .bulk_topology import HI_transition, IH_transition, find_HIs, find_IHs
+from .bulk_topology import (
+    HI_transition,
+    IH_transition,
+    find_HIs,
+    find_IHs,
+    find_rearangements,
+)
 
 
 MAX_ITER = 2
+
+
+def single_rearangement(eptm, with_t3=True):
+    """Performs a single rearangement (if any) on epithelium `eptm`.
+
+    If `with_t3` is True and there are removeable faces, will perform
+    a type 3 or HI transition on one of those faces. If no such
+    transition should occur, will perform a type 1 or IH transition on one
+    of the edges.
+    """
+    edges, faces = find_rearangements(eptm)
+    if len(faces) and with_t3:
+        print(faces)
+        if isinstance(eptm, Sheet):
+            remove_face(eptm, np.random.choice(faces))
+        else:
+            HI_transition(eptm, np.random.choice(faces))
+            print("HI transition")
+    elif len(edges):
+        if isinstance(eptm, Sheet):
+            type1_transition(eptm, np.random.choice(edges))
+        else:
+            IH_transition(eptm, np.random.choice(edges))
+            print("IH transition")
 
 
 def auto_t1(fun):

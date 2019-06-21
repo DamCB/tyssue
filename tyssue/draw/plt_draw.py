@@ -5,6 +5,13 @@ import warnings
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import shutil, glob, tempfile
+import glob
+import tempfile
+import subprocess
+import warnings
+
+import pathlib
 
 from matplotlib import cm
 from matplotlib.path import Path
@@ -14,6 +21,38 @@ from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater, get_sub_eptm
 
 COORDS = ["x", "y"]
+
+
+def create_gif(history, output, num_frames=60, draw_func=None, **draw_kwds):
+    if draw_func is None:
+        draw_func = quick_edge_draw
+
+    graph_dir = pathlib.Path(tempfile.mkdtemp())
+    times = np.linspace(history.time_stamps[0], history.time_stamps[-1], num_frames)
+    for i, (t_, sheet) in enumerate(history):
+        fig, _ = draw_func(sheet, **draw_kwds)
+        fig.savefig(graph_dir / f"sheet_{i:03d}")
+        plt.close(fig)
+
+    figs = glob.glob((graph_dir / "sheet_*.png").as_posix())
+    figs.sort()
+
+    for i, t in enumerate(times):
+        index = np.where(history.time_stamps >= t)[0][0]
+        fig = figs[index]
+        shutil.copy(fig, graph_dir / f"movie_{i:04d}.png")
+    try:
+        proc = subprocess.run(
+            ["convert", (graph_dir / "movie_*.png").as_posix(), output]
+        )
+    except Exception as e:
+        print(
+            "Converting didn't work, make sure imagemagick is available on your system"
+        )
+        raise e
+
+    finally:
+        shutil.rmtree(graph_dir)
 
 
 def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
@@ -171,7 +210,7 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
             sheet.vert_df.loc[srce, y],
             sheet.edge_df.loc[idx, dx],
             sheet.edge_df.loc[idx, dy],
-            **arrow_specs
+            **arrow_specs,
         )
         patches.append(arrow)
     ax.add_collection(PatchCollection(patches, False, **collections_specs))
@@ -449,4 +488,48 @@ def curved_view(sheet, radius_cutoff=1e3):
         curves.append(patch)
     ax.add_collection(PatchCollection(curves, False, **{"facecolors": "none"}))
     ax.autoscale()
+    return fig, ax
+
+
+def plot_junction(eptm, edge_index, coords=["x", "y"]):
+    """Plots local graph around a junction, for debugging purposes
+    """
+    v10, v11 = eptm.edge_df.loc[edge_index, ["srce", "trgt"]]
+    fig, ax = plt.subplots()
+    ax.scatter(*eptm.vert_df.loc[[v10, v11], coords].values.T, marker="+", s=300)
+    v10_out = set(eptm.edge_df[eptm.edge_df["srce"] == v10]["trgt"]) - {v11}
+    v11_out = set(eptm.edge_df[eptm.edge_df["srce"] == v11]["trgt"]) - {v10}
+    verts = v10_out.union(v11_out)
+
+    ax.scatter(*eptm.vert_df.loc[v10_out, coords].values.T)
+    ax.scatter(*eptm.vert_df.loc[v11_out, coords].values.T)
+
+    for _, edge in eptm.edge_df.query(f"srce == {v10}").iterrows():
+        ax.plot(
+            edge[["s" + coords[0], "t" + coords[0]]],
+            edge[["s" + coords[1], "t" + coords[1]]],
+            lw=3,
+            alpha=0.3,
+            c="r",
+        )
+
+    for _, edge in eptm.edge_df.query(f"srce == {v11}").iterrows():
+        ax.plot(
+            edge[["s" + coords[0], "t" + coords[0]]],
+            edge[["s" + coords[1], "t" + coords[1]]],
+            "k--",
+        )
+
+    for v in verts:
+        for _, edge in eptm.edge_df.query(f"srce == {v}").iterrows():
+            if edge["trgt"] in {v10, v11}:
+                continue
+            ax.plot(
+                edge[["s" + coords[0], "t" + coords[0]]],
+                edge[["s" + coords[1], "t" + coords[1]]],
+                "k",
+                lw=0.4,
+            )
+
+    fig.set_size_inches(12, 12)
     return fig, ax

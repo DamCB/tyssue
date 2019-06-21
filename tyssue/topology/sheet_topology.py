@@ -247,10 +247,11 @@ def face_division(sheet, mother, vert_a, vert_b):
 
 
 def remove_face(sheet, face):
-
-    if np.isnan(sheet.face_df.loc[face, "num_sides"]):
+    """Removes a three sided face from the mesh
+    """
+    if not sheet.face_df.loc[face, "num_sides"] == 3:
         logger.info("Face %i is not valid, aborting")
-        return
+        return -1
 
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     verts = edges["srce"].values
@@ -363,6 +364,4 @@ def _cast_to_int(df_value):
     elif len(df_value) == 0:
         return -1
     else:
-        raise ValueError(
-            "Trying to retrieve an integer from " "a more than length 1 df "
-        )
+        raise ValueError("Trying to retrieve an integer from a more than length 1 df ")

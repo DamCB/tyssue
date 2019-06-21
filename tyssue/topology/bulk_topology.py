@@ -395,6 +395,7 @@ def IH_transition(eptm, e_1011):
 
     eptm.reset_index()
     eptm.reset_topo()
+    logger.info(f"IH transition on edge {e_1011}")
     return 0
 
 
@@ -507,6 +508,8 @@ def HI_transition(eptm, face):
     eptm.edge_df.index.name = "edge"
     eptm.reset_index()
     eptm.reset_topo()
+    logger.info(f"HI transition on edge {face}")
+    return 0
 
 
 def _add_edge_to_existing(eptm, cell, vi, vj, new_srce, new_trgt):
