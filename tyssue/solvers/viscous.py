@@ -11,15 +11,15 @@ from itertools import count
 from scipy.integrate import solve_ivp
 
 from ..collisions import auto_collisions
-from ..topology import single_rearangement
+from ..topology import all_rearangements, auto_t1, auto_t3
+
 from ..core.history import History
 from ..core.sheet import Sheet
-from .base import set_pos
+from .base import set_pos, TopologyChangeError
 
 
 log = logging.getLogger(__name__)
-
-MAX_ITER = 10
+MAX_ITER = 100010
 
 
 class ViscousSolver:
@@ -40,6 +40,11 @@ class ViscousSolver:
         self._set_pos = set_pos
         if with_collisions:
             self._set_pos = auto_collisions(self._set_pos)
+        if with_t1:
+            self._set_pos = auto_t1(self._set_pos)
+        if with_t3:
+            self._set_pos = auto_t3(self._set_pos)
+
         self.rearange = with_t1 or with_t3
         self.with_t3 = with_t3
         self.eptm = eptm
@@ -67,13 +72,17 @@ class ViscousSolver:
         \frac{\nabla U_i}{\heta_i}
 
         """
+        if self.eptm.topo_changed:
+            self.eptm.topo_changed = False
+            raise TopologyChangeError
+
         self.set_pos(pos)
         self.prev_t = t
         # self.history.record(to_record=["vert", "edge", "face", "cell"], time_stamp=t)
         grad_U = -self.model.compute_gradient(self.eptm)
         return (grad_U.values / self.eptm.vert_df["viscosity"].values[:, None]).ravel()
 
-    def solve(self, t, t0=0.0, **solver_kwargs):
+    def solve(self, t, **solver_kwargs):
         """Finds a solution to the intial value problem
 
         .. math ::
@@ -81,32 +90,38 @@ class ViscousSolver:
 
 
         """
-        self.prev_t = t0
 
-        if self.rearange:
-            event = _short_event(self.eptm, self.geom)
-            event.terminal = True
-            event.direction = -1
-            solver_kwargs["events"] = event
-
-        print(solver_kwargs)
+        # if self.rearange:
+        #     event = _short_event(self.eptm, self.geom)
+        #     event.terminal = True
+        #     event.direction = -1
+        #     solver_kwargs["events"] = event
+        #
 
         res = {"message": "Not started", "success": False}
         for i in count():
-            print(i)
             if i == MAX_ITER:
                 res["message"] = res["message"] + "\nMax number of iterations reached!"
                 return res
             pos0 = self.eptm.vert_df[self.eptm.coords].values.ravel()
-            res = solve_ivp(self.ode_func, (self.prev_t, t), pos0, **solver_kwargs)
-            self.record(res)
-            if res.t_events is None:
-                return res
-            elif res.t_events[0].shape[0] == 0:
+            if self.prev_t > t:
+                return
+            if "t_eval" in solver_kwargs:
+                solver_kwargs["t_eval"] = solver_kwargs["t_eval"][
+                    np.where(solver_kwargs["t_eval"] >= self.prev_t)[0]
+                ]
+
+            try:
+                res = solve_ivp(self.ode_func, (self.prev_t, t), pos0, **solver_kwargs)
+            except TopologyChangeError:
+                log.info("Topology changed")
+                self.history.record(["face", "edge"], t)
+                if "cell" in self.eptm.datasets:
+                    self.history.record(["cell"], t)
                 continue
-            else:
-                log.info("Rearanging")
-                single_rearangement(self.eptm, with_t3=self.with_t3)
+
+            self.record(res)
+            return res
 
     def record(self, res):
         """Records the solution
