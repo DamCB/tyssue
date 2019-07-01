@@ -21,11 +21,16 @@ def type1_transition(sheet, edge01, epsilon=0.1, remove_tri_faces=True):
     edge_01 : int
        index of the edge around which the transition takes place
     epsilon : float, optional
-       default 0.1, the initial length of the new edge.
+       default 0.1, the initial length of the new edge, in case "threshold_length"
+       is not in settings
     remove_tri_faces : bool, optional
        if True (the default), will remove triangular cells
        after the T1 transition is performed
     """
+
+    # Get the correct value for the length of the new edge
+    epsilon = sheet.settings.get("threshold_length", epsilon)
+
     # Grab the neighbours
     vert0, vert1, face_b = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]].astype(
         int

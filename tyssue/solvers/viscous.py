@@ -19,10 +19,10 @@ from .base import set_pos, TopologyChangeError
 
 
 log = logging.getLogger(__name__)
-MAX_ITER = 100010
+MAX_ITER = 1000
 
 
-class ViscousSolver:
+class EulerSolver:
     """
     """
 
@@ -32,14 +32,11 @@ class ViscousSolver:
         geom,
         model,
         history=None,
-        with_collisions=False,
         with_t1=False,
         with_t3=False,
+        manager=None,
     ):
-
         self._set_pos = set_pos
-        if with_collisions:
-            self._set_pos = auto_collisions(self._set_pos)
         if with_t1:
             self._set_pos = auto_t1(self._set_pos)
         if with_t3:
@@ -55,49 +52,72 @@ class ViscousSolver:
         else:
             self.history = history
         self.prev_t = 0
+        self.manager = manager
+
+    @property
+    def pos0(self):
+        return self.eptm.vert_df[self.eptm.coords].values.ravel()
 
     def set_pos(self, pos):
         """Updates the eptm vertices position
         """
         return self._set_pos(self.eptm, self.geom, pos)
 
+    def record(self, t):
+        self.history.record(["vert"], t)
+
+    def solve(self, tf, dt, **solver_kwargs):
+
+        pos = self.pos0
+        for t in np.arange(self.prev_t, tf + dt, dt):
+            try:
+                dot_r = self.ode_func(t, pos)
+                pos = pos + dot_r * dt
+
+            except TopologyChangeError:
+                log.info("Topology changed")
+                self.history.record(["face", "edge"], t)
+                if "cell" in self.eptm.datasets:
+                    self.history.record(["cell"], t)
+                pos = self.pos0
+                self.geom.update_all(self.eptm)
+
+            self.record(t)
+
     def ode_func(self, t, pos):
         """Updates the vertices positions and computes the gradient.
 
         Returns
         -------
-        les : np.ndarray of shape (self.eptm.Nv * self.eptm.dim, )
+        dot_r : 1D np.ndarray of shape (self.eptm.Nv * self.eptm.dim, )
 
         .. math::
-        \frac{\nabla U_i}{\heta_i}
+        \frac{dr_i}{dt} = \frac{\nabla U_i}{\heta_i}
 
         """
+        self.set_pos(pos)
         if self.eptm.topo_changed:
             self.eptm.topo_changed = False
             raise TopologyChangeError
-
-        self.set_pos(pos)
         self.prev_t = t
-        # self.history.record(to_record=["vert", "edge", "face", "cell"], time_stamp=t)
+        if self.manager is not None:
+            self.manager.execute(self.eptm)
+
         grad_U = -self.model.compute_gradient(self.eptm)
+
+        if self.manager is not None:
+            self.manager.update()
+
         return (grad_U.values / self.eptm.vert_df["viscosity"].values[:, None]).ravel()
 
+
+class IVPSolver(EulerSolver):
+    """
+    """
+
     def solve(self, t, **solver_kwargs):
-        """Finds a solution to the intial value problem
-
-        .. math ::
-        \heta_i \dot{\mathbf{r}_{i}} = \grad_i U
-
-
         """
-
-        # if self.rearange:
-        #     event = _short_event(self.eptm, self.geom)
-        #     event.terminal = True
-        #     event.direction = -1
-        #     solver_kwargs["events"] = event
-        #
-
+        """
         res = {"message": "Not started", "success": False}
         for i in count():
             if i == MAX_ITER:
@@ -144,14 +164,3 @@ class ViscousSolver:
         self.history.record(["face", "edge"], res.t[-1])
         if "cell" in self.eptm.datasets:
             self.history.record(["cell"], res.t[-1])
-
-
-def _short_event(eptm, geom):
-    def short_func(t, pos):
-        log.info("evaluating short function")
-        set_pos(eptm, geom, pos)
-        threshold_length = eptm.settings.get("threshold_length", 1e-4)
-        min_length = eptm.edge_df.length.min()
-        return min_length - threshold_length * 0.9
-
-    return short_func
