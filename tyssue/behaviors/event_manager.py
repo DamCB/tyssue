@@ -135,4 +135,4 @@ def wait(eptm, manager, **kwargs):
     wait_spec.update(**kwargs)
     if kwargs["n_steps"] > 1:
         kwargs.update({"n_steps": kwargs["n_steps"] - 1})
-        manager.next.append(("wait", wait_spec))
+        manager.next.append((wait, wait_spec))
