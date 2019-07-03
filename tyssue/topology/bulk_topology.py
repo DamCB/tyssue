@@ -15,6 +15,41 @@ logger = logging.getLogger(name=__name__)
 MAX_ITER = 10
 
 
+def remove_cell(eptm, cell):
+    """Removes a tetrahedral cell from the epithelium
+    """
+    eptm.get_opposite_faces()
+    edges = eptm.edge_df.query(f"cell == {cell}")
+    if not edges.shape[0] == 12:
+        warnings.warn(f"{cell} is not a tetrahedral cell, aborting")
+        return -1
+    faces = eptm.face_df.loc[edges["face"].unique()]
+    oppo = faces["opposite"][faces["opposite"] != -1]
+    verts = eptm.vert_df.loc[edges["srce"].unique()].copy()
+
+    eptm.vert_df = eptm.vert_df.append(verts.mean(), ignore_index=True)
+    new_vert = eptm.vert_df.index[-1]
+
+    eptm.vert_df.loc[new_vert, "segment"] = "basal"
+    eptm.edge_df.replace(
+        {"srce": verts.index, "trgt": verts.index}, new_vert, inplace=True
+    )
+
+    collapsed = eptm.edge_df.query("srce == trgt")
+
+    eptm.face_df.drop(faces.index, axis=0, inplace=True)
+    eptm.face_df.drop(oppo, axis=0, inplace=True)
+
+    eptm.edge_df.drop(collapsed.index, axis=0, inplace=True)
+
+    eptm.cell_df.drop(cell, axis=0, inplace=True)
+    eptm.vert_df.drop(verts.index, axis=0, inplace=True)
+    eptm.reset_index()
+    eptm.reset_topo()
+    assert eptm.validate()
+    return 0
+
+
 def check_condition4(func):
     @wraps(func)
     def decorated(eptm, *args, **kwargs):

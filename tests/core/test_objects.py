@@ -197,9 +197,7 @@ def test_wrong_datasets_keys():
     datasets, specs = three_faces_sheet()
     datasets["edges"] = datasets["edge"]
     del datasets["edge"]
-    with raises(
-        ValueError, message="Expecting a ValueError since edge not in datasets"
-    ):
+    with raises(ValueError):
         eptm = Epithelium("3faces_2D", datasets, specs)
 
 
