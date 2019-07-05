@@ -31,8 +31,8 @@ class BulkGeometry(SheetGeometry):
         cls.update_perimeters(eptm)
         cls.update_centroid(eptm)
         cls.update_normals(eptm)
-        cls.update_areas(eptm)
         cls.update_vol(eptm)
+        cls.update_areas(eptm)
 
     @staticmethod
     def update_dcoords(eptm):
@@ -55,7 +55,11 @@ class BulkGeometry(SheetGeometry):
     @staticmethod
     def update_areas(eptm):
 
-        SheetGeometry.update_areas(eptm)
+        # SheetGeometry.update_areas(eptm)
+        eptm.edge_df["sub_area"] = (
+            np.linalg.norm(eptm.edge_df[eptm.ncoords], axis=1) / 2
+        )
+        eptm.face_df["area"] = eptm.sum_face(eptm.edge_df["sub_area"])
         eptm.cell_df["area"] = eptm.sum_cell(eptm.edge_df["sub_area"])
 
     @staticmethod

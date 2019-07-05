@@ -827,7 +827,7 @@ class Epithelium:
         if cardinal.max() > 2:
             raise ValueError(
                 "Invalid topology, incorrect faces: {}".format(
-                    cardinal[cardinal > 2].index
+                    list(face_v2[cardinal > 2].index)
                 )
             )
         self.face_df["opposite"] = -1

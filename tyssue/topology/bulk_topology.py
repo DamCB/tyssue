@@ -57,9 +57,10 @@ def check_condition4(func):
         res = func(eptm, *args, **kwargs)
         if len(condition_4i(eptm)) or len(condition_4ii(eptm)):
             print("Invalid epithelium produced, restoring")
-            print("4i on", condition_4i(eptm))
-            print("4ii on", condition_4ii(eptm))
+            # print("4i on", condition_4i(eptm))
+            # print("4ii on", condition_4ii(eptm))
             eptm.restore()
+            eptm.topo_changed = True
         return res
 
     return decorated
