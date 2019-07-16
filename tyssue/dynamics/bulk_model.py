@@ -18,6 +18,17 @@ BulkModel = model_factory(
     effectors.CellVolumeElasticity,
 )
 
+ClosedMonolayerModel = model_factory(
+    [
+        effectors.LineTension,
+        effectors.FaceContractility,
+        effectors.CellAreaElasticity,
+        effectors.CellVolumeElasticity,
+        effectors.LumenVolumeElasticity,
+    ],
+    effectors.CellVolumeElasticity,
+)
+
 
 BulkModelwithFreeBorders = model_factory(
     [
