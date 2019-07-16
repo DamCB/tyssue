@@ -1,15 +1,76 @@
 import numpy as np
 from functools import wraps
+from itertools import count
 
 from ..core.monolayer import Monolayer
 from ..core.sheet import Sheet
 
 from .base_topology import *
 from .sheet_topology import type1_transition, remove_face
-from .bulk_topology import HI_transition, IH_transition, find_HIs, find_IHs
+from .bulk_topology import (
+    HI_transition,
+    IH_transition,
+    find_HIs,
+    find_IHs,
+    find_rearangements,
+)
 
 
-MAX_ITER = 2
+MAX_ITER = 10
+
+
+class TopologyChangeError(ValueError):
+    """ Raised when trying to assign values without
+    the correct length to an epithelium dataset
+    """
+
+    pass
+
+
+def all_rearangements(eptm, with_t3=True):
+    """Performs rearangements (T3/HI first) until
+    there are none left or MAX_ITER is reached.
+    """
+    for i in count():
+        if i == MAX_ITER:
+            return 2
+        retcode = single_rearangement(eptm, with_t3=with_t3)
+        if retcode:  # No transition found
+            return retcode
+
+
+def single_rearangement(eptm, with_t3=True):
+    """Performs a single rearangement (if any) on epithelium `eptm`.
+
+    If `with_t3` is True and there are removeable faces, will perform
+    a type 3 or HI transition on one of those faces. If no such
+    transition should occur, will perform a type 1 or IH transition on one
+    of the edges.
+    """
+    edges, faces = find_rearangements(eptm)
+
+    if len(edges):
+        for i in count():
+            if i == MAX_ITER:
+                return 3
+            if isinstance(eptm, Sheet):
+                retcode = type1_transition(eptm, np.random.choice(edges))
+            else:
+                retcode = IH_transition(eptm, np.random.choice(edges))
+            if not retcode:
+                return 0
+
+    elif len(faces) and with_t3:
+        for i in count():
+            if i == MAX_ITER:
+                return 3
+            if isinstance(eptm, Sheet):
+                retcode = remove_face(eptm, np.random.choice(faces))
+            else:
+                retcode = HI_transition(eptm, np.random.choice(faces))
+            if not retcode:
+                return 0
+    return 1
 
 
 def auto_t1(fun):

@@ -32,6 +32,8 @@ def sheet_view(sheet, coords=["x", "y", "z"], **draw_specs_kw):
     mesh: a :class:`ipyvolume.widgets.Mesh` mesh widget
 
     """
+
+    ipv.style.use(["dark", "minimal"])
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
     fig = ipv.gcf()
@@ -95,7 +97,6 @@ def edge_mesh(sheet, coords, **edge_specs):
     mesh: a :class:`ipyvolume.widgets.Mesh` mesh widget
 
     """
-    ipv.style.use(["dark", "minimal"])
     spec = sheet_spec()["edge"]
     spec.update(**edge_specs)
     if isinstance(spec["color"], str):

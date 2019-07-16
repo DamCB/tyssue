@@ -1,8 +1,9 @@
 numpy
 scipy
 matplotlib
-vispy
+ipyvolume
 pandas
+tables
 sphinx>=1.4
 nbsphinx
 ipykernel

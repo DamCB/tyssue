@@ -13,18 +13,18 @@ from ...geometry.sheet_geometry import SheetGeometry
 logger = logging.getLogger(__name__)
 
 
-def grow(sheet, face, growth_rate):
+def grow(sheet, face, growth_rate, shrink_col="prefered_vol"):
     """Multiplies the equilibrium volume of face by a
     a factor (1+growth_rate)
     """
-    sheet.face_df.loc[face, "prefered_vol"] *= 1 + growth_rate
+    sheet.face_df.loc[face, shrink_col] *= 1 + growth_rate
 
 
-def shrink(sheet, face, shrink_rate):
+def shrink(sheet, face, shrink_rate, shrink_col="prefered_vol"):
     """Devides the equilibrium volume of face face by a
     a factor 1+shrink_rate
     """
-    sheet.face_df.loc[face, "prefered_vol"] /= 1 + shrink_rate
+    sheet.face_df.loc[face, shrink_col] /= 1 + shrink_rate
 
 
 def exchange(sheet, face, geom, remove_tri_faces=True):

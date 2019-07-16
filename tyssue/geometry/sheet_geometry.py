@@ -53,6 +53,13 @@ class SheetGeometry(PlanarGeometry):
         sheet.edge_df["sub_area"] = (
             np.linalg.norm(sheet.edge_df[sheet.ncoords], axis=1) / 2
         )
+        # face_normals = sheet.upcast_face(
+        #     sheet.edge_df.groupby("face")[sheet.ncoords].mean()
+        # )
+        # edge_orient = np.sign(
+        #     np.sum(sheet.edge_df[sheet.ncoords] * face_normals, axis=0)
+        # )
+        # sheet.edge_df["sub_area"] *= edge_orient
         sheet.face_df["area"] = sheet.sum_face(sheet.edge_df["sub_area"])
 
     @staticmethod

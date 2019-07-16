@@ -826,15 +826,18 @@ class Epithelium:
         cardinal = grouped.apply(len)
         if cardinal.max() > 2:
             raise ValueError(
-                "Invalid topology," " incorrect faces: {}".format(cardinal.argmax())
+                "Invalid topology, incorrect faces: {}".format(
+                    list(face_v2[cardinal > 2].index)
+                )
             )
         self.face_df["opposite"] = -1
 
-        face_pairs = []
-        grouped.apply(
-            lambda s: face_pairs.append(list(s.values)) if len(s) == 2 else np.nan
-        ).dropna()
-        face_pairs = np.array(face_pairs)
+        face_pairs = (
+            face_v2[cardinal == 2]
+            .groupby(level=0)
+            .apply(lambda df: dict(enumerate(df)))
+            .values.reshape((-1, 2))
+        )
         if not face_pairs.shape[0]:
             return
         self.face_df.loc[face_pairs[:, 0], "opposite"] = face_pairs[:, 1]
@@ -861,7 +864,7 @@ def _ordered_edges(face_edges):
         srce, trgt, face indices, ordered
     """
 
-    srces, trgts, faces = (face_edges[col].values for col in ["srce", "trgt", "face"])
+    srces, trgts, faces = face_edges[["srce", "trgt", "face"]].values.T
     srce, trgt, face_ = srces[0], trgts[0], faces[0]
     edges = [[srce, trgt, face_]]
     for face_ in faces[1:]:

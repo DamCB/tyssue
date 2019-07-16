@@ -2,11 +2,15 @@ import logging
 import numpy as np
 from functools import wraps
 
+import warnings
+
+
 from .base_topology import add_vert
 from tyssue.utils.decorators import do_undo, validate
 
 
 logger = logging.getLogger(name=__name__)
+MAX_ITER = 100
 
 
 def type1_transition(sheet, edge01, epsilon=0.1, remove_tri_faces=True):
@@ -21,11 +25,16 @@ def type1_transition(sheet, edge01, epsilon=0.1, remove_tri_faces=True):
     edge_01 : int
        index of the edge around which the transition takes place
     epsilon : float, optional
-       default 0.1, the initial length of the new edge.
+       default 0.1, the initial length of the new edge, in case "threshold_length"
+       is not in settings
     remove_tri_faces : bool, optional
        if True (the default), will remove triangular cells
        after the T1 transition is performed
     """
+
+    # Get the correct value for the length of the new edge
+    epsilon = sheet.settings.get("threshold_length", epsilon)
+
     # Grab the neighbours
     vert0, vert1, face_b = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]].astype(
         int
@@ -154,10 +163,13 @@ type 1 transition is not allowed"""
         return 0
     # Type 1 transitions might create 3 or 2 sided cells, we remove those
     tri_faces = sheet.face_df[sheet.face_df["num_sides"] < 4].index
+    i = 0
     while len(tri_faces):
         remove_face(sheet, tri_faces[0])
         tri_faces = sheet.face_df[sheet.face_df["num_sides"] < 4].index
-
+        i += 1
+        if i > MAX_ITER:
+            raise RecursionError
     return 0
 
 
@@ -246,43 +258,51 @@ def face_division(sheet, mother, vert_a, vert_b):
     return daughter
 
 
-def remove_face(sheet, face):
-
-    if np.isnan(sheet.face_df.loc[face, "num_sides"]):
-        logger.info("Face %i is not valid, aborting")
-        return
+def remove_face(sheet, face, allow_rosettes=True):
+    """Removes a three sided face from the mesh
+    """
+    if not sheet.face_df.loc[face, "num_sides"] < 4:
+        logger.info(
+            "Face %i has more than 3 sides and cannot be removed, aborting", face
+        )
+        warnings.warn("Face %i has more than 3 sides and cannot be removed, aborting")
+        if np.isfinite(sheet.face_df.loc[face, "num_sides"]) and allow_rosettes:
+            warnings.warn(
+                "removal of faces with more than 3 sides"
+                " will be disabled by default in future versions."
+                " To adopt the new behavior (do not create rosettes)"
+                " pass `allow_rosettes=False` to this function"
+            )
+        else:
+            return -1
 
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
-    verts = edges["srce"].values
-
-    out_orbits = sheet.get_orbits("srce", "trgt")
-    in_orbits = sheet.get_orbits("trgt", "srce")
-
+    verts = edges["srce"].unique()
     new_vert_data = sheet.vert_df.loc[verts].mean()
     sheet.vert_df = sheet.vert_df.append(new_vert_data, ignore_index=True)
     new_vert = sheet.vert_df.index[-1]
-    for v in verts:
-        out_jes = out_orbits.loc[v].index
-        sheet.edge_df.loc[out_jes, "srce"] = new_vert
 
-        in_jes = in_orbits.loc[v].index
-        sheet.edge_df.loc[in_jes, "trgt"] = new_vert
+    # collapse all edges connected to the face vertices
+    sheet.edge_df.replace({"srce": verts, "trgt": verts}, new_vert, inplace=True)
 
-    sheet.edge_df = sheet.edge_df[sheet.edge_df["srce"] != sheet.edge_df["trgt"]]
+    collapsed = sheet.edge_df.query("srce == trgt")
 
-    sheet.edge_df = sheet.edge_df[sheet.edge_df["face"] != face].copy()
+    sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
+    remanent = sheet.edge_df.query(f"face == {face}").index
+    if remanent.shape[0]:
+        warnings.warn(f"something fishy with face {face}")
+        sheet.edge_df.drop(remanent, axis=0, inplace=True)
 
-    fidx = sheet.face_df.index.delete(face)
-    sheet.face_df = sheet.face_df.loc[fidx].copy()
+    sheet.face_df.drop(face, axis=0, inplace=True)
+    sheet.vert_df.drop(verts, axis=0, inplace=True)
 
     logger.info("removed {} of {} vertices ".format(len(verts), sheet.vert_df.shape[0]))
     logger.info("face {} is now dead ".format(face))
 
-    vidx = sheet.vert_df.index.delete(verts)
-    sheet.vert_df = sheet.vert_df.loc[vidx].copy()
     sheet.reset_index()
     sheet.reset_topo()
-    return new_vert
+
+    return 0
 
 
 def split_vert(sheet, vert, epsilon=0.0):
@@ -363,6 +383,4 @@ def _cast_to_int(df_value):
     elif len(df_value) == 0:
         return -1
     else:
-        raise ValueError(
-            "Trying to retrieve an integer from " "a more than length 1 df "
-        )
+        raise ValueError("Trying to retrieve an integer from a more than length 1 df ")

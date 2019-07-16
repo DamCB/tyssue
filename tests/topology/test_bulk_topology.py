@@ -1,13 +1,34 @@
+import pytest
 import numpy as np
-from tyssue.core.objects import Epithelium
+
+from pathlib import Path
+
 from tyssue.core.monolayer import Monolayer
 from tyssue.geometry.bulk_geometry import BulkGeometry, MonolayerGeometry
 from tyssue import Sheet
 from tyssue.config.geometry import bulk_spec
 
 from tyssue.generation import extrude, three_faces_sheet
-from tyssue.topology.bulk_topology import IH_transition, HI_transition
+from tyssue.topology.bulk_topology import IH_transition, HI_transition, remove_cell
 from tyssue.topology.monolayer_topology import cell_division
+from tyssue.stores import stores_dir
+from tyssue.io import hdf5
+
+
+def test_remove_cell():
+    dsets = hdf5.load_datasets(Path(stores_dir) / "with_4sided_cell.hf5")
+    mono = Monolayer("4", dsets)
+    Nci = mono.Nc
+    cell = mono.cell_df.query("num_faces == 4").index[0]
+    res = remove_cell(mono, cell)
+    MonolayerGeometry.update_all(mono)
+    assert not res
+    assert mono.validate()
+    assert mono.Nc == Nci - 1
+    with pytest.warns(UserWarning):
+        cell = mono.cell_df.query("num_faces != 4").index[0]
+        res = remove_cell(mono, cell)
+        assert mono.validate()
 
 
 def test_IH_transition():

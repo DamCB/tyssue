@@ -1,14 +1,7 @@
 import logging
+from ..topology import TopologyChangeError
 
 log = logging.getLogger(__name__)
-
-
-class TopologyChangeError(ValueError):
-    """ Raised when trying to assign values without
-    the correct length to an epithelium dataset
-    """
-
-    pass
 
 
 def set_pos(eptm, geom, pos):

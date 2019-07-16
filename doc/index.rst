@@ -17,7 +17,8 @@ modeling. It's main focus is on **vertex** based models.
    Basic creation and index manipulation <notebooks/Basic_Usage>
    Visualisation <notebooks/Visualization>
    Geometries <notebooks/Geometries_showcase>
-   Energy minimization <notebooks/Energy_minimization>
+   Quasistatic Models <notebooks/Quasistatic_models>
+   Viscous models <notebooks/SimpleTimeDependent>
    Cell Division <notebooks/Cell_Division>
    Type 1 transition <notebooks/Type_1_transition>
    Apoptosis <notebooks/Apoptosis>

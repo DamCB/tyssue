@@ -8,3 +8,6 @@ test:
 
 coverage:
 	cd tests &&  pytest --cov=tyssue --cov-config=../.coveragerc . && mv .coverage .. && cd ..
+
+nbtest:
+	cd doc/notebooks && pytest --nbval-lax && cd ../..

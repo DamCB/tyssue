@@ -120,7 +120,7 @@ def condition_4i(eptm):
     """
     num_srces = eptm.edge_df.groupby("face")["srce"].apply(lambda s: len(set(s)))
     num_sides = eptm.face_df["num_sides"]
-    return eptm.face_df[num_srces != num_sides].index
+    return eptm.face_df[(num_srces != num_sides) | (num_sides < 3)].index
 
 
 def get_neighbour_face_pairs(eptm):
