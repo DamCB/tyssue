@@ -1,3 +1,25 @@
+# What's new in 0.4
+
+##  Time dependant solvers
+
+- Added two time-dependant solvers `solvers.viscous.EulerSolver` and `solvers.viscous.IVPSolver` -- see [the demo](doc/notebooks/SimpleTimeDependent.ipynb)
+
+- Added a connectivity matrices module
+
+- removed layer type 1 transition (maybe a bit harshly)
+
+- rewrote effectors specification with default values
+
+- added a `merge_border` function to put single edges at a 2D sheet border, and a `trim_borders` option to the `sheet.remove()` and `sheet.sanitize()` methods
+
+## Pipes
+
+- collision detection should now be an optional dependency
+- `doc/notebooks` is now synched with the [tyssue-demo](https://github.com/damcb.tyssue-demo) repo
+- new `make nbtest` uses nbval to run the notebooks under pytest
+(provinding some kind of integration tests)
+
+
 
 # What's new in 0.3.1
 
@@ -13,7 +35,7 @@
 The `solvers.quasistatic.QSSolver` class provides a refactored solver that includes automatic Type 1, Type 3 and collision detection solving after each function evaluation. Use it with:
 
 ```
-solver = QSSolver(with_t1=True, with_t3=True, with_t3=True)
+solver = QSSolver(with_t1=True, with_t3=True)
 solver.find_energy_min(sheet, **minimize_kwargs)
 ```
 
