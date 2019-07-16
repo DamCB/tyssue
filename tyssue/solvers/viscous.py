@@ -55,7 +55,7 @@ class EulerSolver:
         self.manager = manager
 
     @property
-    def pos0(self):
+    def current_pos(self):
         return self.eptm.vert_df[self.eptm.coords].values.ravel()
 
     def set_pos(self, pos):
@@ -66,26 +66,41 @@ class EulerSolver:
     def record(self, t):
         self.history.record(["vert"], t)
 
-    def solve(self, tf, dt, **solver_kwargs):
+    def solve(self, tf, dt, on_topo_change=None, topo_change_args=None):
+        """Solves the system of differential equations from the current time
+        to tf with steps of dt with a forward Euler method.
 
-        pos = self.pos0
+        Parameters
+        ----------
+        tf : float, final time when we stop solving
+        dt : float, time step
+        on_topo_change : function, optional, default None
+             function of `self.eptm`
+        topo_change_args : tuple, arguments passed to `on_topo_change`
+
+        """
+        pos = self.current_pos
         for t in np.arange(self.prev_t, tf + dt, dt):
             try:
                 dot_r = self.ode_func(t, pos)
                 pos = pos + dot_r * dt
-
             except TopologyChangeError:
                 log.info("Topology changed")
+                if on_topo_change is not None:
+                    on_topo_change(*topo_change_args)
+
                 self.history.record(["face", "edge"], t)
                 if "cell" in self.eptm.datasets:
                     self.history.record(["cell"], t)
-                pos = self.pos0
+                pos = self.current_pos
                 self.geom.update_all(self.eptm)
 
             self.record(t)
 
-    def ode_func(self, t, pos):
+    def ode_func(self, t, pos, on_topo_change=None):
         """Updates the vertices positions and computes the gradient.
+
+        Parameters
 
         Returns
         -------
@@ -115,16 +130,21 @@ class IVPSolver(EulerSolver):
     """
     """
 
-    def solve(self, t, **solver_kwargs):
+    def solve(self, tf, on_topo_change=None, topo_change_args=(), **solver_kwargs):
         """
+
+        on_topo_change : function, optional, default None
+             function of `self.eptm`
+        topo_change_args : tuple, arguments passed to `on_topo_change`
+
         """
         res = {"message": "Not started", "success": False}
         for i in count():
             if i == MAX_ITER:
                 res["message"] = res["message"] + "\nMax number of iterations reached!"
                 return res
-            pos0 = self.eptm.vert_df[self.eptm.coords].values.ravel()
-            if self.prev_t > t:
+            pos0 = self.current_pos
+            if self.prev_t > tf:
                 return
             if "t_eval" in solver_kwargs:
                 solver_kwargs["t_eval"] = solver_kwargs["t_eval"][
@@ -132,12 +152,15 @@ class IVPSolver(EulerSolver):
                 ]
 
             try:
-                res = solve_ivp(self.ode_func, (self.prev_t, t), pos0, **solver_kwargs)
+                res = solve_ivp(self.ode_func, (self.prev_t, tf), pos0, **solver_kwargs)
             except TopologyChangeError:
                 log.info("Topology changed")
-                self.history.record(["face", "edge"], t)
+                if on_topo_change is not None:
+                    on_topo_change(*topo_change_args)
+
+                self.history.record(["vert", "face", "edge"], self.prev_t)
                 if "cell" in self.eptm.datasets:
-                    self.history.record(["cell"], t)
+                    self.history.record(["cell"], self.prev_t)
                 continue
 
             self.record(res)

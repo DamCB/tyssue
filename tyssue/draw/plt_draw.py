@@ -23,24 +23,59 @@ from ..utils.utils import spec_updater, get_sub_eptm
 COORDS = ["x", "y"]
 
 
-def create_gif(history, output, num_frames=60, draw_func=None, **draw_kwds):
+def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_kwds):
+    """Creates an animated gif of the recorded history.
+
+    You need imagemagick on your system for this function to work.
+
+    Parameters
+    ----------
+
+    history : a :class:`tyssue.History` object
+    output : path to the output gif file
+    num_frames : int, the number of frames in the gif
+    draw_func : a drawing function
+         this function must take a `sheet` object as first argument
+         and return a `fig, ax` pair. Defaults to quick_edge_draw
+         (aka sheet_view with quick mode)
+    margin : int, the graph margins in percents, default 5
+
+    **draw_kwds are passed to the drawing function
+
+    """
     if draw_func is None:
         draw_func = quick_edge_draw
 
     graph_dir = pathlib.Path(tempfile.mkdtemp())
+    x, y = coords = draw_kwds.get("coords", history.sheet.coords[:2])
+    bounds = history.vert_h[coords].describe().loc[["min", "max"]]
+    delta = (bounds.loc["max"] - bounds.loc["min"]).max()
+    margin = delta * margin / 100
+    xlim = bounds.loc["min", x] - margin, bounds.loc["max", x] + margin
+    ylim = bounds.loc["min", y] - margin, bounds.loc["max", y] + margin
     times = np.linspace(history.time_stamps[0], history.time_stamps[-1], num_frames)
-    for i, (t_, sheet) in enumerate(history):
-        fig, _ = draw_func(sheet, **draw_kwds)
-        fig.savefig(graph_dir / f"sheet_{i:03d}")
-        plt.close(fig)
+    if len(history) < num_frames:
+        for i, (t_, sheet) in enumerate(history):
+            fig, ax = draw_func(sheet, **draw_kwds)
+            ax.set(xlim=xlim, ylim=ylim)
+            fig.savefig(graph_dir / f"sheet_{i:03d}")
+            plt.close(fig)
 
-    figs = glob.glob((graph_dir / "sheet_*.png").as_posix())
-    figs.sort()
+            figs = glob.glob((graph_dir / "sheet_*.png").as_posix())
+            figs.sort()
 
-    for i, t in enumerate(times):
-        index = np.where(history.time_stamps >= t)[0][0]
-        fig = figs[index]
-        shutil.copy(fig, graph_dir / f"movie_{i:04d}.png")
+        for i, t in enumerate(times):
+            index = np.where(history.time_stamps >= t)[0][0]
+            fig = figs[index]
+            shutil.copy(fig, graph_dir / f"movie_{i:04d}.png")
+    else:
+        for i, t in enumerate(times):
+            sheet = history.retrieve(t)
+            fig, ax = draw_func(sheet, **draw_kwds)
+            ax.set(xlim=xlim, ylim=ylim)
+            fig.savefig(graph_dir / f"movie_{i:04d}.png")
+            plt.close(fig)
+
     try:
         proc = subprocess.run(
             ["convert", (graph_dir / "movie_*.png").as_posix(), output]

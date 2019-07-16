@@ -79,6 +79,9 @@ class History:
         self.datasets["edge"] = _edge_h
         self.columns["edge"] = self.ecols
 
+    def __len__(self):
+        return self.time_stamps.__len__()
+
     @property
     def time_stamps(self):
         return self.datasets["vert"]["time"].unique()
@@ -125,7 +128,7 @@ class History:
             hist = pd.concat([hist, df], ignore_index=True, axis=0, sort=False)
             self.datasets[element] = hist
 
-    def retrieve(self, index):
+    def retrieve(self, time):
         """Return datasets at time `time`.
 
         If a specific dataset was not recorded at time time, the closest record before that
@@ -135,20 +138,18 @@ class History:
         for element in self.datasets:
             hist = self.datasets[element]
             cols = self.columns[element]
-            df = _retrieve(hist, index)
+            df = _retrieve(hist, time)
             df = df.set_index(element)[cols]
             sheet_datasets[element] = df
 
-        return sheet_datasets
+        return type(self.sheet)(
+            f"{self.sheet.identifier}_{time:04.3f}", sheet_datasets, self.sheet.specs
+        )
 
     def __iter__(self):
 
         for t in self.time_stamps:
-            sheet = type(self.sheet)(
-                f"{self.sheet.identifier}_{int(t):04d}",
-                self.retrieve(t),
-                self.sheet.specs,
-            )
+            sheet = self.retrieve(t)
             yield t, sheet
 
 

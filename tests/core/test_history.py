@@ -35,28 +35,28 @@ def test_warning():
 def test_retrieve():
     sheet = Sheet("3", *three_faces_sheet())
     history = History(sheet, {"face": ["area"]})
-    dsets = history.retrieve(0)
-    for elem, dset in dsets.items():
+    sheet_ = history.retrieve(0)
+    for elem, dset in sheet_.datasets.items():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
-    assert "area" in dsets["face"].columns
-    dsets = history.retrieve(1)
-    for elem, dset in dsets.items():
+    assert "area" in sheet_.datasets["face"].columns
+    sheet_ = history.retrieve(1)
+    for elem, dset in sheet_.datasets.items():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
 
     sheet.vert_df.loc[0, "x"] = 100
     sheet.face_df["area"] = 100
     history.record()
-    dsets = history.retrieve(1)
-    for elem, dset in dsets.items():
+    sheet_ = history.retrieve(1)
+    for elem, dset in sheet_.datasets.items():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
         print(dset)
-    assert dsets["vert"].loc[0, "x"] == 100
-    assert dsets["face"].loc[0, "area"] != 100
+    assert sheet_.datasets["vert"].loc[0, "x"] == 100
+    assert sheet_.datasets["face"].loc[0, "area"] != 100
     history.record(["vert", "face"])
-    dsets = history.retrieve(2)
-    assert dsets["face"].loc[0, "area"] == 100
-    dsets = history.retrieve(1)
-    assert dsets["face"].loc[0, "area"] != 100
+    sheet_ = history.retrieve(2)
+    assert sheet_.datasets["face"].loc[0, "area"] == 100
+    sheet_ = history.retrieve(1)
+    assert sheet_.datasets["face"].loc[0, "area"] != 100
 
 
 def test_retrieve_bulk():
@@ -64,6 +64,5 @@ def test_retrieve_bulk():
     RNRGeometry.update_all(eptm)
 
     history = History(eptm)
-    dsets = history.retrieve(0)
-    eptm_ = Epithelium("zer", dsets)
+    eptm_ = history.retrieve(0)
     RNRGeometry.update_all(eptm_)
