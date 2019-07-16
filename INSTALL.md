@@ -2,7 +2,7 @@ Since version 0.3, tyssue depends on CGAL for collision detection, and thus a c+
 
 ## Installing tyssue with conda
 
-If you already have a conda environment ready:
+If you have a conda environment ready:
 ```
 conda install -c conda-forge tyssue
 ```
@@ -64,13 +64,20 @@ python setup.py install
 
 If all went well, you have successfully installed tyssue.
 
+### Install testing utilities
+```sh
+pip install pytest pytest-cov nbval
+```
+
 A `Makefile` provides some utility function. Try :
 
 ```sh
 make tests  # Run tests with nose
 make coverage  # Run tests with coverage
 make flake8  # Check PEP8 on the code
+make nbtest # Tests all  the demo notebooks - requires nbval
 ```
+
 
 ### Building the documentation
 
