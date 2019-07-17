@@ -1,0 +1,15 @@
+name: tyssue
+channels:
+    - conda-forge
+dependencies:
+    - numpy
+    - scipy
+    - matplotlib
+    - pandas
+    - pytables
+    - jupyter
+    - notebook
+    - ipywidgets
+    - pythreejs
+    - ipyvolume
+    - tyssue
