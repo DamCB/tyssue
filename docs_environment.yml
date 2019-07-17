@@ -12,4 +12,5 @@ dependencies:
     - ipywidgets
     - pythreejs
     - ipyvolume
+    - nbsphinx
     - tyssue
