@@ -5,6 +5,10 @@ version: 2
 build:
   image: latest
 
+conda:
+  environment: docs_environment.yml
+
+
 python:
   version: 3.7
 
