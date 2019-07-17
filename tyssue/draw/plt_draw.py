@@ -39,6 +39,7 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
          and return a `fig, ax` pair. Defaults to quick_edge_draw
          (aka sheet_view with quick mode)
     margin : int, the graph margins in percents, default 5
+         if margin is -1, let the draw function decide
 
     **draw_kwds are passed to the drawing function
 
@@ -58,7 +59,7 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
     if len(history) < num_frames:
         for i, (t_, sheet) in enumerate(history):
             fig, ax = draw_func(sheet, **draw_kwds)
-            if isinstance(ax, plt.Axes):
+            if isinstance(ax, plt.Axes) and margin >= 0:
                 ax.set(xlim=xlim, ylim=ylim)
             fig.savefig(graph_dir / f"sheet_{i:03d}")
             plt.close(fig)
@@ -74,7 +75,7 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
         for i, t in enumerate(times):
             sheet = history.retrieve(t)
             fig, ax = draw_func(sheet, **draw_kwds)
-            if isinstance(ax, plt.Axes):
+            if isinstance(ax, plt.Axes) and margin >= 0:
                 ax.set(xlim=xlim, ylim=ylim)
             fig.savefig(graph_dir / f"movie_{i:04d}.png")
             plt.close(fig)
