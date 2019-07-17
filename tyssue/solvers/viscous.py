@@ -83,6 +83,7 @@ class EulerSolver:
         for t in np.arange(self.prev_t, tf + dt, dt):
             try:
                 dot_r = self.ode_func(t, pos)
+
                 pos = pos + dot_r * dt
             except TopologyChangeError:
                 log.info("Topology changed")
@@ -110,6 +111,9 @@ class EulerSolver:
         \frac{dr_i}{dt} = \frac{\nabla U_i}{\heta_i}
 
         """
+        if self.eptm.topo_changed:
+            self.eptm.topo_changed = False
+            raise TopologyChangeError
         self.set_pos(pos)
         if self.eptm.topo_changed:
             self.eptm.topo_changed = False

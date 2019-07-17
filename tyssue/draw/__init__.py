@@ -1,10 +1,11 @@
 from .plt_draw import quick_edge_draw, plot_forces
 from .plt_draw import sheet_view as sheet_view_2d
 from .ipv_draw import sheet_view as sheet_view_3d
+from .plt_draw import create_gif
 
 
 def sheet_view(sheet, coords=["x", "y", "z"], ax=None, mode="2D", **draw_specs_kw):
-    """
+    """Main plotting function in 2D or 3D.
 
 
     Parameters
