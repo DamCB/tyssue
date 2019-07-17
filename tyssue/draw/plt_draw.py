@@ -44,7 +44,8 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
 
     """
     if draw_func is None:
-        draw_func = quick_edge_draw
+        draw_func = sheet_view
+        draw_kwds.update({"mode": "quick"})
 
     graph_dir = pathlib.Path(tempfile.mkdtemp())
     x, y = coords = draw_kwds.get("coords", history.sheet.coords[:2])

@@ -125,7 +125,12 @@ class History:
             if not "time" in cols:
                 times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
                 df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
+            if self.time in hist["time"]:
+                # erase previously recorded time point
+                hist = hist[hist["time"] != self.time]
+
             hist = pd.concat([hist, df], ignore_index=True, axis=0, sort=False)
+
             self.datasets[element] = hist
 
     def retrieve(self, time):
