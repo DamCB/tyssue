@@ -58,7 +58,8 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
     if len(history) < num_frames:
         for i, (t_, sheet) in enumerate(history):
             fig, ax = draw_func(sheet, **draw_kwds)
-            ax.set(xlim=xlim, ylim=ylim)
+            if isinstance(ax, plt.Axes):
+                ax.set(xlim=xlim, ylim=ylim)
             fig.savefig(graph_dir / f"sheet_{i:03d}")
             plt.close(fig)
 
@@ -73,7 +74,8 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
         for i, t in enumerate(times):
             sheet = history.retrieve(t)
             fig, ax = draw_func(sheet, **draw_kwds)
-            ax.set(xlim=xlim, ylim=ylim)
+            if isinstance(ax, plt.Axes):
+                ax.set(xlim=xlim, ylim=ylim)
             fig.savefig(graph_dir / f"movie_{i:04d}.png")
             plt.close(fig)
 

@@ -1,8 +1,18 @@
 # .readthedocs.yml
+version: 2
+
 
 build:
   image: latest
 
+conda:
+  environment: doc/notebooks/environment.yml
+
+
 python:
-  version: 3.6
-  setup_py_install: true
+  version: 3.7
+
+sphinx:
+  builder: html
+  configuration: doc/conf.py
+  fail_on_warning: false
