@@ -41,9 +41,7 @@ def type1_transition(sheet, edge01, epsilon=0.1, remove_tri_faces=True):
     )
     if sheet.face_df.loc[face_b, "num_sides"] < 4:
         logger.warning(
-            """Face %s has 3 sides,
-type 1 transition is not allowed"""
-            % face_b
+            """Face %s has 3 sides, type 1 transition is not allowed""" % face_b
         )
         return face_b
 
@@ -296,8 +294,8 @@ def remove_face(sheet, face, allow_rosettes=True):
     sheet.face_df.drop(face, axis=0, inplace=True)
     sheet.vert_df.drop(verts, axis=0, inplace=True)
 
-    logger.info("removed {} of {} vertices ".format(len(verts), sheet.vert_df.shape[0]))
-    logger.info("face {} is now dead ".format(face))
+    logger.info("removed %d of %d vertices", len(verts), sheet.vert_df.shape[0])
+    logger.info("face %d is now dead ", face)
 
     sheet.reset_index()
     sheet.reset_topo()

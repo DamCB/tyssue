@@ -238,7 +238,7 @@ class Epithelium:
 
         log.info("Restoring")
         log.info(
-            "a copy of the unrestored epithelium" " is stored in the `_bad` attribute"
+            "a copy of the unrestored epithelium is stored in the `_bad` attribute"
         )
         bck = self._backups.pop()
         self._bad = self.copy(deep_copy=True)

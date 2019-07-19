@@ -66,7 +66,7 @@ class EulerSolver:
     def record(self, t):
         self.history.record(["vert"], t)
 
-    def solve(self, tf, dt, on_topo_change=None, topo_change_args=None):
+    def solve(self, tf, dt, on_topo_change=None, topo_change_args=()):
         """Solves the system of differential equations from the current time
         to tf with steps of dt with a forward Euler method.
 
@@ -81,9 +81,10 @@ class EulerSolver:
         """
         pos = self.current_pos
         for t in np.arange(self.prev_t, tf + dt, dt):
+            if self.manager is not None:
+                self.manager.execute(self.eptm)
             try:
                 dot_r = self.ode_func(t, pos)
-
                 pos = pos + dot_r * dt
             except TopologyChangeError:
                 log.info("Topology changed")
@@ -96,9 +97,13 @@ class EulerSolver:
                 pos = self.current_pos
                 self.geom.update_all(self.eptm)
 
+            finally:
+                if self.manager is not None:
+                    self.manager.update()
+
             self.record(t)
 
-    def ode_func(self, t, pos, on_topo_change=None):
+    def ode_func(self, t, pos):
         """Updates the vertices positions and computes the gradient.
 
         Parameters
@@ -108,7 +113,7 @@ class EulerSolver:
         dot_r : 1D np.ndarray of shape (self.eptm.Nv * self.eptm.dim, )
 
         .. math::
-        \frac{dr_i}{dt} = \frac{\nabla U_i}{\heta_i}
+        \frac{dr_i}{dt} = \frac{\nabla U_i}{\eta_i}
 
         """
         if self.eptm.topo_changed:
@@ -119,13 +124,8 @@ class EulerSolver:
             self.eptm.topo_changed = False
             raise TopologyChangeError
         self.prev_t = t
-        if self.manager is not None:
-            self.manager.execute(self.eptm)
 
         grad_U = -self.model.compute_gradient(self.eptm)
-
-        if self.manager is not None:
-            self.manager.update()
 
         return (grad_U.values / self.eptm.vert_df["viscosity"].values[:, None]).ravel()
 
