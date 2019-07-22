@@ -95,17 +95,8 @@ def test_split_vert():
 
     split_vert(sheet, 0, epsilon=1e-1)
     geom.update_all(sheet)
-    assert sheet.Nv == 15
-    assert sheet.Ne == 18
-
-    datasets, specs = three_faces_sheet()
-    sheet = Sheet("3cells_2D", datasets, specs)
-    geom.update_all(sheet)
-
-    split_vert(sheet, 1, epsilon=1e-1)
-    geom.update_all(sheet)
     assert sheet.Nv == 14
-    assert sheet.Ne == 18
+    assert sheet.Ne == 20
 
 
 def test_close_face():

@@ -1,7 +1,11 @@
 import logging
+import warnings
+
 import numpy as np
 
 import pandas as pd
+
+
 from itertools import combinations
 from .connectivity import face_face_connectivity
 
@@ -113,6 +117,62 @@ def close_face(eptm, face):
     eptm.edge_df.loc[new_edge, ["srce", "trgt"]] = single_trgt, single_srce
 
 
+def collapse_edge(sheet, edge, reindex=True):
+    """Collapses edge and merges it's vertices, creating (or increasing the rank of)
+    a rosette structure.
+
+    If `reindex` is `True` (the default), resets indexes and topology data.
+    The edge is collapsed on the smaller of the srce, trgt indexes (to minimize reindexing impact)
+
+    """
+    srce, trgt = np.sort(sheet.edge_df.loc[edge, ["srce", "trgt"]]).astype(int)
+
+    edges = sheet.edge_df[
+        ((sheet.edge_df["srce"] == srce) & (sheet.edge_df["trgt"] == trgt))
+        | ((sheet.edge_df["srce"] == trgt) & (sheet.edge_df["trgt"] == srce))
+    ]
+
+    if np.any(sheet.face_df.loc[edges["face"].astype(int), "num_sides"] < 4):
+        warnings.warn("""This operation would result in a two sided face, aborting""")
+        return -1
+
+    sheet.vert_df.loc[srce, sheet.coords] = sheet.vert_df.loc[
+        [srce, trgt], sheet.coords
+    ].mean(axis=0)
+    sheet.vert_df.drop(trgt, axis=0, inplace=True)
+    # rewire
+    sheet.edge_df.replace({"srce": trgt, "trgt": trgt}, srce, inplace=True)
+    # all the edges parallel to the original
+    collapsed = sheet.edge_df.query("srce == trgt")
+    sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
+    sheet.vert_df["rank"] = sheet.edge_df.groupby("srce").size()
+    if reindex:
+        sheet.reset_index()
+        sheet.reset_topo()
+    return 0
+
+
+def merge_vertices(sheet, vert0, vert1, reindex=True):
+    """Merge the two vertices vert0 and vert1 iff they are linked by an edge
+
+    If `reindex` is `True` (the default), resets indexes and topology data
+
+    Note:
+    -----
+    It is more efficient to call directly `collapse_edge`
+
+    """
+    edges = sheet.edge_df[
+        ((sheet.edge_df["srce"] == vert0) & (sheet.edge_df["trgt"] == vert1))
+        | ((sheet.edge_df["srce"] == vert1) & (sheet.edge_df["trgt"] == vert0))
+    ].index
+    if not len(edges):
+        raise ValueError(
+            f"""No edge found between vertices {vert0} and {vert1}, cannot merge"""
+        )
+    return collapse_edge(sheet, edges[0], reindex)
+
+
 def condition_4i(eptm):
     """
     Return an index over the faces violating condition 4 i in Okuda et al 2013,
@@ -169,7 +229,7 @@ def condition_4ii(eptm):
 
 def merge_border_edges(sheet):
     """Merge edges at the border of a sheet such that no vertex has only
-    an on-going and an out-going edge.
+    one incoming and one outgoing edge.
 
     """
 

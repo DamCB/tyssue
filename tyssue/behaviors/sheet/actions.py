@@ -40,7 +40,7 @@ def exchange(sheet, face, geom, remove_tri_faces=True):
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     shorter = edges.length.idxmin()
     # type1_transition(sheet, shorter, 2 * min(edges.length), remove_tri_faces)
-    type1_transition(sheet, shorter, 0.1, remove_tri_faces)
+    type1_transition(sheet, shorter, epsilon=0.1, remove_tri_faces=remove_tri_faces)
     geom.update_all(sheet)
 
 

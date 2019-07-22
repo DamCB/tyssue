@@ -712,17 +712,14 @@ class Epithelium:
         )
         self.face_df = self.face_df.reindex(set(self.edge_df.face))
 
-        new_vertidx = pd.Series(
-            np.arange(self.vert_df.shape[0]), index=self.vert_df.index
-        )
-        # Here we use loc and not the take from upcast
+        new_vidx = pd.Series(np.arange(self.vert_df.shape[0]), index=self.vert_df.index)
 
-        self.edge_df["srce"] = new_vertidx.reindex(self.edge_df["srce"]).values
-        self.edge_df["trgt"] = new_vertidx.reindex(self.edge_df["trgt"]).values
+        self.edge_df["srce"] = new_vidx.reindex(self.edge_df["srce"]).values.astype(int)
+        self.edge_df["trgt"] = new_vidx.reindex(self.edge_df["trgt"]).values.astype(int)
 
         new_fidx = pd.Series(np.arange(self.face_df.shape[0]), index=self.face_df.index)
 
-        self.edge_df["face"] = new_fidx.loc[self.edge_df["face"]].values
+        self.edge_df["face"] = new_fidx.loc[self.edge_df["face"]].values.astype(int)
 
         self.vert_df.reset_index(drop=True, inplace=True)
         self.vert_df.index.name = "vert"
