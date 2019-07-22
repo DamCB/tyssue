@@ -145,7 +145,6 @@ def collapse_edge(sheet, edge, reindex=True):
     # all the edges parallel to the original
     collapsed = sheet.edge_df.query("srce == trgt")
     sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
-    sheet.vert_df["rank"] = sheet.edge_df.groupby("srce").size()
     if reindex:
         sheet.reset_index()
         sheet.reset_topo()
