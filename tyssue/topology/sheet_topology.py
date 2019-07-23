@@ -5,7 +5,8 @@ from functools import wraps
 import warnings
 
 
-from .base_topology import add_vert, collapse_edge, close_face
+from .base_topology import add_vert, collapse_edge, close_face, remove_face
+from .base_topology import split_vert as base_split_vert
 from tyssue.utils.decorators import do_undo, validate
 
 
@@ -16,7 +17,7 @@ MAX_ITER = 100
 def split_vert(
     sheet, vert, face=None, multiplier=1.5, reindex=True, recenter=False, epsilon=None
 ):
-    """Splits a vertex with more than 3 neighbors.
+    """Splits a vertex towards the center of the face.
 
     This operation removes the  face `face` from the neighborhood of the vertex.
     """
@@ -36,33 +37,12 @@ def split_vert(
     face_edges = sheet.edge_df.query(f"face == {face}")
     prev_v, = face_edges[face_edges["trgt"] == vert]["srce"]
     next_v, = face_edges[face_edges["srce"] == vert]["trgt"]
-
-    # Add a vertex
-    sheet.vert_df = sheet.vert_df.append(sheet.vert_df.loc[vert], ignore_index=True)
-    new_vert = sheet.vert_df.index[-1]
-
-    # Move it towards the face center
-    r_ia = sheet.face_df.loc[face, sheet.coords] - sheet.vert_df.loc[vert, sheet.coords]
-    if recenter:
-        sheet.vert_df.loc[new_vert, sheet.coords] += (
-            0.5 * r_ia * epsilon / np.linalg.norm(r_ia)
-        )
-        sheet.vert_df.loc[vert, sheet.coords] -= (
-            0.5 * r_ia * epsilon / np.linalg.norm(r_ia)
-        )
-    else:
-        sheet.vert_df.loc[new_vert, sheet.coords] += (
-            r_ia * epsilon / np.linalg.norm(r_ia)
-        )
-
-    # rewire
     connected = sheet.edge_df[
-        sheet.edge_df[["srce", "trgt"]].isin([prev_v, next_v]).sum(axis=1).astype(bool)
+        sheet.edge_df["trgt"].isin((next_v, prev_v))
+        | sheet.edge_df["srce"].isin((next_v, prev_v))
     ]
 
-    sheet.edge_df.loc[connected.index] = connected.replace(
-        {"srce": vert, "trgt": vert}, new_vert
-    )
+    base_split_vert(sheet, vert, face, connected, epsilon, recenter)
     for face_ in connected["face"]:
         close_face(sheet, face_)
 
@@ -216,39 +196,6 @@ def face_division(sheet, mother, vert_a, vert_b):
     sheet.edge_df.index.name = "edge"
     sheet.reset_topo()
     return daughter
-
-
-def remove_face(sheet, face):
-    """Removes a three sided face from the mesh
-    """
-
-    edges = sheet.edge_df[sheet.edge_df["face"] == face]
-    verts = edges["srce"].unique()
-    new_vert_data = sheet.vert_df.loc[verts].mean()
-    sheet.vert_df = sheet.vert_df.append(new_vert_data, ignore_index=True)
-    new_vert = sheet.vert_df.index[-1]
-
-    # collapse all edges connected to the face vertices
-    sheet.edge_df.replace({"srce": verts, "trgt": verts}, new_vert, inplace=True)
-
-    collapsed = sheet.edge_df.query("srce == trgt")
-
-    sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
-    remanent = sheet.edge_df.query(f"face == {face}").index
-    if remanent.shape[0]:
-        warnings.warn(f"something fishy with face {face}")
-        sheet.edge_df.drop(remanent, axis=0, inplace=True)
-
-    sheet.face_df.drop(face, axis=0, inplace=True)
-    sheet.vert_df.drop(verts, axis=0, inplace=True)
-
-    logger.info("removed %d of %d vertices", len(verts), sheet.vert_df.shape[0])
-    logger.info("face %d is now dead ", face)
-
-    sheet.reset_index()
-    sheet.reset_topo()
-
-    return 0
 
 
 def resolve_t1s(sheet, geom, model, solver, max_iter=60):

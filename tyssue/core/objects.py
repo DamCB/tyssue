@@ -626,6 +626,7 @@ class Epithelium:
             from ..topology.base_topology import merge_border_edges
 
             merge_border_edges(self)
+
         self.remove(invalid_edges, trim_borders)
 
     def remove(self, edge_out, trim_borders=False):
@@ -823,7 +824,7 @@ class Epithelium:
         cardinal = grouped.apply(len)
         if cardinal.max() > 2:
             raise ValueError(
-                "Invalid topology, incorrect faces: {}".format(
+                "Invalid topology, faces have more than one neighbor: {}".format(
                     list(face_v2[cardinal > 2].index)
                 )
             )

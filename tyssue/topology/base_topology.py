@@ -12,6 +12,51 @@ from .connectivity import face_face_connectivity
 logger = logging.getLogger(name=__name__)
 
 
+def split_vert(sheet, vert, face, to_rewire, epsilon, recenter=False):
+    """ Creates a new vertex and moves it towards the center of face.
+
+    The edges in to_rewire will be connected to the new vertex.
+
+    Parameters
+    ----------
+
+    sheet : a :class:`tyssue.Sheet` instance
+    vert : int, the index of the vertex to split
+    face : int, the index of the face where to move the vertex
+    to_rewire : :class:`pd.DataFrame` a subset of `sheet.edge_df`
+        where all the edges pointing to (or from) the old vertex will point
+        to (or from) the new.
+
+    Note
+    ----
+
+    This will leave opened faces and cells
+
+    """
+    # Add a vertex
+    sheet.vert_df = sheet.vert_df.append(sheet.vert_df.loc[vert], ignore_index=True)
+    new_vert = sheet.vert_df.index[-1]
+
+    # Move it towards the face center
+    r_ia = sheet.face_df.loc[face, sheet.coords] - sheet.vert_df.loc[vert, sheet.coords]
+    if recenter:
+        sheet.vert_df.loc[new_vert, sheet.coords] += (
+            0.5 * r_ia * epsilon / np.linalg.norm(r_ia)
+        )
+        sheet.vert_df.loc[vert, sheet.coords] -= (
+            0.5 * r_ia * epsilon / np.linalg.norm(r_ia)
+        )
+    else:
+        sheet.vert_df.loc[new_vert, sheet.coords] += (
+            r_ia * epsilon / np.linalg.norm(r_ia)
+        )
+
+    # rewire
+    sheet.edge_df.loc[to_rewire.index] = to_rewire.replace(
+        {"srce": vert, "trgt": vert}, new_vert
+    )
+
+
 def add_vert(eptm, edge):
     """Adds a vertex in the middle of the edge,
 
@@ -96,7 +141,11 @@ def add_vert(eptm, edge):
 
 
 def close_face(eptm, face):
+    """Closes the face if a single edge is missing.
 
+    This function **does not** close the adjacent and opposite
+    faces.
+    """
     face_edges = eptm.edge_df[eptm.edge_df["face"] == face]
     srces = set(face_edges["srce"])
     trgts = set(face_edges["trgt"])
@@ -117,7 +166,58 @@ def close_face(eptm, face):
     eptm.edge_df.loc[new_edge, ["srce", "trgt"]] = single_trgt, single_srce
 
 
-def collapse_edge(sheet, edge, reindex=True):
+def drop_two_sided_faces(eptm):
+    """Removes all the two (or one?) sided faces from the epithelium
+
+    Note that they are not collapsed, but simply eliminated
+
+    """
+    if eptm.face_df["num_sides"].min() > 2:
+        return
+
+    two_sided = eptm.face_df.query("num_sides < 3").index
+    edges = eptm.edge_df[eptm.edge_df["face"].isin(two_sided)].index
+    eptm.edge_df.drop(edges, axis=0, inplace=True)
+    eptm.face_df.drop(two_sided, axis=0, inplace=True)
+    eptm.reset_index()
+    eptm.reset_topo()
+
+
+def remove_face(sheet, face):
+    """Removes a face from the mesh
+    """
+
+    edges = sheet.edge_df[sheet.edge_df["face"] == face]
+    verts = edges["srce"].unique()
+    new_vert_data = sheet.vert_df.loc[verts].mean()
+    sheet.vert_df = sheet.vert_df.append(new_vert_data, ignore_index=True)
+    new_vert = sheet.vert_df.index[-1]
+
+    # collapse all edges connected to the face vertices
+    sheet.edge_df.replace({"srce": verts, "trgt": verts}, new_vert, inplace=True)
+
+    collapsed = sheet.edge_df.query("srce == trgt")
+
+    sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
+    remanent = sheet.edge_df.query(f"face == {face}").index
+    if remanent.shape[0]:
+        warnings.warn(f"something fishy with face {face}")
+        sheet.edge_df.drop(remanent, axis=0, inplace=True)
+
+    sheet.face_df.drop(face, axis=0, inplace=True)
+    sheet.vert_df.drop(verts, axis=0, inplace=True)
+
+    logger.info("removed %d of %d vertices", len(verts), sheet.vert_df.shape[0])
+    logger.info("face %d is now dead ", face)
+
+    sheet.reset_index()
+    sheet.reset_topo()
+    drop_two_sided_faces(sheet)
+
+    return 0
+
+
+def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     """Collapses edge and merges it's vertices, creating (or increasing the rank of)
     a rosette structure.
 
@@ -132,7 +232,8 @@ def collapse_edge(sheet, edge, reindex=True):
         | ((sheet.edge_df["srce"] == trgt) & (sheet.edge_df["trgt"] == srce))
     ]
 
-    if np.any(sheet.face_df.loc[edges["face"].astype(int), "num_sides"] < 4):
+    has_3_sides = np.any(sheet.face_df.loc[edges["face"].astype(int), "num_sides"] < 4)
+    if has_3_sides and not allow_two_sided:
         warnings.warn("""This operation would result in a two sided face, aborting""")
         return -1
 
@@ -148,6 +249,8 @@ def collapse_edge(sheet, edge, reindex=True):
     if reindex:
         sheet.reset_index()
         sheet.reset_topo()
+    if allow_two_sided:
+        drop_two_sided_faces(sheet)
     return 0
 
 
@@ -226,7 +329,7 @@ def condition_4ii(eptm):
     return np.vstack(np.where(conmat > 2)).T
 
 
-def merge_border_edges(sheet):
+def merge_border_edges(sheet, drop_two_sided=True):
     """Merge edges at the border of a sheet such that no vertex has only
     one incoming and one outgoing edge.
 
@@ -245,5 +348,9 @@ def merge_border_edges(sheet):
     )
     for face in faces:
         close_face(sheet, face)
+
+    if drop_two_sided:
+        drop_two_sided_faces(sheet)
+
     sheet.reset_index()
     sheet.reset_topo()
