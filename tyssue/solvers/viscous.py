@@ -81,9 +81,9 @@ class EulerSolver:
         """
         pos = self.current_pos
         for t in np.arange(self.prev_t, tf + dt, dt):
-            if self.manager is not None:
-                self.manager.execute(self.eptm)
             try:
+                if self.manager is not None:
+                    self.manager.execute(self.eptm)
                 dot_r = self.ode_func(t, pos)
                 pos = pos + dot_r * dt
             except TopologyChangeError:
