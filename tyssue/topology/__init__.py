@@ -2,7 +2,6 @@ import numpy as np
 from functools import wraps
 from itertools import count
 
-from ..core.monolayer import Monolayer
 from ..core.sheet import Sheet
 
 from .base_topology import *

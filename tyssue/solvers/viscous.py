@@ -5,6 +5,7 @@
 import logging
 import numpy as np
 import pandas as pd
+import warnings
 
 from itertools import count
 
@@ -15,11 +16,23 @@ from ..topology import all_rearangements, auto_t1, auto_t3
 
 from ..core.history import History
 from ..core.sheet import Sheet
-from .base import set_pos, TopologyChangeError
+
+# from .base import set_pos, TopologyChangeError
 
 
 log = logging.getLogger(__name__)
 MAX_ITER = 1000
+
+
+def set_pos(eptm, geom, pos):
+    """Updates the vertex position of the :class:`Epithelium` object.
+
+    Assumes that pos is passed as a 1D array to be reshaped as (eptm.Nv, eptm.dim)
+
+    """
+    log.debug("set pos")
+    eptm.vert_df.loc[eptm.active_verts, eptm.coords] = pos.reshape((-1, eptm.dim))
+    geom.update_all(eptm)
 
 
 class EulerSolver:
@@ -38,12 +51,14 @@ class EulerSolver:
     ):
         self._set_pos = set_pos
         if with_t1:
-            self._set_pos = auto_t1(self._set_pos)
+            warnings.warn("with_t1 is deprecated and has no effect")
+            # self._set_pos = auto_t1(self._set_pos)
         if with_t3:
-            self._set_pos = auto_t3(self._set_pos)
+            warnings.warn("with_t3 is deprecated and has no effect")
+            # self._set_pos = auto_t3(self._set_pos)
 
-        self.rearange = with_t1 or with_t3
-        self.with_t3 = with_t3
+        # self.rearange = with_t1 or with_t3
+        # self.with_t3 = with_t3
         self.eptm = eptm
         self.geom = geom
         self.model = model
@@ -79,28 +94,26 @@ class EulerSolver:
         topo_change_args : tuple, arguments passed to `on_topo_change`
 
         """
-        pos = self.current_pos
         for t in np.arange(self.prev_t, tf + dt, dt):
-            try:
-                if self.manager is not None:
-                    self.manager.execute(self.eptm)
-                dot_r = self.ode_func(t, pos)
-                pos = pos + dot_r * dt
-            except TopologyChangeError:
-                log.info("Topology changed")
-                if on_topo_change is not None:
-                    on_topo_change(*topo_change_args)
-
-                self.history.record(["face", "edge"], t)
-                if "cell" in self.eptm.datasets:
-                    self.history.record(["cell"], t)
-                pos = self.current_pos
+            pos = self.current_pos
+            dot_r = self.ode_func(t, pos)
+            pos = pos + dot_r * dt
+            self.set_pos(pos)
+            self.prev_t = t
+            if self.manager is not None:
+                self.manager.execute(self.eptm)
                 self.geom.update_all(self.eptm)
+                if self.eptm.topo_changed:
+                    log.info("Topology changed")
+                    if on_topo_change is not None:
+                        on_topo_change(*topo_change_args)
 
-            finally:
-                if self.manager is not None:
-                    self.manager.update()
+                    self.history.record(["face", "edge"], t)
+                    if "cell" in self.eptm.datasets:
+                        self.history.record(["cell"], t)
+                    self.eptm.topo_changed = False
 
+                self.manager.update()
             self.record(t)
 
     def ode_func(self, t, pos):
@@ -116,14 +129,6 @@ class EulerSolver:
         \frac{dr_i}{dt} = \frac{\nabla U_i}{\eta_i}
 
         """
-        if self.eptm.topo_changed:
-            self.eptm.topo_changed = False
-            raise TopologyChangeError
-        self.set_pos(pos)
-        if self.eptm.topo_changed:
-            self.eptm.topo_changed = False
-            raise TopologyChangeError
-        self.prev_t = t
 
         grad_U = -self.model.compute_gradient(self.eptm)
 

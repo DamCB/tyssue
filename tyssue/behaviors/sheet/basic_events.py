@@ -4,11 +4,46 @@ Small event module
 
 
 """
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 from ...utils.decorators import face_lookup
 from ...geometry.sheet_geometry import SheetGeometry
 from ...topology.sheet_topology import cell_division
 
-from .actions import grow, contract, exchange, remove
+from .actions import grow, contract, exchange, remove, merge_vertices, detach_vertices
+
+
+def reconnect(sheet, manager, **kwargs):
+    """Performs reconnections (vertex merging / splitting) following Finegan et al. 2019
+
+    kwargs overwrite their corresponding `sheet.settings` entries
+
+    Keyword Arguments
+    -----------------
+    threshold_length : the threshold length at which vertex merging is performed
+    p_4 : the probability per unit time to perform a detachement from a rank 4 vertex
+    p_5p : the probability per unit time to perform a detachement from a rank 5 or more vertex
+
+
+    See Also
+    --------
+
+    **The tricellular vertex-specific adhesion molecule Sidekick
+    facilitates polarised cell intercalation during Drosophila axis
+    extension** _Tara M Finegan, Nathan Hervieux, Alexander
+    Nestor-Bergmann, Alexander G. Fletcher, Guy B Blanchard, Benedicte
+    Sanson_ bioRxiv 704932; doi: https://doi.org/10.1101/704932
+
+    """
+    sheet.settings.update(kwargs)
+    nv = sheet.Nv
+    merge_vertices(sheet)
+    logger.info(f"Merged {nv - sheet.Nv} vertices")
+    detach_vertices(sheet)
+    manager.append(reconnect, **kwargs)
 
 
 default_division_spec = {

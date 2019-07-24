@@ -9,6 +9,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+from ..sheet.actions import merge_vertices, detach_vertices
+
 
 def grow(monolayer, cell, grow_rate):
     """Multiplies the equilibrium volume of face
@@ -77,8 +79,7 @@ def contract_apical_face(
         or (monolayer.face_df.loc[face, contraction_column] > max_contractility)
     ):
         return
-    contract(monolayer, face, contractile_increase,
-             multiple, contraction_column)
+    contract(monolayer, face, contractile_increase, multiple, contraction_column)
 
 
 def ab_pull(monolayer, cell, radial_tension, distributed=False):

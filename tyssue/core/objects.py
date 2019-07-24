@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from copy import deepcopy
 from ..utils.utils import set_data_columns, spec_updater
+from ..utils import connectivity
 
 log = logging.getLogger(name=__name__)
 
@@ -276,6 +277,10 @@ class Epithelium:
             lambda df: df["face"].unique().size
         )
         self.cell_df["num_ridges"] = self.edge_df.cell.value_counts()
+
+    def update_rank(self):
+        st_connect = connectivity.srce_trgt_connectivity(self)
+        self.vert_df["rank"] = ((st_connect + st_connect.T) > 0).sum(axis=0)
 
     def reset_topo(self):
         """Recomputes the number of sides for the faces and the

@@ -7,7 +7,7 @@ import pandas as pd
 
 
 from itertools import combinations
-from .connectivity import face_face_connectivity
+from ..utils.connectivity import face_face_connectivity
 
 logger = logging.getLogger(name=__name__)
 
