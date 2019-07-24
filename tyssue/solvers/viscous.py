@@ -103,17 +103,18 @@ class EulerSolver:
             if self.manager is not None:
                 self.manager.execute(self.eptm)
                 self.geom.update_all(self.eptm)
-                if self.eptm.topo_changed:
-                    log.info("Topology changed")
-                    if on_topo_change is not None:
-                        on_topo_change(*topo_change_args)
-
-                    self.history.record(["face", "edge"], t)
-                    if "cell" in self.eptm.datasets:
-                        self.history.record(["cell"], t)
-                    self.eptm.topo_changed = False
-
                 self.manager.update()
+
+            if self.eptm.topo_changed:
+                log.info("Topology changed")
+                if on_topo_change is not None:
+                    on_topo_change(*topo_change_args)
+
+                self.history.record(["face", "edge"], t)
+                if "cell" in self.eptm.datasets:
+                    self.history.record(["cell"], t)
+                self.eptm.topo_changed = False
+
             self.record(t)
 
     def ode_func(self, t, pos):

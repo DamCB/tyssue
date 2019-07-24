@@ -41,8 +41,16 @@ def reconnect(sheet, manager, **kwargs):
     sheet.settings.update(kwargs)
     nv = sheet.Nv
     merge_vertices(sheet)
-    logger.info(f"Merged {nv - sheet.Nv} vertices")
+    if nv != sheet.Nv:
+        logger.info(f"Merged {nv - sheet.Nv} vertices")
+    nv = sheet.Nv
     detach_vertices(sheet)
+    if nv != sheet.Nv:
+        logger.info(f"Detached {sheet.Nv - nv} vertices")
+
+    sheet.reset_index()
+    sheet.reset_topo()
+
     manager.append(reconnect, **kwargs)
 
 
