@@ -1,3 +1,29 @@
+
+# What's new in 0.5
+
+## Major rewrite of the rearangements
+
+We now allow for rosettes to form, and split type1 transition in two steps: merging of edges bellow the critical length and spliting more than rank 3 vertices (or more than rank 4 in 3D). The splitting frequency is governed by two settings `p_4` and `p5p`.This follows Finegan et al 2019. See  doc/notebooks/Rosettes.ipynb for a demo.
+
+A look a the diffs in `sheet_topology` and `bulk_topology` should convince the reader that this should result in a major increase in stability.
+
+Automated reconnection is now treated as an event (treated by an `EventManager` instance), see `tyssue.behavior.base_events.reconnect`.
+
+In EulerSolver, this avoids raising `TopologyChangeError` at least in explicit Euler. Topology changes in IVPSolver are not supported for now.
+
+
+## Viscous solver
+
+- added a `bounds` attribute to EulerSolver. This simply clips the displacement to avoid runaway conditions.
+
+
+## Core and topology
+
+- A new `update_rank` method allows to compute the rank of a vertex (as the number of _flat_ edges connected to it). This required to move the `connectivity` module to utils to avoid circular imports.
+
+- We explicitly allow two sided faces to be created by `collapse_edge` or `remove_face`, they are directly eliminated.
+
+
 # What's new in 0.4
 
 ##  Time dependant solvers

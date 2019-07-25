@@ -122,9 +122,8 @@ class EulerSolver:
             self.record(t)
 
     def ode_func(self, t, pos):
-        """Updates the vertices positions and computes the gradient.
+        """Computes the models' gradient.
 
-        Parameters
 
         Returns
         -------
@@ -136,7 +135,6 @@ class EulerSolver:
         """
 
         grad_U = -self.model.compute_gradient(self.eptm)
-
         return (grad_U.values / self.eptm.vert_df["viscosity"].values[:, None]).ravel()
 
 
@@ -165,18 +163,7 @@ class IVPSolver(EulerSolver):
                     np.where(solver_kwargs["t_eval"] >= self.prev_t)[0]
                 ]
 
-            try:
-                res = solve_ivp(self.ode_func, (self.prev_t, tf), pos0, **solver_kwargs)
-            except TopologyChangeError:
-                log.info("Topology changed")
-                if on_topo_change is not None:
-                    on_topo_change(*topo_change_args)
-
-                self.history.record(["vert", "face", "edge"], self.prev_t)
-                if "cell" in self.eptm.datasets:
-                    self.history.record(["cell"], self.prev_t)
-                continue
-
+            res = solve_ivp(self.ode_func, (self.prev_t, tf), pos0, **solver_kwargs)
             self.record(res)
             return res
 
