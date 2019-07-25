@@ -170,17 +170,17 @@ def drop_two_sided_faces(eptm):
     """Removes all the two (or one?) sided faces from the epithelium
 
     Note that they are not collapsed, but simply eliminated
-
+    Does not reindex
     """
-    if eptm.face_df["num_sides"].min() > 2:
+
+    num_sides = eptm.edge_df.groupby("face").size()
+    if num_sides.min() > 2:
         return
 
-    two_sided = eptm.face_df.query("num_sides < 3").index
+    two_sided = eptm.face_df[num_sides < 3].index
     edges = eptm.edge_df[eptm.edge_df["face"].isin(two_sided)].index
     eptm.edge_df.drop(edges, axis=0, inplace=True)
     eptm.face_df.drop(two_sided, axis=0, inplace=True)
-    eptm.reset_index()
-    eptm.reset_topo()
 
 
 def remove_face(sheet, face):
@@ -209,10 +209,10 @@ def remove_face(sheet, face):
 
     logger.info("removed %d of %d vertices", len(verts), sheet.vert_df.shape[0])
     logger.info("face %d is now dead ", face)
+    drop_two_sided_faces(sheet)
 
     sheet.reset_index()
     sheet.reset_topo()
-    drop_two_sided_faces(sheet)
 
     return 0
 
@@ -246,11 +246,11 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     # all the edges parallel to the original
     collapsed = sheet.edge_df.query("srce == trgt")
     sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
+    if allow_two_sided:
+        drop_two_sided_faces(sheet)
     if reindex:
         sheet.reset_index()
         sheet.reset_topo()
-    if allow_two_sided:
-        drop_two_sided_faces(sheet)
     return 0
 
 

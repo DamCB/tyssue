@@ -48,6 +48,7 @@ class EulerSolver:
         with_t1=False,
         with_t3=False,
         manager=None,
+        bounds=None,
     ):
         self._set_pos = set_pos
         if with_t1:
@@ -68,6 +69,7 @@ class EulerSolver:
             self.history = history
         self.prev_t = 0
         self.manager = manager
+        self.bounds = bounds
 
     @property
     def current_pos(self):
@@ -97,6 +99,8 @@ class EulerSolver:
         for t in np.arange(self.prev_t, tf + dt, dt):
             pos = self.current_pos
             dot_r = self.ode_func(t, pos)
+            if self.bounds is not None:
+                dot_r = np.clip(dot_r, *self.bounds)
             pos = pos + dot_r * dt
             self.set_pos(pos)
             self.prev_t = t

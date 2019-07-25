@@ -344,8 +344,6 @@ def get_opposite(edge_df):
     flipped.names = ["srce", "trgt"]
     try:
         opposite = st_indexed.reindex(flipped)["edge"].values
-    # see https://github.com/pandas-dev/pandas/issues/21770, will be fixed in
-    # pandas 0.24
     except ValueError:
         dup = flipped.duplicated()
         warnings.warn(
