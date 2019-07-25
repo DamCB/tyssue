@@ -5,7 +5,8 @@ from functools import wraps
 import warnings
 
 
-from .base_topology import add_vert
+from .base_topology import add_vert, collapse_edge, close_face, remove_face
+from .base_topology import split_vert as base_split_vert
 from tyssue.utils.decorators import do_undo, validate
 
 
@@ -13,152 +14,91 @@ logger = logging.getLogger(name=__name__)
 MAX_ITER = 100
 
 
-def type1_transition(sheet, edge01, epsilon=0.1, remove_tri_faces=True):
+def split_vert(
+    sheet, vert, face=None, multiplier=1.5, reindex=True, recenter=False, epsilon=None
+):
+    """Splits a vertex towards the center of the face.
+
+    This operation removes the  face `face` from the neighborhood of the vertex.
+    """
+    # Get the value for the length of the new edge
+    if epsilon is None:
+        epsilon = sheet.settings.get("threshold_length", 0.1) * multiplier
+    else:
+        warnings.warn(
+            "The epsilon argument is deprecated and will be removed in a future version. "
+            "The length of the new edge should be set by "
+            "`sheet.settings['threshold_length]*multiplier` "
+        )
+
+    if face is None:
+        face = np.random.choice(sheet.edge_df[sheet.edge_df["srce"] == vert]["face"])
+
+    face_edges = sheet.edge_df.query(f"face == {face}")
+    prev_v, = face_edges[face_edges["trgt"] == vert]["srce"]
+    next_v, = face_edges[face_edges["srce"] == vert]["trgt"]
+    connected = sheet.edge_df[
+        sheet.edge_df["trgt"].isin((next_v, prev_v))
+        | sheet.edge_df["srce"].isin((next_v, prev_v))
+    ]
+
+    base_split_vert(sheet, vert, face, connected, epsilon, recenter)
+    for face_ in connected["face"]:
+        close_face(sheet, face_)
+
+    if reindex:
+        sheet.reset_index()
+        sheet.reset_topo()
+
+    return 0
+
+
+def type1_transition(
+    sheet, edge01, *, epsilon=None, remove_tri_faces=True, multiplier=1.5
+):
     """Performs a type 1 transition around the edge edge01
 
     See ../../doc/illus/t1_transition.png for a sketch of the definition
     of the vertices and cells letterings
+    See Finegan et al. for a description of the algotithm https://doi.org/10.1101/704932
+
 
     Parameters
     ----------
     sheet : a `Sheet` instance
     edge_01 : int
        index of the edge around which the transition takes place
-    epsilon : float, optional
+    epsilon : float, optional, deprecated
        default 0.1, the initial length of the new edge, in case "threshold_length"
-       is not in settings
+       is not in the sheet.settings
     remove_tri_faces : bool, optional
        if True (the default), will remove triangular cells
        after the T1 transition is performed
+    multiplier : float, optional
+       default 1.5, the multiplier to the threshold length, so that the
+       length of the new edge is set to multiplier * threshold_length
+
+
     """
 
-    # Get the correct value for the length of the new edge
-    epsilon = sheet.settings.get("threshold_length", epsilon)
+    srce, trgt, face = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]]
 
-    # Grab the neighbours
-    vert0, vert1, face_b = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]].astype(
-        int
-    )
-    if sheet.face_df.loc[face_b, "num_sides"] < 4:
-        logger.warning(
-            """Face %s has 3 sides,
-type 1 transition is not allowed"""
-            % face_b
-        )
-        return face_b
+    vert = min(srce, trgt)  # find the vertex that won't be reindexed
+    ret_code = collapse_edge(sheet, edge01, reindex=True)
+    if ret_code != 0:
+        warnings.warn(f"Collapse of edge {edge01} failed")
+        return ret_code
 
-    edge10_ = sheet.edge_df[
-        (sheet.edge_df["srce"] == vert1) & (sheet.edge_df["trgt"] == vert0)
-    ]
-    if not len(edge10_.index):
-        # edge01 is at a border, we need to add the opposite
-        # half edge
-        edge10_ = sheet.edge_df.loc[edge01].copy()
-        sheet.edge_df = sheet.edge_df.append(edge10_, ignore_index=True)
-        edge10 = sheet.edge_df.index[-1]
-        sheet.edge_df.loc[edge10, ["srce", "trgt", "face"]] = vert1, vert0, -1
-        face_d = -1
-    else:
-        edge10 = edge10_.index
-        face_d = _cast_to_int(edge10_["face"])
-
-    if face_d != -1 and sheet.face_df.loc[face_d, "num_sides"] < 4:
-        logger.warning(
-            """Face %s has 3 sides,
-        type 1 transition is not allowed"""
-            % face_d
-        )
-        return face_d
-    edge20_ = sheet.edge_df[
-        (sheet.edge_df["trgt"] == vert0) & (sheet.edge_df["face"] == face_b)
-    ]
-    edge20 = edge20_.index
-    vert2 = _cast_to_int(edge20_["srce"])
-
-    edge02_ = sheet.edge_df[
-        (sheet.edge_df["srce"] == vert0) & (sheet.edge_df["trgt"] == vert2)
-    ]
-    edge02 = edge02_.index
-    face_a = _cast_to_int(edge02_["face"])
-
-    edge13_ = sheet.edge_df[
-        (sheet.edge_df["srce"] == vert1) & (sheet.edge_df["face"] == face_b)
-    ]
-    edge13 = edge13_.index
-    vert3 = _cast_to_int(edge13_["trgt"])
-
-    edge31_ = sheet.edge_df[
-        (sheet.edge_df["srce"] == vert3) & (sheet.edge_df["trgt"] == vert1)
-    ]
-    edge31 = edge31_.index
-    face_c = _cast_to_int(edge31_["face"])
-
-    edge13_ = sheet.edge_df[
-        (sheet.edge_df["srce"] == vert1) & (sheet.edge_df["face"] == face_b)
-    ]
-    edge13 = edge13_.index
-    vert3 = _cast_to_int(edge13_["trgt"])
-    if face_a != -1:
-        edge50_ = sheet.edge_df[
-            (sheet.edge_df["trgt"] == vert0) & (sheet.edge_df["face"] == face_a)
-        ]
-        edge50 = edge50_.index
-        vert5 = _cast_to_int(edge50_["srce"])
-
-        edge05_ = sheet.edge_df[
-            (sheet.edge_df["srce"] == vert0) & (sheet.edge_df["trgt"] == vert5)
-        ]
-        edge05 = edge05_.index
-
-    elif face_d != -1:
-        edge05_ = sheet.edge_df[
-            (sheet.edge_df["srce"] == vert0) & (sheet.edge_df["face"] == face_d)
-        ]
-        edge05 = edge05_.index
-        vert5 = _cast_to_int(edge05_["trgt"])
-
-        edge50_ = sheet.edge_df[
-            (sheet.edge_df["srce"] == vert5) & (sheet.edge_df["trgt"] == vert0)
-        ]
-        edge50 = edge50_.index
-
-    else:
-        raise ValueError("Edge has no neighbour around vertex %d", vert0)
-
-    logger.debug("faces a, b, c, d")
-    logger.debug("%d, %d, %d, %d", face_a, face_b, face_c, face_d)
-    logger.debug("vertices 0, 1, 2, 3, 5")
-    logger.debug("%d, %d, %d, %d; %d", vert0, vert1, vert2, vert3, vert5)
-
-    # Perform the rearangements
-    sheet.edge_df.loc[edge01, "face"] = face_c
-    sheet.edge_df.loc[edge10, "face"] = face_a
-    sheet.edge_df.loc[edge13, ["srce", "trgt", "face"]] = vert0, vert3, face_b
-    sheet.edge_df.loc[edge31, ["srce", "trgt", "face"]] = vert3, vert0, face_c
-
-    sheet.edge_df.loc[edge50, ["srce", "trgt", "face"]] = vert5, vert1, face_a
-    sheet.edge_df.loc[edge05, ["srce", "trgt", "face"]] = vert1, vert5, face_d
-
-    # Displace the vertices
-    mean_pos = (
-        sheet.vert_df.loc[vert0, sheet.coords] + sheet.vert_df.loc[vert1, sheet.coords]
-    ) / 2
-    face_b_pos = sheet.face_df.loc[face_b, sheet.coords]
-    sheet.vert_df.loc[vert0, sheet.coords] = (
-        mean_pos - (mean_pos - face_b_pos) * epsilon
-    )
-    if face_d != -1:
-        face_d_pos = sheet.face_df.loc[face_d, sheet.coords]
-    else:
-        face_d_pos = mean_pos
-
-    sheet.vert_df.loc[vert1, sheet.coords] = (
-        mean_pos - (mean_pos - face_d_pos) * epsilon
+    split_vert(
+        sheet,
+        vert,
+        face,
+        multiplier=multiplier,
+        reindex=True,
+        recenter=True,
+        epsilon=epsilon,
     )
 
-    sheet.edge_df = sheet.edge_df[sheet.edge_df["face"] != -1].copy()
-    sheet.edge_df.index.name = "edge"
-    sheet.reset_topo()
     if not remove_tri_faces:
         return 0
     # Type 1 transitions might create 3 or 2 sided cells, we remove those
@@ -256,102 +196,6 @@ def face_division(sheet, mother, vert_a, vert_b):
     sheet.edge_df.index.name = "edge"
     sheet.reset_topo()
     return daughter
-
-
-def remove_face(sheet, face, allow_rosettes=True):
-    """Removes a three sided face from the mesh
-    """
-    if not sheet.face_df.loc[face, "num_sides"] < 4:
-        logger.info(
-            "Face %i has more than 3 sides and cannot be removed, aborting", face
-        )
-        warnings.warn("Face %i has more than 3 sides and cannot be removed, aborting")
-        if np.isfinite(sheet.face_df.loc[face, "num_sides"]) and allow_rosettes:
-            warnings.warn(
-                "removal of faces with more than 3 sides"
-                " will be disabled by default in future versions."
-                " To adopt the new behavior (do not create rosettes)"
-                " pass `allow_rosettes=False` to this function"
-            )
-        else:
-            return -1
-
-    edges = sheet.edge_df[sheet.edge_df["face"] == face]
-    verts = edges["srce"].unique()
-    new_vert_data = sheet.vert_df.loc[verts].mean()
-    sheet.vert_df = sheet.vert_df.append(new_vert_data, ignore_index=True)
-    new_vert = sheet.vert_df.index[-1]
-
-    # collapse all edges connected to the face vertices
-    sheet.edge_df.replace({"srce": verts, "trgt": verts}, new_vert, inplace=True)
-
-    collapsed = sheet.edge_df.query("srce == trgt")
-
-    sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
-    remanent = sheet.edge_df.query(f"face == {face}").index
-    if remanent.shape[0]:
-        warnings.warn(f"something fishy with face {face}")
-        sheet.edge_df.drop(remanent, axis=0, inplace=True)
-
-    sheet.face_df.drop(face, axis=0, inplace=True)
-    sheet.vert_df.drop(verts, axis=0, inplace=True)
-
-    logger.info("removed {} of {} vertices ".format(len(verts), sheet.vert_df.shape[0]))
-    logger.info("face {} is now dead ".format(face))
-
-    sheet.reset_index()
-    sheet.reset_topo()
-
-    return 0
-
-
-def split_vert(sheet, vert, epsilon=0.0):
-    """
-    Splits (or opens up) the sheet at vertex `vert`, creating
-    new verts and separating the connected opposite edges, see
-    ../../doc/illus/vertex_split.png
-
-    Parameters
-    ----------
-    sheet: a :class:`Sheet` instance
-    vert: int, index of the vertex to split
-    epsilon: float, the relative amount of recoil
-      of the new vertices towards the face centers
-    """
-    # Grab relevant edges
-    vert_out_edges = sheet.edge_df[(sheet.edge_df["srce"] == vert)]
-    vert_in_edges = sheet.edge_df[(sheet.edge_df["trgt"] == vert)]
-    # Grab relevant faces
-    neighbor_faces = set(vert_out_edges["face"])
-    if len(neighbor_faces) == 1:
-        logger.info(
-            """
-Chosen vertex %i is bound to a single cell, nothing to do"""
-            % vert
-        )
-        return
-
-    # Create the new vertices
-    num_new_vert = len(neighbor_faces) - 1
-    vert_data = sheet.vert_df.loc[[vert] * num_new_vert]
-    sheet.vert_df = sheet.vert_df.append(vert_data, ignore_index=True)
-
-    new_verts = list(sheet.vert_df.index[-num_new_vert:])
-    split_verts = [vert] + new_verts
-
-    # reasign sources and targets in edge_df
-    for f, v in zip(neighbor_faces, split_verts):
-        eo = vert_out_edges[vert_out_edges["face"] == f].index
-        sheet.edge_df.loc[eo, "srce"] = v
-        ei = vert_in_edges[vert_in_edges["face"] == f].index
-        sheet.edge_df.loc[ei, "trgt"] = v
-    sheet.reset_topo()
-    sheet.reset_index()
-
-    faces = sheet.face_df.loc[neighbor_faces]
-    verts = sheet.vert_df.loc[split_verts]
-    dr = -verts[sheet.coords] + faces[sheet.coords].values
-    sheet.vert_df.loc[split_verts, sheet.coords] += dr * epsilon
 
 
 def resolve_t1s(sheet, geom, model, solver, max_iter=60):

@@ -5,6 +5,7 @@
 import logging
 import numpy as np
 import pandas as pd
+import warnings
 
 from itertools import count
 
@@ -15,11 +16,23 @@ from ..topology import all_rearangements, auto_t1, auto_t3
 
 from ..core.history import History
 from ..core.sheet import Sheet
-from .base import set_pos, TopologyChangeError
+
+# from .base import set_pos, TopologyChangeError
 
 
 log = logging.getLogger(__name__)
 MAX_ITER = 1000
+
+
+def set_pos(eptm, geom, pos):
+    """Updates the vertex position of the :class:`Epithelium` object.
+
+    Assumes that pos is passed as a 1D array to be reshaped as (eptm.Nv, eptm.dim)
+
+    """
+    log.debug("set pos")
+    eptm.vert_df.loc[eptm.active_verts, eptm.coords] = pos.reshape((-1, eptm.dim))
+    geom.update_all(eptm)
 
 
 class EulerSolver:
@@ -35,15 +48,18 @@ class EulerSolver:
         with_t1=False,
         with_t3=False,
         manager=None,
+        bounds=None,
     ):
         self._set_pos = set_pos
         if with_t1:
-            self._set_pos = auto_t1(self._set_pos)
+            warnings.warn("with_t1 is deprecated and has no effect")
+            # self._set_pos = auto_t1(self._set_pos)
         if with_t3:
-            self._set_pos = auto_t3(self._set_pos)
+            warnings.warn("with_t3 is deprecated and has no effect")
+            # self._set_pos = auto_t3(self._set_pos)
 
-        self.rearange = with_t1 or with_t3
-        self.with_t3 = with_t3
+        # self.rearange = with_t1 or with_t3
+        # self.with_t3 = with_t3
         self.eptm = eptm
         self.geom = geom
         self.model = model
@@ -53,6 +69,7 @@ class EulerSolver:
             self.history = history
         self.prev_t = 0
         self.manager = manager
+        self.bounds = bounds
 
     @property
     def current_pos(self):
@@ -66,7 +83,7 @@ class EulerSolver:
     def record(self, t):
         self.history.record(["vert"], t)
 
-    def solve(self, tf, dt, on_topo_change=None, topo_change_args=None):
+    def solve(self, tf, dt, on_topo_change=None, topo_change_args=()):
         """Solves the system of differential equations from the current time
         to tf with steps of dt with a forward Euler method.
 
@@ -79,13 +96,20 @@ class EulerSolver:
         topo_change_args : tuple, arguments passed to `on_topo_change`
 
         """
-        pos = self.current_pos
         for t in np.arange(self.prev_t, tf + dt, dt):
-            try:
-                dot_r = self.ode_func(t, pos)
+            pos = self.current_pos
+            dot_r = self.ode_func(t, pos)
+            if self.bounds is not None:
+                dot_r = np.clip(dot_r, *self.bounds)
+            pos = pos + dot_r * dt
+            self.set_pos(pos)
+            self.prev_t = t
+            if self.manager is not None:
+                self.manager.execute(self.eptm)
+                self.geom.update_all(self.eptm)
+                self.manager.update()
 
-                pos = pos + dot_r * dt
-            except TopologyChangeError:
+            if self.eptm.topo_changed:
                 log.info("Topology changed")
                 if on_topo_change is not None:
                     on_topo_change(*topo_change_args)
@@ -93,40 +117,24 @@ class EulerSolver:
                 self.history.record(["face", "edge"], t)
                 if "cell" in self.eptm.datasets:
                     self.history.record(["cell"], t)
-                pos = self.current_pos
-                self.geom.update_all(self.eptm)
+                self.eptm.topo_changed = False
 
             self.record(t)
 
-    def ode_func(self, t, pos, on_topo_change=None):
-        """Updates the vertices positions and computes the gradient.
+    def ode_func(self, t, pos):
+        """Computes the models' gradient.
 
-        Parameters
 
         Returns
         -------
         dot_r : 1D np.ndarray of shape (self.eptm.Nv * self.eptm.dim, )
 
         .. math::
-        \frac{dr_i}{dt} = \frac{\nabla U_i}{\heta_i}
+        \frac{dr_i}{dt} = \frac{\nabla U_i}{\eta_i}
 
         """
-        if self.eptm.topo_changed:
-            self.eptm.topo_changed = False
-            raise TopologyChangeError
-        self.set_pos(pos)
-        if self.eptm.topo_changed:
-            self.eptm.topo_changed = False
-            raise TopologyChangeError
-        self.prev_t = t
-        if self.manager is not None:
-            self.manager.execute(self.eptm)
 
         grad_U = -self.model.compute_gradient(self.eptm)
-
-        if self.manager is not None:
-            self.manager.update()
-
         return (grad_U.values / self.eptm.vert_df["viscosity"].values[:, None]).ravel()
 
 
@@ -155,18 +163,7 @@ class IVPSolver(EulerSolver):
                     np.where(solver_kwargs["t_eval"] >= self.prev_t)[0]
                 ]
 
-            try:
-                res = solve_ivp(self.ode_func, (self.prev_t, tf), pos0, **solver_kwargs)
-            except TopologyChangeError:
-                log.info("Topology changed")
-                if on_topo_change is not None:
-                    on_topo_change(*topo_change_args)
-
-                self.history.record(["vert", "face", "edge"], self.prev_t)
-                if "cell" in self.eptm.datasets:
-                    self.history.record(["cell"], self.prev_t)
-                continue
-
+            res = solve_ivp(self.ode_func, (self.prev_t, tf), pos0, **solver_kwargs)
             self.record(res)
             return res
 

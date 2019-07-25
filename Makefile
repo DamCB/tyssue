@@ -11,3 +11,6 @@ coverage:
 
 nbtest:
 	cd doc/notebooks && pytest --nbval-lax && cd ../..
+
+pdbtest:
+	cd tests && pytest --pdb . && cd ..

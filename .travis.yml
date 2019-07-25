@@ -14,13 +14,14 @@ before_install:
   - conda env create -q -f environment.yml
   - source activate tyssue
   - conda install pytest pytest-cov
-  - pip install coveralls
+  - pip install coveralls nbval
 
 install:
   - python setup.py install
 
 script:
   - make coverage
+  - make nbtest
 
 after_success:
   - coveralls

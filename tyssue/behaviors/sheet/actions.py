@@ -7,10 +7,56 @@ Basic event module
 
 import logging
 import numpy as np
-from ...topology.sheet_topology import remove_face, type1_transition
+from ...topology.base_topology import collapse_edge
+from ...topology.sheet_topology import remove_face, type1_transition, split_vert
 from ...geometry.sheet_geometry import SheetGeometry
+from ...core.sheet import Sheet
 
 logger = logging.getLogger(__name__)
+
+
+def merge_vertices(sheet):
+    """Merges all the vertices that are closer than the threshold length
+
+    """
+    d_min = sheet.settings.get("threshold_length", 1e-3)
+    short = sheet.edge_df[sheet.edge_df["length"] < d_min].index
+    if not short.shape[0]:
+        return
+    logger.info(f"Collapsing {short.shape[0]} edges")
+    while short.shape[0]:
+        collapse_edge(sheet, short[0], allow_two_sided=True)
+        short = sheet.edge_df[sheet.edge_df["length"] < d_min].index
+
+
+def detach_vertices(sheet):
+    """Stochastically detaches vertices from rosettes.
+
+
+    Uses two probabilities `p_4` and `p_5p` stored in
+    sheet.settings.
+
+    """
+    sheet.update_rank()
+    min_rank = 3 if isinstance(sheet, Sheet) else 4
+
+    if sheet.vert_df["rank"].max() == min_rank:
+        return 0
+
+    dt = sheet.settings.get("dt", 1.0)
+    p_4 = sheet.settings.get("p_4", 0.1) * dt
+    p_5p = sheet.settings.get("p_5p", 1e-2) * dt
+
+    rank4 = sheet.vert_df[sheet.vert_df["rank"] == min_rank + 1].index
+    dice4 = np.random.random(rank4.size)
+
+    rank5p = sheet.vert_df[sheet.vert_df["rank"] > min_rank + 1].index
+    dice5p = np.random.random(rank5p.size)
+
+    to_detach = np.concatenate([rank4[dice4 < p_4], rank5p[dice5p < p_5p]])
+    logger.info(f"Detaching {to_detach.size} vertices")
+    for vert in to_detach:
+        split_vert(sheet, vert)
 
 
 def grow(sheet, face, growth_rate, shrink_col="prefered_vol"):
@@ -40,7 +86,7 @@ def exchange(sheet, face, geom, remove_tri_faces=True):
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     shorter = edges.length.idxmin()
     # type1_transition(sheet, shorter, 2 * min(edges.length), remove_tri_faces)
-    type1_transition(sheet, shorter, 0.1, remove_tri_faces)
+    type1_transition(sheet, shorter, epsilon=0.1, remove_tri_faces=remove_tri_faces)
     geom.update_all(sheet)
 
 

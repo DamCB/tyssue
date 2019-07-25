@@ -190,6 +190,52 @@ def test_sort_eastwest():
     assert_array_equal(np.asarray(eptm.west_edges), [6, 7, 8])
 
 
+def test_update_rank():
+
+    sheet = Sheet("3", *three_faces_sheet())
+    sheet.update_rank()
+    np.testing.assert_array_equal(
+        np.array([3, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2]), sheet.vert_df["rank"]
+    )
+
+    mono = Epithelium("3", extrude(sheet.datasets))
+    mono.update_rank()
+    mono.vert_df["rank"].values
+    np.testing.assert_array_equal(
+        np.array(
+            [
+                4,
+                4,
+                3,
+                3,
+                3,
+                4,
+                3,
+                3,
+                3,
+                4,
+                3,
+                3,
+                3,
+                4,
+                4,
+                3,
+                3,
+                3,
+                4,
+                3,
+                3,
+                3,
+                4,
+                3,
+                3,
+                3,
+            ]
+        ),
+        mono.vert_df["rank"].values,
+    )
+
+
 #### BC ####
 
 

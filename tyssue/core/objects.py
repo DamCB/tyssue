@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from copy import deepcopy
 from ..utils.utils import set_data_columns, spec_updater
+from ..utils import connectivity
 
 log = logging.getLogger(name=__name__)
 
@@ -238,7 +239,7 @@ class Epithelium:
 
         log.info("Restoring")
         log.info(
-            "a copy of the unrestored epithelium" " is stored in the `_bad` attribute"
+            "a copy of the unrestored epithelium is stored in the `_bad` attribute"
         )
         bck = self._backups.pop()
         self._bad = self.copy(deep_copy=True)
@@ -276,6 +277,10 @@ class Epithelium:
             lambda df: df["face"].unique().size
         )
         self.cell_df["num_ridges"] = self.edge_df.cell.value_counts()
+
+    def update_rank(self):
+        st_connect = connectivity.srce_trgt_connectivity(self)
+        self.vert_df["rank"] = ((st_connect + st_connect.T) > 0).sum(axis=0)
 
     def reset_topo(self):
         """Recomputes the number of sides for the faces and the
@@ -626,6 +631,7 @@ class Epithelium:
             from ..topology.base_topology import merge_border_edges
 
             merge_border_edges(self)
+
         self.remove(invalid_edges, trim_borders)
 
     def remove(self, edge_out, trim_borders=False):
@@ -712,17 +718,14 @@ class Epithelium:
         )
         self.face_df = self.face_df.reindex(set(self.edge_df.face))
 
-        new_vertidx = pd.Series(
-            np.arange(self.vert_df.shape[0]), index=self.vert_df.index
-        )
-        # Here we use loc and not the take from upcast
+        new_vidx = pd.Series(np.arange(self.vert_df.shape[0]), index=self.vert_df.index)
 
-        self.edge_df["srce"] = new_vertidx.reindex(self.edge_df["srce"]).values
-        self.edge_df["trgt"] = new_vertidx.reindex(self.edge_df["trgt"]).values
+        self.edge_df["srce"] = new_vidx.reindex(self.edge_df["srce"]).values.astype(int)
+        self.edge_df["trgt"] = new_vidx.reindex(self.edge_df["trgt"]).values.astype(int)
 
         new_fidx = pd.Series(np.arange(self.face_df.shape[0]), index=self.face_df.index)
 
-        self.edge_df["face"] = new_fidx.loc[self.edge_df["face"]].values
+        self.edge_df["face"] = new_fidx.loc[self.edge_df["face"]].values.astype(int)
 
         self.vert_df.reset_index(drop=True, inplace=True)
         self.vert_df.index.name = "vert"
@@ -826,7 +829,7 @@ class Epithelium:
         cardinal = grouped.apply(len)
         if cardinal.max() > 2:
             raise ValueError(
-                "Invalid topology, incorrect faces: {}".format(
+                "Invalid topology, faces have more than one neighbor: {}".format(
                     list(face_v2[cardinal > 2].index)
                 )
             )

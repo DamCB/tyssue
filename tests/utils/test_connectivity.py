@@ -2,7 +2,7 @@ import numpy as np
 
 from tyssue import Sheet, Monolayer
 from tyssue.generation import three_faces_sheet, extrude
-from tyssue.topology import connectivity
+from tyssue.utils import connectivity
 from tyssue.config.geometry import bulk_spec
 
 

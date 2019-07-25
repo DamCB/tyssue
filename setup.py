@@ -28,9 +28,9 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 ## Version management copied form numpy
 ## Thanks to them!
 MAJOR = 0
-MINOR = 4
-MICRO = "rc1"
-ISRELEASED = True
+MINOR = 5
+MICRO = 0
+ISRELEASED = False
 VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
 
 

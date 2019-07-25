@@ -119,7 +119,7 @@ class Monolayer(Epithelium):
         """Infers the face segment from its surrounding edges.
 
         """
-        face_edges = self.edge_df[self.edge_df.face == face]
+        face_edges = self.edge_df[self.edge_df["face"] == face]
         if face_edges.shape[0] == 0:
             logger.info("face %d not found", face)
         v_segments = set(self.vert_df.loc[face_edges["srce"], "segment"])
