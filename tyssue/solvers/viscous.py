@@ -2,6 +2,7 @@
 
 
 """
+import os
 import logging
 import numpy as np
 import pandas as pd
@@ -31,7 +32,8 @@ def set_pos(eptm, geom, pos):
 
     """
     log.debug("set pos")
-    eptm.vert_df.loc[eptm.active_verts, eptm.coords] = pos.reshape((-1, eptm.dim))
+    eptm.vert_df.loc[eptm.active_verts,
+                     eptm.coords] = pos.reshape((-1, eptm.dim))
     geom.update_all(eptm)
 
 
@@ -44,7 +46,6 @@ class EulerSolver:
         eptm,
         geom,
         model,
-        history=None,
         with_t1=False,
         with_t3=False,
         manager=None,
@@ -63,10 +64,7 @@ class EulerSolver:
         self.eptm = eptm
         self.geom = geom
         self.model = model
-        if history is None:
-            self.history = History(eptm)
-        else:
-            self.history = history
+
         self.prev_t = 0
         self.manager = manager
         self.bounds = bounds
@@ -81,7 +79,8 @@ class EulerSolver:
         return self._set_pos(self.eptm, self.geom, pos)
 
     def record(self, t):
-        self.history.record(["vert", "face", "edge"], t)
+        warnings.warn(
+            "No record system detected. Use EulerSolverHistory or EulerSolverHdf5")
 
     def solve(self, tf, dt, on_topo_change=None, topo_change_args=()):
         """Solves the system of differential equations from the current time
@@ -114,9 +113,6 @@ class EulerSolver:
                 if on_topo_change is not None:
                     on_topo_change(*topo_change_args)
 
-                self.history.record(["face", "edge"], t)
-                if "cell" in self.eptm.datasets:
-                    self.history.record(["cell"], t)
                 self.eptm.topo_changed = False
             self.record(t)
 
@@ -137,6 +133,110 @@ class EulerSolver:
         return (grad_U.values / self.eptm.vert_df["viscosity"].values[:, None]).ravel()
 
 
+class EulerSolverHistory(EulerSolver):
+    """
+    """
+
+    def __init__(
+        self,
+        eptm,
+        geom,
+        model,
+        with_t1=False,
+        with_t3=False,
+        manager=None,
+        bounds=None,
+        history=None,
+    ):
+        EulerSolver.__init__(self, eptm, geom, model,
+                             with_t1, with_t3, manager, bounds)
+        if history is None:
+            self.history = History(eptm)
+        else:
+            self.history = history
+
+    def record(self, t):
+        self.history.record(["vert", "face", "edge"], t)
+
+    def solve(self, tf, dt, on_topo_change=None, topo_change_args=()):
+        for t in np.arange(self.prev_t, tf + dt, dt):
+            pos = self.current_pos
+            dot_r = self.ode_func(t, pos)
+            if self.bounds is not None:
+                dot_r = np.clip(dot_r, *self.bounds)
+            pos = pos + dot_r * dt
+            self.set_pos(pos)
+            self.prev_t = t
+            if self.manager is not None:
+                self.manager.execute(self.eptm)
+                self.geom.update_all(self.eptm)
+                self.manager.update()
+
+            if self.eptm.topo_changed:
+                log.info("Topology changed")
+                if on_topo_change is not None:
+                    on_topo_change(*topo_change_args)
+
+                self.history.record(["face", "edge"], t)
+                if "cell" in self.eptm.datasets:
+                    self.history.record(["cell"], t)
+                self.eptm.topo_changed = False
+            self.record(t)
+
+
+class EulerSolverHdf5(EulerSolver):
+    """
+    """
+
+    def __init__(
+        self,
+        eptm,
+        geom,
+        model,
+        with_t1=False,
+        with_t3=False,
+        manager=None,
+        bounds=None,
+        path="",
+    ):
+        EulerSolver.__init__(self, eptm, geom, model,
+                             with_t1, with_t3, manager, bounds)
+        if path is None:
+            try:
+                os.mkdir("temp")
+            except IOError:
+                pass
+            self.path = "temp/"
+        else:
+            self.path = path
+
+    def record(self, t):
+        with pd.HDFStore(os.path.join(self.path, str(round(t, 2)) + '.hf5')) as store:
+            for key in self.eptm.data_names:
+                store.put(key, getattr(self.eptm, "{}_df".format(key)))
+
+    def solve(self, tf, dt, on_topo_change=None, topo_change_args=()):
+        for t in np.arange(self.prev_t, tf + dt, dt):
+            pos = self.current_pos
+            dot_r = self.ode_func(t, pos)
+            if self.bounds is not None:
+                dot_r = np.clip(dot_r, *self.bounds)
+            pos = pos + dot_r * dt
+            self.set_pos(pos)
+            self.prev_t = t
+            if self.manager is not None:
+                self.manager.execute(self.eptm)
+                self.geom.update_all(self.eptm)
+                self.manager.update()
+
+            if self.eptm.topo_changed:
+                log.info("Topology changed")
+                if on_topo_change is not None:
+                    on_topo_change(*topo_change_args)
+                self.eptm.topo_changed = False
+            self.record(t)
+
+
 class IVPSolver(EulerSolver):
     """
     """
@@ -152,7 +252,8 @@ class IVPSolver(EulerSolver):
         res = {"message": "Not started", "success": False}
         for i in count():
             if i == MAX_ITER:
-                res["message"] = res["message"] + "\nMax number of iterations reached!"
+                res["message"] = res["message"] + \
+                    "\nMax number of iterations reached!"
                 return res
             pos0 = self.current_pos
             if self.prev_t > tf:
@@ -162,7 +263,8 @@ class IVPSolver(EulerSolver):
                     np.where(solver_kwargs["t_eval"] >= self.prev_t)[0]
                 ]
 
-            res = solve_ivp(self.ode_func, (self.prev_t, tf), pos0, **solver_kwargs)
+            res = solve_ivp(self.ode_func, (self.prev_t, tf),
+                            pos0, **solver_kwargs)
             self.record(res)
             return res
 
