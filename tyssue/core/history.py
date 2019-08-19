@@ -1,3 +1,4 @@
+import os
 import warnings
 import pandas as pd
 import numpy as np
@@ -125,8 +126,10 @@ class History:
             cols = self.columns[element]
             df = self.sheet.datasets[element][cols].reset_index(drop=False)
             if not "time" in cols:
-                times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
-                df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
+                times = pd.Series(
+                    np.ones((df.shape[0],)) * self.time, name="time")
+                df = pd.concat([df, times], ignore_index=False,
+                               axis=1, sort=False)
             if self.time in hist["time"]:
                 # erase previously recorded time point
                 hist = hist[hist["time"] != self.time]
@@ -141,6 +144,9 @@ class History:
         If a specific dataset was not recorded at time time, the closest record before that
         time is used.
         """
+        if time > self.datasets[element]["time"].values[-1]:
+            warnings.warn(
+                "Are you sure you pass time in parameter and not an index ? ")
         sheet_datasets = {}
         for element in self.datasets:
             hist = self.datasets[element]
@@ -158,6 +164,68 @@ class History:
         for t in self.time_stamps:
             sheet = self.retrieve(t)
             yield t, sheet
+
+
+class History_Hdf5(History):
+    """ This class handles recording and retrieving time series
+    of sheet objects.
+
+    """
+
+    def __init__(self, sheet, extra_cols=None, path=""):
+        """Creates a `SheetHistory` instance.
+
+        Parameters
+        ----------
+        sheet : a :class:`Sheet` object which we want to record
+        extra_cols : dictionnary with sheet.datasets as keys and list of
+            columns as values. Default None
+        """
+        if path is None:
+            try:
+                os.mkdir("temp")
+            except IOError:
+                pass
+            self.path = "temp/"
+        else:
+            self.path = path
+
+        History.__init__(self, sheet, extra_cols)
+
+    def record(self, to_record=None, time_stamp=None):
+        """Appends a copy of the sheet datasets to the history instance.
+
+        Parameters
+        ----------
+        to_report : list of strings, default ['vert']
+            the datasets from self.sheet to be saved
+
+        """
+        if to_record is None:
+            to_record = ["vert"]
+
+        if time_stamp is not None:
+            self.time = time_stamp
+        else:
+            self.time += 1
+
+        with pd.HDFStore(os.path.join(self.path, (str(round(self.time, 2)) + '.hf5'))) as store:
+            for element in to_record:
+                store.put(element, getattr(
+                    self.sheet, "{}_df".format(element)))
+
+    def retrieve(self, time, to_record=None):
+        """Return datasets at time `time`.
+
+        If a specific dataset was not recorded at time time, the closest record before that
+        time is used.
+        """
+        with pd.HDFStore(os.path.join(self.path, (str(round(self.time, 2)) + '.hf5'))) as store:
+            data = {name: store[name] for name in to_record if name in store}
+
+        return type(self.sheet)(
+            f"{self.sheet.identifier}_{time:04.3f}", data, self.sheet.specs
+        )
 
 
 def _retrieve(dset, time):
