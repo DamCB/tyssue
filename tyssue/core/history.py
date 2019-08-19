@@ -46,6 +46,7 @@ class History:
         self.datasets = {}
         self.columns = {}
         vcols = sheet.coords + extra_cols["vert"]
+        vcols = list(set(vcols))
         self.vcols = _filter_columns(vcols, sheet.vert_df.columns, "vertex")
         _vert_h = sheet.vert_df[self.vcols].reset_index(drop=False)
         if not "time" in self.vcols:
@@ -72,6 +73,7 @@ class History:
             extra_cols["edge"].append("cell")
 
         ecols = ["srce", "trgt", "face"] + extra_cols["edge"]
+        ecols = list(set(ecols))
         self.ecols = _filter_columns(ecols, sheet.edge_df.columns, "edge")
         _edge_h = sheet.edge_df[self.ecols].reset_index(drop=False)
         if not "time" in self.ecols:

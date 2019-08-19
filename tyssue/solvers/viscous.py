@@ -81,7 +81,7 @@ class EulerSolver:
         return self._set_pos(self.eptm, self.geom, pos)
 
     def record(self, t):
-        self.history.record(["vert"], t)
+        self.history.record(["vert", "face", "edge"], t)
 
     def solve(self, tf, dt, on_topo_change=None, topo_change_args=()):
         """Solves the system of differential equations from the current time
@@ -118,7 +118,6 @@ class EulerSolver:
                 if "cell" in self.eptm.datasets:
                     self.history.record(["cell"], t)
                 self.eptm.topo_changed = False
-
             self.record(t)
 
     def ode_func(self, t, pos):
