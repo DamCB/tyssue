@@ -191,7 +191,7 @@ class HistoryHdf5(History):
             self.path = path
 
         self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'w')
-
+        self.times = []
         History.__init__(self, sheet, extra_cols)
 
     def record(self, to_record=None, time_stamp=None):
@@ -210,7 +210,7 @@ class HistoryHdf5(History):
             self.time = time_stamp
         else:
             self.time += 1
-
+        self.times.append(self.time)
         for element in to_record:
             self.hf5file.put(key=str(self.time) + '/' + element + '_df',
                              value=getattr(self.sheet, "{}_df".format(element)))
@@ -221,16 +221,16 @@ class HistoryHdf5(History):
         If a specific dataset was not recorded at time time, the closest record before that
         time is used.
         """
+        times = pd.Series(self.times)
+        t = times[times <= time].values[-1]
         self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'r')
-        data = {name: self.hf5file[str(time) + '/' + name + '_df'] for name in to_record if (str(time) + '/' + name + '_df') in self.hf5file}
+        data = {name: self.hf5file[str(t) + '/' + name + '_df']
+                for name in to_record if (str(t) + '/' + name + '_df') in self.hf5file}
 
         self.hf5file.close()
         return type(self.sheet)(
-            f"{self.sheet.identifier}_{time:04.3f}", data, self.sheet.specs
+            f"{self.sheet.identifier}_{t:04.3f}", data, self.sheet.specs
         )
-
-
-
 
 
 def _retrieve(dset, time):
