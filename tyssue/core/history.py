@@ -222,7 +222,8 @@ class HistoryHdf5(History):
         time is used.
         """
         times = pd.Series(self.times)
-        t = times[times <= time].values[-1]
+        t = times[(np.abs(times - time)).idxmin()]
+
         self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'r')
         data = {name: self.hf5file[str(t) + '/' + name + '_df']
                 for name in to_record if (str(t) + '/' + name + '_df') in self.hf5file}
@@ -235,5 +236,5 @@ class HistoryHdf5(History):
 
 def _retrieve(dset, time):
     times = dset["time"].values
-    t = times[times <= time][-1]
+    t = times[(np.abs(times - time)).idxmin()]
     return dset[dset["time"] == t]
