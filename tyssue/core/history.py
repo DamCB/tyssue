@@ -210,31 +210,47 @@ class HistoryHdf5(History):
             self.time = time_stamp
         else:
             self.time += 1
-        self.times.append(self.time)
-        for element in to_record:
-            self.hf5file.put(key=str(self.time) + '/' + element + '_df',
-                             value=getattr(self.sheet, "{}_df".format(element)))
 
-    def retrieve(self, time, to_record=None):
+        for element in to_record:
+            df = getattr(self.sheet, "{}_df".format(element))
+            times = pd.Series(
+                np.ones((df.shape[0],)) * self.time, name="time")
+            df = pd.concat([df, times], ignore_index=False,
+                           axis=1, sort=False)
+            try:
+                self.hf5file.append(key="{}_df".format(element),
+                                    value=df)
+            except:
+                self.hf5file.put(key="{}_df".format(element),
+                                 value=df)
+
+    def retrieve(self, time):
         """Return datasets at time `time`.
 
         If a specific dataset was not recorded at time time, the closest record before that
         time is used.
         """
-        times = pd.Series(self.times)
-        t = times[(np.abs(times - time)).idxmin()]
+        if time > self.datasets["vert"]["time"].values[-1]:
+            warnings.warn(
+                "The time argument you passed is bigger than the maximum recorded time, are you sure you pass time in parameter and not an index ? ")
 
         self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'r')
-        data = {name: self.hf5file[str(t) + '/' + name + '_df']
-                for name in to_record if (str(t) + '/' + name + '_df') in self.hf5file}
+        sheet_datasets = {}
+        for element in self.datasets:
+            hist = self.hf5file["{}_df".format(element)]
+            cols = self.columns[element]
+            df = _retrieve(hist, time)
+            sheet_datasets[element] = df
 
         self.hf5file.close()
+
         return type(self.sheet)(
-            f"{self.sheet.identifier}_{t:04.3f}", data, self.sheet.specs
+            f"{self.sheet.identifier}_{time:04.3f}", sheet_datasets, self.sheet.specs
         )
 
 
 def _retrieve(dset, time):
     times = dset["time"].values
+    times = pd.Series(times)
     t = times[(np.abs(times - time)).idxmin()]
     return dset[dset["time"] == t]
