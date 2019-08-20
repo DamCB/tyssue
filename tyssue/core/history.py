@@ -159,6 +159,9 @@ class History:
             f"{self.sheet.identifier}_{time:04.3f}", sheet_datasets, self.sheet.specs
         )
 
+    def closefile(self):
+        pass
+
     def __iter__(self):
 
         for t in self.time_stamps:
@@ -265,6 +268,8 @@ class HistoryHdf5(History):
             f"{self.sheet.identifier}_{time:04.3f}", sheet_datasets, self.sheet.specs
         )
 
+    def closefile(self):
+        self.hf5file.close()
 
 def _retrieve(dset, time):
     times = dset["time"].values
