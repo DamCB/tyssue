@@ -144,9 +144,9 @@ class History:
         If a specific dataset was not recorded at time time, the closest record before that
         time is used.
         """
-        if time > self.datasets[element]["time"].values[-1]:
+        if time > self.datasets["vert"]["time"].values[-1]:
             warnings.warn(
-                "Are you sure you pass time in parameter and not an index ? ")
+                "The time argument you passed is bigger than the maximum recorded time, are you sure you pass time in parameter and not an index ? ")
         sheet_datasets = {}
         for element in self.datasets:
             hist = self.datasets[element]
@@ -166,7 +166,7 @@ class History:
             yield t, sheet
 
 
-class History_Hdf5(History):
+class HistoryHdf5(History):
     """ This class handles recording and retrieving time series
     of sheet objects.
 
@@ -190,6 +190,8 @@ class History_Hdf5(History):
         else:
             self.path = path
 
+        self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'w')
+
         History.__init__(self, sheet, extra_cols)
 
     def record(self, to_record=None, time_stamp=None):
@@ -209,10 +211,9 @@ class History_Hdf5(History):
         else:
             self.time += 1
 
-        with pd.HDFStore(os.path.join(self.path, (str(round(self.time, 2)) + '.hf5'))) as store:
-            for element in to_record:
-                store.put(element, getattr(
-                    self.sheet, "{}_df".format(element)))
+        for element in to_record:
+            self.hf5file.put(key=str(self.time) + '/' + element + '_df',
+                             value=getattr(self.sheet, "{}_df".format(element)))
 
     def retrieve(self, time, to_record=None):
         """Return datasets at time `time`.
@@ -220,12 +221,16 @@ class History_Hdf5(History):
         If a specific dataset was not recorded at time time, the closest record before that
         time is used.
         """
-        with pd.HDFStore(os.path.join(self.path, (str(round(self.time, 2)) + '.hf5'))) as store:
-            data = {name: store[name] for name in to_record if name in store}
+        self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'r')
+        data = {name: self.hf5file[str(time) + '/' + name + '_df'] for name in to_record if (str(time) + '/' + name + '_df') in self.hf5file}
 
+        self.hf5file.close()
         return type(self.sheet)(
             f"{self.sheet.identifier}_{time:04.3f}", data, self.sheet.specs
         )
+
+
+
 
 
 def _retrieve(dset, time):
