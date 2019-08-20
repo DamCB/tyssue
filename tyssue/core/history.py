@@ -172,7 +172,7 @@ class HistoryHdf5(History):
 
     """
 
-    def __init__(self, sheet, extra_cols=None, path=""):
+    def __init__(self, sheet, extra_cols=None, path="", overwrite=False):
         """Creates a `SheetHistory` instance.
 
         Parameters
@@ -182,16 +182,33 @@ class HistoryHdf5(History):
             columns as values. Default None
         """
         if path is None:
-            try:
-                os.mkdir("temp")
-            except IOError:
-                pass
-            self.path = "temp/"
+            warnings.warn(
+                "No directory is giving. The HDF5 file will be saving in the working directory.")
+            self.path = os.os.getcwd()
         else:
             self.path = path
 
-        self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'w')
-        self.times = []
+        if os.path.exists(os.path.join(self.path, 'out.hf5')):
+            if overwrite:
+                self.hf5file = pd.HDFStore(
+                    os.path.join(self.path, 'out.hf5'), 'w')
+                warnings.warn("The file already exist and will be overwrite.")
+            else:
+                expend = 1
+                while True:
+                    expend += 1
+                    new_file_name = "out{}.hf5".format(str(expend))
+                    if os.path.exists(os.path.join(self.path, new_file_name)):
+                        continue
+                    else:
+                        self.hf5file = pd.HDFStore(
+                            os.path.join(self.path, new_file_name), 'w')
+                        warnings.warn(
+                            "The file already exist and the new filename is {}".format(new_file_name))
+                        break
+
+        else:
+            self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'w')
         History.__init__(self, sheet, extra_cols)
 
     def record(self, to_record=None, time_stamp=None):
