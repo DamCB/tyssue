@@ -126,7 +126,6 @@ class History:
             self.time = time_stamp
         else:
             self.time += 1
-        self.index += 1
 
         if self.index % (int(self.save_every / self.dt)) == 0:
             for element in to_record:
@@ -146,6 +145,8 @@ class History:
                     [hist, df], ignore_index=True, axis=0, sort=False)
 
                 self.datasets[element] = hist
+
+        self.index += 1
 
     def retrieve(self, time):
         """Return datasets at time `time`.
@@ -254,6 +255,8 @@ class HistoryHdf5(History):
                     except:
                         file.put(key="{}_df".format(element),
                                      value=df)
+
+        self.index += 1
 
     def retrieve(self, time):
         """Return datasets at time `time`.
