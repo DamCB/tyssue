@@ -27,7 +27,7 @@ class History:
 
     """
 
-    def __init__(self, sheet, record_frequency=-1, tf=-1, extra_cols=None):
+    def __init__(self, sheet, save_every=0, dt=0, extra_cols=None):
         """Creates a `SheetHistory` instance.
 
         Parameters
@@ -43,14 +43,11 @@ class History:
             extra_cols = defaultdict(list, **extra_cols)
 
         self.sheet = sheet
-        self.time = 0
 
-        if record_frequency != -1 and tf != -1:
-            self.time_recording = list(np.arange(0, tf, record_frequency))
-            self.time_recording.append(
-                self.time_recording[-1] + record_frequency)
-        else:
-            self.time_recording = None
+        self.time = 0
+        self.index = 0
+        self.save_every = save_every
+        self.dt = dt
 
         self.datasets = {}
         self.columns = {}
@@ -129,9 +126,9 @@ class History:
             self.time = time_stamp
         else:
             self.time += 1
+        self.index += 1
 
-        if (((self.time_recording is not None) and (self.time in self.time_recording))
-                or (self.time_recording is None)):
+        if self.index % (int(self.save_every / self.dt)) == 0:
             for element in to_record:
                 hist = self.datasets[element]
                 cols = self.columns[element]
@@ -184,7 +181,7 @@ class HistoryHdf5(History):
 
     """
 
-    def __init__(self, sheet, record_frequency=-1, tf=-1, extra_cols=None, path="", overwrite=False):
+    def __init__(self, sheet, save_every=0, dt=0, extra_cols=None, path="", overwrite=False):
         """Creates a `SheetHistory` instance.
 
         Parameters
@@ -223,7 +220,7 @@ class HistoryHdf5(History):
         else:
             self.hf5file = os.path.join(self.path, 'out.hf5')
             pd.HDFStore(self.hf5file, 'w').close()
-        History.__init__(self, sheet, record_frequency, tf, extra_cols)
+        History.__init__(self, sheet, save_every, dt, extra_cols)
 
     def record(self, to_record=None, time_stamp=None):
         """Appends a copy of the sheet datasets to the history instance.
@@ -242,8 +239,7 @@ class HistoryHdf5(History):
         else:
             self.time += 1
 
-        if (((self.time_recording is not None) and (self.time in self.time_recording))
-                or (self.time_recording is None)):
+        if self.index % (int(self.save_every / self.dt)) == 0:
             for element in to_record:
                 df = self.sheet.datasets[element]
                 times = pd.Series(
