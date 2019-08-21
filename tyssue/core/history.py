@@ -27,12 +27,13 @@ class History:
 
     """
 
-    def __init__(self, sheet, extra_cols=None):
+    def __init__(self, sheet, record_frequency=-1, tf=-1, extra_cols=None):
         """Creates a `SheetHistory` instance.
 
         Parameters
         ----------
         sheet : a :class:`Sheet` object which we want to record
+        record_frequency : set to choose to record only a subset of time point. Default every time point is recorded.
         extra_cols : dictionnary with sheet.datasets as keys and list of
             columns as values. Default None
         """
@@ -43,6 +44,13 @@ class History:
 
         self.sheet = sheet
         self.time = 0
+
+        if record_frequency != -1 and tf != -1:
+            self.time_recording = list(np.arange(0, tf, record_frequency))
+            self.time_recording.append(
+                self.time_recording[-1] + record_frequency)
+        else:
+            self.time_recording = None
 
         self.datasets = {}
         self.columns = {}
@@ -121,22 +129,26 @@ class History:
             self.time = time_stamp
         else:
             self.time += 1
-        for element in to_record:
-            hist = self.datasets[element]
-            cols = self.columns[element]
-            df = self.sheet.datasets[element][cols].reset_index(drop=False)
-            if not "time" in cols:
-                times = pd.Series(
-                    np.ones((df.shape[0],)) * self.time, name="time")
-                df = pd.concat([df, times], ignore_index=False,
-                               axis=1, sort=False)
-            if self.time in hist["time"]:
-                # erase previously recorded time point
-                hist = hist[hist["time"] != self.time]
 
-            hist = pd.concat([hist, df], ignore_index=True, axis=0, sort=False)
+        if (((self.time_recording is not None) and (self.time in self.time_recording))
+                or (self.time_recording is None)):
+            for element in to_record:
+                hist = self.datasets[element]
+                cols = self.columns[element]
+                df = self.sheet.datasets[element][cols].reset_index(drop=False)
+                if not "time" in cols:
+                    times = pd.Series(
+                        np.ones((df.shape[0],)) * self.time, name="time")
+                    df = pd.concat([df, times], ignore_index=False,
+                                   axis=1, sort=False)
+                if self.time in hist["time"]:
+                    # erase previously recorded time point
+                    hist = hist[hist["time"] != self.time]
 
-            self.datasets[element] = hist
+                hist = pd.concat(
+                    [hist, df], ignore_index=True, axis=0, sort=False)
+
+                self.datasets[element] = hist
 
     def retrieve(self, time):
         """Return datasets at time `time`.
@@ -159,9 +171,6 @@ class History:
             f"{self.sheet.identifier}_{time:04.3f}", sheet_datasets, self.sheet.specs
         )
 
-    def closefile(self):
-        pass
-
     def __iter__(self):
 
         for t in self.time_stamps:
@@ -175,7 +184,7 @@ class HistoryHdf5(History):
 
     """
 
-    def __init__(self, sheet, extra_cols=None, path="", overwrite=False):
+    def __init__(self, sheet, record_frequency=-1, tf=-1, extra_cols=None, path="", overwrite=False):
         """Creates a `SheetHistory` instance.
 
         Parameters
@@ -186,16 +195,17 @@ class HistoryHdf5(History):
         """
         if path is None:
             warnings.warn(
-                "No directory is giving. The HDF5 file will be saving in the working directory.")
+                "No directory is given. The HDF5 file will be saved in the working directory.")
             self.path = os.os.getcwd()
         else:
             self.path = path
 
         if os.path.exists(os.path.join(self.path, 'out.hf5')):
             if overwrite:
-                self.hf5file = pd.HDFStore(
-                    os.path.join(self.path, 'out.hf5'), 'w')
-                warnings.warn("The file already exist and will be overwrite.")
+                self.hf5file = os.path.join(self.path, 'out.hf5')
+                pd.HDFStore(self.hf5file, 'w').close()
+                warnings.warn(
+                    "The file already exist and will be overwritten.")
             else:
                 expend = 1
                 while True:
@@ -204,15 +214,16 @@ class HistoryHdf5(History):
                     if os.path.exists(os.path.join(self.path, new_file_name)):
                         continue
                     else:
-                        self.hf5file = pd.HDFStore(
-                            os.path.join(self.path, new_file_name), 'w')
+                        self.hf5file = os.path.join(self.path, new_file_name)
+                        pd.HDFStore(self.hf5file, 'w').close()
                         warnings.warn(
                             "The file already exist and the new filename is {}".format(new_file_name))
                         break
 
         else:
-            self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'w')
-        History.__init__(self, sheet, extra_cols)
+            self.hf5file = os.path.join(self.path, 'out.hf5')
+            pd.HDFStore(self.hf5file, 'w').close()
+        History.__init__(self, sheet, record_frequency, tf, extra_cols)
 
     def record(self, to_record=None, time_stamp=None):
         """Appends a copy of the sheet datasets to the history instance.
@@ -231,18 +242,22 @@ class HistoryHdf5(History):
         else:
             self.time += 1
 
-        for element in to_record:
-            df = getattr(self.sheet, "{}_df".format(element))
-            times = pd.Series(
-                np.ones((df.shape[0],)) * self.time, name="time")
-            df = pd.concat([df, times], ignore_index=False,
-                           axis=1, sort=False)
-            try:
-                self.hf5file.append(key="{}_df".format(element),
-                                    value=df)
-            except:
-                self.hf5file.put(key="{}_df".format(element),
-                                 value=df)
+        if (((self.time_recording is not None) and (self.time in self.time_recording))
+                or (self.time_recording is None)):
+            for element in to_record:
+                df = self.sheet.datasets[element]
+                times = pd.Series(
+                    np.ones((df.shape[0],)) * self.time, name="time")
+                df = pd.concat([df, times], ignore_index=False,
+                               axis=1, sort=False)
+
+                with pd.HDFStore(self.hf5file, 'a') as file:
+                    try:
+                        file.append(key="{}_df".format(element),
+                                        value=df)
+                    except:
+                        file.put(key="{}_df".format(element),
+                                     value=df)
 
     def retrieve(self, time):
         """Return datasets at time `time`.
@@ -254,22 +269,18 @@ class HistoryHdf5(History):
             warnings.warn(
                 "The time argument you passed is bigger than the maximum recorded time, are you sure you pass time in parameter and not an index ? ")
 
-        self.hf5file = pd.HDFStore(os.path.join(self.path, 'out.hf5'), 'r')
-        sheet_datasets = {}
-        for element in self.datasets:
-            hist = self.hf5file["{}_df".format(element)]
-            cols = self.columns[element]
-            df = _retrieve(hist, time)
-            sheet_datasets[element] = df
-
-        self.hf5file.close()
+        with pd.HDFStore(self.hf5file, 'r') as file:
+            sheet_datasets = {}
+            for element in self.datasets:
+                hist = file["{}_df".format(element)]
+                cols = self.columns[element]
+                df = _retrieve(hist, time)
+                sheet_datasets[element] = df
 
         return type(self.sheet)(
             f"{self.sheet.identifier}_{time:04.3f}", sheet_datasets, self.sheet.specs
         )
 
-    def closefile(self):
-        self.hf5file.close()
 
 def _retrieve(dset, time):
     times = dset["time"].values

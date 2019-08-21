@@ -120,8 +120,6 @@ class EulerSolver:
                 self.eptm.topo_changed = False
             self.record(t)
 
-        self.history.closefile()
-
     def ode_func(self, t, pos):
         """Computes the models' gradient.
 
