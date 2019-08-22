@@ -50,6 +50,8 @@ class History:
         if save_every is not None:
             self.save_every = save_every
             self.dt = dt
+        else:
+            self.save_every = None
 
         self.datasets = {}
         self.columns = {}

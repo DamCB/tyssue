@@ -34,7 +34,7 @@ def test_warning():
 
 def test_retrieve():
     sheet = Sheet("3", *three_faces_sheet())
-    history = History(sheet, {"face": ["area"]})
+    history = History(sheet, extra_cols={"face": ["area"]})
     sheet_ = history.retrieve(0)
     for elem, dset in sheet_.datasets.items():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
