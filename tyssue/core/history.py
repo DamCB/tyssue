@@ -27,13 +27,14 @@ class History:
 
     """
 
-    def __init__(self, sheet, save_every=0, dt=0, extra_cols=None):
+    def __init__(self, sheet, save_every=None, dt=None, extra_cols=None):
         """Creates a `SheetHistory` instance.
 
         Parameters
         ----------
         sheet : a :class:`Sheet` object which we want to record
-        record_frequency : set to choose to record only a subset of time point. Default every time point is recorded.
+        save_every : float, set every time interval to save the sheet
+        dt : float, time step
         extra_cols : dictionnary with sheet.datasets as keys and list of
             columns as values. Default None
         """
@@ -46,8 +47,9 @@ class History:
 
         self.time = 0
         self.index = 0
-        self.save_every = save_every
-        self.dt = dt
+        if save_every is not None:
+            self.save_every = save_every
+            self.dt = dt
 
         self.datasets = {}
         self.columns = {}
@@ -127,7 +129,7 @@ class History:
         else:
             self.time += 1
 
-        if self.index % (int(self.save_every / self.dt)) == 0:
+        if (self.save_every is None) or (self.index % (int(self.save_every / self.dt)) == 0):
             for element in to_record:
                 hist = self.datasets[element]
                 cols = self.columns[element]
@@ -182,14 +184,18 @@ class HistoryHdf5(History):
 
     """
 
-    def __init__(self, sheet, save_every=0, dt=0, extra_cols=None, path="", overwrite=False):
+    def __init__(self, sheet, save_every=None, dt=None, extra_cols=None, path="", overwrite=False):
         """Creates a `SheetHistory` instance.
 
         Parameters
         ----------
         sheet : a :class:`Sheet` object which we want to record
+        save_every : float, set every time interval to save the sheet
+        dt : float, time step
         extra_cols : dictionnary with sheet.datasets as keys and list of
             columns as values. Default None
+        path : string, define the path where save HDF5 file
+        overwrite : bool, Overwrite or not the file if it is already exist. Default False
         """
         if path is None:
             warnings.warn(
@@ -240,7 +246,7 @@ class HistoryHdf5(History):
         else:
             self.time += 1
 
-        if self.index % (int(self.save_every / self.dt)) == 0:
+        if (self.save_every is None) or (self.index % (int(self.save_every / self.dt)) == 0):
             for element in to_record:
                 df = self.sheet.datasets[element]
                 times = pd.Series(
@@ -249,12 +255,10 @@ class HistoryHdf5(History):
                                axis=1, sort=False)
 
                 with pd.HDFStore(self.hf5file, 'a') as file:
-                    try:
-                        file.append(key="{}_df".format(element),
-                                        value=df)
-                    except:
-                        file.put(key="{}_df".format(element),
-                                     value=df)
+
+                    file.append(key="{}_df".format(element),
+                                    value=df)
+
 
         self.index += 1
 
@@ -283,6 +287,5 @@ class HistoryHdf5(History):
 
 def _retrieve(dset, time):
     times = dset["time"].values
-    times = pd.Series(times)
-    t = times[(np.abs(times - time)).idxmin()]
+    t = times[np.argmin(np.abs(times - time))]
     return dset[dset["time"] == t]

@@ -9,7 +9,7 @@ def test_simple_history():
     """
     """
     sheet = Sheet("3", *three_faces_sheet())
-    history = History(sheet, {"edge": ["dx"]})
+    history = History(sheet, extra_cols={"edge": ["dx"]})
     assert "dx" in history.datasets["edge"].columns
 
     for element in sheet.datasets:
