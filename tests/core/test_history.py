@@ -1,7 +1,11 @@
 import warnings
 import pytest
+import os
+
+import pandas as pd
 
 from tyssue import Sheet, History, config, Epithelium, RNRGeometry
+from tyssue.core.history import HistoryHdf5
 from tyssue.generation import three_faces_sheet, extrude
 
 
@@ -75,3 +79,67 @@ def test_retrieve_bulk():
     history = History(eptm)
     eptm_ = history.retrieve(0)
     RNRGeometry.update_all(eptm_)
+
+
+def test_historyHDF5_path_warning():
+    """
+    """
+    sheet = Sheet("3", *three_faces_sheet())
+    with pytest.warns(UserWarning):
+        history = HistoryHdf5(sheet, extra_cols={"edge": ["dx"]}, path=None)
+
+
+def test_historyHDF5_file_warning():
+    pd.HDFStore('out.hf5', 'w').close()
+    sheet = Sheet("3", *three_faces_sheet())
+    with pytest.warns(UserWarning):
+        history = HistoryHdf5(sheet, extra_cols={"edge": ["dx"]}, path=os.getcwd())
+
+    os.remove('out.hf5')
+    os.remove('out2.hf5')
+
+
+def test_historyHDF5_retrieve():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = HistoryHdf5(sheet, extra_cols={"edge": ["dx"]}, path=os.getcwd())
+
+    for element in sheet.datasets:
+        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
+    history.record(["vert", "face", "edge"], time_stamp=0)
+    history.record(["vert", "face", "edge"], time_stamp=1)
+    sheet_ = history.retrieve(0)
+    for elem, dset in sheet_.datasets.items():
+        assert dset.shape[0] == sheet.datasets[elem].shape[0]
+        assert dset.time.unique()[0] == 0
+
+    sheet_ = history.retrieve(1)
+    for elem, dset in sheet_.datasets.items():
+        assert dset.shape[0] == sheet.datasets[elem].shape[0]
+        assert dset.time.unique()[0] == 1
+    os.remove('out.hf5')
+
+
+def test_historyHDF5_save_every():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = HistoryHdf5(sheet, extra_cols={"edge": ["dx"]}, path=os.getcwd(), save_every=2, dt=1)
+
+    for element in sheet.datasets:
+        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
+    for i in range(6):
+        history.record(["vert", "face", "edge"], time_stamp=i)
+    sheet_ = history.retrieve(0)
+    for elem, dset in sheet_.datasets.items():
+        assert dset.shape[0] == sheet.datasets[elem].shape[0]
+        assert dset.time.unique()[0] == 0
+
+    sheet_ = history.retrieve(1)
+    for elem, dset in sheet_.datasets.items():
+        assert dset.shape[0] == sheet.datasets[elem].shape[0]
+        assert dset.time.unique()[0] == 0
+
+    sheet_ = history.retrieve(2)
+    for elem, dset in sheet_.datasets.items():
+        assert dset.shape[0] == sheet.datasets[elem].shape[0]
+        assert dset.time.unique()[0] == 2
+
+    os.remove('out.hf5')

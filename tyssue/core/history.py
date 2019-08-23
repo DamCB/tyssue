@@ -202,7 +202,7 @@ class HistoryHdf5(History):
         if path is None:
             warnings.warn(
                 "No directory is given. The HDF5 file will be saved in the working directory.")
-            self.path = os.os.getcwd()
+            self.path = os.getcwd()
         else:
             self.path = path
 
