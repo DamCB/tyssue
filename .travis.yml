@@ -21,7 +21,6 @@ install:
 
 script:
   - make coverage
-  - make nbtest
 
 after_success:
   - coveralls
