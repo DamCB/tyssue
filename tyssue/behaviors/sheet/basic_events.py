@@ -192,6 +192,18 @@ def check_tri_faces(sheet, manager, **kwargs):
         ]
     )
 
+default_contraction_spec = {
+    "face_id": -1,
+    "face": -1,
+    "shrink_rate": 1.05,
+    "contractile_increase": 1.0,
+    "critical_area": 1e-2,
+    "max_contractility": 10,
+    "multiple": True,
+    "contraction_column": "line_tension",
+    "unique": True,
+}
+
 
 @face_lookup
 def contraction_line_tension(sheet, manager, **kwargs):
