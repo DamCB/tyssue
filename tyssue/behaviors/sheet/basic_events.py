@@ -4,6 +4,7 @@ Small event module
 
 
 """
+import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,7 +14,7 @@ from ...utils.decorators import face_lookup
 from ...geometry.sheet_geometry import SheetGeometry
 from ...topology.sheet_topology import cell_division
 
-from .actions import grow, contract, exchange, remove, merge_vertices, detach_vertices
+from .actions import grow, contract, exchange, remove, merge_vertices, detach_vertices, increase_value, decrease_value
 
 
 def reconnect(sheet, manager, **kwargs):
@@ -154,7 +155,8 @@ def type1_transition(sheet, manager, **kwargs):
         exchange(sheet, face, type1_transition_spec["geom"])
 
 
-default_face_elimination_spec = {"face_id": -1, "face": -1, "geom": SheetGeometry}
+default_face_elimination_spec = {
+    "face_id": -1, "face": -1, "geom": SheetGeometry}
 
 
 @face_lookup
@@ -184,7 +186,39 @@ def check_tri_faces(sheet, manager, **kwargs):
     tri_faces = sheet.face_df[(sheet.face_df["num_sides"] < 4)].id
     manager.extend(
         [
-            (face_elimination, {"face_id": f, "geom": check_tri_faces_spec["geom"]})
+            (face_elimination, {"face_id": f,
+                                "geom": check_tri_faces_spec["geom"]})
             for f in tri_faces
         ]
     )
+
+
+@face_lookup
+def contraction_line_tension(sheet, manager, **kwargs):
+    """
+    Single step contraction event
+    """
+    contraction_spec = default_contraction_spec
+    contraction_spec.update(**kwargs)
+    face = contraction_spec["face"]
+
+    if sheet.face_df.loc[face, "area"] < contraction_spec["critical_area"]:
+        return
+
+    # reduce prefered_area
+    decrease_value(sheet,
+                   'face',
+                   face,
+                   contraction_spec["shrink_rate"],
+                   col="prefered_area",
+                   divide=True,
+                   bound=contraction_spec["critical_area"] / 2,
+                   )
+
+    increase_linear_tension(
+        sheet,
+        face,
+        contraction_spec["contractile_increase"],
+        multiple=contraction_spec["multiple"],
+        isotropic=True,
+        limit=100)

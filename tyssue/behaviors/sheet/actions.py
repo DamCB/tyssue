@@ -12,6 +12,7 @@ from ...topology.sheet_topology import remove_face, type1_transition, split_vert
 from ...geometry.sheet_geometry import SheetGeometry
 from ...core.sheet import Sheet
 
+import warnings
 logger = logging.getLogger(__name__)
 
 
@@ -67,42 +68,66 @@ def detach_vertices(sheet):
         split_vert(sheet, vert)
 
 
-def grow(sheet, face, growth_rate, growth_col="prefered_vol"):
-    """Multiplies the grow columns of face by a factor.
+def increase_value(sheet,
+                   dataset,
+                   index,
+                   increase_rate,
+                   col,
+                   multiple=True,
+                   bound=None):
+    """Increase the value in the dataset at position index/col.
 
     Parameters
     ----------
     sheet : a :class:`Sheet` object
-    face : index of face
-    growth_rate : rate use to multiply value of growth_col of face.
-    growth_col : column from face dataframe which apply growth_rate.
-                growth_col need to exist in face_df. Default 'prefered_vol'
-
-
-    :Example:
-
-    >>> print(sheet.face_df[face, 'prefered_vol'])
-    10
-    >>> grow(sheet, face, 1.7, 'prefered_vol')
-    >>> print(sheet.face_df[face, 'prefered_vol'])
-    17.0
-
+    dataset : str: 'cell' or 'face' or 'edge' or 'vert'
+    index : index in the dataset
+    increase_rate : rate use to multiply value in the column col.
+    col : column from dataset which apply increase_rate.
+    multiple : current col value is multiply or add by increase_rate. Default True.
+    bound: limit value that the new value can't be higher. Default None
     """
-    sheet.face_df.loc[face, growth_col] *= growth_rate
+    if multiple:
+        new_value = sheet.datasets[dataset].loc[index, col] * increase_rate
+    else:
+        new_value = sheet.datasets[dataset].loc[index, col] + increase_rate
+
+    if bound is not None:
+        if new_value <= bound:
+            sheet.datasets[dataset].loc[index, col] = new_value
+    else:
+        sheet.datasets[dataset].loc[index, col] = new_value
 
 
-def shrink(sheet, face, shrink_rate, shrink_col="prefered_vol"):
-    """Devides the shrink_col of face by a factor.
+def decrease_value(sheet,
+                   dataset,
+                   index,
+                   decrease_rate,
+                   col,
+                   divide=True,
+                   bound=None):
+    """Decrease the value in the dataset at position index/col.
 
     Parameters
     ----------
     sheet : a :class:`Sheet` object
-    face : index of face
-    shrink_rate : rate use to multiply value of shrink_col of face.
-    shrink_col : column from face dataframe which apply shrink_rate.
-                shrink_col need to exist in face_df. Default 'prefered_vol'
+    dataset : str: 'cell' or 'face' or 'edge' or 'vert'
+    index : index in the dataset
+    decrease_rate : rate use to divide value in the column col.
+    col : column from dataset which apply decrease_rate.
+    divide : current col value is divide or substract by decrease_rate. Default True.
+    bound: limit value that the new value can't be lower. Default None.
     """
-    sheet.face_df.loc[face, shrink_col] /= shrink_rate
+    if divide:
+        new_value = sheet.datasets[dataset].loc[index, col] / decrease_rate
+    else:
+        new_value = sheet.datasets[dataset].loc[index, col] - decrease_rate
+
+    if bound is not None:
+        if new_value >= bound:
+            sheet.datasets[dataset].loc[index, col] = new_value
+    else:
+        sheet.datasets[dataset].loc[index, col] = new_value
 
 
 def exchange(sheet, face, geom, remove_tri_faces=True):
@@ -139,35 +164,6 @@ def remove(sheet, face, geom):
     geom.update_all(sheet)
 
 
-def contract(
-    sheet,
-    face,
-    contractile_increase,
-    multiple=False,
-    contract_col="contractility",
-):
-    """
-    Contract the face by increasing the 'contractility' parameter
-    by contractile_increase
-
-    Parameters
-    ----------
-    sheet : a :class:`Sheet` object
-    face : index of face
-    contractile_increase : rate use to multiply/add value of contraction_col of face.
-    multiple : contractile_increase is multiply/add to the current line_tension value.
-                Default False.
-    contract_col : column from face dataframe which apply contractile_increase.
-                contract_col need to exist in face_df. Default 'contractility'
-
-    """
-    if multiple:
-        sheet.face_df.loc[face, contract_col] *= contractile_increase
-    else:
-        new_contractility = contractile_increase
-        sheet.face_df.loc[face, contract_col] += new_contractility
-
-
 def ab_pull(sheet, face, radial_tension, distributed=False):
     """ Adds radial_tension to the face's vertices radial_tension
 
@@ -185,30 +181,6 @@ def ab_pull(sheet, face, radial_tension, distributed=False):
         radial_tension = radial_tension / len(verts)
 
     sheet.vert_df.loc[verts, "radial_tension"] += radial_tension
-
-
-def relax(sheet, face, relax_decrease, relax_col="contractility"):
-    """
-    Relax the face by decreasing the relax_col parameter
-    by relax_decrease
-
-    Parameters
-    ----------
-    sheet : a :class:`Sheet` object
-    face : index of face
-    relax_decrease : rate use to divide value of relax_col of face.
-    relax_col : column from face dataframe which apply relax_decrease.
-                relax_col need to exist in face_df. Default 'contractility'
-
-    """
-    initial_contractility = 1.12
-    new_contractility = (
-        sheet.face_df.loc[face, relax_col] / relax_decrease
-    )
-
-    if new_contractility >= (initial_contractility / 2):
-        sheet.face_df.loc[face, relax_col] = new_contractility
-        sheet.face_df.loc[face, "prefered_area"] *= relax_decrease
 
 
 def increase_linear_tension(sheet,
@@ -237,15 +209,13 @@ def increase_linear_tension(sheet,
 
     if isotropic:
         for index, edge in edges.iterrows():
-            if multiple:
-                new_line_tension = sheet.edge_df.loc[
-                    edge.name, "line_tension"] * line_tension_increase
-            else:
-                new_line_tension = sheet.edge_df.loc[
-                    edge.name, "line_tension"] + line_tension_increase
-
-            if new_line_tension <= limit:
-                sheet.edge_df.loc[edge.name, "line_tension"] = new_line_tension
+            increase_value(sheet,
+                           'edge',
+                           edge.name,
+                           line_tension_increase,
+                           'line_tension',
+                           multiple,
+                           limit)
 
     else:
         for index, edge in edges.iterrows():
@@ -255,13 +225,105 @@ def increase_linear_tension(sheet,
             )
 
             if np.abs(angle_) < np.pi / 4:
-                if multiple:
-                    new_line_tension = sheet.edge_df.loc[
-                        edge.name, "line_tension"] * line_tension_increase
+                increase_value(sheet,
+                               'edge',
+                               edge.name,
+                               line_tension_increase,
+                               'line_tension',
+                               multiple,
+                               limit)
 
-                else:
-                    new_line_tension = sheet.edge_df.loc[
-                        edge.name, "line_tension"] + line_tension_increase
-                if new_line_tension <= limit:
-                    sheet.edge_df.loc[edge.name,
-                                      "line_tension"] = new_line_tension
+
+def grow(sheet, face, growth_rate, growth_col="prefered_vol"):
+    """Multiplies the grow columns of face by a factor.
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of face
+    growth_rate : rate use to multiply value of growth_col of face.
+    growth_col : column from face dataframe which apply growth_rate.
+                growth_col need to exist in face_df. Default 'prefered_vol'
+
+
+    :Example:
+
+    >>> print(sheet.face_df[face, 'prefered_vol'])
+    10
+    >>> grow(sheet, face, 1.7, 'prefered_vol')
+    >>> print(sheet.face_df[face, 'prefered_vol'])
+    17.0
+
+    """
+    warnings.warn("deprecated, use increase_value function")
+    increase_value(sheet, 'face', face, growth_rate, growth_col, True)
+
+
+def shrink(sheet, face, shrink_rate, shrink_col="prefered_vol"):
+    """Devides the shrink_col of face by a factor.
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of face
+    shrink_rate : rate use to multiply value of shrink_col of face.
+    shrink_col : column from face dataframe which apply shrink_rate.
+                shrink_col need to exist in face_df. Default 'prefered_vol'
+    """
+    warnings.warn("deprecated, use decrease_value function")
+    decrease_value(sheet, 'face', face, shrink_rate, shrink_col, True)
+
+
+def contract(
+    sheet,
+    face,
+    contractile_increase,
+    multiple=False,
+    contract_col="contractility",
+):
+    """
+    Contract the face by increasing the 'contractility' parameter
+    by contractile_increase
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of face
+    contractile_increase : rate use to multiply/add value of contraction_col of face.
+    multiple : contractile_increase is multiply/add to the current line_tension value.
+                Default False.
+    contract_col : column from face dataframe which apply contractile_increase.
+                contract_col need to exist in face_df. Default 'contractility'
+
+    """
+    warnings.warn("deprecated, use increase_value function")
+    increase_value(sheet, 'face', face, contractile_increase,
+                   contract_col, multiple)
+
+
+def relax(sheet, face, relax_decrease, relax_col="contractility"):
+    """
+    Relax the face by decreasing the relax_col parameter
+    by relax_decrease
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of face
+    relax_decrease : rate use to divide value of relax_col of face.
+    relax_col : column from face dataframe which apply relax_decrease.
+                relax_col need to exist in face_df. Default 'contractility'
+
+    """
+
+    # TODO : test si relaxation possible ou non a mettre au niveau sup
+    warnings.warn("deprecated, use decrease_value function")
+    initial_contractility = 1.12
+    new_contractility = (
+        sheet.face_df.loc[face, relax_col] / relax_decrease
+    )
+
+    if new_contractility >= (initial_contractility / 2):
+        decrease_value(sheet, 'face', face, relax_decrease, relax_col, True)
+        increase_value(sheet, 'face', face, relax_decrease,
+                       "prefered_area", True)
