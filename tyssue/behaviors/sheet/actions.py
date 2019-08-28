@@ -205,7 +205,7 @@ def relax(sheet, face, relax_decrease, relax_col="contractility"):
         sheet.face_df.loc[face, "prefered_area"] *= relax_decrease
 
 
-def increase_linear_tension(sheet, face, line_tension_increase, multiple=True, isotropic=True, angle=np.pi / 4, limit=100, geom=SheetGeometry):
+def increase_linear_tension(sheet, face, line_tension_increase, multiple=True, isotropic=True, angle=np.pi / 4, limit=100):
     """
     Increase edges line tension from face isotropic or according to an angle.
 
@@ -217,7 +217,6 @@ def increase_linear_tension(sheet, face, line_tension_increase, multiple=True, i
     isotropic : all edges are increase, or only a subset of edges. Default True.
     angle : angle below edges are increase by line_tension_increase if isotropic is False. Default pi/4
     limit : line_tension stay below this limit value
-    geom : a geometry class
 
     """
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
