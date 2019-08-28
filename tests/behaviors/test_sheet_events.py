@@ -192,7 +192,7 @@ def test_execute_division():
     sheet.face_df["id"] = sheet.face_df.index.values
     manager = EventManager("face")
     face_id = 1
-    event = (division, {"face_id": face_id, "growth_rate": 0.2, "critical_vol": 1.5})
+    event = (division, {"face_id": face_id, "growth_rate": 1.2, "critical_vol": 1.5})
     manager.current.append(event)
     V0 = sheet.face_df.loc[1, "prefered_vol"]
     manager.execute(sheet)
@@ -350,12 +350,12 @@ def test_increase_line_tension():
 def test_grow():
     sheet = Sheet("emin", *three_faces_sheet())
     sheet.face_df["prefered_vol"] = 1.0
-    grow(sheet, 0, 0.2)
+    grow(sheet, 0, 1.2)
     assert sheet.face_df.loc[0, "prefered_vol"] == 1.2
 
 
 def test_shrink():
     sheet = Sheet("emin", *three_faces_sheet())
     sheet.face_df["prefered_vol"] = 1.0
-    shrink(sheet, 0, 0.6)
+    shrink(sheet, 0, 1.6)
     assert sheet.face_df.loc[0, "prefered_vol"] == 0.625

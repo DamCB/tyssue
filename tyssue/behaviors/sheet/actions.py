@@ -18,6 +18,10 @@ logger = logging.getLogger(__name__)
 def merge_vertices(sheet):
     """Merges all the vertices that are closer than the threshold length
 
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+
     """
     d_min = sheet.settings.get("threshold_length", 1e-3)
     short = sheet.edge_df[sheet.edge_df["length"] < d_min].index
@@ -35,6 +39,10 @@ def detach_vertices(sheet):
 
     Uses two probabilities `p_4` and `p_5p` stored in
     sheet.settings.
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
 
     """
     sheet.update_rank()
@@ -59,18 +67,40 @@ def detach_vertices(sheet):
         split_vert(sheet, vert)
 
 
-def grow(sheet, face, growth_rate, shrink_col="prefered_vol"):
-    """Multiplies the equilibrium volume of face by a
-    a factor (1+growth_rate)
+def grow(sheet, face, growth_rate, growth_col="prefered_vol"):
+    """Multiplies the grow columns of face by a factor.
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of face
+    growth_rate : rate use to multiply value of growth_col of face.
+    growth_col : column from face dataframe which apply growth_rate. growth_col need to exist in face_df. Default 'prefered_vol'
+
+
+    :Example:
+
+    >>> print(sheet.face_df[face, 'prefered_vol'])
+    10
+    >>> grow(sheet, face, 1.7, 'prefered_vol')
+    >>> print(sheet.face_df[face, 'prefered_vol'])
+    17.0
+
     """
-    sheet.face_df.loc[face, shrink_col] *= 1 + growth_rate
+    sheet.face_df.loc[face, growth_col] *= growth_rate
 
 
 def shrink(sheet, face, shrink_rate, shrink_col="prefered_vol"):
-    """Devides the equilibrium volume of face face by a
-    a factor 1+shrink_rate
+    """Devides the shrink_col of face by a factor.
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of face
+    shrink_rate : rate use to multiply value of shrink_col of face.
+    shrink_col : column from face dataframe which apply shrink_rate. shrink_col need to exist in face_df. Default 'prefered_vol'
     """
-    sheet.face_df.loc[face, shrink_col] /= 1 + shrink_rate
+    sheet.face_df.loc[face, shrink_col] /= shrink_rate
 
 
 def exchange(sheet, face, geom, remove_tri_faces=True):
@@ -82,11 +112,13 @@ def exchange(sheet, face, geom, remove_tri_faces=True):
     sheet : a :class:`Sheet` object
     face : index of the face
     geom : a Geometry class
+    remove_tri_faces : remove automaticaly tri faces if existed. Default True.
     """
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     shorter = edges.length.idxmin()
     # type1_transition(sheet, shorter, 2 * min(edges.length), remove_tri_faces)
-    type1_transition(sheet, shorter, epsilon=0.1, remove_tri_faces=remove_tri_faces)
+    type1_transition(sheet, shorter, epsilon=0.1,
+                     remove_tri_faces=remove_tri_faces)
     geom.update_all(sheet)
 
 
@@ -110,7 +142,7 @@ def contract(
     face,
     contractile_increase,
     multiple=False,
-    contraction_column="contractility",
+    contract_col="contractility",
 ):
     """
     Contract the face by increasing the 'contractility' parameter
@@ -118,18 +150,30 @@ def contract(
 
     Parameters
     ----------
-    face : id face
+    sheet : a :class:`Sheet` object
+    face : index of face
+    contractile_increase : rate use to multiply/add value of contraction_col of face.
+    multiple : line_tension_increase is multiply or add to the current line_tension value. Default False.
+    contract_col : column from face dataframe which apply contractile_increase. contract_col need to exist in face_df. Default 'contractility'
 
     """
     if multiple:
-        sheet.face_df.loc[face, contraction_column] *= contractile_increase
+        sheet.face_df.loc[face, contract_col] *= contractile_increase
     else:
         new_contractility = contractile_increase
-        sheet.face_df.loc[face, contraction_column] += new_contractility
+        sheet.face_df.loc[face, contract_col] += new_contractility
 
 
 def ab_pull(sheet, face, radial_tension, distributed=False):
     """ Adds radial_tension to the face's vertices radial_tension
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of face
+    radial_tension :
+    distributed : Devide radial_tension by number of vertices, and apply this new radial tension to each vertices. Default False.
+
     """
     verts = sheet.edge_df[sheet.edge_df["face"] == face]["srce"].unique()
     if distributed:
@@ -138,16 +182,27 @@ def ab_pull(sheet, face, radial_tension, distributed=False):
     sheet.vert_df.loc[verts, "radial_tension"] += radial_tension
 
 
-def relax(sheet, face, contractility_decrease, contraction_column="contractility"):
+def relax(sheet, face, relax_decrease, relax_col="contractility"):
+    """
+    Relax the face by decreasing the relax_col parameter
+    by relax_decrease
 
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : index of face
+    relax_decrease : rate use to divide value of relax_col of face.
+    relax_col : column from face dataframe which apply relax_decrease. relax_col need to exist in face_df. Default 'contractility'
+
+    """
     initial_contractility = 1.12
     new_contractility = (
-        sheet.face_df.loc[face, contraction_column] / contractility_decrease
+        sheet.face_df.loc[face, relax_col] / relax_decrease
     )
 
     if new_contractility >= (initial_contractility / 2):
-        sheet.face_df.loc[face, contraction_column] = new_contractility
-        sheet.face_df.loc[face, "prefered_area"] *= contractility_decrease
+        sheet.face_df.loc[face, relax_col] = new_contractility
+        sheet.face_df.loc[face, "prefered_area"] *= relax_decrease
 
 
 def increase_linear_tension(sheet, face, line_tension_increase, multiple=True, isotropic=True, angle=np.pi / 4, limit=100, geom=SheetGeometry):
@@ -180,13 +235,13 @@ def increase_linear_tension(sheet, face, line_tension_increase, multiple=True, i
                 sheet.edge_df.loc[edge.name, "line_tension"] = new_line_tension
 
     else:
-    for index, edge in edges.iterrows():
-        angle_ = np.arctan2(
+        for index, edge in edges.iterrows():
+            angle_ = np.arctan2(
                 sheet.edge_df.loc[edge.name, "dx"], sheet.edge_df.loc[
                     edge.name, "dy"]
-        )
+            )
 
-        if np.abs(angle_) < np.pi / 4:
+            if np.abs(angle_) < np.pi / 4:
                 if multiple:
                     new_line_tension = sheet.edge_df.loc[
                         edge.name, "line_tension"] * line_tension_increase
