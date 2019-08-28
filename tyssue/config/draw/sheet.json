@@ -2,7 +2,7 @@
     "edge": {
 	"visible": true,
         "width": 0.5,
-        "head_width": 0.2,
+        "head_width": 0.0,
         "length_includes_head": true,
         "shape": "right",
         "color": "#2b5d0a",
@@ -11,7 +11,7 @@
 	"colormap": "viridis"
     },
     "vert": {
-        "visible": true,
+        "visible": false,
         "s": 100,
         "color": "#000a4b",
         "alpha": 0.3,

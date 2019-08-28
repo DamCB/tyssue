@@ -4,7 +4,7 @@ import pandas as pd
 from tyssue import config, Sheet, SheetGeometry, History
 from tyssue.generation import three_faces_sheet
 from tyssue.dynamics import PlanarModel
-from tyssue.solvers.viscous import EulerSolver, IVPSolver
+from tyssue.solvers.viscous import EulerSolver
 
 
 def test_euler():
@@ -17,7 +17,7 @@ def test_euler():
     sheet.update_specs(config.dynamics.quasistatic_plane_spec())
     sheet.face_df["prefered_area"] = sheet.face_df["area"].mean()
     history = History(sheet)
-    solver = EulerSolver(sheet, geom, model, with_t1=True, with_t3=True)
+    solver = EulerSolver(sheet, geom, model, auto_reconnect=True)
 
     sheet.vert_df["viscosity"] = 1.0
     sheet.edge_df.loc[[0, 17], "line_tension"] *= 4

@@ -22,19 +22,16 @@ class EventManager:
 
     """
 
-    def __init__(self, element, logfile=None):
+    def __init__(self, element=None, logfile=None):
         """Creates an events class
 
         Parameters
         ----------
         element : str
-           element on which the events occur, e.g face or cell
+           element on which the events occur, e.g face or cell, optional
         logfile : str, default None
            if logfile is not None, will create a logging handler
            for this file where each event will be logged
-
-
-
         """
         self.current = deque()
         self.next = deque()

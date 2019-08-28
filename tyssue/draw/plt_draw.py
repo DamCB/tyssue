@@ -144,7 +144,6 @@ def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
 
     ax.autoscale()
     ax.set_aspect("equal")
-    ax.grid()
     return fig, ax
 
 

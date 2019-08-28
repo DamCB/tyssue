@@ -48,9 +48,6 @@ def reconnect(sheet, manager, **kwargs):
     if nv != sheet.Nv:
         logger.info(f"Detached {sheet.Nv - nv} vertices")
 
-    sheet.reset_index()
-    sheet.reset_topo()
-
     manager.append(reconnect, **kwargs)
 
 

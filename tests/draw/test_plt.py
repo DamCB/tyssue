@@ -31,6 +31,7 @@ class TestsPlt:
         )
         cmap = plt.cm.get_cmap("viridis")
         color_cmap = cmap(self.sheet.vert_df.rand)
+        self.draw_specs["vert"]["visible"] = True
         self.draw_specs["vert"]["color"] = color_cmap
         self.draw_specs["vert"]["alpha"] = 0.5
         self.draw_specs["vert"]["s"] = 500

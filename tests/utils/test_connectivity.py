@@ -6,6 +6,14 @@ from tyssue.utils import connectivity
 from tyssue.config.geometry import bulk_spec
 
 
+def test_ef_connect():
+    data, specs = three_faces_sheet()
+    sheet = Sheet("test", data, specs)
+    ef_connect = connectivity.edge_in_face_connectivity(sheet)
+    idx = sheet.edge_df.query(f"face == {sheet.Nf-1}").index
+    assert ef_connect[idx[0], idx[1]]
+
+
 def test_face_face_connectivity():
     data, specs = three_faces_sheet()
     sheet = Sheet("test", data, specs)
