@@ -14,7 +14,7 @@ from ...utils.decorators import face_lookup
 from ...geometry.sheet_geometry import SheetGeometry
 from ...topology.sheet_topology import cell_division
 
-from .actions import grow, contract, exchange, remove, merge_vertices, detach_vertices, increase_value, decrease_value, increase_linear_tension
+from .actions import grow, contract, exchange, remove, merge_vertices, detach_vertices, increase, decrease, increase_linear_tension
 
 
 def reconnect(sheet, manager, **kwargs):
@@ -123,12 +123,13 @@ def contraction(sheet, manager, **kwargs):
         > contraction_spec["max_contractility"]
     ):
         return
-    contract(
+    increase(
         sheet,
+        'face',
         face,
         contraction_spec["contractile_increase"],
-        contraction_spec["multiple"],
         contraction_spec["contraction_column"],
+        contraction_spec["multiple"],
     )
 
 
@@ -192,7 +193,7 @@ def check_tri_faces(sheet, manager, **kwargs):
         ]
     )
 
-default_contraction_spec = {
+default_contraction_line_tension_spec = {
     "face_id": -1,
     "face": -1,
     "shrink_rate": 1.05,
@@ -210,7 +211,7 @@ def contraction_line_tension(sheet, manager, **kwargs):
     """
     Single step contraction event
     """
-    contraction_spec = default_contraction_spec
+    contraction_spec = default_contraction_line_tension_spec
     contraction_spec.update(**kwargs)
     face = contraction_spec["face"]
 
@@ -218,14 +219,14 @@ def contraction_line_tension(sheet, manager, **kwargs):
         return
 
     # reduce prefered_area
-    decrease_value(sheet,
-                   'face',
-                   face,
-                   contraction_spec["shrink_rate"],
-                   col="prefered_area",
-                   divide=True,
-                   bound=contraction_spec["critical_area"] / 2,
-                   )
+    decrease(sheet,
+           'face',
+           face,
+           contraction_spec["shrink_rate"],
+           col="prefered_area",
+           divide=True,
+           bound=contraction_spec["critical_area"] / 2,
+           )
 
     increase_linear_tension(
         sheet,

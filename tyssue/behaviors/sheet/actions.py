@@ -68,66 +68,66 @@ def detach_vertices(sheet):
         split_vert(sheet, vert)
 
 
-def increase_value(sheet,
-                   dataset,
-                   index,
-                   increase_rate,
-                   col,
-                   multiple=True,
-                   bound=None):
+def increase(sheet,
+             element,
+             index,
+             increase_rate,
+             col,
+             multiple=True,
+             bound=None):
     """Increase the value in the dataset at position index/col.
 
     Parameters
     ----------
     sheet : a :class:`Sheet` object
-    dataset : str: 'cell' or 'face' or 'edge' or 'vert'
-    index : index in the dataset
+    element : str: 'cell' or 'face' or 'edge' or 'vert'
+    index : index in the datasets[element]
     increase_rate : rate use to multiply value in the column col.
     col : column from dataset which apply increase_rate.
-    multiple : current col value is multiply or add by increase_rate. Default True.
-    bound: limit value that the new value can't be higher. Default None
+    multiple : bool: if true, the current col value is multiply by increase_rate. if false it is added. Default multiply.
+    bound: Higher limit of the modify value. Default None
     """
     if multiple:
-        new_value = sheet.datasets[dataset].loc[index, col] * increase_rate
+        new_value = sheet.datasets[element].loc[index, col] * increase_rate
     else:
-        new_value = sheet.datasets[dataset].loc[index, col] + increase_rate
+        new_value = sheet.datasets[element].loc[index, col] + increase_rate
 
     if bound is not None:
         if new_value <= bound:
-            sheet.datasets[dataset].loc[index, col] = new_value
+            sheet.datasets[element].loc[index, col] = new_value
     else:
-        sheet.datasets[dataset].loc[index, col] = new_value
+        sheet.datasets[element].loc[index, col] = new_value
 
 
-def decrease_value(sheet,
-                   dataset,
-                   index,
-                   decrease_rate,
-                   col,
-                   divide=True,
-                   bound=None):
+def decrease(sheet,
+             element,
+             index,
+             decrease_rate,
+             col,
+             divide=True,
+             bound=None):
     """Decrease the value in the dataset at position index/col.
 
     Parameters
     ----------
     sheet : a :class:`Sheet` object
-    dataset : str: 'cell' or 'face' or 'edge' or 'vert'
-    index : index in the dataset
+    element : str: 'cell' or 'face' or 'edge' or 'vert'
+    index : index in the datasets[element]
     decrease_rate : rate use to divide value in the column col.
-    col : column from dataset which apply decrease_rate.
-    divide : current col value is divide or substract by decrease_rate. Default True.
-    bound: limit value that the new value can't be lower. Default None.
+    col : column from element which apply decrease_rate.
+    divide : bool: if true the current col value is divide by decrease_rate. If false it is substracted. Default divide.
+    bound: lower limit of the modify value. Default None.
     """
     if divide:
-        new_value = sheet.datasets[dataset].loc[index, col] / decrease_rate
+        new_value = sheet.datasets[element].loc[index, col] / decrease_rate
     else:
-        new_value = sheet.datasets[dataset].loc[index, col] - decrease_rate
+        new_value = sheet.datasets[element].loc[index, col] - decrease_rate
 
     if bound is not None:
         if new_value >= bound:
-            sheet.datasets[dataset].loc[index, col] = new_value
+            sheet.datasets[element].loc[index, col] = new_value
     else:
-        sheet.datasets[dataset].loc[index, col] = new_value
+        sheet.datasets[element].loc[index, col] = new_value
 
 
 def exchange(sheet, face, geom, remove_tri_faces=True):
@@ -139,7 +139,7 @@ def exchange(sheet, face, geom, remove_tri_faces=True):
     sheet : a :class:`Sheet` object
     face : index of the face
     geom : a Geometry class
-    remove_tri_faces : remove automaticaly tri faces if existed. Default True.
+    remove_tri_faces : remove automaticaly triangular faces if existed. Default True.
     """
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     shorter = edges.length.idxmin()
@@ -172,8 +172,7 @@ def ab_pull(sheet, face, radial_tension, distributed=False):
     sheet : a :class:`Sheet` object
     face : index of face
     radial_tension :
-    distributed : Devide radial_tension by number of vertices, and apply this new
-                    radial tension to each vertices. Default False.
+    distributed : bool: If true devide radial_tension by number of vertices, and apply this new radial tension to each vertices. Default not distributed.
 
     """
     verts = sheet.edge_df[sheet.edge_df["face"] == face]["srce"].unique()
@@ -209,13 +208,13 @@ def increase_linear_tension(sheet,
 
     if isotropic:
         for index, edge in edges.iterrows():
-            increase_value(sheet,
-                           'edge',
-                           edge.name,
-                           line_tension_increase,
-                           'line_tension',
-                           multiple,
-                           limit)
+            increase(sheet,
+                     'edge',
+                     edge.name,
+                     line_tension_increase,
+                     "line_tension",
+                     multiple,
+                     limit)
 
     else:
         for index, edge in edges.iterrows():
@@ -225,13 +224,13 @@ def increase_linear_tension(sheet,
             )
 
             if np.abs(angle_) < np.pi / 4:
-                increase_value(sheet,
-                               'edge',
-                               edge.name,
-                               line_tension_increase,
-                               'line_tension',
-                               multiple,
-                               limit)
+                increase(sheet,
+                         'edge',
+                         edge.name,
+                         line_tension_increase,
+                         "line_tension",
+                         multiple,
+                         limit)
 
 
 def grow(sheet, face, growth_rate, growth_col="prefered_vol"):
@@ -255,8 +254,8 @@ def grow(sheet, face, growth_rate, growth_col="prefered_vol"):
     17.0
 
     """
-    warnings.warn("deprecated, use increase_value function")
-    increase_value(sheet, 'face', face, growth_rate, growth_col, True)
+    warnings.warn("deprecated, use increase function")
+    increase(sheet, 'face', face, growth_rate, growth_col, True)
 
 
 def shrink(sheet, face, shrink_rate, shrink_col="prefered_vol"):
@@ -270,8 +269,8 @@ def shrink(sheet, face, shrink_rate, shrink_col="prefered_vol"):
     shrink_col : column from face dataframe which apply shrink_rate.
                 shrink_col need to exist in face_df. Default 'prefered_vol'
     """
-    warnings.warn("deprecated, use decrease_value function")
-    decrease_value(sheet, 'face', face, shrink_rate, shrink_col, True)
+    warnings.warn("deprecated, use decrease function")
+    decrease(sheet, 'face', face, shrink_rate, shrink_col, True)
 
 
 def contract(
@@ -290,15 +289,15 @@ def contract(
     sheet : a :class:`Sheet` object
     face : index of face
     contractile_increase : rate use to multiply/add value of contraction_col of face.
-    multiple : contractile_increase is multiply/add to the current line_tension value.
+    multiple : contractile_increase is multiply/add to the current contract_col value.
                 Default False.
     contract_col : column from face dataframe which apply contractile_increase.
                 contract_col need to exist in face_df. Default 'contractility'
 
     """
-    warnings.warn("deprecated, use increase_value function")
-    increase_value(sheet, 'face', face, contractile_increase,
-                   contract_col, multiple)
+    warnings.warn("deprecated, use increase function")
+    increase(sheet, 'face', face, contractile_increase,
+             contract_col, multiple)
 
 
 def relax(sheet, face, relax_decrease, relax_col="contractility"):
@@ -316,14 +315,9 @@ def relax(sheet, face, relax_decrease, relax_col="contractility"):
 
     """
 
-    # TODO : test si relaxation possible ou non a mettre au niveau sup
-    warnings.warn("deprecated, use decrease_value function")
+    warnings.warn("deprecated, use decrease function")
     initial_contractility = 1.12
-    new_contractility = (
-        sheet.face_df.loc[face, relax_col] / relax_decrease
-    )
-
-    if new_contractility >= (initial_contractility / 2):
-        decrease_value(sheet, 'face', face, relax_decrease, relax_col, True)
-        increase_value(sheet, 'face', face, relax_decrease,
-                       "prefered_area", True)
+    decrease(sheet, 'face', face, relax_decrease, col=relax_col,
+             divide=True, bound=(initial_contractility / 2))
+    increase(sheet, 'face', face, relax_decrease,
+             "prefered_area", True)
