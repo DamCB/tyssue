@@ -8,7 +8,10 @@ Basic event module
 import logging
 import numpy as np
 from ...topology.base_topology import collapse_edge
-from ...topology.sheet_topology import remove_face, type1_transition, split_vert
+from ...topology.sheet_topology import remove_face, type1_transition
+from ...topology.sheet_topology import split_vert as sheet_split
+from ...topology.bulk_topology import split_vert as bulk_split
+
 from ...geometry.sheet_geometry import SheetGeometry
 from ...core.sheet import Sheet
 
@@ -27,11 +30,12 @@ def merge_vertices(sheet):
     d_min = sheet.settings.get("threshold_length", 1e-3)
     short = sheet.edge_df[sheet.edge_df["length"] < d_min].index
     if not short.shape[0]:
-        return
+        return -1
     logger.info(f"Collapsing {short.shape[0]} edges")
     while short.shape[0]:
         collapse_edge(sheet, short[0], allow_two_sided=True)
         short = sheet.edge_df[sheet.edge_df["length"] < d_min].index
+    return 0
 
 
 def detach_vertices(sheet):
@@ -47,7 +51,12 @@ def detach_vertices(sheet):
 
     """
     sheet.update_rank()
-    min_rank = 3 if isinstance(sheet, Sheet) else 4
+    if isinstance(sheet, Sheet):
+        min_rank = 3
+        split_vert = sheet_split
+    else:
+        min_rank = 4
+        split_vert = bulk_split
 
     if sheet.vert_df["rank"].max() == min_rank:
         return 0
@@ -64,6 +73,7 @@ def detach_vertices(sheet):
 
     to_detach = np.concatenate([rank4[dice4 < p_4], rank5p[dice5p < p_5p]])
     logger.info(f"Detaching {to_detach.size} vertices")
+
     for vert in to_detach:
         split_vert(sheet, vert)
 

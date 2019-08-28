@@ -7,9 +7,28 @@ import numpy as np
 from scipy import sparse
 
 
+def _index_mesh(df):
+    ii1, ii2 = np.meshgrid(df.index, df.index)
+    return pd.DataFrame({"row": ii1.ravel(), "col": ii2.ravel()})
+
+
 def _elements_mesh(df, elem1, elem2):
     ee1, ee2 = np.meshgrid(df[elem1], df[elem2])
     return pd.DataFrame({"row": ee1.ravel(), "col": ee2.ravel()})
+
+
+def edge_in_face_connectivity(eptm):
+    """Returns an array of shape (eptm.Ne, eptm.Ne) with
+    C_ij = 1 iff edges i and j belong to the same face.
+
+    """
+    mesh = eptm.edge_df.groupby("face").apply(_index_mesh)
+    ef_connect = sparse.coo_matrix(
+        (np.ones(mesh.shape[0]), (mesh["row"], mesh["col"])),
+        shape=(eptm.Ne, eptm.Ne),
+        dtype=int,
+    ).toarray()
+    return ef_connect
 
 
 def face_face_connectivity(eptm, exclude_opposites=False):

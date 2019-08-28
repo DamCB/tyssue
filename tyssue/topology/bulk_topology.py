@@ -162,7 +162,9 @@ def split_vert(eptm, vert, face=None, multiplier=1.5):
         logger.info(f"OH for face {face} of cell {cell}")
         _OH_transition(eptm, all_edges, elements, multiplier)
     else:
-        raise ValueError("")
+        raise ValueError(
+            "Cell has too many edges connected to the vertex, try with another"
+        )
 
     # Tidy up
     for face in all_edges["face"].unique():
