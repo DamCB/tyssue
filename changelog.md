@@ -23,6 +23,9 @@ In EulerSolver, this avoids raising `TopologyChangeError` at least in explicit E
 
 - We explicitly allow two sided faces to be created by `collapse_edge` or `remove_face`, they are directly eliminated.
 
+## Behaviors
+- We add two basics function in actions for sheet tissue : increase and decrease. In the near future, we will removed deprecated function that increase and decrease will replace (such as growth, shrink, contract and relax).
+
 
 # What's new in 0.4
 
