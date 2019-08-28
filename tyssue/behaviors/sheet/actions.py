@@ -75,7 +75,8 @@ def grow(sheet, face, growth_rate, growth_col="prefered_vol"):
     sheet : a :class:`Sheet` object
     face : index of face
     growth_rate : rate use to multiply value of growth_col of face.
-    growth_col : column from face dataframe which apply growth_rate. growth_col need to exist in face_df. Default 'prefered_vol'
+    growth_col : column from face dataframe which apply growth_rate.
+                growth_col need to exist in face_df. Default 'prefered_vol'
 
 
     :Example:
@@ -98,7 +99,8 @@ def shrink(sheet, face, shrink_rate, shrink_col="prefered_vol"):
     sheet : a :class:`Sheet` object
     face : index of face
     shrink_rate : rate use to multiply value of shrink_col of face.
-    shrink_col : column from face dataframe which apply shrink_rate. shrink_col need to exist in face_df. Default 'prefered_vol'
+    shrink_col : column from face dataframe which apply shrink_rate.
+                shrink_col need to exist in face_df. Default 'prefered_vol'
     """
     sheet.face_df.loc[face, shrink_col] /= shrink_rate
 
@@ -153,8 +155,10 @@ def contract(
     sheet : a :class:`Sheet` object
     face : index of face
     contractile_increase : rate use to multiply/add value of contraction_col of face.
-    multiple : line_tension_increase is multiply or add to the current line_tension value. Default False.
-    contract_col : column from face dataframe which apply contractile_increase. contract_col need to exist in face_df. Default 'contractility'
+    multiple : contractile_increase is multiply/add to the current line_tension value.
+                Default False.
+    contract_col : column from face dataframe which apply contractile_increase.
+                contract_col need to exist in face_df. Default 'contractility'
 
     """
     if multiple:
@@ -172,7 +176,8 @@ def ab_pull(sheet, face, radial_tension, distributed=False):
     sheet : a :class:`Sheet` object
     face : index of face
     radial_tension :
-    distributed : Devide radial_tension by number of vertices, and apply this new radial tension to each vertices. Default False.
+    distributed : Devide radial_tension by number of vertices, and apply this new
+                    radial tension to each vertices. Default False.
 
     """
     verts = sheet.edge_df[sheet.edge_df["face"] == face]["srce"].unique()
@@ -192,7 +197,8 @@ def relax(sheet, face, relax_decrease, relax_col="contractility"):
     sheet : a :class:`Sheet` object
     face : index of face
     relax_decrease : rate use to divide value of relax_col of face.
-    relax_col : column from face dataframe which apply relax_decrease. relax_col need to exist in face_df. Default 'contractility'
+    relax_col : column from face dataframe which apply relax_decrease.
+                relax_col need to exist in face_df. Default 'contractility'
 
     """
     initial_contractility = 1.12
@@ -205,7 +211,13 @@ def relax(sheet, face, relax_decrease, relax_col="contractility"):
         sheet.face_df.loc[face, "prefered_area"] *= relax_decrease
 
 
-def increase_linear_tension(sheet, face, line_tension_increase, multiple=True, isotropic=True, angle=np.pi / 4, limit=100):
+def increase_linear_tension(sheet,
+                            face,
+                            line_tension_increase,
+                            multiple=True,
+                            isotropic=True,
+                            angle=np.pi / 4,
+                            limit=100):
     """
     Increase edges line tension from face isotropic or according to an angle.
 
@@ -213,9 +225,11 @@ def increase_linear_tension(sheet, face, line_tension_increase, multiple=True, i
     ----------
     face : index of face
     line_tension_increase : factor for increase line tension value
-    multiple : line_tension_increase is multiply or add to the current line_tension value. Default True.
+    multiple : line_tension_increase is multiply or add to the current
+                line_tension value. Default True.
     isotropic : all edges are increase, or only a subset of edges. Default True.
-    angle : angle below edges are increase by line_tension_increase if isotropic is False. Default pi/4
+    angle : angle below edges are increase by line_tension_increase if
+                isotropic is False. Default pi/4
     limit : line_tension stay below this limit value
 
     """
