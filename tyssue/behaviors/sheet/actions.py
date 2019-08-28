@@ -150,12 +150,50 @@ def relax(sheet, face, contractility_decrease, contraction_column="contractility
         sheet.face_df.loc[face, "prefered_area"] *= contractility_decrease
 
 
-def increase_linear_tension(sheet, face, line_tension, geom=SheetGeometry):
+def increase_linear_tension(sheet, face, line_tension_increase, multiple=True, isotropic=True, angle=np.pi / 4, limit=100, geom=SheetGeometry):
+    """
+    Increase edges line tension from face isotropic or according to an angle.
+
+    Parameters
+    ----------
+    face : index of face
+    line_tension_increase : factor for increase line tension value
+    multiple : line_tension_increase is multiply or add to the current line_tension value. Default True.
+    isotropic : all edges are increase, or only a subset of edges. Default True.
+    angle : angle below edges are increase by line_tension_increase if isotropic is False. Default pi/4
+    limit : line_tension stay below this limit value
+    geom : a geometry class
+
+    """
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
+
+    if isotropic:
+        for index, edge in edges.iterrows():
+            if multiple:
+                new_line_tension = sheet.edge_df.loc[
+                    edge.name, "line_tension"] * line_tension_increase
+            else:
+                new_line_tension = sheet.edge_df.loc[
+                    edge.name, "line_tension"] + line_tension_increase
+
+            if new_line_tension <= limit:
+                sheet.edge_df.loc[edge.name, "line_tension"] = new_line_tension
+
+    else:
     for index, edge in edges.iterrows():
         angle_ = np.arctan2(
-            sheet.edge_df.loc[edge.name, "dx"], sheet.edge_df.loc[edge.name, "dy"]
+                sheet.edge_df.loc[edge.name, "dx"], sheet.edge_df.loc[
+                    edge.name, "dy"]
         )
 
         if np.abs(angle_) < np.pi / 4:
-            sheet.edge_df.loc[edge.name, "line_tension"] *= line_tension
+                if multiple:
+                    new_line_tension = sheet.edge_df.loc[
+                        edge.name, "line_tension"] * line_tension_increase
+
+                else:
+                    new_line_tension = sheet.edge_df.loc[
+                        edge.name, "line_tension"] + line_tension_increase
+                if new_line_tension <= limit:
+                    sheet.edge_df.loc[edge.name,
+                                      "line_tension"] = new_line_tension
