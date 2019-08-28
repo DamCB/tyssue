@@ -14,7 +14,7 @@ from ...utils.decorators import face_lookup
 from ...geometry.sheet_geometry import SheetGeometry
 from ...topology.sheet_topology import cell_division
 
-from .actions import grow, contract, exchange, remove, merge_vertices, detach_vertices, increase_value, decrease_value
+from .actions import grow, contract, exchange, remove, merge_vertices, detach_vertices, increase_value, decrease_value, increase_linear_tension
 
 
 def reconnect(sheet, manager, **kwargs):
