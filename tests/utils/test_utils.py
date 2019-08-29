@@ -14,6 +14,13 @@ from tyssue.topology.base_topology import close_face
 from tyssue.core.sheet import get_opposite
 
 
+def test_get_next():
+    sheet = Sheet("emin", *three_faces_sheet())
+    next_ = utils.get_next(sheet)
+    expected = np.array([1, 2, 3, 4, 5, 0, 7, 8, 9, 10, 11, 6, 13, 14, 15, 16, 17, 12])
+    np.testing.assert_array_equal(next_, expected)
+
+
 def test_to_nd():
     grid = hexa_grid2d(6, 4, 3, 3)
     datasets = from_2d_voronoi(Voronoi(grid))

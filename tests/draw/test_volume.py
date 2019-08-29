@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import ipyvolume as ipv
 
 from tyssue.generation import three_faces_sheet, extrude
 from tyssue import Sheet, config, Epithelium, SheetGeometry
@@ -35,9 +36,15 @@ def test_sheet_view():
     assert edge_mesh.lines.shape == (18, 2)
     sheet.face_df["visible"] = False
     sheet.face_df.loc[0, "visible"] = True
-
+    ipv.clear()
     fig, (edge_mesh, face_mesh) = sheet_view(sheet, face=face_spec, edge=edge_spec)
     assert face_mesh.triangles.shape == (6, 3)
+
+    ipv.clear()
+    edge_spec = {"color": lambda sheet: sheet.edge_df["dx"], "visible": True}
+    face_spec = {"color": lambda sheet: sheet.face_df["area"], "visible": True}
+    fig, (edge_mesh, face_mesh) = sheet_view(sheet, face=face_spec, edge=edge_spec)
+    assert face_mesh.color.shape == (13, 3)
 
 
 def test_highlight():

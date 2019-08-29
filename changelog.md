@@ -1,3 +1,45 @@
+# What's new in 0.5.1
+
+## SolverIVP desapeared
+
+In the absence of a clear way to deal with rearangement, we had to let this go for now, it may come back later...
+
+## Behaviors
+
+- We add two basics function in actions for sheet tissue : increase and decrease. In the near future, we will removed deprecated function that increase and decrease will replace (such as growth, shrink, contract and relax).
+
+## History and HistoryHdf5
+
+- new `HistoryHdf5` class that records each time point in a hdf file instead of in memory.
+
+- new `browse_history` function that creates a widget to slide through the different time points
+
+## Draw
+
+- the `color` entries in edge and face specs can now be functions that take a sheet object as sole argument:
+```py
+specs = {
+    "edge":{
+        'color':'lightslategrey',
+        'visible':True
+    },
+    "face":{
+        'color': lambda sheet : sheet.face_df["apoptosis"],
+        'colormap':'Reds',
+        'visible':True
+    }
+}
+```
+
+This way, the color is updated at each function call, without having to define a new function.
+
+
+
+## Utils
+
+- new `get_next` function returns the indexes of the next half-edge for every edge (e.g the edge whose srce is the trgt of the current edge)
+
+
 
 # What's new in 0.5
 
@@ -22,9 +64,6 @@ In EulerSolver, this avoids raising `TopologyChangeError` at least in explicit E
 - A new `update_rank` method allows to compute the rank of a vertex (as the number of _flat_ edges connected to it). This required to move the `connectivity` module to utils to avoid circular imports.
 
 - We explicitly allow two sided faces to be created by `collapse_edge` or `remove_face`, they are directly eliminated.
-
-## Behaviors
-- We add two basics function in actions for sheet tissue : increase and decrease. In the near future, we will removed deprecated function that increase and decrease will replace (such as growth, shrink, contract and relax).
 
 
 # What's new in 0.4

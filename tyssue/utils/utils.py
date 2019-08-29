@@ -298,3 +298,19 @@ def ar_calculation(sheet, coords=["x", "y"]):
     srce_pos = sheet.upcast_srce(sheet.vert_df[sheet.coords])
     srce_pos["face"] = sheet.edge_df["face"]
     return srce_pos.groupby("face").apply(_compute_ar, coords)
+
+
+def get_next(eptm):
+    """
+    Returns the indices of the next edge for each edge
+    """
+    fs_indexed = (
+        eptm.edge_df[["face", "srce"]]
+        .reset_index()
+        .set_index(["face", "srce"], drop=False)
+    )
+    ft_index = pd.MultiIndex.from_frame(
+        eptm.edge_df[["face", "trgt"]], names=["face", "srce"]
+    )
+    next_ = fs_indexed.loc[ft_index, "edge"].values
+    return next_
