@@ -40,6 +40,12 @@ def test_sheet_view():
     fig, (edge_mesh, face_mesh) = sheet_view(sheet, face=face_spec, edge=edge_spec)
     assert face_mesh.triangles.shape == (6, 3)
 
+    ipv.clear()
+    edge_spec = {"color": lambda sheet: sheet.edge_df["dx"], "visible": True}
+    face_spec = {"color": lambda sheet: sheet.face_df["area"], "visible": True}
+    fig, (edge_mesh, face_mesh) = sheet_view(sheet, face=face_spec, edge=edge_spec)
+    assert face_mesh.color.shape == (39, 3)
+
 
 def test_highlight():
     dsets = extrude(three_faces_sheet()[0])

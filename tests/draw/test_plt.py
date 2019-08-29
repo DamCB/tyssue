@@ -106,3 +106,9 @@ class TestsPlt:
         self.draw_specs["face"]["color"] = "red"
         self.draw_specs["edge"]["color"] = np.random.random(self.sheet.Nv)
         fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
+
+    def test_sheet_view_callable(self):
+        with pytest.raises(ValueError):
+            self.draw_specs["face"]["color"] = lambda sheet: np.ones(5)
+            self.draw_specs["edge"]["color"] = lambda sheet: np.ones(5)
+            fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
