@@ -265,10 +265,9 @@ class HistoryHdf5(History):
             if "\cell" in keys:
                 sheet = Epithelium
 
-        self.dtypes = {k: df.dtypes
-                       for k, df in sheet.datasets.items()}
-
         History.__init__(self, sheet, save_every, dt, extra_cols)
+        self.dtypes = {k: df[self.columns[k]].dtypes
+                       for k, df in sheet.datasets.items()}
 
     @classmethod
     def from_archive(cls, hf5file, columns=None, eptm_class=None):
@@ -328,10 +327,8 @@ class HistoryHdf5(History):
                 warnings.warn(
                     "New columns {} will not be saved in the {} table".format(diff_col, element))
             else:
-                try:
-                    pd.testing.assert_series_equal(pd.Series(dtypes_[element].values), pd.Series(self.dtypes[element].values))
-                except AssertionError:
-                    raise AssertionError(
+                if dtypes_[element].to_dict() != self.dtypes[element].to_dict():
+                    raise ValueError(
                         "There is a change of datatype in {} table".format(element))
 
         if (self.save_every is None) or (
@@ -340,7 +337,7 @@ class HistoryHdf5(History):
             for element, df in self.sheet.datasets.items():
                 times = pd.Series(
                     np.ones((df.shape[0],)) * self.time, name="time")
-                df = df[self.dtypes[element].keys()]
+                df = df[self.columns[element]]
                 df = pd.concat([df, times], ignore_index=False,
                                axis=1, sort=False)
 

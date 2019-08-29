@@ -212,6 +212,6 @@ def test_change_col_types():
     history.record()
     history.record()
     sheet.face_df['z'] = 'abc'
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         history.record()
     os.remove("test.hf5")
