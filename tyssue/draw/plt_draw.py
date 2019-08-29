@@ -1,22 +1,33 @@
 """
 Matplotlib based plotting
 """
-import warnings
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import shutil, glob, tempfile
+import shutil
 import glob
 import tempfile
 import subprocess
 import warnings
-
 import pathlib
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 from matplotlib import cm
 from matplotlib.path import Path
 from matplotlib.patches import Polygon, FancyArrow, Arc, PathPatch
 from matplotlib.collections import PatchCollection, PolyCollection
+
+try:
+    from ipywidgets import interact
+except ImportError:
+    print("ipywidgets not found")
+
+    def interact(*args, **kwargs):
+        print("you need ipywidget for this")
+
+
 from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater, get_sub_eptm
 
@@ -50,7 +61,8 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
 
     graph_dir = pathlib.Path(tempfile.mkdtemp())
     x, y = coords = draw_kwds.get("coords", history.sheet.coords[:2])
-    bounds = history.vert_h[coords].describe().loc[["min", "max"]]
+    sheet0 = history.retrieve(0)
+    bounds = sheet0.vert_df[coords].describe().loc[["min", "max"]]
     delta = (bounds.loc["max"] - bounds.loc["min"]).max()
     margin = delta * margin / 100
     xlim = bounds.loc["min", x] - margin, bounds.loc["max", x] + margin
@@ -177,6 +189,8 @@ def parse_face_specs(face_draw_specs, sheet):
 
     collection_specs = {}
     color = face_draw_specs.get("color")
+    if callable(color):
+        color = color(sheet)
     if color is None:
         return {}
     elif isinstance(color, str):
@@ -263,6 +277,9 @@ def parse_edge_specs(edge_draw_specs, sheet):
     }
     collection_specs = {}
     if "color" in edge_draw_specs:
+        if callable(edge_draw_specs["color"]):
+            edge_draw_specs["color"] = edge_draw_specs["color"](sheet)
+
         if isinstance(edge_draw_specs["color"], str):
             collection_specs["edgecolors"] = edge_draw_specs["color"]
         elif hasattr(edge_draw_specs["color"], "__len__"):
@@ -281,6 +298,7 @@ def _wire_color_from_sequence(edge_spec, sheet):
     """
     """
     color_ = edge_spec["color"]
+
     color_min, color_max = edge_spec.get("color_range", (color_.min(), color_.max()))
     cmap = cm.get_cmap(edge_spec.get("colormap", "viridis"))
     if color_.shape in [(sheet.Nv, 3), (sheet.Nv, 4)]:
@@ -309,14 +327,24 @@ def quick_edge_draw(sheet, coords=["x", "y"], ax=None, **draw_spec_kw):
         fig, ax = plt.subplots()
     else:
         fig = ax.get_figure()
+    lines_x, lines_y = _get_lines(sheet, coords)
+    ax.plot(lines_x, lines_y, **draw_spec_kw)
+    ax.set_aspect("equal")
+    return fig, ax
 
-    x, y = coords
-    srce_x = sheet.upcast_srce(sheet.vert_df[x]).values
-    srce_y = sheet.upcast_srce(sheet.vert_df[y]).values
-    trgt_x = sheet.upcast_trgt(sheet.vert_df[x]).values
-    trgt_y = sheet.upcast_trgt(sheet.vert_df[y]).values
+
+def _get_lines(sheet, coords):
 
     lines_x, lines_y = np.zeros(2 * sheet.Ne), np.zeros(2 * sheet.Ne)
+    scoords = ["s" + c for c in coords]
+    tcoords = ["t" + c for c in coords]
+    if set(scoords + tcoords).issubset(sheet.edge_df.columns):
+        srce_x, srce_y = sheet.edge_df[scoords].values.T
+        trgt_x, trgt_y = sheet.edge_df[tcoords].values.T
+    else:
+        srce_x, srce_y = sheet.upcast_srce(sheet.vert_df[coords]).values.T
+        trgt_x, trgt_y = sheet.upcast_trgt(sheet.vert_df[coords]).values.T
+
     lines_x[::2] = srce_x
     lines_x[1::2] = trgt_x
     lines_y[::2] = srce_y
@@ -325,9 +353,7 @@ def quick_edge_draw(sheet, coords=["x", "y"], ax=None, **draw_spec_kw):
     # matplotlib/blob/master/lib/matplotlib/tri/triplot.py#L65
     lines_x = np.insert(lines_x, slice(None, None, 2), np.nan)
     lines_y = np.insert(lines_y, slice(None, None, 2), np.nan)
-    ax.plot(lines_x, lines_y, **draw_spec_kw)
-    ax.set_aspect("equal")
-    return fig, ax
+    return lines_x, lines_y
 
 
 def plot_forces(

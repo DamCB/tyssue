@@ -1,4 +1,8 @@
+import warnings
 from .plt_draw import quick_edge_draw, plot_forces
+from .plt_draw import sheet_view as sheet_view_2d
+from .ipv_draw import browse_history
+
 from .plt_draw import sheet_view as sheet_view_2d
 from .ipv_draw import sheet_view as sheet_view_3d
 from .plt_draw import create_gif

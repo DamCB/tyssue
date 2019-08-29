@@ -16,6 +16,7 @@ from ...geometry.sheet_geometry import SheetGeometry
 from ...core.sheet import Sheet
 
 import warnings
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,13 +79,7 @@ def detach_vertices(sheet):
         split_vert(sheet, vert)
 
 
-def increase(sheet,
-             element,
-             index,
-             increase_rate,
-             col,
-             multiple=True,
-             bound=None):
+def increase(sheet, element, index, increase_rate, col, multiple=True, bound=None):
     """Increase the value in the dataset at position index/col.
 
     Parameters
@@ -109,13 +104,7 @@ def increase(sheet,
         sheet.datasets[element].loc[index, col] = new_value
 
 
-def decrease(sheet,
-             element,
-             index,
-             decrease_rate,
-             col,
-             divide=True,
-             bound=None):
+def decrease(sheet, element, index, decrease_rate, col, divide=True, bound=None):
     """Decrease the value in the dataset at position index/col.
 
     Parameters
@@ -154,8 +143,7 @@ def exchange(sheet, face, geom, remove_tri_faces=True):
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     shorter = edges.length.idxmin()
     # type1_transition(sheet, shorter, 2 * min(edges.length), remove_tri_faces)
-    type1_transition(sheet, shorter, epsilon=0.1,
-                     remove_tri_faces=remove_tri_faces)
+    type1_transition(sheet, shorter, epsilon=0.1, remove_tri_faces=remove_tri_faces)
     geom.update_all(sheet)
 
 
@@ -192,13 +180,15 @@ def ab_pull(sheet, face, radial_tension, distributed=False):
     sheet.vert_df.loc[verts, "radial_tension"] += radial_tension
 
 
-def increase_linear_tension(sheet,
-                            face,
-                            line_tension_increase,
-                            multiple=True,
-                            isotropic=True,
-                            angle=np.pi / 4,
-                            limit=100):
+def increase_linear_tension(
+    sheet,
+    face,
+    line_tension_increase,
+    multiple=True,
+    isotropic=True,
+    angle=np.pi / 4,
+    limit=100,
+):
     """
     Increase edges line tension from face isotropic or according to an angle.
 
@@ -218,29 +208,32 @@ def increase_linear_tension(sheet,
 
     if isotropic:
         for index, edge in edges.iterrows():
-            increase(sheet,
-                     'edge',
-                     edge.name,
-                     line_tension_increase,
-                     "line_tension",
-                     multiple,
-                     limit)
+            increase(
+                sheet,
+                "edge",
+                edge.name,
+                line_tension_increase,
+                "line_tension",
+                multiple,
+                limit,
+            )
 
     else:
         for index, edge in edges.iterrows():
             angle_ = np.arctan2(
-                sheet.edge_df.loc[edge.name, "dx"], sheet.edge_df.loc[
-                    edge.name, "dy"]
+                sheet.edge_df.loc[edge.name, "dx"], sheet.edge_df.loc[edge.name, "dy"]
             )
 
             if np.abs(angle_) < np.pi / 4:
-                increase(sheet,
-                         'edge',
-                         edge.name,
-                         line_tension_increase,
-                         "line_tension",
-                         multiple,
-                         limit)
+                increase(
+                    sheet,
+                    "edge",
+                    edge.name,
+                    line_tension_increase,
+                    "line_tension",
+                    multiple,
+                    limit,
+                )
 
 
 def grow(sheet, face, growth_rate, growth_col="prefered_vol"):
@@ -265,7 +258,7 @@ def grow(sheet, face, growth_rate, growth_col="prefered_vol"):
 
     """
     warnings.warn("deprecated, use increase function")
-    increase(sheet, 'face', face, growth_rate, growth_col, True)
+    increase(sheet, "face", face, growth_rate, growth_col, True)
 
 
 def shrink(sheet, face, shrink_rate, shrink_col="prefered_vol"):
@@ -280,15 +273,11 @@ def shrink(sheet, face, shrink_rate, shrink_col="prefered_vol"):
                 shrink_col need to exist in face_df. Default 'prefered_vol'
     """
     warnings.warn("deprecated, use decrease function")
-    decrease(sheet, 'face', face, shrink_rate, shrink_col, True)
+    decrease(sheet, "face", face, shrink_rate, shrink_col, True)
 
 
 def contract(
-    sheet,
-    face,
-    contractile_increase,
-    multiple=False,
-    contract_col="contractility",
+    sheet, face, contractile_increase, multiple=False, contract_col="contractility"
 ):
     """
     Contract the face by increasing the 'contractility' parameter
@@ -306,8 +295,7 @@ def contract(
 
     """
     warnings.warn("deprecated, use increase function")
-    increase(sheet, 'face', face, contractile_increase,
-             contract_col, multiple)
+    increase(sheet, "face", face, contractile_increase, contract_col, multiple)
 
 
 def relax(sheet, face, relax_decrease, relax_col="contractility"):
@@ -327,7 +315,13 @@ def relax(sheet, face, relax_decrease, relax_col="contractility"):
 
     warnings.warn("deprecated, use decrease function")
     initial_contractility = 1.12
-    decrease(sheet, 'face', face, relax_decrease, col=relax_col,
-             divide=True, bound=(initial_contractility / 2))
-    increase(sheet, 'face', face, relax_decrease,
-             "prefered_area", True)
+    decrease(
+        sheet,
+        "face",
+        face,
+        relax_decrease,
+        col=relax_col,
+        divide=True,
+        bound=(initial_contractility / 2),
+    )
+    increase(sheet, "face", face, relax_decrease, "prefered_area", True)

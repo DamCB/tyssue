@@ -4,6 +4,7 @@ import warnings
 import numpy as np
 import pandas as pd
 from matplotlib import cm
+from ipywidgets import interact
 
 from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater, get_sub_eptm
@@ -20,6 +21,41 @@ $ conda install -c conda-forge ipyvolume
     )
 
 
+def browse_history(history, coords=["x", "y", "z"], **draw_specs_kw):
+
+    times = history.time_stamps
+    num_frames = times.size
+    draw_specs = sheet_spec()
+    spec_updater(draw_specs, draw_specs_kw)
+    sheet = history.retrieve(0)
+    ipv.clear()
+    fig, meshes = sheet_view(sheet, coords, **draw_specs_kw)
+
+    lim_inf = sheet.vert_df[sheet.coords].min().min()
+    lim_sup = sheet.vert_df[sheet.coords].max().max()
+    ipv.xyzlim(lim_inf, lim_sup)
+
+    def set_frame(i=0):
+        fig.animation = 0
+        t = times[i]
+        meshes = _get_meshes(history.retrieve(t), coords, draw_specs)
+        update_view(fig, meshes)
+
+    ipv.show()
+    interact(set_frame, i=(0, num_frames - 1))
+
+
+def update_view(fig, meshes):
+
+    for old, new in zip(fig.meshes, meshes):
+        old.x = new.x
+        old.y = new.y
+        old.z = new.z
+        old.color = new.color
+        old.triangles = new.triangles
+        old.lines = new.lines
+
+
 def sheet_view(sheet, coords=["x", "y", "z"], **draw_specs_kw):
     """
     Creates a javascript renderer of the edge lines to be displayed
@@ -33,31 +69,17 @@ def sheet_view(sheet, coords=["x", "y", "z"], **draw_specs_kw):
 
     """
 
-    ipv.style.use(["dark", "minimal"])
+    # ipv.style.use(["dark", "minimal"])
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
     fig = ipv.gcf()
-
-    edge_spec = draw_specs["edge"]
-    if edge_spec["visible"]:
-        edges = edge_mesh(sheet, coords, **edge_spec)
-        fig.meshes = fig.meshes + [edges]
-    else:
-        edges = None
-
-    face_spec = draw_specs["face"]
-    if face_spec["visible"]:
-        faces = face_mesh(sheet, coords, **face_spec)
-        fig.meshes = fig.meshes + [faces]
-    else:
-        faces = None
-
+    fig.meshes = fig.meshes + _get_meshes(sheet, coords, draw_specs)
     box_size = max(*(np.ptp(sheet.vert_df[u]) for u in sheet.coords))
     border = 0.05 * box_size
     lim_inf = sheet.vert_df[sheet.coords].min().min() - border
     lim_sup = sheet.vert_df[sheet.coords].max().max() + border
     ipv.xyzlim(lim_inf, lim_sup)
-    return fig, (edges, faces)
+    return fig, fig.meshes
 
 
 def view_ipv(sheet, coords=["x", "y", "z"], **edge_specs):
@@ -92,13 +114,14 @@ def edge_mesh(sheet, coords, **edge_specs):
 
     Returns
     -------
-
-    fig: a :class:`ipyvolume.widgets.Figure` widget
     mesh: a :class:`ipyvolume.widgets.Mesh` mesh widget
 
     """
     spec = sheet_spec()["edge"]
     spec.update(**edge_specs)
+    if callable(spec["color"]):
+        spec["color"] = spec["color"](sheet)
+
     if isinstance(spec["color"], str):
         color = spec["color"]
     elif hasattr(spec["color"], "__len__"):
@@ -116,8 +139,13 @@ def edge_mesh(sheet, coords, **edge_specs):
 
 
 def face_mesh(sheet, coords, **face_draw_specs):
-
+    """
+    Creates a ipyvolume Mesh of the face polygons
+    """
     Ne, Nf = sheet.Ne, sheet.Nf
+    if callable(face_draw_specs["color"]):
+        face_draw_specs["color"] = face_draw_specs["color"](sheet)
+
     if isinstance(face_draw_specs["color"], str):
         color = face_draw_specs["color"]
 
@@ -192,6 +220,7 @@ def _wire_color_from_sequence(edge_spec, sheet):
 
 def _face_color_from_sequence(face_spec, sheet):
     color_ = face_spec["color"]
+
     cmap = cm.get_cmap(face_spec.get("colormap", "viridis"))
     Nf, Ne = sheet.Nf, sheet.Ne
     color_min, color_max = face_spec.get("color_range", (color_.min(), color_.max()))
@@ -214,3 +243,22 @@ def _face_color_from_sequence(face_spec, sheet):
         raise ValueError(
             "shape of `face_spec['color']` must be either (Nf, 3), (Nf, 4) or (Nf,)"
         )
+
+
+def _get_meshes(sheet, coords, draw_specs):
+
+    meshes = []
+    edge_spec = draw_specs["edge"]
+    if edge_spec["visible"]:
+        edges = edge_mesh(sheet, coords, **edge_spec)
+        meshes.append(edges)
+    else:
+        edges = None
+
+    face_spec = draw_specs["face"]
+    if face_spec["visible"]:
+        faces = face_mesh(sheet, coords, **face_spec)
+        meshes.append(faces)
+    else:
+        faces = None
+    return meshes
