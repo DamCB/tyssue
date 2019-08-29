@@ -14,6 +14,7 @@ from ...topology.bulk_topology import split_vert as bulk_split
 
 from ...geometry.sheet_geometry import SheetGeometry
 from ...core.sheet import Sheet
+from ...utils import connectivity
 
 import warnings
 logger = logging.getLogger(__name__)
@@ -50,7 +51,9 @@ def detach_vertices(sheet):
     sheet : a :class:`Sheet` object
 
     """
-    sheet.update_rank()
+    #sheet.update_rank()
+    st_connect = connectivity.srce_trgt_connectivity(sheet)
+    rank = ((st_connect + st_connect.T) > 0).sum(axis=0)
     if isinstance(sheet, Sheet):
         min_rank = 3
         split_vert = sheet_split
@@ -58,17 +61,17 @@ def detach_vertices(sheet):
         min_rank = 4
         split_vert = bulk_split
 
-    if sheet.vert_df["rank"].max() == min_rank:
+    if rank.max() == min_rank:
         return 0
 
     dt = sheet.settings.get("dt", 1.0)
     p_4 = sheet.settings.get("p_4", 0.1) * dt
     p_5p = sheet.settings.get("p_5p", 1e-2) * dt
 
-    rank4 = sheet.vert_df[sheet.vert_df["rank"] == min_rank + 1].index
+    rank4 = sheet.vert_df[rank == min_rank + 1].index
     dice4 = np.random.random(rank4.size)
 
-    rank5p = sheet.vert_df[sheet.vert_df["rank"] > min_rank + 1].index
+    rank5p = sheet.vert_df[rank > min_rank + 1].index
     dice5p = np.random.random(rank5p.size)
 
     to_detach = np.concatenate([rank4[dice4 < p_4], rank5p[dice5p < p_5p]])
