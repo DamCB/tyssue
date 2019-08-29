@@ -180,8 +180,11 @@ def parse_face_specs(face_draw_specs, sheet):
 
     collection_specs = {}
     color = face_draw_specs.get("color")
+
     if callable(color):
         color = color(sheet)
+        face_draw_specs["color"] = color
+
     if color is None:
         return {}
     elif isinstance(color, str):

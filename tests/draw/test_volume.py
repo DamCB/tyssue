@@ -44,7 +44,7 @@ def test_sheet_view():
     edge_spec = {"color": lambda sheet: sheet.edge_df["dx"], "visible": True}
     face_spec = {"color": lambda sheet: sheet.face_df["area"], "visible": True}
     fig, (edge_mesh, face_mesh) = sheet_view(sheet, face=face_spec, edge=edge_spec)
-    assert face_mesh.color.shape == (39, 3)
+    assert face_mesh.color.shape == (13, 3)
 
 
 def test_highlight():
