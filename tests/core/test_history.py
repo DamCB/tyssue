@@ -20,16 +20,21 @@ def test_simple_history():
     assert "dx" in history.datasets["edge"].columns
 
     for element in sheet.datasets:
-        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
+        assert sheet.datasets[element].shape[
+            0] == history.datasets[element].shape[0]
     history.record()
-    assert sheet.datasets["vert"].shape[0] * 2 == history.datasets["vert"].shape[0]
+    assert sheet.datasets["vert"].shape[0] * \
+        2 == history.datasets["vert"].shape[0]
     history.record()
-    assert sheet.datasets["vert"].shape[0] * 3 == history.datasets["vert"].shape[0]
-    assert sheet.datasets["face"].shape[0] * 3 == history.datasets["face"].shape[0]
+    assert sheet.datasets["vert"].shape[0] * \
+        3 == history.datasets["vert"].shape[0]
+    assert sheet.datasets["face"].shape[0] * \
+        3 == history.datasets["face"].shape[0]
     mono = Epithelium("eptm", extrude(sheet.datasets))
     histo2 = History(mono)
     for element in mono.datasets:
-        assert mono.datasets[element].shape[0] == histo2.datasets[element].shape[0]
+        assert mono.datasets[element].shape[
+            0] == histo2.datasets[element].shape[0]
 
 
 def test_warning():
@@ -93,7 +98,8 @@ def test_historyHDF5_path_warning():
         history.record(time_stamp=0)
 
     with pytest.warns(UserWarning):
-        history = HistoryHdf5(sheet, extra_cols={"edge": ["dx"]}, hf5file="out.hf5")
+        history = HistoryHdf5(
+            sheet, extra_cols={"edge": ["dx"]}, hf5file="out.hf5")
         history.record(time_stamp=0)
 
     os.remove("out.hf5")
@@ -105,7 +111,8 @@ def test_historyHDF5_retrieve():
     history = HistoryHdf5(sheet, extra_cols={"edge": ["dx"]})
 
     for element in sheet.datasets:
-        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
+        assert sheet.datasets[element].shape[
+            0] == history.datasets[element].shape[0]
     history.record(time_stamp=0)
     history.record(time_stamp=1)
     sheet_ = history.retrieve(0)
@@ -122,10 +129,12 @@ def test_historyHDF5_retrieve():
 
 def test_historyHDF5_save_every():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet, extra_cols={"edge": ["dx"]}, save_every=2, dt=1)
+    history = HistoryHdf5(
+        sheet, extra_cols={"edge": ["dx"]}, save_every=2, dt=1)
 
     for element in sheet.datasets:
-        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
+        assert sheet.datasets[element].shape[
+            0] == history.datasets[element].shape[0]
     for i in range(6):
         history.record(time_stamp=i)
     sheet_ = history.retrieve(0)
@@ -175,3 +184,34 @@ def test_to_and_from_archive():
         assert sheet_.Nv == sheet.Nv
     finally:
         os.remove("test.hf5")
+
+
+def test_unsaved_col():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = HistoryHdf5(sheet,
+                          extra_cols={"face": sheet.face_df.columns,
+                                      "edge": list(sheet.edge_df.columns),
+                                      "vert": list(sheet.vert_df.columns)},
+                          hf5file="test.hf5")
+    history.record()
+    history.record()
+    sheet.face_df['new_col'] = 0
+    with pytest.warns(UserWarning):
+        history.record()
+    os.remove("test.hf5")
+
+
+def test_change_col_types():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = HistoryHdf5(sheet,
+                          extra_cols={"face": sheet.face_df.columns,
+                                      "edge": list(
+                                          sheet.edge_df.columns),
+                                      "vert": list(sheet.vert_df.columns)},
+                          hf5file="test.hf5")
+    history.record()
+    history.record()
+    sheet.face_df['z'] = 'abc'
+    with pytest.raises(ValueError):
+        history.record()
+    os.remove("test.hf5")
