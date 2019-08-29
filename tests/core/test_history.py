@@ -205,12 +205,13 @@ def test_change_col_types():
     sheet = Sheet("3", *three_faces_sheet())
     history = HistoryHdf5(sheet,
                           extra_cols={"face": sheet.face_df.columns,
-                                      "edge": list(sheet.edge_df.columns),
+                                      "edge": list(
+                                          sheet.edge_df.columns),
                                       "vert": list(sheet.vert_df.columns)},
                           hf5file="test.hf5")
     history.record()
     history.record()
     sheet.face_df['z'] = 'abc'
-    with pytest.warns(UserWarning):
+    with pytest.raises(AssertionError):
         history.record()
     os.remove("test.hf5")

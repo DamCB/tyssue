@@ -265,9 +265,8 @@ class HistoryHdf5(History):
             if "\cell" in keys:
                 sheet = Epithelium
 
-        self.dtypes = {
-            0: {k: df.dtypes
-                for k, df in sheet.datasets.items()}}
+        self.dtypes = {k: df.dtypes
+                       for k, df in sheet.datasets.items()}
 
         History.__init__(self, sheet, save_every, dt, extra_cols)
 
@@ -320,18 +319,19 @@ class HistoryHdf5(History):
         else:
             self.time += 1.
 
-        self.dtypes[self.time] = {k: df.dtypes for k,
-                                  df in self.sheet.datasets.items()}
+        dtypes_ = {k: df.dtypes for k, df in self.sheet.datasets.items()}
 
         for element, df in self.sheet.datasets.items():
-            diff_col = set(self.dtypes[self.time][element].keys()).difference(
-                set(self.dtypes[0][element].keys()))
+            diff_col = set(dtypes_[element].keys()).difference(
+                set(self.dtypes[element].keys()))
             if diff_col:
                 warnings.warn(
-                    "Columns {} would not be saved in the {} table".format(diff_col, element))
+                    "New columns {} will not be saved in the {} table".format(diff_col, element))
             else:
-                if False in self.dtypes[self.time][element].values == self.dtypes[0][element].values:
-                    warnings.warn(
+                try:
+                    pd.testing.assert_series_equal(pd.Series(dtypes_[element].values), pd.Series(self.dtypes[element].values))
+                except AssertionError:
+                    raise AssertionError(
                         "There is a change of datatype in {} table".format(element))
 
         if (self.save_every is None) or (
@@ -340,17 +340,13 @@ class HistoryHdf5(History):
             for element, df in self.sheet.datasets.items():
                 times = pd.Series(
                     np.ones((df.shape[0],)) * self.time, name="time")
-                df = df[self.dtypes[0][element].keys()]
+                df = df[self.dtypes[element].keys()]
                 df = pd.concat([df, times], ignore_index=False,
                                axis=1, sort=False)
 
                 with pd.HDFStore(self.hf5file, "a") as file:
-                    try:
-                        file.append(key=element, value=df,
-                                    data_columns=["time"])
-                    except ValueError:
-                        warnings.warn(
-                            "Are you sure you have the correct datatype in {} table? ".format(element))
+                    file.append(key=element, value=df,
+                                data_columns=["time"])
 
         self.index += 1
 
