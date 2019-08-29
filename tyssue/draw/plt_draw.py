@@ -19,15 +19,6 @@ from matplotlib.path import Path
 from matplotlib.patches import Polygon, FancyArrow, Arc, PathPatch
 from matplotlib.collections import PatchCollection, PolyCollection
 
-try:
-    from ipywidgets import interact
-except ImportError:
-    print("ipywidgets not found")
-
-    def interact(*args, **kwargs):
-        print("you need ipywidget for this")
-
-
 from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater, get_sub_eptm
 
