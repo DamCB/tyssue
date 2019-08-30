@@ -48,7 +48,7 @@ class History:
 
         self.sheet = sheet
 
-        self.time = 0.
+        self.time = 0.0
         self.index = 0
         if save_every is not None:
             self.save_every = save_every
@@ -151,16 +151,13 @@ class History:
                 cols = self.columns[element]
                 df = self.sheet.datasets[element][cols].reset_index(drop=False)
                 if not "time" in cols:
-                    times = pd.Series(
-                        np.ones((df.shape[0],)) * self.time, name="time")
-                    df = pd.concat(
-                        [df, times], ignore_index=False, axis=1, sort=False)
+                    times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
+                    df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
                 if self.time in hist["time"]:
                     # erase previously recorded time point
                     hist = hist[hist["time"] != self.time]
 
-                hist = pd.concat(
-                    [hist, df], ignore_index=True, axis=0, sort=False)
+                hist = pd.concat([hist, df], ignore_index=True, axis=0, sort=False)
 
                 self.datasets[element] = hist
 
@@ -260,14 +257,15 @@ class HistoryHdf5(History):
                         break
         if sheet is None:
             last = self.time_stamps[-1]
-            with pd.HDFStore(self.hf5file, "a") as file:
+            with pd.HDFStore(self.hf5file, "r") as file:
                 keys = file.keys()
             if "\cell" in keys:
                 sheet = Epithelium
 
         History.__init__(self, sheet, save_every, dt, extra_cols)
-        self.dtypes = {k: df[self.columns[k]].dtypes
-                       for k, df in sheet.datasets.items()}
+        self.dtypes = {
+            k: df[self.columns[k]].dtypes for k, df in sheet.datasets.items()
+        }
 
     @classmethod
     def from_archive(cls, hf5file, columns=None, eptm_class=None):
@@ -316,34 +314,36 @@ class HistoryHdf5(History):
         if time_stamp is not None:
             self.time = time_stamp
         else:
-            self.time += 1.
+            self.time += 1.0
 
         dtypes_ = {k: df.dtypes for k, df in self.sheet.datasets.items()}
 
         for element, df in self.sheet.datasets.items():
             diff_col = set(dtypes_[element].keys()).difference(
-                set(self.dtypes[element].keys()))
+                set(self.dtypes[element].keys())
+            )
             if diff_col:
                 warnings.warn(
-                    "New columns {} will not be saved in the {} table".format(diff_col, element))
+                    "New columns {} will not be saved in the {} table".format(
+                        diff_col, element
+                    )
+                )
             else:
                 if dtypes_[element].to_dict() != self.dtypes[element].to_dict():
                     raise ValueError(
-                        "There is a change of datatype in {} table".format(element))
+                        "There is a change of datatype in {} table".format(element)
+                    )
 
         if (self.save_every is None) or (
             self.index % (int(self.save_every / self.dt)) == 0
         ):
             for element, df in self.sheet.datasets.items():
-                times = pd.Series(
-                    np.ones((df.shape[0],)) * self.time, name="time")
+                times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
                 df = df[self.columns[element]]
-                df = pd.concat([df, times], ignore_index=False,
-                               axis=1, sort=False)
+                df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
 
                 with pd.HDFStore(self.hf5file, "a") as file:
-                    file.append(key=element, value=df,
-                                data_columns=["time"])
+                    file.append(key=element, value=df, data_columns=["time"])
 
         self.index += 1
 
