@@ -22,6 +22,9 @@ from tyssue.behaviors.sheet.actions import (
     contract,
     ab_pull,
     relax,
+    set_value,
+    increase,
+    decrease,
     increase_linear_tension,
     grow,
     shrink,
@@ -136,7 +139,8 @@ def test_execute_apoptosis():
     specs = config.geometry.cylindrical_sheet()
     sheet = Sheet("emin", datasets, specs)
     geom.update_all(sheet)
-    sheet.settings["apoptosis"] = {"contractile_increase": 2.0, "critical_area": 0.1}
+    sheet.settings["apoptosis"] = {
+        "contractile_increase": 2.0, "critical_area": 0.1}
     sheet.face_df["id"] = sheet.face_df.index.values
     init_nb_faces = len(sheet.face_df)
     manager = EventManager("face")
@@ -165,7 +169,8 @@ def test_execute_apoptosis():
     manager.current.append(modified_cell_event)
     manager.execute(sheet)
     manager.update()
-    next_nbsides = sheet.face_df.loc[sheet.idx_lookup(face_id, "face"), "num_sides"]
+    next_nbsides = sheet.face_df.loc[
+        sheet.idx_lookup(face_id, "face"), "num_sides"]
     i = 1
     while next_nbsides > 4:
         assert next_nbsides == initial_nbsides - i
@@ -173,7 +178,8 @@ def test_execute_apoptosis():
         i = i + 1
         manager.execute(sheet)
         manager.update()
-        next_nbsides = sheet.face_df.loc[sheet.idx_lookup(face_id, "face"), "num_sides"]
+        next_nbsides = sheet.face_df.loc[
+            sheet.idx_lookup(face_id, "face"), "num_sides"]
         if i > 20:
             raise RecursionError
     manager.execute(sheet)
@@ -192,7 +198,8 @@ def test_execute_division():
     sheet.face_df["id"] = sheet.face_df.index.values
     manager = EventManager("face")
     face_id = 1
-    event = (division, {"face_id": face_id, "growth_rate": 1.2, "critical_vol": 1.5})
+    event = (division, {"face_id": face_id,
+                        "growth_rate": 1.2, "critical_vol": 1.5})
     manager.current.append(event)
     V0 = sheet.face_df.loc[1, "prefered_vol"]
     manager.execute(sheet)
@@ -328,6 +335,28 @@ def test_ab_pull():
     np.testing.assert_array_equal(
         sheet.vert_df.loc[0:5, "radial_tension"], np.ones(6) * 2.5
     )
+
+
+def test_set_value():
+    sheet = Sheet("emin", *three_faces_sheet())
+    sheet.face_df["prefered_vol"] = 1.0
+    set_value(sheet, 'face', 0, 12.0, 'prefered_vol')
+    assert sheet.face_df.loc[0, "prefered_vol"] == 12.0
+    assert sheet.face_df.loc[1, "prefered_vol"] == 1.0
+
+
+def test_increase():
+    sheet = Sheet("emin", *three_faces_sheet())
+    sheet.face_df["prefered_vol"] = 1.0
+    increase(sheet, 'face', 0, 1.2, 'prefered_vol')
+    assert sheet.face_df.loc[0, "prefered_vol"] == 1.2
+
+
+def test_decrease():
+    sheet = Sheet("emin", *three_faces_sheet())
+    sheet.face_df["prefered_vol"] = 1.0
+    decrease(sheet, 'face', 0, 1.6, 'prefered_vol')
+    assert sheet.face_df.loc[0, "prefered_vol"] == 0.625
 
 
 def test_increase_line_tension():
