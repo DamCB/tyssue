@@ -155,6 +155,28 @@ def test_historyHDF5_save_every():
     os.remove("out.hf5")
 
 
+def test_historyHDF5_save_other_sheet():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = HistoryHdf5(
+        sheet, extra_cols={"edge": ["dx"], "face": ['area']})
+
+    for element in sheet.datasets:
+        assert sheet.datasets[element].shape[
+            0] == history.datasets[element].shape[0]
+    sheet.face_df.loc[0, 'area'] = 1.
+    history.record(time_stamp=1)
+
+    sheet.face_df.loc[0, 'area'] = 12.
+    history.record(time_stamp=2, sheet=sheet)
+
+    sheet1_ = history.retrieve(1)
+    assert sheet1_.face_df.loc[0, 'area'] == 1.
+    sheet2_ = history.retrieve(2)
+    assert sheet2_.face_df.loc[0, 'area'] == 12.
+
+    os.remove("out.hf5")
+
+
 def test_historyHDF5_from_archive():
 
     sheet = Sheet("3", *three_faces_sheet())
