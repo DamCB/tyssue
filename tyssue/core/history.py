@@ -306,8 +306,8 @@ class HistoryHdf5(History):
         ----------
         to_report : Deprecated - list of strings
             the datasets from self.sheet to be saved
-        sheet: a :class:`Sheet` object which we want to record. This argument is used
-        to convert several HF5 files of one simulation to only one HF5 files.
+        sheet: a :class:`Sheet` object which we want to record. This argument can
+        be used if the sheet object is different at each time point.
 
         """
         if to_record is not None:
