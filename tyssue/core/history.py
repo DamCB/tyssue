@@ -299,7 +299,7 @@ class HistoryHdf5(History):
             times = file.select("vert", columns=["time"])["time"].unique()
         return times
 
-    def record(self, to_record=None, time_stamp=None):
+    def record(self, sheet=None, to_record=None, time_stamp=None):
         """Appends a copy of the sheet datasets to the history HDF file.
 
         Parameters
@@ -310,6 +310,9 @@ class HistoryHdf5(History):
         """
         if to_record is not None:
             warnings.warn("Deprecated, all the datasets will be saved anyway")
+
+        if sheet is not None:
+            self.sheet = sheet.copy()
 
         if time_stamp is not None:
             self.time = time_stamp
