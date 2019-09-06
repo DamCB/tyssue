@@ -299,17 +299,22 @@ class HistoryHdf5(History):
             times = file.select("vert", columns=["time"])["time"].unique()
         return times
 
-    def record(self, to_record=None, time_stamp=None):
+    def record(self, to_record=None, time_stamp=None, sheet=None):
         """Appends a copy of the sheet datasets to the history HDF file.
 
         Parameters
         ----------
         to_report : Deprecated - list of strings
             the datasets from self.sheet to be saved
+        sheet: a :class:`Sheet` object which we want to record. This argument can
+        be used if the sheet object is different at each time point.
 
         """
         if to_record is not None:
             warnings.warn("Deprecated, all the datasets will be saved anyway")
+
+        if sheet is not None:
+            self.sheet = sheet
 
         if time_stamp is not None:
             self.time = time_stamp
