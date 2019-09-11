@@ -14,7 +14,17 @@ from ...utils.decorators import face_lookup
 from ...geometry.sheet_geometry import SheetGeometry
 from ...topology.sheet_topology import cell_division
 
-from .actions import grow, contract, exchange, remove, merge_vertices, detach_vertices, increase, decrease, increase_linear_tension
+from .actions import (
+    grow,
+    contract,
+    exchange,
+    remove,
+    merge_vertices,
+    detach_vertices,
+    increase,
+    decrease,
+    increase_linear_tension,
+)
 
 
 def reconnect(sheet, manager, **kwargs):
@@ -101,7 +111,7 @@ default_contraction_spec = {
     "contractile_increase": 1.0,
     "critical_area": 1e-2,
     "max_contractility": 10,
-    "multiple": False,
+    "multiply": False,
     "contraction_column": "contractility",
     "unique": True,
 }
@@ -122,11 +132,11 @@ def contraction(sheet, manager, **kwargs):
         return
     increase(
         sheet,
-        'face',
+        "face",
         face,
         contraction_spec["contractile_increase"],
         contraction_spec["contraction_column"],
-        contraction_spec["multiple"],
+        contraction_spec["multiply"],
     )
 
 
@@ -153,8 +163,7 @@ def type1_transition(sheet, manager, **kwargs):
         exchange(sheet, face, type1_transition_spec["geom"])
 
 
-default_face_elimination_spec = {
-    "face_id": -1, "face": -1, "geom": SheetGeometry}
+default_face_elimination_spec = {"face_id": -1, "face": -1, "geom": SheetGeometry}
 
 
 @face_lookup
@@ -184,11 +193,11 @@ def check_tri_faces(sheet, manager, **kwargs):
     tri_faces = sheet.face_df[(sheet.face_df["num_sides"] < 4)].id
     manager.extend(
         [
-            (face_elimination, {"face_id": f,
-                                "geom": check_tri_faces_spec["geom"]})
+            (face_elimination, {"face_id": f, "geom": check_tri_faces_spec["geom"]})
             for f in tri_faces
         ]
     )
+
 
 default_contraction_line_tension_spec = {
     "face_id": -1,
@@ -197,7 +206,7 @@ default_contraction_line_tension_spec = {
     "contractile_increase": 1.0,
     "critical_area": 1e-2,
     "max_contractility": 10,
-    "multiple": True,
+    "multiply": True,
     "contraction_column": "line_tension",
     "unique": True,
 }
@@ -216,19 +225,21 @@ def contraction_line_tension(sheet, manager, **kwargs):
         return
 
     # reduce prefered_area
-    decrease(sheet,
-           'face',
-           face,
-           contraction_spec["shrink_rate"],
-           col="prefered_area",
-           divide=True,
-           bound=contraction_spec["critical_area"] / 2,
-           )
+    decrease(
+        sheet,
+        "face",
+        face,
+        contraction_spec["shrink_rate"],
+        col="prefered_area",
+        divide=True,
+        bound=contraction_spec["critical_area"] / 2,
+    )
 
     increase_linear_tension(
         sheet,
         face,
         contraction_spec["contractile_increase"],
-        multiple=contraction_spec["multiple"],
+        multiply=contraction_spec["multiply"],
         isotropic=True,
-        limit=100)
+        limit=100,
+    )
