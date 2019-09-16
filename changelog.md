@@ -1,18 +1,29 @@
-# What's new in 0.5.1
+# What's new in 0.6.0
 
-## SolverIVP desapeared
+## Topology
+
+Some bug fixes for 3D rearangements
+
+## Collisions
+
+Puts an exact kernel in c_collisions.cpp
+
+
+## We switched to CodeCoV for coverage reports (purely from hype/style motivations)
+
+## SolverIVP disapeared
 
 In the absence of a clear way to deal with rearangement, we had to let this go for now, it may come back later...
 
 ## Behaviors
 
-- We add two basics function in actions for sheet tissue : increase and decrease. In the near future, we will removed deprecated function that increase and decrease will replace (such as growth, shrink, contract and relax).
+- We add two basics function in actions for sheet tissue : `increase` and `decrease`. In the near future, we will removed deprecated function that `increase` and `decrease` will replace (such as `growth`, `shrink`, `contract` and `relax`).
 
 ## History and HistoryHdf5
 
 - new `HistoryHdf5` class that records each time point in a hdf file instead of in memory.
 
-- new `browse_history` function that creates a widget to slide through the different time points
+- new `browse_history` function that creates a widget to slide through the different time points with an ipyvolume 3D view
 
 ## Draw
 
@@ -34,11 +45,9 @@ specs = {
 This way, the color is updated at each function call, without having to define a new function.
 
 
-
 ## Utils
 
-- new `get_next` function returns the indexes of the next half-edge for every edge (e.g the edge whose srce is the trgt of the current edge)
-
+- new `get_next` function returns the indexes of the next half-edge for every edge (e.g the edge whose `srce` is the `trgt` of the current edge)
 
 
 # What's new in 0.5
