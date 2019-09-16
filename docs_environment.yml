@@ -1,16 +1,17 @@
 name: tyssue
 channels:
-    - conda-forge
+  - conda-forge
 dependencies:
-    - numpy
-    - scipy
-    - matplotlib
-    - pandas
-    - pytables
-    - jupyter
-    - notebook
-    - ipywidgets
-    - pythreejs
-    - ipyvolume
-    - nbsphinx
-    - tyssue
+  - python==3.7
+  - numpy
+  - scipy
+  - matplotlib
+  - pandas
+  - pytables
+  - jupyter
+  - notebook
+  - ipywidgets
+  - pythreejs
+  - ipyvolume
+  - nbsphinx
+  - tyssue
