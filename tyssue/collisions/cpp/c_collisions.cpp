@@ -12,14 +12,14 @@
 #include <iostream>
 
 
-#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/Polygon_mesh_processing/self_intersections.h>
 
 namespace py = pybind11;
 namespace PMP = CGAL::Polygon_mesh_processing;
 
-using K                     = CGAL::Simple_cartesian<double>;
+using K                     = CGAL::Exact_predicates_inexact_constructions_kernel;
 using Point_3               = K::Point_3;
 using Mesh                  = CGAL::Surface_mesh<Point_3>;
 using face_descriptor       = boost::graph_traits<Mesh>::face_descriptor;

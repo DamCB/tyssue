@@ -35,14 +35,14 @@ def contract(
     monolayer,
     face,
     contractile_increase,
-    multiple=False,
+    multiply=False,
     contraction_column="contractility",
 ):
     """
     Contract the face by increasing the 'contractility' parameter
     by contractile_increase
     """
-    if multiple:
+    if multiply:
         monolayer.face_df.loc[face, contraction_column] *= contractile_increase
     else:
         monolayer.face_df.loc[face, contraction_column] += contractile_increase
@@ -65,7 +65,7 @@ def contract_apical_face(
     contractile_increase=1.0,
     critical_area=1e-2,
     max_contractility=50,
-    multiple=False,
+    multiply=False,
     contraction_column="contractility",
 ):
     """Single step contraction event for apical face only
@@ -79,7 +79,7 @@ def contract_apical_face(
         or (monolayer.face_df.loc[face, contraction_column] > max_contractility)
     ):
         return
-    contract(monolayer, face, contractile_increase, multiple, contraction_column)
+    contract(monolayer, face, contractile_increase, multiply, contraction_column)
 
 
 def ab_pull(monolayer, cell, radial_tension, distributed=False):
