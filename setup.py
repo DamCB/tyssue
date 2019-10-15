@@ -166,8 +166,7 @@ class CMakeBuild(build_ext):
         subprocess.check_call(
             ["cmake", "--build", "."] + build_args, cwd=self.build_temp
         )
-        print(env["CXXFLAGS"])
-        print()  # Add an empty line for cleaner output
+        print(env["CXXFLAGS"], "\n")
 
 
 if __name__ == "__main__":
