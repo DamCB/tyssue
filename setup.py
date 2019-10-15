@@ -198,7 +198,10 @@ if __name__ == "__main__":
         packages=find_packages(),
         package_data={"tyssue": files},
         include_package_data=True,
-        ext_modules=[CMakeExtension("tyssue/collisions/cpp/c_collisions")],
+        ext_modules=[
+            CMakeExtension("tyssue/collisions/cpp/c_collisions"),
+            CMakeExtension("tyssue/generation/cpp/mesh_generation"),
+        ],
         cmdclass=dict(build_ext=CMakeBuild),
         zip_safe=False,
     )
