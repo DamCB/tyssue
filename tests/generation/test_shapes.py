@@ -5,7 +5,12 @@ from math import sin
 
 import numpy as np
 from numpy.testing import assert_almost_equal
-from tyssue.generation.shapes import generate_ring, ellipsoid_sheet, spherical_sheet
+from tyssue.generation.shapes import (
+    generate_ring,
+    ellipsoid_sheet,
+    spherical_sheet,
+    spherical_monolayer,
+)
 from tyssue import PlanarGeometry
 
 
@@ -62,4 +67,21 @@ def test_ellipsoid():
 def test_spherical():
     sph = spherical_sheet(1.0, 40)
     rho = np.linalg.norm(sph.vert_df[sph.coords], axis=1)
-    np.testing.assert_array_almost_equal(rho, np.ones(sph.Nv), decimal=1)
+    np.testing.assert_almost_equal(rho.mean(), 1.0, decimal=1)
+
+
+def test_spherical_mono():
+    radius = 1  # µm
+    height = 3  # the height of the cells
+    Nc = 400  # the (approximate) number of cells
+    R_in = radius
+    R_out = radius + height
+
+    organo = spherical_monolayer(R_in, R_out, Nc, apical="in")
+
+    rho = np.linalg.norm(organo.vert_df[organo.coords], axis=1)
+
+    mean_apical = rho[organo.vert_df["segment"] == "apical"].mean()
+    mean_basal = rho[organo.vert_df["segment"] == "basal"].mean()
+    np.testing.assert_almost_equal(mean_apical, radius, decimal=1)
+    np.testing.assert_almost_equal(mean_basal, radius + height, decimal=1)

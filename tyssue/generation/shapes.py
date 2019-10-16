@@ -9,12 +9,19 @@ from .. import config
 from ..core.sheet import Sheet, get_outer_sheet
 from ..core.objects import get_prev_edges
 from ..core.objects import Epithelium
+from ..core.monolayer import Monolayer
+
 from ..topology import type1_transition
 from .from_voronoi import from_3d_voronoi
-from ..geometry.bulk_geometry import BulkGeometry
-from ..geometry.sheet_geometry import EllipsoidGeometry, SheetGeometry
-
-from ..utils import single_cell
+from ..geometry.bulk_geometry import BulkGeometry, ClosedMonolayerGeometry
+from ..geometry.sheet_geometry import (
+    EllipsoidGeometry,
+    SheetGeometry,
+    ClosedSheetGeometry,
+)
+from .cpp import mesh_generation
+from .modifiers import extrude
+from ..utils import single_cell, swap_apico_basal
 
 
 class AnnularSheet(Sheet):
@@ -272,11 +279,30 @@ def spherical_sheet(radius, Nf, **kwargs):
     the given number of cells
     """
 
-    n_zs = int(np.ceil(np.roots([2, 1.0, -Nf])[-1]))  # determined experimentaly ;p
-    eptm = ellipsoid_sheet(radius, radius, radius, n_zs, **kwargs)
-    eptm.settings.pop("abc")
-    eptm.settings["radius"] = radius
+    centers = np.array(mesh_generation.make_spherical(Nf))
+    eptm = sheet_from_cell_centers(centers, **kwargs)
+
+    rhos = (eptm.vert_df[eptm.coords] ** 2).sum(axis=1).mean()
+    ClosedSheetGeometry.scale(eptm, radius / rhos, eptm.coords)
+
+    ClosedSheetGeometry.update_all(eptm)
     return eptm
+
+
+def spherical_monolayer(R_in, R_out, Nc, apical="out"):
+    """Returns a spherical monolayer with the given inner and
+    outer radii, and approximately the gieven number of cells.
+
+    The `apical` argument can be 'in' out 'out' to specify wether
+    the apical face of the cells faces inward or outward, reespectively.
+    """
+    sheet = spherical_sheet(R_in, Nc)
+    delta_R = R_out - R_in
+    mono = Monolayer("mono", extrude(sheet.datasets, method="normals", scale=-delta_R))
+    if apical == "out":
+        swap_apico_basal(mono)
+    ClosedMonolayerGeometry.update_all(mono)
+    return mono
 
 
 def sheet_from_cell_centers(points, noise=0):
