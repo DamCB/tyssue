@@ -314,3 +314,14 @@ def get_next(eptm):
     )
     next_ = fs_indexed.loc[ft_index, "edge"].values
     return next_
+
+
+## small utlity to swap apical and basal segments
+def swap_apico_basal(organo):
+    """Swap apical and basal segments of an organoid
+    """
+    for elem in ["vert", "face", "edge"]:
+        swaped = organo.datasets[elem]["segment"].copy()
+        swaped.loc[organo.segment_index("apical", elem)] = "basal"
+        swaped.loc[organo.segment_index("basal", elem)] = "apical"
+        organo.datasets[elem]["segment"] = swaped

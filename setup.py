@@ -29,8 +29,8 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 ## Thanks to them!
 MAJOR = 0
 MINOR = 6
-MICRO = 0
-ISRELEASED = True
+MICRO = 1
+ISRELEASED = False
 VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
 
 
@@ -198,7 +198,10 @@ if __name__ == "__main__":
         packages=find_packages(),
         package_data={"tyssue": files},
         include_package_data=True,
-        ext_modules=[CMakeExtension("tyssue/collisions/cpp/c_collisions")],
+        ext_modules=[
+            CMakeExtension("tyssue/collisions/cpp/c_collisions"),
+            CMakeExtension("tyssue/generation/cpp/mesh_generation"),
+        ],
         cmdclass=dict(build_ext=CMakeBuild),
         zip_safe=False,
     )

@@ -28,10 +28,13 @@ endif()
 include( ${CGAL_USE_FILE})
 
 
-set (SOURCE_DIR "tyssue/collisions/cpp")
-include_directories (${SOURCE_DIR})
+set (COLLISION_SRCE "tyssue/collisions/cpp")
+set (GENERATION_SRCE "tyssue/generation/cpp")
+
+include_directories (${COLLISION_SRCE} ${GENERATION_SRCE})
 
 # Assumes pybind11 is a subdirectory at the project root
 # Make sure you git cloned tyssue recursively
 add_subdirectory(pybind11)
-pybind11_add_module(c_collisions ${SOURCES} "${SOURCE_DIR}/c_collisions.cpp" )
+pybind11_add_module(c_collisions ${SOURCES} "${COLLISION_SRCE}/c_collisions.cpp" )
+pybind11_add_module(mesh_generation ${SOURCES} "${GENERATION_SRCE}/mesh_generation.cpp" )
