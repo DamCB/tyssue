@@ -138,6 +138,8 @@ def extrude(apical_datasets, method="homotecy", scale=0.3, vector=[0, 0, -1]):
             if not col in datasets[elem]:
                 datasets[elem][col] = value
 
+    # if (method == "normals") and (scale < 0):
+    #     datasets["edge"][["srce", "trgt"]] = datasets["edge"][["trgt", "srce"]]
     return datasets
 
 

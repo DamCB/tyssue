@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from .planar_geometry import PlanarGeometry
-from .utils import rotation_matrix
+from .utils import rotation_matrix, rotation_matrices
 
 
 class SheetGeometry(PlanarGeometry):
@@ -186,8 +186,8 @@ class SheetGeometry(PlanarGeometry):
         else:
             return np.dot(rotation_matrix(psi, [0, 0, 1]), r1)
 
-    @classmethod
-    def face_projected_pos(cls, sheet, face, psi=0):
+    @staticmethod
+    def face_projected_pos(sheet, face, psi=0):
         """Returns the position of a face vertices projected on a plane
         perpendicular to the face normal, and translated so that the face
         center is at the center of the coordinate system
@@ -216,7 +216,7 @@ class SheetGeometry(PlanarGeometry):
             sheet.vert_df.loc[face_orbit.values, sheet.coords].values
             - sheet.face_df.loc[face, sheet.coords].values
         )
-        u, s, rotation = np.linalg.svd(rel_pos.astype(np.float), full_matrices=False)
+        _, _, rotation = np.linalg.svd(rel_pos.astype(np.float), full_matrices=False)
         # rotation = cls.face_rotation(sheet, face, psi=psi)
         if psi != 0:
             rotation = np.dot(rotation_matrix(psi, [0, 0, 1]), rotation)
@@ -224,6 +224,49 @@ class SheetGeometry(PlanarGeometry):
             np.dot(rel_pos, rotation.T), index=face_orbit, columns=sheet.coords
         )
         return rot_pos
+
+    @staticmethod
+    def face_rotations(sheet):
+        """Returns the (sheet.Ne, 3, 3) array of rotation matrices
+        such that each rotation aligns the coordinate system along face normals
+
+        """
+        normals = sheet.edge_df.groupby("face")[sheet.ncoords].mean()
+        normals = normals / np.linalg.norm(normals, axis=0)
+        normals = sheet.upcast_face(normals)
+
+        n_xy = np.linalg.norm(normals[["nx", "ny"]])
+        theta = -np.arctan2(n_xy, normals.nz)
+
+        direction = np.array(
+            [normals.ny.to_numpy(), -normals.nx.to_numpy(), np.zeros(sheet.Ne)]
+        ).T
+        rots = rotation_matrices(theta, direction)
+
+        return rots
+
+    @classmethod
+    def get_phis(cls, sheet):
+        """Returns the 'latitude' of the vertices in the plane perpendicular
+        to each face normal. For not-too-deformed faces, sorting vertices by this
+        gives clockwize orientation.
+
+        I think not-too-deformed means starconvex here.
+
+        """
+        rots = cls.face_rotations(sheet)
+
+        rel_srce_pos = (
+            sheet.edge_df[["sx", "sy", "sz"]]
+            - sheet.edge_df[["fx", "fy", "fz"]].to_numpy()
+        ).to_numpy()
+        rotated = np.einsum("ikj, ik -> ij", rots, rel_srce_pos)
+        return np.arctan2(rotated[:, 1], rotated[:, 0])
+
+    @classmethod
+    def sort_oriented_edges(cls, sheet):
+        phis = cls.get_phis(sheet)
+        sheet.edge_df = sheet.edge_df.sort_values(["face", phis]).reset_index()
 
 
 class ClosedSheetGeometry(SheetGeometry):

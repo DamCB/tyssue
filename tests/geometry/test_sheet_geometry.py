@@ -1,5 +1,7 @@
 import os
+import numpy as np
 import pandas as pd
+
 
 from tyssue import config, Sheet, SheetGeometry
 from tyssue.generation import three_faces_sheet
@@ -50,3 +52,18 @@ def test_rod_update_height():
     SheetGeometry.update_all(sheet)
 
     assert (sheet.vert_df.rho.mean() - 0.96074585429756632) ** 2 < TOLERANCE
+
+
+def test_get_phis():
+    pth = os.path.join(stores_dir, "rod_sheet.hf5")
+    datasets = load_datasets(pth)
+    specs = config.geometry.rod_sheet()
+    sheet = Sheet("rod", datasets, specs)
+    SheetGeometry.update_all(sheet)
+    sheet.edge_df["sphi"] = SheetGeometry.get_phis(sheet)
+
+    assert np.all(
+        sheet.edge_df.sort_values(["face", "sphi"])
+        .groupby("face")
+        .apply(lambda df: np.roll(df["trgt"], 1) == df["srce"])
+    )
