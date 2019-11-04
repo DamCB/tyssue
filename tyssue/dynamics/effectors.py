@@ -118,6 +118,46 @@ class LengthElasticity(AbstractEffector):
         return -grad, grad
 
 
+# From Mapeng Bi et al. https://doi.org/10.1038/nphys3471
+class PerimeterElasticity(AbstractEffector):
+
+    dimensions = units.line_elasticity
+    magnitude = "perimeter_elasticity"
+    label = "Perimeter Elasticity"
+    element = "face"
+    specs = {
+        "face": {
+            "is_alive": 1,
+            "perimeter": 1.0,
+            "perimeter_elasticity": 0.1,
+            "prefered_perimeter": 3.81,
+        }
+    }
+
+    spatial_ref = "prefered_perimeter", units.length
+
+    @staticmethod
+    def energy(eptm):
+        return eptm.face_df.eval(
+            "0.5 * is_alive"
+            "* perimeter_elasticity"
+            "* (perimeter - prefered_perimeter)** 2"
+        )
+
+    @staticmethod
+    def gradient(eptm):
+
+        gamma_ = eptm.face_df.eval(
+            "perimeter_elasticity * is_alive" "*  (perimeter - prefered_perimeter)"
+        )
+        gamma = eptm.upcast_face(gamma_)
+
+        grad_srce = -eptm.edge_df[eptm.ucoords] * to_nd(gamma, len(eptm.coords))
+        grad_srce.columns = ["g" + u for u in eptm.coords]
+        grad_trgt = -grad_srce
+        return grad_srce, grad_trgt
+
+
 class FaceAreaElasticity(AbstractEffector):
 
     dimensionless = False

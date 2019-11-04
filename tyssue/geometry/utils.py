@@ -74,3 +74,43 @@ def rotation_matrix(angle, direction):
         ]
     )
     return R
+
+
+def rotation_matrices(angle, direction):
+    """ Return an (N, 3, 3) array of rotation matrices
+    along N angles and N directions
+
+
+
+    Parameters
+    ----------
+    angle : np.ndarray of shape (N,)
+        array of rotation angles
+
+    directions : np.ndarray of shape (N, 3)
+        array of rotation vectors
+
+    Returns
+    -------
+    rots : np.ndarray of shape (N, 3, 3)
+        the array of rotation matrices
+    """
+    direction = direction / np.linalg.norm(direction, axis=1)[:, None]
+
+    sint, cost = np.sin(angle), np.cos(angle)
+
+    rots = np.zeros((cost.size, 3, 3))
+    for i in range(3):
+        rots[:, i, i] = cost
+    rots += np.einsum("ij, ik -> ijk", direction, direction) * (1 - cost[:, None, None])
+
+    direction *= sint[:, None]
+
+    rots[:, 0, 1] -= direction[:, 2]
+    rots[:, 0, 2] += direction[:, 1]
+    rots[:, 1, 0] += direction[:, 2]
+    rots[:, 1, 2] -= direction[:, 0]
+    rots[:, 2, 0] -= direction[:, 1]
+    rots[:, 2, 1] += direction[:, 0]
+
+    return rots

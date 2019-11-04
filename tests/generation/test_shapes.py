@@ -85,3 +85,4 @@ def test_spherical_mono():
     mean_basal = rho[organo.vert_df["segment"] == "basal"].mean()
     np.testing.assert_almost_equal(mean_apical, radius, decimal=1)
     np.testing.assert_almost_equal(mean_basal, radius + height, decimal=1)
+    assert np.all(organo.cell_df["vol"] > 0)

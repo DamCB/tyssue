@@ -7,6 +7,7 @@ from tyssue.dynamics.effectors import (
     LineTension,
     SurfaceTension,
     LengthElasticity,
+    PerimeterElasticity,
     FaceContractility,
     FaceAreaElasticity,
     FaceVolumeElasticity,
@@ -17,6 +18,7 @@ from tyssue.dynamics.effectors import (
 
 sheet_effectors = [
     LengthElasticity,
+    PerimeterElasticity,
     FaceAreaElasticity,
     FaceVolumeElasticity,
     LineTension,

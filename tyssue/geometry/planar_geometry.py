@@ -1,5 +1,4 @@
 import numpy as np
-
 from .base_geometry import BaseGeometry
 
 
