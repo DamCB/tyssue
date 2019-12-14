@@ -13,7 +13,7 @@ before_install:
   - conda init bash
   - conda info -a
   - conda env create -q -f environment.yml
-  - conda activate tyssue
+  - source activate tyssue
   - conda install pytest pytest-cov
   - pip install coveralls nbval
 
