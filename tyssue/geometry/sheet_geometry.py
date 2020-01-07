@@ -38,9 +38,9 @@ class SheetGeometry(PlanarGeometry):
         center of mass.
         """
         coords = sheet.coords
-        face_pos = sheet.edge_df[["f" + c for c in coords]].values
-        srce_pos = sheet.edge_df[["s" + c for c in coords]].values
-        r_ij = sheet.edge_df[["d" + c for c in coords]].values
+        face_pos = sheet.edge_df[["f" + c for c in coords]].to_numpy()
+        srce_pos = sheet.edge_df[["s" + c for c in coords]].to_numpy()
+        r_ij = sheet.edge_df[["d" + c for c in coords]].to_numpy()
         r_ai = srce_pos - face_pos
         normals = np.cross(r_ai, r_ij)
         sheet.edge_df[sheet.ncoords] = normals
@@ -213,8 +213,8 @@ class SheetGeometry(PlanarGeometry):
         #     sheet.face_df.loc[face, sheet.coords].values,
         #     n_sides).reshape(len(sheet.coords), n_sides).T
         rel_pos = (
-            sheet.vert_df.loc[face_orbit.values, sheet.coords].values
-            - sheet.face_df.loc[face, sheet.coords].values
+            sheet.vert_df.loc[face_orbit.to_numpy(), sheet.coords].to_numpy()
+            - sheet.face_df.loc[face, sheet.coords].to_numpy()
         )
         _, _, rotation = np.linalg.svd(rel_pos.astype(np.float), full_matrices=False)
         # rotation = cls.face_rotation(sheet, face, psi=psi)
@@ -283,9 +283,10 @@ class ClosedSheetGeometry(SheetGeometry):
 
     @staticmethod
     def update_lumen_vol(sheet):
-        lumen_pos_faces = sheet.edge_df[["f" + c for c in sheet.coords]].values
+        lumen_pos_faces = sheet.edge_df[["f" + c for c in sheet.coords]].to_numpy()
         lumen_sub_vol = (
-            np.sum((lumen_pos_faces) * sheet.edge_df[sheet.ncoords].values, axis=1) / 6
+            np.sum((lumen_pos_faces) * sheet.edge_df[sheet.ncoords].to_numpy(), axis=1)
+            / 6
         )
         sheet.settings["lumen_vol"] = sum(lumen_sub_vol)
 

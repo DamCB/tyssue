@@ -29,7 +29,7 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 ## Thanks to them!
 MAJOR = 0
 MINOR = 6
-MICRO = 2
+MICRO = 3
 ISRELEASED = True
 VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
 
@@ -85,32 +85,23 @@ def get_version_info():
 
 
 def write_version_py(filename="tyssue/version.py"):
-    cnt = """
-# THIS FILE IS GENERATED FROM tyssue SETUP.PY
-#
-short_version = '%(version)s'
-version = '%(version)s'
-full_version = '%(full_version)s'
-git_revision = '%(git_revision)s'
-release = %(isrelease)s
-if not release:
-    version = full_version
-"""
     FULLVERSION, GIT_REVISION = get_version_info()
 
-    a = open(filename, "w")
-    try:
+    with open(filename, "w") as a:
         a.write(
-            cnt
-            % {
-                "version": VERSION,
-                "full_version": FULLVERSION,
-                "git_revision": GIT_REVISION,
-                "isrelease": str(ISRELEASED),
-            }
+            f"""
+# THIS FILE IS GENERATED FROM tyssue SETUP.PY
+#
+short_version = '{VERSION}'
+full_version = '{FULLVERSION}'
+git_revision = '{GIT_REVISION}'
+release = {ISRELEASED}
+if release:
+    version = full_version
+else:
+    version = short_version
+"""
         )
-    finally:
-        a.close()
 
 
 ## Extension management from pybind/cmake_example
