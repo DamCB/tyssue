@@ -9,6 +9,9 @@ from ..utils.utils import spec_updater
 
 def face_visual(sheet, coords=None, **draw_specs_kw):
 
+    if coords is None:
+        coords = list("xyz")
+
     draw_specs = sheet_spec()["face"]
     draw_specs.update(draw_specs_kw)
     if "visible" in sheet.face_df.columns:
@@ -17,18 +20,17 @@ def face_visual(sheet, coords=None, **draw_specs_kw):
         )
 
         upcast_visible = sheet.upcast_face(sheet.face_df["visible"])
-        visible_edges = sheet.edge_df[upcast_visible == 1]
+        visible_edges = sheet.edge_df[upcast_visible]
         # edge indices as (Nf + Nv) * 3 array
-        faces = visible_edges[["srce", "trgt", "face"]].values
+        faces = visible_edges[["srce", "trgt", "face"]].to_numpy()
         # The src, trgt, face triangle is correctly oriented
         # both vert_idx cols are shifted by Nf
         faces[:, :2] += sheet.Nf
     else:
         vertices, faces = sheet.triangular_mesh(coords)
-    if coords is None:
-        coords = list("xyz")
 
     color = None
+
     if isinstance(draw_specs["color"], str):
         face_colors = None
         color = draw_specs["color"]
