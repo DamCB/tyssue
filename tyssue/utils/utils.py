@@ -32,7 +32,7 @@ def to_nd(df, ndim):
     df_nd : return array reshaped in ndim.
 
     """
-    df_nd = np.asarray(df).repeat(ndim).reshape((df.size, ndim))
+    df_nd = df[:, None]#np.asarray(df).repeat(ndim).reshape((df.size, ndim))
     return df_nd
 
 
@@ -117,11 +117,17 @@ def data_at_opposite(sheet, edge_data, free_value=None):
     """
     if isinstance(edge_data, pd.Series):
         opposite = pd.Series(
-            edge_data.reindex(sheet.edge_df["opposite"]).values, index=edge_data.index
+            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(), index=edge_data.index
+        )
+    elif isinstance(edge_data, pd.DataFrame):
+        opposite = pd.DataFrame(
+            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(), index=edge_data.index,
+            columns=edge_data.columns
         )
     else:
         opposite = pd.DataFrame(
-            edge_data.reindex(sheet.edge_df["opposite"]).values, index=edge_data.index
+            np.asarray(edge_data).take(sheet.edge_df["opposite"].to_numpy(), axis=0),
+            index=sheet.edge_df.index
         )
     if free_value is not None:
         opposite = opposite.replace(np.nan, free_value)
