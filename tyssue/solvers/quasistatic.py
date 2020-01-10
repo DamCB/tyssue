@@ -133,3 +133,107 @@ class QSSolver:
             self._opt_energy, self._opt_grad, pos0.flatten(), eptm, geom, model
         )
         return grad_err
+
+
+    
+    def find_energy_min_relax_square_boundary(self, eptm, geom, model, **minimize_kw):
+        """Energy minimization function. It relaxes both vertex positions and square boundary size.
+
+        The epithelium's total energy is minimized by displacing its vertices.
+        This is a wrapper around `scipy.optimize.minimize`
+
+        Parameters
+        ----------
+        eptm : a :class:`tyssue.Epithlium` object
+        geom : a geometry class
+        geom must provide an `update_all` method that takes `eptm`
+            as sole argument and updates the relevant geometrical quantities
+        model : a model class
+            model must provide `compute_energy` and `compute_gradient` methods
+            that take `eptm` as first and unique positional argument.
+
+        """
+        log.info("initial number of vertices: %i", eptm.Nv)
+        settings = config.solvers.quasistatic()
+        settings.update(**minimize_kw)
+
+        res = self._minimize_relax_square_boundary(eptm, geom, model, **settings)
+        log.info("final number of vertices: %i", eptm.Nv)
+        
+        # plug in BC result wo
+        for u, boundary in eptm.settings["boundaries"].items():
+                eptm.specs['settings']['boundaries'][u]=[boundary[0],boundary[1]+res['x'][-1]]
+        geom.update_all(eptm)
+        
+        
+        
+        return res
+
+
+    def _minimize_relax_square_boundary(self, eptm, geom, model, **kwargs):
+        for i in count():
+            if i == MAX_ITER:
+                return self.res
+            pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.flatten()
+            pos0=np.append(pos0,0.0)
+            try:
+                self.res = optimize.minimize(
+                    self._opt_energy_GC_all,
+                    pos0,
+                    args=(eptm, geom, model),
+                    jac=self._opt_grad_GC_all,
+                    #jac=False,
+                    **kwargs
+                )
+                return self.res
+            except TopologyChangeError:
+                log.info("TopologyChange")
+                self.num_restarts = i + 1
+
+    def _opt_energy_relax_square_boundary(self, pos, eptm, geom, model):
+        if self.rearange and eptm.topo_changed:
+            # reset switch
+            eptm.topo_changed = False
+            raise TopologyChangeError("Topology changed before energy evaluation")
+        for u, boundary in eptm.settings["boundaries"].items():
+                eptm.specs['settings']['boundaries'][u]=[boundary[0],boundary[1]+pos[-1]]
+        #print("lattice displacement")
+        #print( pos[-1])
+        #pos=pos[0:-1]
+        self.set_pos(eptm, geom, pos[0:-1])
+        geom.update_all(eptm)
+        e=model.compute_energy(eptm)
+        # reverse bc effect
+        for u, boundary in eptm.settings["boundaries"].items():
+                eptm.specs['settings']['boundaries'][u]=[boundary[0],boundary[1]-pos[-1]]
+        self.set_pos(eptm, geom, pos[0:-1])
+        geom.update_all(eptm)
+        return e
+    
+    def _opt_grad_relax_square_boundary(self, pos, eptm, geom, model):
+        #pos=pos[0:-1]
+        increment_for_gradient_estimation=0.0001
+        if self.rearange and eptm.topo_changed:
+            raise TopologyChangeError("Topology changed before gradient evaluation")
+        grad_i = model.compute_gradient(eptm)
+        #
+        for u, boundary in eptm.settings["boundaries"].items():
+                eptm.specs['settings']['boundaries'][u]=[boundary[0],boundary[1]+pos[-1]]
+        self.set_pos(eptm, geom, pos[0:-1])
+        geom.update_all(eptm)
+        a=model.compute_energy(eptm)
+        
+        for u, boundary in eptm.settings["boundaries"].items():
+                eptm.specs['settings']['boundaries'][u]=[boundary[0],boundary[1]+increment_for_gradient_estimation]
+        self.set_pos(eptm, geom, pos[0:-1])
+        geom.update_all(eptm)
+        b=model.compute_energy(eptm)
+        
+        c=(b-a)/increment_for_gradient_estimation
+        #print("approx grad")
+        #print(c)
+        for u, boundary in eptm.settings["boundaries"].items():
+                eptm.specs['settings']['boundaries'][u]=[boundary[0],boundary[1]-pos[-1]-increment_for_gradient_estimation]
+        self.set_pos(eptm, geom, pos[0:-1])
+        geom.update_all(eptm)
+        return np.append(grad_i.loc[eptm.active_verts].values.ravel(),c)
