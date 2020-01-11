@@ -128,22 +128,27 @@ def cell_division(sheet, mother, geom, angle=None):
     daughter = face_division(sheet, mother, vert_a, vert_b)
     return daughter
 
-def cell_division_periodic_generalisaiton(sheet, mother, geom, angle=None):
-    # cell_division function does not work if a cell rests on a periodic boundary edge this function:
-    # Checks for perodic boundaries 
-    # if there are, it checks if dividing cell rests on an edge of the periodic boundaries
-    # if so, it displaces the boundaries by a half a period and moves the target cell in the bulk of the tissue
-    # It then performs cell division normally and reverts the periodic boundaries to the original configuration
-    on=False
+def cell_division_new(sheet, mother, geom, angle=None):
+     """
+     gcourcou 11/1/2020 periodic boundary consideration:
+     cell_division function does not work if a cell rests on a periodic boundary edge this function.
+     Function checks for perodic boundaries 
+     if there are, it checks if dividing cell rests on an edge of the periodic boundaries
+     if so, it displaces the boundaries by a half a period and moves the target cell in the bulk of the tissue
+     It then performs cell division normally and reverts the periodic boundaries to the original configuration
+     """
+    
     if sheet.settings.get("boundaries") is not None:
+        mother_on_periodic_boundary=False
         if sheet.face_df.loc[mother]['at_x_boundary'] or sheet.face_df.loc[mother]['at_y_boundary'] :
-            on=True
+            mother_on_periodic_boundary=True
             saved_boundary=sheet.specs['settings']['boundaries'].copy()
             for u, boundary in sheet.settings["boundaries"].items():
                 if sheet.face_df.loc[mother][f'at_{u}_boundary']:
                     period=boundary[1]-boundary[0]
                     sheet.specs['settings']['boundaries'][u]=[boundary[0]+period/2.0,boundary[1]+period/2.0]
             geom.update_all(sheet)
+            
     if not sheet.face_df.loc[mother, "is_alive"]:
         logger.warning("Cell %s is not alive and cannot devide", mother)
         return
@@ -155,9 +160,11 @@ def cell_division_periodic_generalisaiton(sheet, mother, geom, angle=None):
     vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet, edge_b)
     sheet.vert_df.index.name = "vert"
     daughter = face_division(sheet, mother, vert_a, vert_b)
-    if on==True:
-        sheet.specs['settings']['boundaries']=saved_boundary
-        geom.update_all(sheet)
+    
+    if sheet.settings.get("boundaries") is not None:
+        if mother_on_periodic_boundary==True:
+            sheet.specs['settings']['boundaries']=saved_boundary
+            geom.update_all(sheet)
     return daughter
 
 def get_division_edges(sheet, mother, geom, angle=None, axis="x"):
