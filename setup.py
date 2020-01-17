@@ -29,8 +29,8 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 ## Thanks to them!
 MAJOR = 0
 MINOR = 6
-MICRO = 2
-ISRELEASED = True
+MICRO = 4
+ISRELEASED = False
 VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
 
 
@@ -85,7 +85,11 @@ def get_version_info():
 
 
 def write_version_py(filename="tyssue/version.py"):
-    cnt = """
+    FULLVERSION, GIT_REVISION = get_version_info()
+
+    with open(filename, "w") as a:
+        a.write(
+            f"""
 # THIS FILE IS GENERATED FROM tyssue SETUP.PY
 #
 short_version = '%(version)s'
@@ -95,6 +99,8 @@ git_revision = '%(git_revision)s'
 release = %(isrelease)s
 if not release:
     version = full_version
+else:
+    version = short_version
 """
     FULLVERSION, GIT_REVISION = get_version_info()
 

@@ -15,7 +15,7 @@ message(STATUS "CMake additional search path for libraries: ${CMAKE_LIBRARY_PATH
 
 
 # CGAL and its components
-find_package(CGAL QUIET COMPONENTS Core GMP MPFI)
+find_package(CGAL)
 message(STATUS "CGAL version: ${CGAL_VERSION}")
 
 if (NOT CGAL_FOUND)

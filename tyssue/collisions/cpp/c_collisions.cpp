@@ -24,6 +24,9 @@ using Point_3               = K::Point_3;
 using Mesh                  = CGAL::Surface_mesh<Point_3>;
 using face_descriptor       = boost::graph_traits<Mesh>::face_descriptor;
 
+typedef Mesh::Vertex_index vertex_descriptor;
+typedef Mesh::Face_index face_descriptor;
+
 
 Mesh sheet_to_surface_mesh(py::array_t<double> vertices, py::array_t<double> faces)
 {
@@ -43,13 +46,12 @@ Mesh sheet_to_surface_mesh(py::array_t<double> vertices, py::array_t<double> fac
     py::buffer_info info_faces = faces.request();
     for (int i=0; i<info_faces.shape[0]; i=i+3)
     {
-        std::vector<int> vertice_in_face;
 
-        vertice_in_face.push_back(((double*)info_faces.ptr)[i]);
-        vertice_in_face.push_back(((double*)info_faces.ptr)[i+1]);
-        vertice_in_face.push_back(((double*)info_faces.ptr)[i+2]);
+      vertex_descriptor u = vertex_descriptor(((double*)info_faces.ptr)[i]);
+      vertex_descriptor v = vertex_descriptor(((double*)info_faces.ptr)[i+1]);
+      vertex_descriptor w = vertex_descriptor(((double*)info_faces.ptr)[i+2]);
+      face_descriptor f = mesh.add_face(u,v,w);
 
-        mesh.add_face(vertice_in_face);
     }
 
     return mesh;

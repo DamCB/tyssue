@@ -118,8 +118,9 @@ class LengthElasticity(AbstractEffector):
         return -grad, grad
 
 
-# From Mapeng Bi et al. https://doi.org/10.1038/nphys3471
 class PerimeterElasticity(AbstractEffector):
+    """From Mapeng Bi et al. https://doi.org/10.1038/nphys3471
+    """
 
     dimensions = units.line_elasticity
     magnitude = "perimeter_elasticity"
