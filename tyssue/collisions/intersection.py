@@ -1,10 +1,14 @@
 import numpy as np
+
 try:
     from .cpp import c_collisions
-except ImportError:
-    print("collision solver could not be imported "
-          "You may need to install CGAL and re-install tyssue")
+except ImportError as e:
+    print(
+        "collision solver could not be imported "
+        "You may need to install CGAL and re-install tyssue"
+    )
     c_collisions = None
+
 
 def self_intersections(sheet):
     """Checks for self collisions for the sheet

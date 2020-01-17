@@ -85,44 +85,30 @@ def get_version_info():
 
 
 def write_version_py(filename="tyssue/version.py"):
-    FULLVERSION, GIT_REVISION = get_version_info()
+    fullversion, git_revision = get_version_info()
 
     with open(filename, "w") as a:
         a.write(
             f"""
 # THIS FILE IS GENERATED FROM tyssue SETUP.PY
 #
-short_version = '%(version)s'
-version = '%(version)s'
-full_version = '%(full_version)s'
-git_revision = '%(git_revision)s'
-release = %(isrelease)s
-if not release:
+short_version = '{VERSION}'
+full_version = '{fullversion}'
+git_revision = '{git_revision}'
+release = {ISRELEASED}
+if release:
     version = full_version
 else:
     version = short_version
 """
-    FULLVERSION, GIT_REVISION = get_version_info()
-
-    a = open(filename, "w")
-    try:
-        a.write(
-            cnt
-            % {
-                "version": VERSION,
-                "full_version": FULLVERSION,
-                "git_revision": GIT_REVISION,
-                "isrelease": str(ISRELEASED),
-            }
         )
-    finally:
-        a.close()
 
 
 ## Extension management from pybind/cmake_example
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=""):
-        Extension.__init__(self, name, sources=[])
+        # Make build optionnal
+        Extension.__init__(self, name, sources=[], optional=True)
         self.sourcedir = os.path.abspath(sourcedir)
 
 
