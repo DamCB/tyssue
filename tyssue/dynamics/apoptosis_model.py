@@ -20,7 +20,7 @@ class ApicoBasalTension(effectors.AbstractEffector):
     label = "Apical-basal tension"
     magnitude = "radial_tension"
     element = "vert"
-    specs = {"vert": {"radial_tension", "height", "is_active"}}
+    specs = {"vert": {"radial_tension":0.0, "height": 1.0, "is_active": 1}}
 
     @staticmethod
     def energy(sheet):

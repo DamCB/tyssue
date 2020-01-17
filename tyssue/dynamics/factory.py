@@ -31,16 +31,16 @@ def model_factory(effectors, ref_effector=None):
 
         labels = []
         specs = {
-            "cell": set(),
-            "face": set(),
-            "edge": set(),
-            "vert": set(),
-            "settings": {"nrj_norm_factor"},
+            "cell": {},
+            "face": {},
+            "edge": {},
+            "vert": {},
+            "settings": {"nrj_norm_factor": 1.0},
         }
         for f in effectors:
             labels.append(f.label)
-            for k in specs.keys():
-                specs[k] = specs[k].union(f.specs.get(k, {}))
+            for k in specs:
+                specs[k].update(f.specs.get(k, {}))
 
         @staticmethod
         def dimensionalize(nondim_specs):
