@@ -161,39 +161,37 @@ class CMakeBuild(build_ext):
         print(env["CXXFLAGS"], "\n")
 
 
-if __name__ == "__main__":
-
-    write_version_py()
-    setup(
-        name=DISTNAME,
-        description=DESCRIPTION,
-        long_description=LONG_DESCRIPTION,
-        maintainer=MAINTAINER,
-        maintainer_email=MAINTAINER_EMAIL,
-        url=URL,
-        license=LICENSE,
-        download_url=DOWNLOAD_URL,
-        version=VERSION,
-        classifiers=[
-            "Development Status :: 4 - Beta",
-            "Intended Audience :: Science/Research",
-            "License :: OSI Approved :: MPL v2.0",
-            "Natural Language :: English",
-            "Operating System :: MacOS",
-            "Operating System :: Microsoft",
-            "Operating System :: POSIX :: Linux",
-            "Programming Language :: Python :: 3.6",
-            #                     "Programming Language :: Python :: Implementation :: CPython",
-            "Topic :: Scientific/Engineering :: Bio-Informatics",
-            "Topic :: Scientific/Engineering :: Medical Science Apps",
-        ],
-        packages=find_packages(),
-        package_data={"tyssue": files},
-        include_package_data=True,
-        ext_modules=[
-            CMakeExtension("tyssue/collisions/cpp/c_collisions"),
-            CMakeExtension("tyssue/generation/cpp/mesh_generation"),
-        ],
-        cmdclass=dict(build_ext=CMakeBuild),
-        zip_safe=False,
-    )
+write_version_py()
+setup(
+    name=DISTNAME,
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    maintainer=MAINTAINER,
+    maintainer_email=MAINTAINER_EMAIL,
+    url=URL,
+    license=LICENSE,
+    download_url=DOWNLOAD_URL,
+    version=VERSION,
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Natural Language :: English",
+        "Operating System :: MacOS",
+        "Operating System :: Microsoft",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
+        "Topic :: Scientific/Engineering :: Medical Science Apps.",
+        "Topic :: Scientific/Engineering :: Physics",
+    ],
+    packages=find_packages(),
+    package_data={"tyssue": files},
+    include_package_data=True,
+    ext_modules=[
+        CMakeExtension("tyssue/collisions/cpp/c_collisions"),
+        CMakeExtension("tyssue/generation/cpp/mesh_generation"),
+    ],
+    cmdclass=dict(build_ext=CMakeBuild),
+    zip_safe=False,
+)
