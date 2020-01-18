@@ -2,7 +2,7 @@ import numpy as np
 
 try:
     from .cpp import c_collisions
-except ImportError as e:
+except ImportError:
     print(
         "collision solver could not be imported "
         "You may need to install CGAL and re-install tyssue"
