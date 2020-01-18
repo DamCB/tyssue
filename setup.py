@@ -140,7 +140,7 @@ class CMakeBuild(build_ext):
                 "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}".format(cfg.upper(), extdir)
             ]
             if sys.maxsize > 2 ** 32:
-                cmake_args += ["-A", "x64"]
+                cmake_args += ["-A"]
             build_args += ["--", "/m"]
         else:
             cmake_args += ["-DCMAKE_BUILD_TYPE=" + cfg]
