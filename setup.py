@@ -25,8 +25,8 @@ DOWNLOAD_URL = "https://github.com/DamCB/tyssue.git"
 files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 
 
-# Version management copied form numpy
-# Thanks to them!
+## Version management copied form numpy
+## Thanks to them!
 MAJOR = 0
 MINOR = 6
 MICRO = 6
