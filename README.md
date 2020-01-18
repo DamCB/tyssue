@@ -155,27 +155,17 @@ it's time to move on...
 
 You can install the library with the conda package manager
 
-### Linux and MacOS
 
 ```bash
 conda install -c conda-forge tyssue
 ```
 
-### Windows
-
-As the tyssue library relies on the C++ CGAL library, it needs a compilation stage. This is not always simple, and conda-forge distribution might not always work.
-
-So we provide a less feature rich `tyssue-base` package, without CGAL extensions, which is architecture independant.
-
-```bash
-conda install -c conda-forge tyssue-base
-```
 
 ### Through PyPi
 
-You can also install tyssue from PyPi, this is also CGAL-less:
+You can also install tyssue from PyPi, this is a CGAL-less version (pure python), lacking some features:
 
-`python -m pip install --user tyssue`
+`python -m pip install --user --upgrade tyssue`
 
 See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary python environment.
 

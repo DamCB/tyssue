@@ -18,7 +18,7 @@ Some advanced features are not available, namely:
 - Periodic boundary sheet generation
 
 ```sh
-python -m pip install --user --Upgrade tyssue
+python -m pip install --user --upgrade tyssue
 ```
 
 ## Installing from source
