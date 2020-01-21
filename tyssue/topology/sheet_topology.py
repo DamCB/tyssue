@@ -113,22 +113,8 @@ def type1_transition(
     return 0
 
 
+
 def cell_division(sheet, mother, geom, angle=None):
-
-    if not sheet.face_df.loc[mother, "is_alive"]:
-        logger.warning("Cell %s is not alive and cannot devide", mother)
-        return
-    edge_a, edge_b = get_division_edges(sheet, mother, geom, angle=angle, axis="x")
-    if edge_a is None:
-        return
-
-    vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet, edge_a)
-    vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet, edge_b)
-    sheet.vert_df.index.name = "vert"
-    daughter = face_division(sheet, mother, vert_a, vert_b)
-    return daughter
-
-def cell_division_new(sheet, mother, geom, angle=None):
      """
      gcourcou 11/1/2020 periodic boundary consideration:
      cell_division function does not work if a cell rests on a periodic boundary edge this function.
