@@ -51,8 +51,6 @@ sheet.update_specs(dim_model_specs, reset=True)
 fig, ax = sheet_view(sheet, coords, **draw_specs)
 fig.set_size_inches(12, 5)
 
-
-
 #arbitrarily choose a cell to divide
 div_cell=sheet.face_df.index[(sheet.face_df['at_x_boundary'] == True)&(sheet.face_df['at_y_boundary']== False)].tolist()[0]
 print("test cell division on boundary begins (rember point is that in the original cell_div, cells on the boundary cannot divide) ")
