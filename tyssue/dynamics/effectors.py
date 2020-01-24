@@ -4,7 +4,7 @@ Generic forces and energies
 import pandas as pd
 import numpy as np
 
-from ..utils import to_nd, _to_3d
+from ..utils import to_nd
 from . import units
 
 from .planar_gradients import area_grad as area_grad2d
@@ -616,17 +616,13 @@ class BarrierElasticity(AbstractEffector):
 
     @staticmethod
     def energy(eptm):
-        """eptm.vert_df['energy'] = sheet.vert_df.eval('delta_rho**2 * barrier_elasticity/2')
-        energy = [0 if v.delta_rho < 0 else v.energy for v in eptm.vert_df.itertuples()]
-        return energy
-        """
         return eptm.vert_df.eval(
             'delta_rho**2 * barrier_elasticity/2')
 
     @staticmethod
     def gradient(eptm):
-        grad = height_grad(eptm) * _to_3d(
-            eptm.vert_df.eval('barrier_elasticity * delta_rho'))
+        grad = height_grad(eptm) * to_nd(
+            eptm.vert_df.eval('barrier_elasticity * delta_rho'), 3)
         grad.columns = ['g' + c for c in eptm.coords]
         return grad, None
 
