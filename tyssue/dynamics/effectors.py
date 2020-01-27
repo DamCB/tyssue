@@ -595,7 +595,7 @@ class RadialTension(AbstractEffector):
         upcast_height = eptm.upcast_srce(height_grad(eptm))
         grad_srce = to_nd(upcast_tension, 3) * upcast_height
         grad_srce.columns = ["g" + u for u in eptm.coords]
-        return grad_srce, None
+        return grad_srce, pd.DataFrame(0, index=np.arange(eptm.Ne), columns=[''])
 
 
 class BarrierElasticity(AbstractEffector):
