@@ -570,6 +570,64 @@ class LumenAreaElasticity(AbstractEffector):
         return (Ky * (Vy - V0) * grad_srce, Ky * (Vy - V0) * grad_trgt)
 
 
+class RadialTension(AbstractEffector):
+    """
+    Apply a tension perpendicular to a face.
+    """
+
+    dimensions = units.line_tension
+    magnitude = 'radial_tension'
+    label = 'Apical basal tension'
+    element = 'face'
+    specs = {'face': {'height',
+                      'radial_tension'}}
+
+    @staticmethod
+    def energy(eptm):
+        return eptm.face_df.eval(
+            'height * radial_tension')
+
+    @staticmethod
+    def gradient(eptm):
+        upcast_f = eptm.upcast_face(
+            eptm.face_df[['radial_tension', 'num_sides']])
+        upcast_tension = (upcast_f['radial_tension'] / upcast_f['num_sides'])
+
+        upcast_height = eptm.upcast_srce(height_grad(eptm))
+        grad_srce = to_nd(upcast_tension, 3) * upcast_height
+        grad_srce.columns = ["g" + u for u in eptm.coords]
+        return grad_srce, pd.DataFrame(0, index=np.arange(eptm.Ne), columns=[''])
+
+
+class BarrierElasticity(AbstractEffector):
+    """
+    Barrier use to maintain the tissue integrity.
+    """
+
+    dimensions = units.line_elasticity
+    magnitude = 'barrier_elasticity'
+    label = 'Barrier elasticity'
+    element = 'vert'
+    specs = {
+        'vert': {
+            'barrier_elasticity',
+            'is_active',
+            'delta_rho'}
+    }  # distance to a barrier membrane
+
+    @staticmethod
+    def energy(eptm):
+        return eptm.vert_df.eval(
+            'delta_rho**2 * barrier_elasticity/2')
+
+    @staticmethod
+    def gradient(eptm):
+        grad = height_grad(eptm) * to_nd(
+            eptm.vert_df.eval('barrier_elasticity * delta_rho'), 3)
+        grad.columns = ['g' + c for c in eptm.coords]
+        return grad, None
+
+
 def _exponants(dimensions, ref_dimensions, spatial_unit=None, temporal_unit=None):
 
     spatial_exponant = time_exponant = 0
