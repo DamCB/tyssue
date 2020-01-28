@@ -9,6 +9,17 @@ conda install -c conda-forge tyssue
 
 This will install tyssue and all its dependencies, with the pre-compiled binary parts.
 
+## Install tyssue using pip
+
+This install a cross-platform, pure python version of tyssue.
+Some advanced features are not available, namely:
+
+- Collision detection
+- Periodic boundary sheet generation
+
+```sh
+python -m pip install --user --upgrade tyssue
+```
 
 ## Installing from source
 
