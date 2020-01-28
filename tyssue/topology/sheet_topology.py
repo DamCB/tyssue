@@ -114,14 +114,28 @@ def type1_transition(
 
 
 def cell_division(sheet, mother, geom, angle=None):
+    """ Causes a cell to divide
+
+    Parameters
+    ----------
+    
+    sheet : a 'Sheet' instance
+    mother : face index of target dividing cell 
+    geom : a 2D geometry
+    angle : division angle for newly formed edge
+    
+    Returns
+    -------
+    daughter: face index of new cell 
+    
+    Notes
+    -----
+    - Function checks for perodic boundaries if there are, it checks if dividing cell 
+      rests on an edge of the periodic boundaries if so, it displaces the boundaries 
+      by a half a period and moves the target cell in the bulk of the tissue. It then 
+      performs cell division normally and reverts the periodic boundaries to the original 
+      configuration
     """
-     gcourcou 11/1/2020 periodic boundary consideration:
-     cell_division function does not work if a cell rests on a periodic boundary edge this function.
-     Function checks for perodic boundaries 
-     if there are, it checks if dividing cell rests on an edge of the periodic boundaries
-     if so, it displaces the boundaries by a half a period and moves the target cell in the bulk of the tissue
-     It then performs cell division normally and reverts the periodic boundaries to the original configuration
-     """
 
     if sheet.settings.get("boundaries") is not None:
         mother_on_periodic_boundary = False
@@ -152,8 +166,7 @@ def cell_division(sheet, mother, geom, angle=None):
     sheet.vert_df.index.name = "vert"
     daughter = face_division(sheet, mother, vert_a, vert_b)
 
-    if sheet.settings.get("boundaries") is not None:
-        if mother_on_periodic_boundary == True:
+    if sheet.settings.get("boundaries") is not None and mother_on_periodic_boundary:
             sheet.specs["settings"]["boundaries"] = saved_boundary
             geom.update_all(sheet)
     return daughter
