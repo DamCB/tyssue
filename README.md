@@ -155,10 +155,17 @@ it's time to move on...
 
 You can install the library with the conda package manager
 
+
 ```bash
 conda install -c conda-forge tyssue
 ```
 
+
+### Through PyPi
+
+You can also install tyssue from PyPi, this is a CGAL-less version (pure python), lacking some features:
+
+`python -m pip install --user --upgrade tyssue`
 
 See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary python environment.
 

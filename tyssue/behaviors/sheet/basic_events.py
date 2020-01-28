@@ -53,7 +53,7 @@ def reconnect(sheet, manager, **kwargs):
     nv = sheet.Nv
     merge_vertices(sheet)
     if nv != sheet.Nv:
-        logger.info(f"Merged {nv - sheet.Nv} vertices")
+        logger.info(f"Merged {nv - sheet.Nv+1} vertices")
     nv = sheet.Nv
     try:
         detach_vertices(sheet)

@@ -14,6 +14,8 @@ from tyssue.dynamics.effectors import (
     CellVolumeElasticity,
     CellAreaElasticity,
     BorderElasticity,
+    RadialTension,
+    BarrierElasticity,
 )
 
 sheet_effectors = [
@@ -24,6 +26,9 @@ sheet_effectors = [
     LineTension,
     FaceContractility,
     SurfaceTension,
+    BorderElasticity,
+    RadialTension,
+    BarrierElasticity,
 ]
 
 bulk_effectors = [CellAreaElasticity, CellVolumeElasticity]

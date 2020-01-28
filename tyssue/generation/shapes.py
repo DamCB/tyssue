@@ -19,7 +19,14 @@ from ..geometry.sheet_geometry import (
     SheetGeometry,
     ClosedSheetGeometry,
 )
-from .cpp import mesh_generation
+
+try:
+    from .cpp import mesh_generation
+except ImportError:
+    "CGAL-based mesh generation utilities not found, you may need to install"
+    " CGAL and build from source"
+    mesh_generation = None
+
 from .modifiers import extrude
 from ..utils import single_cell, swap_apico_basal
 

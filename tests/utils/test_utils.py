@@ -7,7 +7,7 @@ from tyssue import Sheet, SheetGeometry
 from tyssue.generation import three_faces_sheet, extrude
 from tyssue.generation import hexa_grid2d, from_2d_voronoi
 from tyssue.generation import hexa_grid3d, from_3d_voronoi
-from numpy.testing import assert_almost_equal, assert_allclose
+from numpy.testing import assert_almost_equal, assert_allclose, assert_array_equal
 from tyssue import Monolayer, config
 from tyssue import SheetGeometry as geom
 from tyssue.topology.base_topology import close_face
@@ -26,7 +26,7 @@ def test_to_nd():
     datasets = from_2d_voronoi(Voronoi(grid))
     sheet = Sheet("test", datasets)
     result = utils._to_3d(sheet.face_df["x"])
-    assert result.shape[1] == 3
+    assert (sheet.face_df[['x', 'y', 'z']] * result).shape[1] == 3
 
 
 def test_spec_updater():
@@ -70,6 +70,24 @@ def test_data_at_opposite():
     opp = utils.data_at_opposite(sheet, sheet.edge_df["length"], free_value=-1)
     assert opp.loc[1] == -1.0
 
+def test_data_at_opposite_df():
+    sheet = Sheet("emin", *three_faces_sheet())
+    geom.update_all(sheet)
+    sheet.get_opposite()
+    opp = utils.data_at_opposite(sheet, sheet.edge_df[["dx", "dy"]], free_value=None)
+
+    assert opp.shape == (sheet.Ne, 2)
+    assert list(opp.columns) == ["dx", "dy"]
+
+
+def test_data_at_opposite_array():
+    sheet = Sheet("emin", *three_faces_sheet())
+    geom.update_all(sheet)
+    sheet.get_opposite()
+    opp = utils.data_at_opposite(sheet, sheet.edge_df[["dx", "dy"]].to_numpy(), free_value=None)
+
+    assert opp.shape == (sheet.Ne, 2)
+    assert_array_equal(opp.index, sheet.edge_df.index)
 
 def test_single_cell():
     grid = hexa_grid3d(6, 4, 3)

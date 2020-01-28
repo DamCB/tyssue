@@ -42,11 +42,11 @@ def model_tester(eptm, model):
     nondim_specs = {elem: {k: 1 for k in spec} for elem, spec in model.specs.items()}
     dim_specs = model.dimensionalize(nondim_specs)
     for elem, spec in model.specs.items():
-        assert set(dim_specs[elem].keys()) == spec
+        assert set(dim_specs[elem].keys()) == set(spec.keys())
 
     nondim_specs = model.dimensionalize(dim_specs)
     for elem, spec in model.specs.items():
-        assert set(nondim_specs[elem].keys()) == spec
+        assert set(nondim_specs[elem].keys()) == set(spec.keys())
 
     eptm.update_specs(dim_specs, reset=False)
     energies = model.compute_energy(eptm, full_output=True)
