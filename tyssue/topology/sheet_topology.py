@@ -167,8 +167,8 @@ def cell_division(sheet, mother, geom, angle=None):
     daughter = face_division(sheet, mother, vert_a, vert_b)
 
     if sheet.settings.get("boundaries") is not None and mother_on_periodic_boundary:
-            sheet.specs["settings"]["boundaries"] = saved_boundary
-            geom.update_all(sheet)
+        sheet.specs["settings"]["boundaries"] = saved_boundary
+        geom.update_all(sheet)
     return daughter
 
 
