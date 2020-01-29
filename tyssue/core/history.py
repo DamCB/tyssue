@@ -335,8 +335,11 @@ class HistoryHdf5(History):
                 )
             else:
                 if dtypes_[element].to_dict() != self.dtypes[element].to_dict():
+                    change_type = {k: self.dtypes[element].to_dict()[k] for k in self.dtypes[element].to_dict() if k in dtypes_[
+                        element].to_dict() and self.dtypes[element].to_dict()[k] != dtypes_[element].to_dict()[k]}
                     raise ValueError(
-                        "There is a change of datatype in {} table".format(element)
+                        "There is a change of datatype in {} table in {} columns".format(
+                            element, change_type)
                     )
 
         if (self.save_every is None) or (
