@@ -37,8 +37,8 @@ def test_relaxation_convergance():
             previous_box_size = 0
         else:
             previous_box_size = solution_result["x"][-1]
-        solution_result = solver.find_energy_min_periodic_square_tissue(
-            sheet, PlanarGeometry, model
+        solution_result = solver.find_energy_min(
+            sheet, PlanarGeometry, model, periodic=True
         )
         epsilon = solution_result["x"][-1] - previous_box_size
         # print(epsilon)

@@ -62,7 +62,7 @@ class QSSolver:
         self.res = {"success": False, "message": "Not Started"}
         self.num_restarts = 0
 
-    def find_energy_min(self, eptm, geom, model, **minimize_kw):
+    def find_energy_min(self, eptm, geom, model, periodic=False, **minimize_kw):
         """Energy minimization function.
 
         The epithelium's total energy is minimized by displacing its vertices.
@@ -82,8 +82,10 @@ class QSSolver:
         log.info("initial number of vertices: %i", eptm.Nv)
         settings = config.solvers.quasistatic()
         settings.update(**minimize_kw)
-
-        res = self._minimize(eptm, geom, model, **settings)
+        if periodic == False:
+            res = self._minimize(eptm, geom, model, **settings)
+        else:
+            res = self._minimize_pbc(eptm, geom, model, **settings)
         log.info("final number of vertices: %i", eptm.Nv)
 
         return res
@@ -134,33 +136,7 @@ class QSSolver:
         return grad_err
 
     # The functions bellow are for a perodic square tissue in 2D
-    def find_energy_min_periodic_square_tissue(self, eptm, geom, model, **minimize_kw):
-        """Energy minimization function.
-
-        The epithelium's total energy is minimized by displacing its vertices.
-        This is a wrapper around `scipy.optimize.minimize`
-
-        Parameters
-        ----------
-        eptm : a :class:`tyssue.Epithlium` object
-        geom : a geometry class
-        geom must provide an `update_all` method that takes `eptm`
-            as sole argument and updates the relevant geometrical quantities
-        model : a model class
-            model must provide `compute_energy` and `compute_gradient` methods
-            that take `eptm` as first and unique positional argument.
-
-        """
-        log.info("initial number of vertices: %i", eptm.Nv)
-        settings = config.solvers.quasistatic()
-        settings.update(**minimize_kw)
-
-        res = self._minimize_periodic_square_tissue(eptm, geom, model, **settings)
-        log.info("final number of vertices: %i", eptm.Nv)
-
-        return res
-
-    def _minimize_periodic_square_tissue(self, eptm, geom, model, **kwargs):
+    def _minimize_pbc(self, eptm, geom, model, **kwargs):
         for i in count():
             if i == MAX_ITER:
                 return self.res
@@ -170,11 +146,10 @@ class QSSolver:
             pos0 = np.append(pos0, size)
             try:
                 self.res = optimize.minimize(
-                    self._opt_energy_periodic_square_tissue,
+                    self._opt_energy_pbc,
                     pos0,
                     args=(eptm, geom, model),
-                    jac=self._opt_grad_periodic_square_tissue,
-                    # jac=False,
+                    jac=self._opt_grad_pbc,
                     **kwargs
                 )
                 return self.res
@@ -182,7 +157,7 @@ class QSSolver:
                 log.info("TopologyChange")
                 self.num_restarts = i + 1
 
-    def _opt_energy_periodic_square_tissue(self, pos, eptm, geom, model):
+    def _opt_energy_pbc(self, pos, eptm, geom, model):
         if self.rearange and eptm.topo_changed:
             # reset switch
             eptm.topo_changed = False
@@ -194,9 +169,7 @@ class QSSolver:
         e = model.compute_energy(eptm)
         return e
 
-    def _opt_grad_periodic_square_tissue(
-        self, pos, eptm, geom, model, box_increment=0.0001
-    ):
+    def _opt_grad_pbc(self, pos, eptm, geom, model, box_increment=0.0001):
         """Gradient calculation for vertices along with an approximation for box size variable
         
         Paramameters
