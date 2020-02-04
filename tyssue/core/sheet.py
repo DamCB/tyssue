@@ -272,7 +272,58 @@ class Sheet(Epithelium):
         subsheet.reset_index()
         subsheet.reset_topo()
         return subsheet
+       
+    def extract_bounding_box_GC_2dellipse(
+        self, r_x, r_y, coords=["x", "y"]
+    ):
+        """Extracts a new sheet from the embryo sheet
 
+        that correspond to boundary coordinate define by the user.
+
+        Parameters
+        ----------
+        x_boundary : pair of floats
+        y_boundary : pair of floats
+        z_boundary : pair of floats
+        coords : list of strings, default ['x', 'y', 'z']
+          coordinates over which to crop the sheet
+
+        Returns
+        -------
+        subsheet : a new :class:`Sheet` object
+
+        """
+        x, y = coords
+        datasets = {}
+        datasets["face"] = self.face_df.copy()
+        
+        center_x=(self.face_df['x'].max()+self.face_df['x'].min() )/2.
+        center_y=(self.face_df['y'].max()+self.face_df['y'].min() )/2.
+        
+        def ellipse_boundary(data):
+            # returns true if point is in boundary
+            res=(data['x']-center_x)**2/(r_x**2)+(data['y']-center_y)**2/(r_y**2)
+            if res<=1:
+                return True
+            else:
+                return False
+        
+        for index,row in self.face_df.iterrows():
+            if ellipse_boundary(row)== False:
+                datasets["face"] =datasets["face"].drop(index)
+        
+
+        datasets["edge"] = self.edge_df[
+            self.edge_df["face"].isin(datasets["face"].index)
+        ].copy()
+
+        datasets["vert"] = self.vert_df.loc[self.edge_df["srce"].unique()].copy()
+
+        subsheet = Sheet("subsheet", datasets, self.specs)
+        subsheet.reset_index()
+        subsheet.reset_topo()
+        return subsheet
+       
     @classmethod
     def planar_sheet_2d(cls, identifier, nx, ny, distx, disty, noise=None):
         """Creates a planar sheet from an hexagonal grid of cells.
