@@ -29,7 +29,7 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 # Thanks to them!
 MAJOR = 0
 MINOR = 6
-MICRO = 8
+MICRO = 9
 ISRELEASED = True
 VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
 
