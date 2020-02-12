@@ -1,3 +1,10 @@
+# What's new in 0.7.0
+
+## Quasi-static solver
+
+- Added periodic boundary conditions support
+
+
 # What's new in 0.6.0
 
 ## Topology

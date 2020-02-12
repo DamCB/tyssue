@@ -1,8 +1,7 @@
-# /bin/env python
 """Quasistatic solver for vertex models
 
 """
-
+import numpy as np
 import logging
 from itertools import count
 
@@ -63,7 +62,7 @@ class QSSolver:
         self.res = {"success": False, "message": "Not Started"}
         self.num_restarts = 0
 
-    def find_energy_min(self, eptm, geom, model, **minimize_kw):
+    def find_energy_min(self, eptm, geom, model, periodic=False, **minimize_kw):
         """Energy minimization function.
 
         The epithelium's total energy is minimized by displacing its vertices.
@@ -83,8 +82,10 @@ class QSSolver:
         log.info("initial number of vertices: %i", eptm.Nv)
         settings = config.solvers.quasistatic()
         settings.update(**minimize_kw)
-
-        res = self._minimize(eptm, geom, model, **settings)
+        if periodic == False:
+            res = self._minimize(eptm, geom, model, **settings)
+        else:
+            res = self._minimize_pbc(eptm, geom, model, **settings)
         log.info("final number of vertices: %i", eptm.Nv)
 
         return res
@@ -133,3 +134,76 @@ class QSSolver:
             self._opt_energy, self._opt_grad, pos0.flatten(), eptm, geom, model
         )
         return grad_err
+
+    # The functions bellow are for a perodic square tissue in 2D
+    def _minimize_pbc(self, eptm, geom, model, **kwargs):
+        for i in count():
+            if i == MAX_ITER:
+                return self.res
+            pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.flatten()
+            for u, boundary in eptm.settings["boundaries"].items():
+                size = eptm.specs["settings"]["boundaries"][u][1]
+            pos0 = np.append(pos0, size)
+            try:
+                self.res = optimize.minimize(
+                    self._opt_energy_pbc,
+                    pos0,
+                    args=(eptm, geom, model),
+                    jac=self._opt_grad_pbc,
+                    **kwargs
+                )
+                return self.res
+            except TopologyChangeError:
+                log.info("TopologyChange")
+                self.num_restarts = i + 1
+
+    def _opt_energy_pbc(self, pos, eptm, geom, model):
+        if self.rearange and eptm.topo_changed:
+            # reset switch
+            eptm.topo_changed = False
+            raise TopologyChangeError("Topology changed before energy evaluation")
+        for u, boundary in eptm.settings["boundaries"].items():
+            eptm.specs["settings"]["boundaries"][u] = [boundary[0], pos[-1]]
+        self.set_pos(eptm, geom, pos[0:-1])
+        geom.update_all(eptm)
+        e = model.compute_energy(eptm)
+        return e
+
+    def _opt_grad_pbc(self, pos, eptm, geom, model, box_increment=0.0001):
+        """Gradient calculation for vertices along with an approximation for box size variable
+        
+        Paramameters
+        ------------
+        pos: positions of vertices and last element is size of periodic box
+        eptm: a :class:`tyssue.Epithlium` object ( function was made for 2D arrangments)
+        geom : a geometry class
+        geom must provide an `update_all` method that takes `eptm`
+            as sole argument and updates the relevant geometrical quantities
+        model : a model class
+            model must provide `compute_energy` and `compute_gradient` methods
+            that take `eptm` as first and unique positional argument.
+        box_increment: size of displacement of box size to approximate gradient of box size variable
+        
+        """
+        if self.rearange and eptm.topo_changed:
+            raise TopologyChangeError("Topology changed before gradient evaluation")
+        grad_i = model.compute_gradient(eptm)
+        energy_before_increment = model.compute_energy(eptm)
+        for u, boundary in eptm.settings["boundaries"].items():
+            eptm.specs["settings"]["boundaries"][u] = [
+                boundary[0],
+                boundary[1] + box_increment,
+            ]
+        geom.update_all(eptm)
+        energy_after_increment = model.compute_energy(eptm)
+        grad_of_box_size_variable = (
+            energy_after_increment - energy_before_increment
+        ) / box_increment
+        for u, boundary in eptm.settings["boundaries"].items():
+            eptm.specs["settings"]["boundaries"][u] = [
+                boundary[0],
+                boundary[1] - box_increment,
+            ]
+        return np.append(
+            grad_i.loc[eptm.active_verts].values.ravel(), grad_of_box_size_variable
+        )
