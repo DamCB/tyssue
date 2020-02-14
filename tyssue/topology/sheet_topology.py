@@ -30,7 +30,6 @@ def split_vert(
             "The length of the new edge should be set by "
             "`sheet.settings['threshold_length]*multiplier` "
         )
-
     if face is None:
         face = np.random.choice(sheet.edge_df[sheet.edge_df["srce"] == vert]["face"])
 
@@ -81,9 +80,9 @@ def type1_transition(
 
     """
 
-    srce, trgt, face = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]]
+    srce, trgt, face = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]].astype(int)
 
-    vert = min(srce, trgt)  # find the vertex that won't be reindexed
+    vert = min(srce, trgt)  # find the vertex that wont be reindexed
     ret_code = collapse_edge(sheet, edge01, reindex=True)
     if ret_code != 0:
         warnings.warn(f"Collapse of edge {edge01} failed")
