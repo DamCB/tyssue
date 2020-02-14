@@ -36,20 +36,15 @@ def split_vert(sheet, vert, face, to_rewire, epsilon, recenter=False):
     # Add a vertex
     sheet.vert_df = sheet.vert_df.append(sheet.vert_df.loc[vert], ignore_index=True)
     new_vert = sheet.vert_df.index[-1]
-
     # Move it towards the face center
     r_ia = sheet.face_df.loc[face, sheet.coords] - sheet.vert_df.loc[vert, sheet.coords]
+    shift = r_ia * epsilon / np.linalg.norm(r_ia)
     if recenter:
-        sheet.vert_df.loc[new_vert, sheet.coords] += (
-            0.5 * r_ia * epsilon / np.linalg.norm(r_ia)
-        )
-        sheet.vert_df.loc[vert, sheet.coords] -= (
-            0.5 * r_ia * epsilon / np.linalg.norm(r_ia)
-        )
+        sheet.vert_df.loc[new_vert, sheet.coords] += shift / 2.0
+        sheet.vert_df.loc[vert, sheet.coords] -= shift / 2.0
+
     else:
-        sheet.vert_df.loc[new_vert, sheet.coords] += (
-            r_ia * epsilon / np.linalg.norm(r_ia)
-        )
+        sheet.vert_df.loc[new_vert, sheet.coords] += shift
 
     # rewire
     sheet.edge_df.loc[to_rewire.index] = to_rewire.replace(
