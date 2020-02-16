@@ -144,7 +144,14 @@ def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
     face_spec = draw_specs["face"]
     if face_spec["visible"]:
         ax = draw_face(sheet, coords, ax, **face_spec)
-
+    
+    try :
+        ax.set_xlim(draw_specs["axis"]["x_min"],draw_specs["axis"]["x_max"])
+        ax.set_ylim(draw_specs["axis"]["y_min"],draw_specs["axis"]["y_max"])
+    except:
+        ax.autoscale()
+        ax.set_aspect("equal")
+    
     ax.autoscale()
     ax.set_aspect("equal")
     return fig, ax
