@@ -39,6 +39,9 @@ def sheet_spec():
                 "alpha": 1.0,
                 "zorder": -1
             }
+            "axis": {
+                "autoscale": true
+            }
         }
 
     """

@@ -27,5 +27,7 @@
         "color":"#8aa678",
         "alpha": 1.0,
         "zorder": -1
+    },
+    "axis": { "autoscale": true
     }
 }

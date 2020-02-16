@@ -144,19 +144,20 @@ def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
     face_spec = draw_specs["face"]
     if face_spec["visible"]:
         ax = draw_face(sheet, coords, ax, **face_spec)
-    
-    try :
-        ax.set_xlim(draw_specs["axis"]["x_min"],draw_specs["axis"]["x_max"])
-        ax.set_ylim(draw_specs["axis"]["y_min"],draw_specs["axis"]["y_max"])
-    except:
+
+    axis_spec = draw_specs["axis"]
+    if axis_spec["autoscale"] == True:
         ax.autoscale()
         ax.set_aspect("equal")
-    
-    ax.autoscale()
-    ax.set_aspect("equal")
+    else:
+        ax.set_xlim(axis_spec["x_min"], axis_spec["x_max"])
+        ax.set_ylim(axis_spec["y_min"], axis_spec["y_max"])
+        ax.set_aspect("equal")
+
     return fig, ax
 
-def sheet_view_GC_colorbar(sheet, coords=COORDS, ax1=None,ax2=None, **draw_specs_kw):
+
+def sheet_view_GC_colorbar(sheet, coords=COORDS, ax1=None, ax2=None, **draw_specs_kw):
     """ Base view function, parametrizable
     through draw_secs
 
@@ -187,20 +188,20 @@ def sheet_view_GC_colorbar(sheet, coords=COORDS, ax1=None,ax2=None, **draw_specs
     """
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
-#    if (ax1 is None) or (ax2 is None):
-#        fig, (ax1,ax2) = plt.subplots(1,2,gridspec_kw={'width_ratios': [100, 1]})
-#    else:
-#        fig, (ax1,ax2) = plt.subplots(1,2,gridspec_kw={'width_ratios': [100, 1]})
+    #    if (ax1 is None) or (ax2 is None):
+    #        fig, (ax1,ax2) = plt.subplots(1,2,gridspec_kw={'width_ratios': [100, 1]})
+    #    else:
+    #        fig, (ax1,ax2) = plt.subplots(1,2,gridspec_kw={'width_ratios': [100, 1]})
     if (ax1 is None) or (ax2 is None):
         fig = plt.figure()
     else:
         fig = plt.get_figure()
-    
+
     grid0 = plt.GridSpec(10, 10)
     grid0.update(wspace=0.0)
-    
+
     ax1 = fig.add_subplot(grid0[:, :9])
-    
+
     vert_spec = draw_specs["vert"]
     if vert_spec["visible"]:
         ax1 = draw_vert(sheet, coords, ax1, **vert_spec)
@@ -217,17 +218,17 @@ def sheet_view_GC_colorbar(sheet, coords=COORDS, ax1=None,ax2=None, **draw_specs
     ax1.set_aspect("equal")
     ax1.grid()
 
-    #gc
-    ax2=fig.add_subplot(grid0[:, 9])
-    cmap = cm.get_cmap('viridis')
-    #norm = mpl.colors.Normalize(vmin=np.min(draw_specs['face']['color']), vmax=np.max(draw_specs['face']['color']))
-    norm = mpl.colors.Normalize(vmin=np.min(sheet.face_df['col']), vmax=np.max(sheet.face_df['col']))
-    
-    cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=cmap,
-                                norm=norm,
-                                orientation='vertical')
-    cb1.set_label('Some Units')
-    #plt.tight_layout()
+    # gc
+    ax2 = fig.add_subplot(grid0[:, 9])
+    cmap = cm.get_cmap("viridis")
+    # norm = mpl.colors.Normalize(vmin=np.min(draw_specs['face']['color']), vmax=np.max(draw_specs['face']['color']))
+    norm = mpl.colors.Normalize(
+        vmin=np.min(sheet.face_df["col"]), vmax=np.max(sheet.face_df["col"])
+    )
+
+    cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, orientation="vertical")
+    cb1.set_label("Some Units")
+    # plt.tight_layout()
     return fig, ax1, ax2
 
 
