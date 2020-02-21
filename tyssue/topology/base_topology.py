@@ -34,7 +34,9 @@ def split_vert(sheet, vert, face, to_rewire, epsilon, recenter=False):
 
     """
     # Add a vertex
-    sheet.vert_df = sheet.vert_df.append(sheet.vert_df.loc[vert], ignore_index=True)
+    this_vert = sheet.vert_df.loc[vert:vert] # avoid type munching
+    sheet.vert_df = sheet.vert_df.append(this_vert, ignore_index=True)
+    # reset datatypes
     new_vert = sheet.vert_df.index[-1]
     # Move it towards the face center
     r_ia = sheet.face_df.loc[face, sheet.coords] - sheet.vert_df.loc[vert, sheet.coords]
@@ -103,9 +105,11 @@ def add_vert(eptm, edge):
         (eptm.edge_df["srce"] == srce) & (eptm.edge_df["trgt"] == trgt)
     ]
 
-    new_vert = eptm.vert_df.loc[[srce, trgt]].mean()
+    new_vert = eptm.vert_df.loc[srce:srce]
     eptm.vert_df = eptm.vert_df.append(new_vert, ignore_index=True)
     new_vert = eptm.vert_df.index[-1]
+    eptm.vert_df.loc[new_vert, eptm.coords] = eptm.vert_df.loc[[srce, trgt], eptm.coords].mean()
+
     new_edges = []
 
     for p, p_data in parallels.iterrows():
@@ -155,7 +159,7 @@ def close_face(eptm, face):
         print("Closing only possible with exactly two dangling vertices")
         raise err
 
-    eptm.edge_df = eptm.edge_df.append(face_edges.iloc[0], ignore_index=True)
+    eptm.edge_df = eptm.edge_df.append(face_edges.iloc[0:1], ignore_index=True)
     eptm.edge_df.index.name = "edge"
     new_edge = eptm.edge_df.index[-1]
     eptm.edge_df.loc[new_edge, ["srce", "trgt"]] = single_trgt, single_srce
