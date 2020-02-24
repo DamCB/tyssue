@@ -4,6 +4,19 @@
 
 - Added periodic boundary conditions support
 
+## Generation
+
+- adds spherical sheet and monolayers from CGAL
+
+## Install
+
+- CGAL-less version installable with pip
+
+## Geometry & Dynamics
+
+- New geometry classes
+- BorderElasticity, RadialTension, and  BarrierElasticity effectors
+- Cell division on periodic boundary conditions
 
 # What's new in 0.6.0
 
