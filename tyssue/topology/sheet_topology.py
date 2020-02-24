@@ -117,22 +117,22 @@ def cell_division(sheet, mother, geom, angle=None):
 
     Parameters
     ----------
-    
+
     sheet : a 'Sheet' instance
-    mother : face index of target dividing cell 
+    mother : face index of target dividing cell
     geom : a 2D geometry
     angle : division angle for newly formed edge
-    
+
     Returns
     -------
-    daughter: face index of new cell 
-    
+    daughter: face index of new cell
+
     Notes
     -----
-    - Function checks for perodic boundaries if there are, it checks if dividing cell 
-      rests on an edge of the periodic boundaries if so, it displaces the boundaries 
-      by a half a period and moves the target cell in the bulk of the tissue. It then 
-      performs cell division normally and reverts the periodic boundaries to the original 
+    - Function checks for perodic boundaries if there are, it checks if dividing cell
+      rests on an edge of the periodic boundaries if so, it displaces the boundaries
+      by a half a period and moves the target cell in the bulk of the tissue. It then
+      performs cell division normally and reverts the periodic boundaries to the original
       configuration
     """
 
@@ -207,12 +207,12 @@ def face_division(sheet, mother, vert_a, vert_b):
     """
     # mother = sheet.edge_df.loc[edge_a, 'face']
 
-    face_cols = sheet.face_df.loc[mother]
+    face_cols = sheet.face_df.loc[mother:mother]
     sheet.face_df = sheet.face_df.append(face_cols, ignore_index=True)
     sheet.face_df.index.name = "face"
     daughter = int(sheet.face_df.index[-1])
 
-    edge_cols = sheet.edge_df[sheet.edge_df["face"] == mother].iloc[0]
+    edge_cols = sheet.edge_df[sheet.edge_df["face"] == mother].iloc[0:1]
     sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
     new_edge_m = sheet.edge_df.index[-1]
     sheet.edge_df.loc[new_edge_m, "srce"] = vert_b

@@ -51,14 +51,14 @@ class Epithelium:
                         ## Topology
                         "num_sides": 6,
                         ## Masks
-                        "is_alive": True},
+                        "is_alive": 1},
                     "vert": {
                         ## Coordinates
                         "x": 0.,
                         "y": 0.,
                         "z": 0.,
                         ## Masks
-                        "is_active": True},
+                        "is_active": 1},
                     "edge": {
                         ## Connections
                         "srce": 0,

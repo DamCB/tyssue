@@ -28,9 +28,9 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 # Version management copied form numpy
 # Thanks to them!
 MAJOR = 0
-MINOR = 6
-MICRO = 9
-ISRELEASED = True
+MINOR = 7
+MICRO = 0
+ISRELEASED = False
 VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
 
 
@@ -117,12 +117,16 @@ class CMakeBuild(build_ext):
         try:
             out = subprocess.check_output(["cmake", "--version"])
         except OSError:
-            raise RuntimeError("CMake must be installed to build the following extensions: " +
-                               ", ".join(e.name for e in self.extensions))
+            raise RuntimeError(
+                "CMake must be installed to build the following extensions: "
+                + ", ".join(e.name for e in self.extensions)
+            )
 
         if platform.system() == "Windows":
-            cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
-            if cmake_version < '3.1.0':
+            cmake_version = LooseVersion(
+                re.search(r"version\s*([\d.]+)", out.decode()).group(1)
+            )
+            if cmake_version < "3.1.0":
                 raise RuntimeError("CMake >= 3.1.0 is required on Windows")
 
         for ext in self.extensions:

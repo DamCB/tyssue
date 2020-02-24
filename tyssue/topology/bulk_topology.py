@@ -78,7 +78,7 @@ def remove_cell(eptm, cell):
 def close_cell(eptm, cell):
     """Closes the cell by adding a face. Assumes a single face is missing
     """
-    eptm.face_df = eptm.face_df.append(eptm.face_df.iloc[0], ignore_index=True)
+    eptm.face_df = eptm.face_df.append(eptm.face_df.loc[0:0], ignore_index=True)
 
     new_face = eptm.face_df.index[-1]
 
@@ -301,7 +301,7 @@ def cell_division(eptm, mother, geom, vertices=None):
             plane_center=None,
         )
 
-    cell_cols = eptm.cell_df.loc[mother]
+    cell_cols = eptm.cell_df.loc[mother:mother]
     eptm.cell_df = eptm.cell_df.append(cell_cols, ignore_index=True)
     eptm.cell_df.index.name = "cell"
     daughter = eptm.cell_df.index[-1]
