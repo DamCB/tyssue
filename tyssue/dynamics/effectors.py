@@ -457,11 +457,8 @@ class SurfaceTension(AbstractEffector):
     def gradient(eptm):
 
         G = to_nd(eptm.upcast_face(eptm.face_df["surface_tension"]), len(eptm.coords))
-        #try:
-        #    grad_a_srce, grad_a_trgt = area_grad(eptm)
-        #except:
-        #    grad_a_srce, grad_a_trgt = lumen_area_grad(eptm)
-        grad_a_srce, grad_a_trgt = lumen_area_grad(eptm)
+        
+        grad_a_srce, grad_a_trgt = area_grad2d(eptm)
         
         grad_a_srce = G * grad_a_srce
         grad_a_trgt = G * grad_a_trgt
