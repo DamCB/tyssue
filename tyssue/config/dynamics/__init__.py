@@ -69,7 +69,7 @@ def quasistatic_plane_spec_env_pressure():
         }
 
     """
-    specfile = os.path.join(CURRENT_DIR, "plane_qs.json")
+    specfile = os.path.join(CURRENT_DIR, "plane_env_pressure_qs.json")
     return load_spec(specfile)
 
 
