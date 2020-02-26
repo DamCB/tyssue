@@ -40,6 +40,38 @@ def quasistatic_plane_spec():
     specfile = os.path.join(CURRENT_DIR, "plane_qs.json")
     return load_spec(specfile)
 
+def quasistatic_plane_spec_env_pressure():
+    """Default specification for the dynamics
+    of a sheet vertex model - also suitable for general faceted tissue
+
+    .. code-block::
+
+        {
+        "face": {
+            "contractility": 0.04,
+            "vol_elasticity": 1.0,
+            "prefered_height": 10.0,
+            "prefered_area": 24.0,
+            "prefered_vol": 0.0,
+            "surface_tension": 1.0
+            },
+        "vert": {
+             "radial_tension": 0.0
+             },
+        "edge": {
+             "is_active": 1,
+             "line_tension": 0.12
+             },
+        "settings": {
+            "grad_norm_factor": 1.0,
+            "nrj_norm_factor": 1.0
+            }
+        }
+
+    """
+    specfile = os.path.join(CURRENT_DIR, "plane_qs.json")
+    return load_spec(specfile)
+
 
 def quasistatic_sheet_spec():
     """Default specification for the dynamics
