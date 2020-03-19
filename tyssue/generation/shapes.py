@@ -308,6 +308,9 @@ def spherical_monolayer(R_in, R_out, Nc, apical="out"):
     mono = Monolayer("mono", extrude(sheet.datasets, method="normals", scale=-delta_R))
     if apical == "out":
         swap_apico_basal(mono)
+    else:
+        mono.settings["lumen_side"] = "apical"
+
     ClosedMonolayerGeometry.update_all(mono)
     return mono
 
