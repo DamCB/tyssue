@@ -265,7 +265,7 @@ class HistoryHdf5(History):
             last = self.time_stamps[-1]
             with pd.HDFStore(self.hf5file, "r") as file:
                 keys = file.keys()
-            if r"\cell" in keys:
+            if "\cell" in keys:
                 sheet = Epithelium
 
         History.__init__(self, sheet, save_every, dt, extra_cols)
