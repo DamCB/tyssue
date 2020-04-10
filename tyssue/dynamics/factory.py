@@ -37,10 +37,17 @@ def model_factory(effectors, ref_effector=None):
             "vert": {},
             "settings": {"nrj_norm_factor": 1.0},
         }
+
+        _effectors = effectors
+
         for f in effectors:
             labels.append(f.label)
             for k in specs:
                 specs[k].update(f.specs.get(k, {}))
+
+        @classmethod
+        def __iter__(cls):
+            yield from cls._effectors
 
         @staticmethod
         def dimensionalize(nondim_specs):
