@@ -27,11 +27,10 @@ class PlanarGeometry(BaseGeometry):
     @staticmethod
     def update_normals(sheet):
 
-        coords = sheet.coords
-        face_pos = sheet.edge_df[["f" + c for c in coords]].values
-        srce_pos = sheet.edge_df[["s" + c for c in coords]].values
-        trgt_pos = sheet.edge_df[["t" + c for c in coords]].values
-        normals = np.cross(srce_pos - face_pos, trgt_pos - srce_pos)
+        rcoords = ["r" + c for c in sheet.coords]
+        dcoords = ["d" + c for c in sheet.coords]
+
+        normals = np.cross(sheet.edg_df[rcoords], sheet.edg_df[dcoords])
         sheet.edge_df["nz"] = normals
 
     @staticmethod
@@ -60,6 +59,10 @@ class PlanarGeometry(BaseGeometry):
         ) * np.cos(psi)
 
         return rot_pos
+
+    @staticmethod
+    def get_phis(sheet):
+        return np.arctan2(sheet.edge_df["ry"], sheet.edge_df["rx"])
 
 
 # The following classes will probably be included in tyssue at some point

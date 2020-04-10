@@ -61,7 +61,9 @@ class BaseGeometry:
         scoords = ["s" + c for c in sheet.coords]
         sheet.face_df[sheet.coords] = sheet.edge_df.groupby("face")[scoords].mean()
         face_pos = sheet.upcast_face(sheet.face_df[sheet.coords])
-        sheet.edge_df[["f" + c for c in sheet.coords]] = face_pos
+        for c in sheet.coords:
+            sheet.edge_df["f" + c] = face_pos[c]
+            sheet.edge_df["r" + c] = sheet.edge_df["s" + c] - sheet.edge_df["f" + c]
 
     @staticmethod
     def center(eptm):

@@ -66,8 +66,10 @@ class BulkGeometry(SheetGeometry):
     def update_centroid(eptm):
         scoords = ["s" + c for c in eptm.coords]
         eptm.face_df[eptm.coords] = eptm.edge_df.groupby("face")[scoords].mean()
-        face_pos = eptm.upcast_face(eptm.face_df[eptm.coords]).values
-        eptm.edge_df[["f" + c for c in eptm.coords]] = face_pos
+        face_pos = eptm.upcast_face(eptm.face_df[eptm.coords])
+        for c in eptm.coords:
+            eptm.edge_df["f" + c] = face_pos[c]
+            eptm.edge_df["r" + c] = eptm.edge_df["s" + c] - eptm.edge_df["f" + c]
 
         eptm.cell_df[eptm.coords] = eptm.edge_df.groupby("cell")[scoords].mean()
         cell_pos = eptm.upcast_cell(eptm.cell_df[eptm.coords]).values
