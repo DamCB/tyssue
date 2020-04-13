@@ -141,9 +141,9 @@ class QSSolver:
             if i == MAX_ITER:
                 return self.res
             pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.flatten()
-            for u, boundary in eptm.settings["boundaries"].items():
-                size = eptm.specs["settings"]["boundaries"][u][1]
-            pos0 = np.append(pos0, size)
+            upper_bound_x = eptm.specs["settings"]["boundaries"]["x"][1]
+            upper_bound_y = eptm.specs["settings"]["boundaries"]["y"][1]
+            pos0 = np.append(pos0, [upper_bound_x, upper_bound_y])
             try:
                 self.res = optimize.minimize(
                     self._opt_energy_pbc,
@@ -162,14 +162,14 @@ class QSSolver:
             # reset switch
             eptm.topo_changed = False
             raise TopologyChangeError("Topology changed before energy evaluation")
-        for u, boundary in eptm.settings["boundaries"].items():
-            eptm.specs["settings"]["boundaries"][u] = [boundary[0], pos[-1]]
-        self.set_pos(eptm, geom, pos[0:-1])
+        eptm.specs["settings"]["boundaries"]["x"][1] = pos[-2]
+        eptm.specs["settings"]["boundaries"]["y"][1] = pos[-1]
+        self.set_pos(eptm, geom, pos[0:-2])
         geom.update_all(eptm)
         e = model.compute_energy(eptm)
         return e
 
-    def _opt_grad_pbc(self, pos, eptm, geom, model, box_increment=0.0001):
+    def _opt_grad_pbc(self, pos, eptm, geom, model, box_increment=0.001):
         """Gradient calculation for vertices along with an approximation for box size variable
         
         Paramameters
@@ -189,21 +189,27 @@ class QSSolver:
             raise TopologyChangeError("Topology changed before gradient evaluation")
         grad_i = model.compute_gradient(eptm)
         energy_before_increment = model.compute_energy(eptm)
-        for u, boundary in eptm.settings["boundaries"].items():
-            eptm.specs["settings"]["boundaries"][u] = [
-                boundary[0],
-                boundary[1] + box_increment,
-            ]
+        # box size grad x
+        eptm.specs["settings"]["boundaries"]["x"][1] += box_increment
         geom.update_all(eptm)
         energy_after_increment = model.compute_energy(eptm)
-        grad_of_box_size_variable = (
+        grad_of_box_size_variable_x = (
             energy_after_increment - energy_before_increment
         ) / box_increment
-        for u, boundary in eptm.settings["boundaries"].items():
-            eptm.specs["settings"]["boundaries"][u] = [
-                boundary[0],
-                boundary[1] - box_increment,
-            ]
+        eptm.specs["settings"]["boundaries"]["x"][1] -= box_increment
+        geom.update_all(eptm)
+
+        # box size grad y
+        eptm.specs["settings"]["boundaries"]["y"][1] += box_increment
+        geom.update_all(eptm)
+        energy_after_increment = model.compute_energy(eptm)
+        grad_of_box_size_variable_y = (
+            energy_after_increment - energy_before_increment
+        ) / box_increment
+        eptm.specs["settings"]["boundaries"]["y"][1] -= box_increment
+        geom.update_all(eptm)
+
         return np.append(
-            grad_i.loc[eptm.active_verts].values.ravel(), grad_of_box_size_variable
+            grad_i.loc[eptm.active_verts].values.ravel(),
+            [grad_of_box_size_variable_x, grad_of_box_size_variable_y],
         )
