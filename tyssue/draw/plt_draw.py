@@ -169,8 +169,12 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
             if isinstance(color, np.ndarray):
                 faces = sheet.face_df["face_o"].values.astype(np.uint32)
                 collection_specs["facecolors"] = color.take(faces, axis=0)
-
-    polys = sheet.face_polygons(coords)
+    if not sheet.is_ordered:
+        sheet_ = sheet.copy()
+        sheet_.reset_index(order=True)
+        polys = sheet_.face_polygons(coords)
+    else:
+        polys = sheet.face_polygons(coords)
     p = PolyCollection(polys, closed=True, **collection_specs)
     ax.add_collection(p)
     return ax

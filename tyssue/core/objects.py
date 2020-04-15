@@ -148,6 +148,7 @@ class Epithelium:
 
         self.position_buffer = None
         self.topo_changed = False
+        self.is_ordered = False
 
     @property
     def vert_df(self):
@@ -588,18 +589,22 @@ class Epithelium:
         Note
         ----
         Vertices are assumed to be ordered in a face. If you are not
-        sure it is the case, you can run `sheet.reset_index()` before calling
+        sure it is the case, you can run `sheet.reset_index(order=True)` before calling
         this function.
         """
+        if not self.is_ordered:
+            raise ValueError(
+                "The vertices are assumed to be correctly ordered around the cell"
+            )
         if coords is None:
             coords = self.coords
 
         scoords = ["s" + c for c in coords]
-        if scoords not in self.edge_df.columns:
+        if not set(scoords).issubset(self.edge_df.columns):
             for c in coords:
                 self.edge_df["s" + c] = self.upcast_srce(self.vert_df[c])
 
-        polys = self.edge_df.groupby("face").apply(lambda df: list(df[scoords]))
+        polys = self.edge_df.groupby("face").apply(lambda df: df[scoords].to_numpy())
         return polys
 
     def validate(self):
@@ -627,7 +632,7 @@ class Epithelium:
         is_valid = self.get_valid()
         return ~is_valid
 
-    def sanitize(self, trim_borders=False):
+    def sanitize(self, trim_borders=False, order_edges=False):
         """Removes invalid faces and associated vertices
 
         If trim_borders is True (defaults to False), there will be a single
@@ -639,9 +644,9 @@ class Epithelium:
 
             merge_border_edges(self)
 
-        self.remove(invalid_edges, trim_borders)
+        self.remove(invalid_edges, trim_borders, order_edges)
 
-    def remove(self, edge_out, trim_borders=False):
+    def remove(self, edge_out, trim_borders=False, order_edges=False):
         """Remove the edges indexed by `edge_out` associated with all
         the cells and faces containing those edges
 
@@ -681,6 +686,8 @@ class Epithelium:
             from ..topology.base_topology import merge_border_edges
 
             merge_border_edges(self)
+        if order_edges:
+            self.reset_index(order=True)
 
     def cut_out(self, bbox, coords=None):
         """Returns the index of edges with at least one vertex outside of the bounding box
@@ -721,16 +728,6 @@ class Epithelium:
         """
         log.debug("reseting index for %s", self.identifier)
         self.topo_changed = True
-        if order:
-            if self.dim == 2:
-                phis = PlanarGeometry.get_phis(self)
-            else:
-                if not "rx" in self.edge_df:
-                    SheetGeometry.update_dcoords(self)
-                    SheetGeometry.update_centroid(self)
-                phis = SheetGeometry.get_phis(self)
-            self.edge_df.sort_values(["face", phis], inplace=True)
-
         # remove disconnected vertices and faces
         self.vert_df = self.vert_df.reindex(
             set(self.edge_df.srce).union(self.edge_df.trgt)
@@ -759,6 +756,20 @@ class Epithelium:
             self.edge_df["cell"] = new_cidx.loc[self.edge_df["cell"]].values
             self.cell_df.reset_index(drop=True, inplace=True)
             self.cell_df.index.name = "cell"
+
+        if order:
+            if self.dim == 2:
+                phis = PlanarGeometry.get_phis(self)
+            else:
+                if "rx" not in self.edge_df:
+                    SheetGeometry.update_dcoords(self)
+                    SheetGeometry.update_centroid(self)
+                phis = SheetGeometry.get_phis(self)
+            self.edge_df["phi"] = phis
+            self.edge_df.sort_values(["face", "phi"], inplace=True)
+            self.is_ordered = True
+        else:
+            self.is_ordered = False
 
         self.edge_df.reset_index(drop=True, inplace=True)
         self.edge_df.index.name = "edge"

@@ -263,7 +263,7 @@ class SheetGeometry(PlanarGeometry):
         r_mats[:, 2, 1] += sin_rot_axis[:, 0]
 
         # upcast
-        rotations = sheet.upcast_face(r_mats)
+        rotations = r_mats.take(sheet.edge_df["face"], axis=0)
         return rotations
 
     @staticmethod

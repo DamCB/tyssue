@@ -30,7 +30,7 @@ class PlanarGeometry(BaseGeometry):
         rcoords = ["r" + c for c in sheet.coords]
         dcoords = ["d" + c for c in sheet.coords]
 
-        normals = np.cross(sheet.edg_df[rcoords], sheet.edg_df[dcoords])
+        normals = np.cross(sheet.edge_df[rcoords], sheet.edge_df[dcoords])
         sheet.edge_df["nz"] = normals
 
     @staticmethod
@@ -60,8 +60,12 @@ class PlanarGeometry(BaseGeometry):
 
         return rot_pos
 
-    @staticmethod
-    def get_phis(sheet):
+    @classmethod
+    def get_phis(cls, sheet):
+        if not "rx" in sheet.edge_df:
+            cls.update_dcoords(sheet)
+            cls.update_centroid(sheet)
+
         return np.arctan2(sheet.edge_df["ry"], sheet.edge_df["rx"])
 
 

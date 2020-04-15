@@ -186,7 +186,7 @@ class Sheet(Epithelium):
         """
         self.get_extra_indices()
         self.edge_df = self.edge_df.loc[self.srtd_edges]
-        self.reset_index()
+        self.reset_index(order=False)
         self.reset_topo()
         self.get_extra_indices()
 
