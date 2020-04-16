@@ -8,6 +8,11 @@ build:
 conda:
   environment: docs_environment.yml
 
+submodules:
+  include:
+    - doc/notebooks
+  recursive: true
+
 
 python:
   version: 3.7
