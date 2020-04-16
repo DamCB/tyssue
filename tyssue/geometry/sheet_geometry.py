@@ -236,7 +236,12 @@ class SheetGeometry(PlanarGeometry):
         face_normals = sheet.edge_df.groupby("face")[sheet.ncoords].mean()
         rot_angles = face_normals.eval("-arctan2((nx**2 + ny**2), nz)").to_numpy()
         rot_axis = np.vstack([face_normals.ny, -face_normals.nx, np.zeros(sheet.Nf)]).T
-        rot_axis /= np.linalg.norm(rot_axis, axis=1)[:, None]
+        norm = np.linalg.norm(rot_axis, axis=1)
+        if abs(norm).max() < 1e-10:
+            # No rotation needed
+            return
+
+        rot_axis /= norm[:, None]
 
         cosa = np.cos(rot_angles)
         r_mats = np.zeros((sheet.Nf, 3, 3))
@@ -287,10 +292,13 @@ class SheetGeometry(PlanarGeometry):
         The 'method' argument is passed to face_rotations
 
         """
-        rots = cls.face_rotations(sheet, method)
-        rel_srce_pos = sheet.edge_df[["r" + c for c in sheet.coords]]
 
-        rotated = np.einsum("ikj, ik -> ij", rots, rel_srce_pos)
+        rel_srce_pos = sheet.edge_df[["r" + c for c in sheet.coords]]
+        rots = cls.face_rotations(sheet, method)
+        if rots is None:
+            rotated = rel_srce_pos.to_numpy()
+        else:
+            rotated = np.einsum("ikj, ik -> ij", rots, rel_srce_pos)
         return np.arctan2(rotated[:, 1], rotated[:, 0])
 
 
