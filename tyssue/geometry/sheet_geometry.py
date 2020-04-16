@@ -85,11 +85,6 @@ class SheetGeometry(PlanarGeometry):
              distance to the coordinate height axis if between the focii, and
              from the closest focus otherwise. The focii positions are updated
              before the height update.
-                 ---------------
-               /                 \
-               |  *          *   |
-               \                 /
-                 ---------------
         In all the cases, this distance is shifted by an amount of
         `sheet.vert_df['basal_shift']`
         """

@@ -1,5 +1,15 @@
 # What's new in 0.7.0
 
+## Coordinate system and vertex ordering
+
+- Added `"rx", "ry", "rz"` columns, reprensenting the source vertex positions relative to face center
+- The `face_projected_pos` method has been rewritten with a much faster implementation.
+- There is now a `"phi"` angle representing the angle in the
+face plane.
+- There is a new `order` optional parameter to `reset_index` and `sanitize` that re-indexes `edge_df` such that the vertices for each face are contiguous and ordered clockwize in the face plane.
+- The `face_polygons` method benefits from this rewrite, so does the 2D `sheet_view`.
+
+
 ## Quasi-static solver
 
 - Added periodic boundary conditions support
@@ -16,7 +26,38 @@
 
 - New geometry classes
 - BorderElasticity, RadialTension, and  BarrierElasticity effectors
+- Effectors now take nested dictionnaries as specs, instead of dictionnary of sets:
+```py
+    specs = {
+        "face": {
+            "is_alive": 1,
+            "perimeter": 1.0,
+            "perimeter_elasticity": 0.1,
+            "prefered_perimeter": 3.81,
+        }
+    }
+```
+Instead of the previous:
+
+```py
+    specs = {
+        "face": {
+            "is_alive",
+            "perimeter",
+            "perimeter_elasticity",
+            "prefered_perimeter",
+        }
+    }
+```
+
+This allows to give default values to the paramters directly in the effector class definition, and to have a `specs` attribute for the model directly.
+
+A warning is raised if the effector definition uses the old style.
+
+
 - Cell division on periodic boundary conditions
+
+
 
 # What's new in 0.6.0
 

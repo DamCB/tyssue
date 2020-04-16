@@ -42,12 +42,28 @@ def model_factory(effectors, ref_effector=None):
 
         for f in effectors:
             labels.append(f.label)
-            for k in specs:
-                specs[k].update(f.specs.get(k, {}))
+            try:
+                for k in specs:
+                    specs[k].update(f.specs.get(k, {}))
+            except ValueError:
+                warnings.warn(
+                    """
+Since 0.7, you need to provide a default value for each of the
+specs parameters, e.g.
+    specs = {
+        "face": {
+            "is_alive": 1,
+            "perimeter": 1.0,
+            "perimeter_elasticity": 0.1,
+            "prefered_perimeter": 3.81,
+        }
+    }
 
-        @classmethod
-        def __iter__(cls):
-            yield from cls._effectors
+Setting all default values to 1.0 for now
+"""
+                )
+                for k in specs:
+                    specs[k].update({key: 1.0 for key in f.specs.get(k, {})})
 
         @staticmethod
         def dimensionalize(nondim_specs):
