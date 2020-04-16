@@ -19,7 +19,6 @@ from tyssue.behaviors.sheet.basic_events import (
     check_tri_faces,
 )
 from tyssue.behaviors.sheet.actions import (
-    contract,
     ab_pull,
     relax,
     set_value,
@@ -27,7 +26,6 @@ from tyssue.behaviors.sheet.actions import (
     decrease,
     increase_linear_tension,
     grow,
-    shrink,
 )
 from tyssue.behaviors.sheet.actions import remove as type3
 from tyssue.behaviors.sheet.actions import exchange as type1_at_shorter
@@ -298,17 +296,6 @@ def test_remove_face():
     assert sheet.Ne == 10
 
 
-def test_contract():
-
-    sheet = Sheet("emin", *three_faces_sheet())
-    sheet.face_df["contractility"] = 1.0
-    contract(sheet, 0, 0.5, multiply=False)
-    assert sheet.face_df.loc[0, "contractility"] == 1.5
-
-    contract(sheet, 1, 2.0, multiply=True)
-    assert sheet.face_df.loc[1, "contractility"] == 2.0
-
-
 def test_relax():
 
     sheet = Sheet("emin", *three_faces_sheet())
@@ -377,10 +364,3 @@ def test_grow():
     sheet.face_df["prefered_vol"] = 1.0
     grow(sheet, 0, 1.2)
     assert sheet.face_df.loc[0, "prefered_vol"] == 1.2
-
-
-def test_shrink():
-    sheet = Sheet("emin", *three_faces_sheet())
-    sheet.face_df["prefered_vol"] = 1.0
-    shrink(sheet, 0, 1.6)
-    assert sheet.face_df.loc[0, "prefered_vol"] == 0.625

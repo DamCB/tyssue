@@ -34,7 +34,7 @@ def split_vert(sheet, vert, face, to_rewire, epsilon, recenter=False):
 
     """
     # Add a vertex
-    this_vert = sheet.vert_df.loc[vert:vert] # avoid type munching
+    this_vert = sheet.vert_df.loc[vert:vert]  # avoid type munching
     sheet.vert_df = sheet.vert_df.append(this_vert, ignore_index=True)
     # reset datatypes
     new_vert = sheet.vert_df.index[-1]
@@ -108,7 +108,9 @@ def add_vert(eptm, edge):
     new_vert = eptm.vert_df.loc[srce:srce]
     eptm.vert_df = eptm.vert_df.append(new_vert, ignore_index=True)
     new_vert = eptm.vert_df.index[-1]
-    eptm.vert_df.loc[new_vert, eptm.coords] = eptm.vert_df.loc[[srce, trgt], eptm.coords].mean()
+    eptm.vert_df.loc[new_vert, eptm.coords] = eptm.vert_df.loc[
+        [srce, trgt], eptm.coords
+    ].mean()
 
     new_edges = []
 
@@ -351,5 +353,5 @@ def merge_border_edges(sheet, drop_two_sided=True):
     if drop_two_sided:
         drop_two_sided_faces(sheet)
 
-    sheet.reset_index()
+    sheet.reset_index(order=False)
     sheet.reset_topo()

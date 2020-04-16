@@ -28,16 +28,19 @@ def area_grad(sheet):
 
 
 def lumen_area_grad(eptm):
-    apical_pos = eptm.vert_df[["x", "y"]].copy()
-    apical_pos.loc[eptm.basal_verts] = 0
-    srce_pos = eptm.upcast_srce(apical_pos)
-    trgt_pos = eptm.upcast_trgt(apical_pos)
+
+    srce_pos = eptm.edge_df[eptm.scoords]
+    trgt_pos = eptm.edge_df[eptm.tcoords]
     grad_srce = srce_pos.copy()
-    grad_srce.columns = ["gx", "gy"]
+    grad_srce.columns = ["g" + c for c in eptm.coords]
     grad_trgt = grad_srce.copy()
-    grad_srce["gx"] = trgt_pos["y"]
-    grad_srce["gy"] = -trgt_pos["x"]
-    grad_trgt["gx"] = -srce_pos["y"]
-    grad_trgt["gy"] = srce_pos["x"]
+    grad_srce["gx"] = trgt_pos["ty"]
+    grad_srce["gy"] = -trgt_pos["tx"]
+    grad_trgt["gx"] = -srce_pos["sy"]
+    grad_trgt["gy"] = srce_pos["sx"]
+    lumen_side = eptm.settings.get("lumen_side", "basal")
+    grad_srce[eptm.edge_df.segment != lumen_side] = 0
+    grad_trgt[eptm.edge_df.segment != lumen_side] = 0
+
     # minus sign due to the backward orientation
     return -grad_srce, -grad_trgt

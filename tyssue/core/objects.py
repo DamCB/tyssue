@@ -10,6 +10,8 @@ import pandas as pd
 from copy import deepcopy
 from ..utils.utils import set_data_columns, spec_updater
 from ..utils import connectivity
+from ..geometry.planar_geometry import PlanarGeometry
+from ..geometry.sheet_geometry import SheetGeometry
 
 log = logging.getLogger(name=__name__)
 
@@ -146,6 +148,7 @@ class Epithelium:
 
         self.position_buffer = None
         self.topo_changed = False
+        self.is_ordered = False
 
     @property
     def vert_df(self):
@@ -315,11 +318,9 @@ class Epithelium:
     def Nc(self):
         """The number of cells in the epithelium
         """
-        if "cell" in self.data_names:
-            return self.cell_df.shape[0]
-        elif "face" in self.data_names:
+        if "cell" not in self.data_names:
             return self.face_df.shape[0]
-        return None
+        return self.cell_df.shape[0]
 
     def _upcast(self, idx, df):
 
@@ -584,15 +585,26 @@ class Epithelium:
 
         Each element of the Series is a (num_sides, num_dims) array of points
         ordered counterclockwise.
+
+        Note
+        ----
+        Vertices are assumed to be ordered in a face. If you are not
+        sure it is the case, you can run `sheet.reset_index(order=True)` before calling
+        this function.
         """
+        if not self.is_ordered:
+            raise ValueError(
+                "The vertices are assumed to be correctly ordered around the cell"
+            )
         if coords is None:
             coords = self.coords
 
-        def _get_verts_pos(face):
-            edges = _ordered_edges(face)
-            return np.array([self.vert_df.loc[idx[0], coords] for idx in edges])
+        scoords = ["s" + c for c in coords]
+        if not set(scoords).issubset(self.edge_df.columns):
+            for c in coords:
+                self.edge_df["s" + c] = self.upcast_srce(self.vert_df[c])
 
-        polys = self.edge_df.groupby("face").apply(_get_verts_pos).dropna()
+        polys = self.edge_df.groupby("face").apply(lambda df: df[scoords].to_numpy())
         return polys
 
     def validate(self):
@@ -620,21 +632,24 @@ class Epithelium:
         is_valid = self.get_valid()
         return ~is_valid
 
-    def sanitize(self, trim_borders=False):
+    def sanitize(self, trim_borders=False, order_edges=False):
         """Removes invalid faces and associated vertices
 
         If trim_borders is True (defaults to False), there will be a single
         border edge per border face.
         """
         invalid_edges = self.get_invalid()
-        if not len(invalid_edges) and trim_borders:
+        if not any(invalid_edges) and trim_borders:
             from ..topology.base_topology import merge_border_edges
 
             merge_border_edges(self)
+            self.topo_changed = False
+            return
 
-        self.remove(invalid_edges, trim_borders)
+        self.remove(invalid_edges, trim_borders, order_edges)
+        self.topo_changed = False
 
-    def remove(self, edge_out, trim_borders=False):
+    def remove(self, edge_out, trim_borders=False, order_edges=False):
         """Remove the edges indexed by `edge_out` associated with all
         the cells and faces containing those edges
 
@@ -674,6 +689,8 @@ class Epithelium:
             from ..topology.base_topology import merge_border_edges
 
             merge_border_edges(self)
+        if order_edges:
+            self.reset_index(order=True)
 
     def cut_out(self, bbox, coords=None):
         """Returns the index of edges with at least one vertex outside of the bounding box
@@ -706,12 +723,14 @@ class Epithelium:
             ]
         )
 
-    def reset_index(self):
+    def reset_index(self, order=False):
         """Resets the datasets  to have continuous indices
+
+        If order is True (the default), sorts the edges
+        such that for each face, vertices are ordered clockwize
         """
         log.debug("reseting index for %s", self.identifier)
         self.topo_changed = True
-
         # remove disconnected vertices and faces
         self.vert_df = self.vert_df.reindex(
             set(self.edge_df.srce).union(self.edge_df.trgt)
@@ -740,6 +759,20 @@ class Epithelium:
             self.edge_df["cell"] = new_cidx.loc[self.edge_df["cell"]].values
             self.cell_df.reset_index(drop=True, inplace=True)
             self.cell_df.index.name = "cell"
+
+        if order:
+            if self.dim == 2:
+                phis = PlanarGeometry.get_phis(self)
+            else:
+                if "rx" not in self.edge_df:
+                    SheetGeometry.update_dcoords(self)
+                    SheetGeometry.update_centroid(self)
+                phis = SheetGeometry.get_phis(self)
+            self.edge_df["phi"] = phis
+            self.edge_df.sort_values(["face", "phi"], inplace=True)
+            self.is_ordered = True
+        else:
+            self.is_ordered = False
 
         self.edge_df.reset_index(drop=True, inplace=True)
         self.edge_df.index.name = "edge"
@@ -798,9 +831,16 @@ class Epithelium:
         for each face of the tissue.
         If `vertex_normals` is True, also returns the normals of each vertex
         (set as the average of the vertex' edges), suitable for .OBJ export
+
+        Note
+        ----
+        Vertices are assumed to be ordered in a face. If you are not
+        sure it is the case, you can run `sheet.reset_index()` before calling
+        this function.
+
         """
         vertices = self.vert_df[coords]
-        faces = self.edge_df.groupby("face").apply(_ordered_vert_idxs)
+        faces = self.edge_df.groupby("face").apply(lambda df: list(df["srce"]))
         faces = faces.dropna()
 
         if vertex_normals:
@@ -808,8 +848,8 @@ class Epithelium:
                 self.edge_df.groupby("srce")[self.ncoords].mean()
                 + self.edge_df.groupby("trgt")[self.ncoords].mean()
             ) / 2.0
-            return vertices.values, faces.values, normals.values
-        return vertices.values, faces.values
+            return vertices.to_numpy(), faces.to_numpy(), normals.to_numpy()
+        return vertices.to_numpy(), faces.to_numpy()
 
     def validate_closed_cells(self):
         is_closed = self.edge_df.groupby("cell").apply(_is_closed_cell)
@@ -863,7 +903,6 @@ def _ordered_edges(face_edges):
     edges: list of 3 ints
         srce, trgt, face indices, ordered
     """
-
     srces, trgts, faces = face_edges[["srce", "trgt", "face"]].values.T
     srce, trgt, face_ = srces[0], trgts[0], faces[0]
     edges = [[srce, trgt, face_]]

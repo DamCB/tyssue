@@ -30,7 +30,7 @@ class History:
 
     """
 
-    def __init__(self, sheet, save_every=None, dt=None, extra_cols=None):
+    def __init__(self, sheet, save_every=None, dt=None, extra_cols=None, save_all=True):
         """Creates a `SheetHistory` instance.
 
         Parameters
@@ -40,9 +40,16 @@ class History:
         dt : float, time step
         extra_cols : dictionnary with sheet.datasets as keys and list of
             columns as values. Default None
+        save_all : bool
+            if True, saves all the data at each time point
         """
         if extra_cols is None:
-            extra_cols = defaultdict(list)
+            if save_all:
+                extra_cols = {
+                    k: list(sheet.datasets[k].columns) for k in sheet.datasets
+                }
+            else:
+                extra_cols = defaultdict(list)
         else:
             extra_cols = defaultdict(list, **extra_cols)
 
@@ -105,8 +112,12 @@ class History:
 
         """
         with pd.HDFStore(hf5file, "a") as store:
+
             for key, df in self.datasets.items():
-                store.append(key=key, value=df, data_columns=["time"])
+                kwargs = {"data_columns": ["time"]}
+                if "segment" in df.columns:
+                    kwargs["min_itemsize"] = {"segment": 7}
+                store.append(key=key, value=df, **kwargs)
 
     @property
     def time_stamps(self):
@@ -338,11 +349,14 @@ class HistoryHdf5(History):
                 new_types = dtypes_[element].to_dict()
                 if new_types != old_types:
                     changed_type = {
-                        k: old_types[k] for k in old_types
-                        if k in new_types and old_types[k] != new_types[k]}
+                        k: old_types[k]
+                        for k in old_types
+                        if k in new_types and old_types[k] != new_types[k]
+                    }
                     raise ValueError(
                         "There is a change of datatype in {} table in {} columns".format(
-                            element, changed_type)
+                            element, changed_type
+                        )
                     )
 
         if (self.save_every is None) or (
@@ -352,9 +366,11 @@ class HistoryHdf5(History):
                 times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
                 df = df[self.columns[element]]
                 df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
-
+                kwargs = {"data_columns": ["time"]}
+                if "segment" in df.columns:
+                    kwargs["min_itemsize"] = {"segment": 8}
                 with pd.HDFStore(self.hf5file, "a") as file:
-                    file.append(key=element, value=df, data_columns=["time"])
+                    file.append(key=element, value=df, **kwargs)
 
         self.index += 1
 

@@ -38,4 +38,4 @@ def test_models():
     specs = config.geometry.bulk_spec()
     monolayer = Monolayer("ell", datasets, specs)
 
-    testing.model_tester(mono, ClosedMonolayerModel)
+    testing.model_tester(monolayer, ClosedMonolayerModel)
