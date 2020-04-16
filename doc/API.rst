@@ -61,7 +61,7 @@ Sheet (2D 1/2)
    :members:
    :undoc-members:
 
-.. autoclass:: tyssue.geometry.sheet_geometry.ClosedSheetGeometry
+.. autoclass:: tyssue.ClosedSheetGeometry
    :members:
    :undoc-members:
 
