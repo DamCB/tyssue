@@ -17,6 +17,7 @@ from tyssue.topology.sheet_topology import cell_division, type1_transition, spli
 from tyssue.config.geometry import cylindrical_sheet
 from tyssue.draw import sheet_view
 
+
 def test_condition4i():
     sheet = Sheet("test", *three_faces_sheet())
     assert len(condition_4i(sheet)) == 0
@@ -92,7 +93,7 @@ def test_split_vert():
     sheet = Sheet("3cells_2D", datasets, specs)
     geom.update_all(sheet)
 
-    split_vert(sheet, 0, epsilon=1e-1)
+    split_vert(sheet, 0, multiplier=10)
     geom.update_all(sheet)
     assert sheet.Nv == 14
     assert sheet.Ne == 20

@@ -30,7 +30,7 @@ class History:
 
     """
 
-    def __init__(self, sheet, save_every=None, dt=None, extra_cols=None):
+    def __init__(self, sheet, save_every=None, dt=None, extra_cols=None, save_all=True):
         """Creates a `SheetHistory` instance.
 
         Parameters
@@ -40,9 +40,16 @@ class History:
         dt : float, time step
         extra_cols : dictionnary with sheet.datasets as keys and list of
             columns as values. Default None
+        save_all : bool
+            if True, saves all the data at each time point
         """
         if extra_cols is None:
-            extra_cols = defaultdict(list)
+            if save_all:
+                extra_cols = {
+                    k: list(sheet.datasets[k].columns) for k in sheet.datasets
+                }
+            else:
+                extra_cols = defaultdict(list)
         else:
             extra_cols = defaultdict(list, **extra_cols)
 
@@ -109,9 +116,7 @@ class History:
             for key, df in self.datasets.items():
                 kwargs = {"data_columns": ["time"]}
                 if "segment" in df.columns:
-                    kwargs["min_itemsize"] = {
-                        "segment": 7,
-                    }
+                    kwargs["min_itemsize"] = {"segment": 7}
                 store.append(key=key, value=df, **kwargs)
 
     @property
@@ -363,9 +368,7 @@ class HistoryHdf5(History):
                 df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
                 kwargs = {"data_columns": ["time"]}
                 if "segment" in df.columns:
-                    kwargs["min_itemsize"] = {
-                        "segment": 8,
-                    }
+                    kwargs["min_itemsize"] = {"segment": 8}
                 with pd.HDFStore(self.hf5file, "a") as file:
                     file.append(key=element, value=df, **kwargs)
 

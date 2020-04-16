@@ -639,12 +639,15 @@ class Epithelium:
         border edge per border face.
         """
         invalid_edges = self.get_invalid()
-        if not len(invalid_edges) and trim_borders:
+        if not any(invalid_edges) and trim_borders:
             from ..topology.base_topology import merge_border_edges
 
             merge_border_edges(self)
+            self.topo_changed = False
+            return
 
         self.remove(invalid_edges, trim_borders, order_edges)
+        self.topo_changed = False
 
     def remove(self, edge_out, trim_borders=False, order_edges=False):
         """Remove the edges indexed by `edge_out` associated with all
@@ -900,9 +903,6 @@ def _ordered_edges(face_edges):
     edges: list of 3 ints
         srce, trgt, face indices, ordered
     """
-    warnings.warn(
-        "You should not need this anymore, see `sheet.reset_index(order=True)`"
-    )
     srces, trgts, faces = face_edges[["srce", "trgt", "face"]].values.T
     srce, trgt, face_ = srces[0], trgts[0], faces[0]
     edges = [[srce, trgt, face_]]

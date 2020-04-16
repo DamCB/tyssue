@@ -367,16 +367,15 @@ def plot_forces(
         app_grad = approx_grad(sheet, geom, model)
         grad_i = (
             pd.DataFrame(
-                index=sheet.active_verts,
+                index=sheet.vert_df[sheet.vert_df.is_active.astype(bool)].index,
                 data=app_grad.reshape((-1, len(sheet.coords))),
                 columns=["g" + c for c in sheet.coords],
             )
             * scaling
         )
-
     else:
         grad_i = model.compute_gradient(sheet, components=False) * scaling
-
+        grad_i = grad_i.loc[sheet.vert_df["is_active"].astype(bool)]
     arrows = pd.DataFrame(columns=coords + gcoords, index=sheet.vert_df.index)
     arrows[coords] = sheet.vert_df[coords]
     arrows[gcoords] = -grad_i[gcoords]  # F = -grad E

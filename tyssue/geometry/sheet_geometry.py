@@ -240,28 +240,10 @@ class SheetGeometry(PlanarGeometry):
         if abs(norm).max() < 1e-10:
             # No rotation needed
             return
-
+        norm = norm.clip(min=1e-10)
         rot_axis /= norm[:, None]
 
-        cosa = np.cos(rot_angles)
-        r_mats = np.zeros((sheet.Nf, 3, 3))
-        for i in range(3):
-            r_mats[:, i, i] = cosa
-
-        r_mats += np.einsum("ij, ik -> ijk", rot_axis, rot_axis) * (
-            1 - cosa[:, None, None]
-        )
-        sin_rot_axis = rot_axis * np.sin(rot_angles)[:, None]
-
-        r_mats[:, 0, 1] -= sin_rot_axis[:, 2]
-        r_mats[:, 0, 2] += sin_rot_axis[:, 1]
-
-        r_mats[:, 1, 0] += sin_rot_axis[:, 2]
-        r_mats[:, 1, 2] -= sin_rot_axis[:, 0]
-
-        r_mats[:, 2, 0] -= sin_rot_axis[:, 1]
-        r_mats[:, 2, 1] += sin_rot_axis[:, 0]
-
+        r_mats = rotation_matrices(rot_angles, rot_axis)
         # upcast
         rotations = r_mats.take(sheet.edge_df["face"], axis=0)
         return rotations

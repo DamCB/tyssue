@@ -52,7 +52,6 @@ Since 0.7, you need to provide a default value for each of the
 specs parameters, e.g.
     specs = {
         "face": {
-            "is_alive": 1,
             "perimeter": 1.0,
             "perimeter_elasticity": 0.1,
             "prefered_perimeter": 3.81,
@@ -133,6 +132,7 @@ Setting all default values to 1.0 for now
                 grad_v = sum(vert_grads)
 
             grad_i = sum([g for g in (grad_s, grad_t, grad_v) if g is not None])
+
             return grad_i / norm_factor
 
     return NewModel
