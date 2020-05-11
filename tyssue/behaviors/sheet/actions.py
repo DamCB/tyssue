@@ -341,4 +341,4 @@ def relax(sheet, face, relax_decrease, relax_col="contractility"):
         divide=True,
         bound=(initial_contractility / 2),
     )
-    increase(sheet, "face", face, relax_decrease, "prefered_area", True)
+    increase(sheet, "face", face, relax_decrease, "prefered_area", True, bound=(initial_contractility / 2))
