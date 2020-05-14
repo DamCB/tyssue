@@ -332,6 +332,7 @@ def relax(sheet, face, relax_decrease, relax_col="contractility"):
 
     warnings.warn("deprecated, use decrease function")
     initial_contractility = 1.12
+    initial_prefered_area = 28
     decrease(
         sheet,
         "face",
@@ -341,4 +342,4 @@ def relax(sheet, face, relax_decrease, relax_col="contractility"):
         divide=True,
         bound=(initial_contractility / 2),
     )
-    increase(sheet, "face", face, relax_decrease, "prefered_area", True)
+    increase(sheet, "face", face, relax_decrease, "prefered_area", True, bound=(initial_prefered_area * 2))
