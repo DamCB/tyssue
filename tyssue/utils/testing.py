@@ -22,7 +22,7 @@ def effector_tester(eptm, effector):
     if grad_s.shape == (eptm.Nv, eptm.dim):
         assert grad_t is None
     elif grad_s.shape == (eptm.Ne, eptm.dim):
-        assert grad_t.shape[0] == eptm.Ne
+        assert grad_t.shape == (eptm.Ne, eptm.dim)
         assert np.all(np.isfinite(grad_t))
     else:
         raise ValueError(

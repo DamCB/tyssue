@@ -195,18 +195,17 @@ def _wire_color_from_sequence(edge_spec, sheet):
     cmap = cm.get_cmap(edge_spec.get("colormap", "viridis"))
     if color_.shape in [(sheet.Nv, 3), (sheet.Nv, 4)]:
         return np.asarray(color_)
-    elif color_.shape == (sheet.Nv,):
+    if color_.shape == (sheet.Nv,):
         if np.ptp(color_) < 1e-10:
-            warnings.warn("Attempting to draw a colormap " "with a uniform value")
             return np.ones((sheet.Nv, 3)) * 0.7
         return cmap((color_ - color_.min()) / np.ptp(color_))
 
-    elif color_.shape in [(sheet.Ne, 3), (sheet.Ne, 4)]:
+    if color_.shape in [(sheet.Ne, 3), (sheet.Ne, 4)]:
         color_ = pd.DataFrame(color_, index=sheet.edge_df.index)
         color_["srce"] = sheet.edge_df["srce"]
         color_ = color_.groupby("srce").mean().values
         return color_
-    elif color_.shape == (sheet.Ne,):
+    if color_.shape == (sheet.Ne,):
         color_ = pd.DataFrame(color_, index=sheet.edge_df.index)
         color_["srce"] = sheet.edge_df["srce"]
         color_ = color_.groupby("srce").mean().values.ravel()
@@ -232,7 +231,7 @@ def _face_color_from_sequence(face_spec, sheet):
 
     elif color_.shape == (sheet.Nf,):
         if np.ptp(color_) < 1e-10:
-            warnings.warn("Attempting to draw a colormap " "with a uniform value")
+            # warnings.warn("Attempting to draw a colormap with a uniform value")
             return np.ones((face_mesh_shape, 3)) * 0.5
 
         normed = (color_ - color_min) / (color_max - color_min)

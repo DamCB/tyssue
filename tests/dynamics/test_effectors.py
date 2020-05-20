@@ -1,4 +1,4 @@
-from tyssue.generation import extrude, three_faces_sheet
+from tyssue.generation import three_faces_sheet
 from tyssue import Monolayer, config, Sheet
 
 from tyssue.utils import testing

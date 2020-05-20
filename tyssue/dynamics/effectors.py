@@ -587,13 +587,14 @@ class RadialTension(AbstractEffector):
 
     @staticmethod
     def gradient(eptm):
-        upcast_f = eptm.upcast_face(eptm.face_df[["radial_tension", "num_sides"]])
-        upcast_tension = upcast_f["radial_tension"] / upcast_f["num_sides"]
+        upcast_tension = eptm.upcast_face(
+            eptm.face_df.eval("radial_tension / num_sides")
+        )
 
         upcast_height = eptm.upcast_srce(height_grad(eptm))
         grad_srce = to_nd(upcast_tension, 3) * upcast_height
         grad_srce.columns = ["g" + u for u in eptm.coords]
-        return grad_srce, pd.DataFrame(0, index=np.arange(eptm.Ne), columns=[""])
+        return grad_srce / 2, grad_srce / 2
 
 
 class BarrierElasticity(AbstractEffector):
