@@ -16,6 +16,7 @@ before_install:
   - source activate tyssue
   - conda install pytest pytest-cov
   - pip install coveralls nbval
+  - rm tests/draww/test_vispy.py
 
 install:
   - python setup.py install
