@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from matplotlib import cm
 
 import vispy as vp
 from vispy import app, scene
@@ -30,6 +31,9 @@ def face_visual(sheet, coords=None, **draw_specs_kw):
         vertices, faces = sheet.triangular_mesh(coords)
 
     color = None
+
+    if callable(draw_specs["color"]):
+        draw_specs["color"] = draw_specs["color"](sheet)
 
     if isinstance(draw_specs["color"], str):
         face_colors = None
@@ -62,6 +66,25 @@ def face_visual(sheet, coords=None, **draw_specs_kw):
             data=colors,
             columns=["R", "G", "B", "A"][: colors.shape[1]],
         )
+    elif colors.shape == (sheet.Nf,):
+        cmap = cm.get_cmap(draw_specs.get("colormap", "viridis"))
+        color_min, color_max = draw_specs.get(
+            "color_range", (colors.min(), colors.max())
+        )
+        normed = (colors - color_min) / (color_max - color_min)
+        up_color = sheet.upcast_face(normed).to_numpy()
+        face_colors = pd.DataFrame(
+            cmap(up_color), index=sheet.edge_df.index, columns=list("RGBA")
+        )
+
+        if "alpha" in draw_specs:
+            alpha = np.asarray(draw_specs["alpha"])
+            if alpha.shape == (1,):
+                face_colors["A"] = alpha
+            elif alpha.shape == (sheet.Nf,):
+                face_colors["A"] = np.upcast_face(alpha)
+            elif alpha.shape == (sheet.Ne,):
+                face_colors["A"] = alpha
 
     mesh = scene.visuals.Mesh(
         vertices=vertices, faces=faces, face_colors=face_colors, color=color
@@ -77,6 +100,9 @@ def edge_visual(sheet, coords=None, **draw_specs_kw):
         coords = list("xyz")
 
     color = None
+    if callable(draw_specs["color"]):
+        draw_specs["color"] = draw_specs["color"](sheet)
+
     if isinstance(draw_specs["color"], str):
         color = draw_specs["color"]
 
@@ -138,26 +164,25 @@ def edge_visual(sheet, coords=None, **draw_specs_kw):
     return wire
 
 
-def vp_view(sheet, coords=None, interactive=True, **draw_specs_kw):
-
+def sheet_view(sheet, coords=None, interactive=True, **draw_specs_kw):
+    """Uses VisPy to display an epithelium
+    """
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
 
     if coords is None:
         coords = ["x", "y", "z"]
-    canvas = scene.SceneCanvas(keys="interactive", show=True)
+    canvas = scene.SceneCanvas(keys="interactive", show=True, size=(1240, 720))
     view = canvas.central_widget.add_view()
     view.camera = "turntable"
     view.camera.aspect = 1
     view.bgcolor = vp.color.Color("#222222")
-
-    if draw_specs["face"]["visible"]:
-        mesh = face_visual(sheet, coords, **draw_specs["face"])
-        view.add(mesh)
-
     if draw_specs["edge"]["visible"]:
         wire = edge_visual(sheet, coords, **draw_specs["edge"])
         view.add(wire)
+    if draw_specs["face"]["visible"]:
+        mesh = face_visual(sheet, coords, **draw_specs["face"])
+        view.add(mesh)
 
     canvas.show()
     view.camera.set_range()

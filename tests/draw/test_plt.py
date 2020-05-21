@@ -62,6 +62,14 @@ class TestsPlt:
         assert ax.collections[2].get_edgecolors().shape == (0, 4)
         assert ax.collections[2].get_facecolors().shape == (3, 4)
 
+        self.draw_specs["edge"]["head_width"] = 1.0
+        fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
+        assert len(ax.collections) == 3
+        assert ax.collections[0].get_edgecolors().shape == (13, 4)
+        assert ax.collections[1].get_edgecolors().shape == (18, 4)
+        assert ax.collections[2].get_edgecolors().shape == (0, 4)
+        assert ax.collections[2].get_facecolors().shape == (3, 4)
+
     def test_sheet_view_color_string(self):
         self.draw_specs["edge"]["color"] = "k"
         self.draw_specs["face"]["color"] = "red"

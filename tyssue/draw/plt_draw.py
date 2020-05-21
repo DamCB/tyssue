@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 
 from matplotlib import cm
 from matplotlib.path import Path
-from matplotlib.patches import Polygon, FancyArrow, Arc, PathPatch
-from matplotlib.collections import PatchCollection, PolyCollection
+from matplotlib.patches import FancyArrow, Arc, PathPatch
+from matplotlib.collections import PatchCollection, PolyCollection, LineCollection
 
 from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater, get_sub_eptm
@@ -58,7 +58,8 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
     margin = delta * margin / 100
     xlim = bounds.loc["min", x] - margin, bounds.loc["max", x] + margin
     ylim = bounds.loc["min", y] - margin, bounds.loc["max", y] + margin
-    times = np.linspace(history.time_stamps[0], history.time_stamps[-1], num_frames)
+    time_stamps = history.time_stamps
+    times = np.linspace(time_stamps[0], time_stamps[-1], num_frames)
     if len(history) < num_frames:
         for i, (t_, sheet) in enumerate(history):
             fig, ax = draw_func(sheet, **draw_kwds)
@@ -71,7 +72,7 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
             figs.sort()
 
         for i, t in enumerate(times):
-            index = np.where(history.time_stamps >= t)[0][0]
+            index = np.where(time_stamps >= t)[0][0]
             fig = figs[index]
             shutil.copy(fig, graph_dir / f"movie_{i:04d}.png")
     else:
@@ -245,43 +246,47 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
     """
     draw_spec = sheet_spec()["edge"]
     draw_spec.update(**draw_spec_kw)
-
-    x, y = coords
+    arrow_specs, collections_specs = _parse_edge_specs(draw_spec, sheet)
     dx, dy = ("d" + c for c in coords)
-    app_length = np.hypot(sheet.edge_df[dx], sheet.edge_df[dy])
+    sx, sy = ("s" + c for c in coords)
+    tx, ty = ("t" + c for c in coords)
 
-    patches = []
-    arrow_specs, collections_specs = parse_edge_specs(draw_spec, sheet)
+    if draw_spec.get("head_width"):
 
-    for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows():
-        srce = int(edge["srce"])
-        arrow = FancyArrow(
-            sheet.vert_df.loc[srce, x],
-            sheet.vert_df.loc[srce, y],
-            sheet.edge_df.loc[idx, dx],
-            sheet.edge_df.loc[idx, dy],
-            **arrow_specs,
+        app_length = (
+            np.hypot(sheet.edge_df[dx], sheet.edge_df[dy]) * sheet.edge_df.length.mean()
         )
-        patches.append(arrow)
-    ax.add_collection(PatchCollection(patches, False, **collections_specs))
+        patches = [
+            FancyArrow(*edge[[sx, sy, dx, dy]], **arrow_specs)
+            for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows()
+        ]
+        ax.add_collection(PatchCollection(patches, False, **collections_specs))
+    else:
+        segments = sheet.edge_df[[sx, sy, tx, ty]].to_numpy().reshape((-1, 2, 2))
+        ax.add_collection(LineCollection(segments, **collections_specs))
     return ax
 
 
-def parse_edge_specs(edge_draw_specs, sheet):
+def _parse_edge_specs(edge_draw_specs, sheet):
 
     arrow_keys = ["head_width", "length_includes_head", "shape"]
     arrow_specs = {
         key: val for key, val in edge_draw_specs.items() if key in arrow_keys
     }
     collection_specs = {}
+    if arrow_specs.get("head_width"):  # draw arrows
+        color_key = "edgecolors"
+    else:
+        color_key = "colors"
+
     if "color" in edge_draw_specs:
         if callable(edge_draw_specs["color"]):
             edge_draw_specs["color"] = edge_draw_specs["color"](sheet)
 
         if isinstance(edge_draw_specs["color"], str):
-            collection_specs["edgecolors"] = edge_draw_specs["color"]
+            collection_specs[color_key] = edge_draw_specs["color"]
         elif hasattr(edge_draw_specs["color"], "__len__"):
-            collection_specs["edgecolors"] = _wire_color_from_sequence(
+            collection_specs[color_key] = _wire_color_from_sequence(
                 edge_draw_specs, sheet
             )
 
