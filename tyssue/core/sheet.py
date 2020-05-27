@@ -20,6 +20,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import scipy.linalg as linalg
+from scipy.sparse import coo_matrix
 
 from .objects import Epithelium
 from ..config.geometry import flat_sheet
@@ -296,20 +297,28 @@ class Sheet(Epithelium):
 
         n_edges = len(edges_index)
 
-        # Fill gamma matrix to measure tension
-        g_gamma_matrix = np.zeros((n_edges, self.Nv * 3))
-
         srce, trgt = self.edge_df.loc[
             edges_index, ['srce', 'trgt']].iteritems()
         srce = srce[1].to_numpy()
         trgt = trgt[1].to_numpy()
 
+        # Fill gamma matrix to measure tension
         pos = (self.edge_df.loc[edges_index, dcoords].to_numpy() / np.repeat(np.linalg.norm(
-            self.edge_df.loc[edges_index, dcoords].to_numpy(), axis=1), 3).reshape((n_edges, 3)))
+            self.edge_df.loc[edges_index, dcoords].to_numpy(), axis=1), ndim).reshape((n_edges, ndim)))
 
-        for i in range(n_edges):
-            g_gamma_matrix[i][srce[i] * ndim:srce[i] * ndim + ndim] = pos[i]
-            g_gamma_matrix[i][trgt[i] * ndim:trgt[i] * ndim + ndim] = -pos[i]
+        pos = np.concatenate((pos, -pos)).flatten()
+        row = np.concatenate((
+            np.array([np.arange(i * ndim, i * ndim + ndim)
+                      for i in srce]).flatten(),
+            np.array([np.arange(i * ndim, i * ndim + ndim)
+                      for i in trgt]).flatten())
+        )
+
+        col = np.concatenate(
+            (np.repeat(np.arange(n_edges), ndim), np.repeat(np.arange(n_edges), ndim)))
+
+        g_gamma_matrix = coo_matrix((pos, (col, row)), shape=(
+            n_edges, self.Nv * ndim)).toarray()
 
         g_gamma_matrix = g_gamma_matrix.T
 
