@@ -19,6 +19,7 @@ A dynamical model derived from Monier, Gettings et al. 2015 is provided in
 import warnings
 import numpy as np
 import pandas as pd
+import scipy.linalg as linalg
 
 from .objects import Epithelium
 from ..config.geometry import flat_sheet
@@ -272,6 +273,67 @@ class Sheet(Epithelium):
         subsheet.reset_index()
         subsheet.reset_topo()
         return subsheet
+
+    def get_force_inference(self, coords=None):
+        """Measure force based on Brodland method.
+
+        g_gamma_matrix*tension_vector = 0
+        Equation is homogenous and to avoid tension_vectors = 0,
+        Construction and solve the constrained least-squares equation system
+        [[g_gamma_matrix.T g_gamma_matrix, C^T_1],
+         [C_1, 0]]
+         où C1 = {1....1}
+
+        """
+        if coords is None:
+            coords = self.coords
+        ndim = self.dim
+        dcoords = ["d" + c for c in coords]
+
+        self.get_extra_indices()
+        edges_index = self.east_edges
+        edges_index_opposite = self.west_edges
+
+        n_edges = len(edges_index)
+
+        # Fill gamma matrix to measure tension
+        g_gamma_matrix = np.zeros((n_edges, self.Nv * 3))
+
+        srce, trgt = self.edge_df.loc[
+            edges_index, ['srce', 'trgt']].iteritems()
+        srce = srce[1].to_numpy()
+        trgt = trgt[1].to_numpy()
+
+        pos = (self.edge_df.loc[edges_index, dcoords].to_numpy() / np.repeat(np.linalg.norm(
+            self.edge_df.loc[edges_index, dcoords].to_numpy(), axis=1), 3).reshape((n_edges, 3)))
+
+        for i in range(n_edges):
+            g_gamma_matrix[i][srce[i] * ndim:srce[i] * ndim + ndim] = pos[i]
+            g_gamma_matrix[i][trgt[i] * ndim:trgt[i] * ndim + ndim] = -pos[i]
+
+        g_gamma_matrix = g_gamma_matrix.T
+
+        p = np.ones((n_edges + 1, n_edges + 1))
+
+        # get g_gamma_matrix.T g_gamma_matrix
+        g_gamma_matrix_dot = np.dot(g_gamma_matrix.T, g_gamma_matrix)
+        p[0:n_edges, 0:n_edges] = g_gamma_matrix_dot
+        p[n_edges, n_edges] = 0
+
+        q = np.zeros((n_edges + 1, 1))
+        q[n_edges, 0] = n_edges
+
+        # Compute QR decomposition of a matrix.
+        r1, r2 = linalg.qr(p)
+        y = np.dot(r1.T, q)
+
+        x = linalg.solve(r2, y)
+
+        tension = x[0:n_edges][:, 0]
+
+        self.edge_df['tension'] = 0
+        self.edge_df.loc[edges_index, 'tension'] = tension
+        self.edge_df.loc[edges_index_opposite, 'tension'] = tension
 
     @classmethod
     def planar_sheet_2d(cls, identifier, nx, ny, distx, disty, noise=None):
