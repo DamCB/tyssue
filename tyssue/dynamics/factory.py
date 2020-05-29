@@ -102,17 +102,6 @@ Setting all default values to 1.0 for now
         @staticmethod
         def compute_gradient(eptm, components=False):
             norm_factor = eptm.specs["settings"].get("nrj_norm_factor", 1)
-            if not eptm.ucoords[0] in eptm.edge_df.columns:
-                warnings.warn(
-                    "setting ucoords in grad computation," "please fix your specs"
-                )
-                for uc in eptm.ucoords:
-                    eptm.edge_df[uc] = 0.0
-
-            eptm.edge_df[eptm.ucoords] = eptm.edge_df[eptm.dcoords] / to_nd(
-                eptm.edge_df["length"], eptm.dim
-            )
-
             grads = [f.gradient(eptm) for f in effectors]
             if components:
                 return grads

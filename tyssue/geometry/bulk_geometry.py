@@ -27,6 +27,7 @@ class BulkGeometry(SheetGeometry):
 
         """
         cls.update_dcoords(eptm)
+        cls.update_ucoords(eptm)
         cls.update_length(eptm)
         cls.update_perimeters(eptm)
         cls.update_centroid(eptm)
@@ -37,6 +38,10 @@ class BulkGeometry(SheetGeometry):
     @staticmethod
     def update_dcoords(eptm):
         SheetGeometry.update_dcoords(eptm)
+
+    @staticmethod
+    def update_ucoords(eptm):
+        SheetGeometry.update_ucoords(eptm)
 
     @staticmethod
     def update_vol(eptm):

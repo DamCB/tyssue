@@ -23,6 +23,7 @@ class SheetGeometry(PlanarGeometry):
 
         """
         cls.update_dcoords(sheet)
+        cls.update_ucoords(sheet)
         cls.update_length(sheet)
         cls.update_centroid(sheet)
         cls.update_height(sheet)

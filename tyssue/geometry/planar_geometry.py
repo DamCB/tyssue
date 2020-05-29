@@ -18,6 +18,7 @@ class PlanarGeometry(BaseGeometry):
         """
 
         cls.update_dcoords(sheet)
+        cls.update_ucoords(sheet)
         cls.update_length(sheet)
         cls.update_centroid(sheet)
         cls.update_normals(sheet)
