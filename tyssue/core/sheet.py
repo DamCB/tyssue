@@ -285,6 +285,21 @@ class Sheet(Epithelium):
          [C_1, 0]]
          où C1 = {1....1}
 
+        shape of g_gamma_matrix = (Ne/2, Nv*len(coords))
+
+         .. note:: Results might not be consistens for highly curved epithelium
+
+        Parameters
+        ----------
+        coords: coordinates
+        column: None, specify a column name in edge_df to put tension value
+        free_border_edges: bool, default False, take into account edges in the
+        border of the tissue if True
+
+        Returns
+        -------
+        edges_tensions: tension values array if `column` not define
+
         """
         if coords is None:
             coords = self.coords
