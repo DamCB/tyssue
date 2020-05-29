@@ -275,7 +275,7 @@ class Sheet(Epithelium):
         subsheet.reset_topo()
         return subsheet
 
-    def get_force_inference(self, coords=None):
+    def get_force_inference(self, coords=None, column=None, free_border_edges=False):
         """Measure force based on Brodland method.
 
         g_gamma_matrix*tension_vector = 0
@@ -288,40 +288,37 @@ class Sheet(Epithelium):
         """
         if coords is None:
             coords = self.coords
-        ndim = self.dim
-        dcoords = ["d" + c for c in coords]
+        ndim = len(coords)
+        ucoords = ["u" + c for c in coords]
 
         self.get_extra_indices()
-        edges_index = self.east_edges
-        edges_index_opposite = self.west_edges
+        edges_index = self.east_edges.to_numpy()
+        edges_index_opposite = self.west_edges.to_numpy()
+        if free_border_edges:
+            edges_lonely = np.setxor1d(self.sgle_edges, edges_index)
+            edges_index = np.concatenate((edges_index, edges_lonely))
 
         n_edges = len(edges_index)
 
-        srce, trgt = self.edge_df.loc[
-            edges_index, ['srce', 'trgt']].iteritems()
-        srce = srce[1].to_numpy()
-        trgt = trgt[1].to_numpy()
+        srce, trgt = self.edge_df.loc[edges_index, ['srce', 'trgt']].to_numpy().T
 
         # Fill gamma matrix to measure tension
-        pos = (self.edge_df.loc[edges_index, dcoords].to_numpy() / np.repeat(np.linalg.norm(
-            self.edge_df.loc[edges_index, dcoords].to_numpy(), axis=1), ndim).reshape((n_edges, ndim)))
+        pos = self.edge_df.loc[edges_index, ucoords].to_numpy()
 
         pos = np.concatenate((pos, -pos)).flatten()
+
         row = np.concatenate((
-            np.array([np.arange(i * ndim, i * ndim + ndim)
-                      for i in srce]).flatten(),
-            np.array([np.arange(i * ndim, i * ndim + ndim)
-                      for i in trgt]).flatten())
+            np.vstack([srce * ndim + i for i in range(ndim)]).T.flatten(),
+            np.vstack([trgt * ndim + i for i in range(ndim)]).T.flatten())
+        )
+        col = np.concatenate((
+            np.repeat(np.arange(n_edges), ndim),
+            np.repeat(np.arange(n_edges), ndim))
         )
 
-        col = np.concatenate(
-            (np.repeat(np.arange(n_edges), ndim), np.repeat(np.arange(n_edges), ndim)))
-
-        g_gamma_matrix = coo_matrix((pos, (col, row)), shape=(
-            n_edges, self.Nv * ndim)).toarray()
+        g_gamma_matrix = coo_matrix((pos, (col, row))).toarray()
 
         g_gamma_matrix = g_gamma_matrix.T
-
         p = np.ones((n_edges + 1, n_edges + 1))
 
         # get g_gamma_matrix.T g_gamma_matrix
@@ -340,9 +337,17 @@ class Sheet(Epithelium):
 
         tension = x[0:n_edges][:, 0]
 
-        self.edge_df['tension'] = np.nan
-        self.edge_df.loc[edges_index, 'tension'] = tension
-        self.edge_df.loc[edges_index_opposite, 'tension'] = tension
+        edges_tensions = np.full([self.Ne], np.nan)
+        edges_tensions[edges_index] = tension
+        if free_border_edges:
+            edges_tensions[edges_index_opposite] = tension[:len(edges_index_opposite)]
+        else:
+            edges_tensions[edges_index_opposite] = tension
+
+        if column is None:
+            return edges_tensions
+        else:
+            self.edge_df[column] = edges_tensions
 
     @classmethod
     def planar_sheet_2d(cls, identifier, nx, ny, distx, disty, noise=None):
