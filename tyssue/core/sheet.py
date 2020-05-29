@@ -340,7 +340,7 @@ class Sheet(Epithelium):
 
         tension = x[0:n_edges][:, 0]
 
-        self.edge_df['tension'] = 0
+        self.edge_df['tension'] = np.nan
         self.edge_df.loc[edges_index, 'tension'] = tension
         self.edge_df.loc[edges_index_opposite, 'tension'] = tension
 
