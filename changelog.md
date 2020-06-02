@@ -1,3 +1,6 @@
+## Core
+- Add force inference algorithm in sheet class, based on method describe in Brodland et al. 2014. 
+
 # What's new in 0.7.0
 
 ## Coordinate system and vertex ordering
