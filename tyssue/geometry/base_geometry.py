@@ -1,4 +1,5 @@
 import numpy as np
+from ..utils.utils import to_nd
 
 
 class BaseGeometry:
@@ -36,6 +37,12 @@ class BaseGeometry:
             sheet.edge_df[sheet.dcoords] = trgt_pos - srce_pos
         else:
             update_periodic_dcoords(sheet)
+
+    @staticmethod
+    def update_ucoords(sheet):
+        sheet.edge_df[sheet.ucoords] = sheet.edge_df[sheet.dcoords] / to_nd(
+            sheet.edge_df["length"], sheet.dim
+        )
 
     @staticmethod
     def update_length(sheet):

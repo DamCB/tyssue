@@ -12,6 +12,7 @@ class MultiSheetGeometry:
         msheet.update_interpolants()
         for sheet in msheet:
             SheetGeometry.update_dcoords(sheet)
+            SheetGeometry.update_ucoords(sheet)
             SheetGeometry.update_length(sheet)
             SheetGeometry.update_centroid(sheet)
             SheetGeometry.update_normals(sheet)

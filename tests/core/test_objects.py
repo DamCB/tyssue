@@ -18,6 +18,9 @@ from tyssue.generation import extrude, hexa_grid3d, hexa_grid2d
 from tyssue.config.dynamics import quasistatic_sheet_spec
 from tyssue.config.geometry import spherical_sheet
 from tyssue.generation import generate_ring
+from tyssue.dynamics import effectors, model_factory
+from tyssue.solvers.quasistatic import QSSolver
+from tyssue import PlanarGeometry
 
 
 def test_3faces():
@@ -69,7 +72,8 @@ def test_opposite():
     )
     assert_array_equal(true_opp, opposites)
 
-    edge_df = datasets["edge"].append(datasets["edge"].loc[0], ignore_index=True)
+    edge_df = datasets["edge"].append(
+        datasets["edge"].loc[0], ignore_index=True)
     edge_df.index.name = "edge"
     with pytest.warns(UserWarning):
         opposites = get_opposite(edge_df)
@@ -123,7 +127,8 @@ def test_extra_indices():
     datasets["face"] = pd.DataFrame(data=np.zeros((3, 2)), columns=["x", "y"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y"])
+    datasets["vert"] = pd.DataFrame(
+        data=np.array(tri_verts), columns=["x", "y"])
     datasets["vert"].index.name = "vert"
     specs = config.geometry.planar_spec()
     eptm = Sheet("extra", datasets, specs, coords=["x", "y"])
@@ -179,7 +184,8 @@ def test_sort_eastwest():
     datasets["face"] = pd.DataFrame(data=np.zeros((3, 2)), columns=["x", "y"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y"])
+    datasets["vert"] = pd.DataFrame(
+        data=np.array(tri_verts), columns=["x", "y"])
     datasets["vert"].index.name = "vert"
     specs = config.geometry.planar_spec()
     eptm = Sheet("extra", datasets, specs, coords=["x", "y"])
@@ -196,7 +202,8 @@ def test_update_rank():
     sheet = Sheet("3", *three_faces_sheet())
     sheet.update_rank()
     np.testing.assert_array_equal(
-        np.array([3, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2]), sheet.vert_df["rank"]
+        np.array([3, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2]
+                 ), sheet.vert_df["rank"]
     )
 
     mono = Epithelium("3", extrude(sheet.datasets))
@@ -437,8 +444,10 @@ def test_orbits():
     datasets = extrude(datasets_2d)
     eptm = Epithelium("3faces_3D", datasets, specs)
 
-    expected_res_cell = datasets["edge"].groupby("srce").apply(lambda df: df["cell"])
-    expected_res_face = datasets["edge"].groupby("face").apply(lambda df: df["trgt"])
+    expected_res_cell = datasets["edge"].groupby(
+        "srce").apply(lambda df: df["cell"])
+    expected_res_face = datasets["edge"].groupby(
+        "face").apply(lambda df: df["trgt"])
     assert_array_equal(expected_res_cell, eptm.get_orbits("srce", "cell"))
     assert_array_equal(expected_res_face, eptm.get_orbits("face", "trgt"))
 
@@ -644,7 +653,8 @@ def test_face_polygons_exception():
     datasets["face"] = pd.DataFrame(data=np.zeros((3, 2)), columns=["x", "y"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y"])
+    datasets["vert"] = pd.DataFrame(
+        data=np.array(tri_verts), columns=["x", "y"])
     datasets["vert"].index.name = "vert"
 
     specs = config.geometry.planar_spec()
@@ -684,7 +694,7 @@ def test_invalid_valid_sanitize():
         [3, 1, 2],
     ]  # changed 0 to 1 to create an invalid face
 
-    ## Epithelium whose faces are all valid
+    # Epithelium whose faces are all valid
     ##
     datasets["edge"] = pd.DataFrame(
         data=np.array(tri_edges_valid), columns=["srce", "trgt", "face"]
@@ -694,21 +704,23 @@ def test_invalid_valid_sanitize():
     datasets["face"] = pd.DataFrame(data=np.zeros((3, 2)), columns=["x", "y"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y"])
+    datasets["vert"] = pd.DataFrame(
+        data=np.array(tri_verts), columns=["x", "y"])
     datasets["vert"].index.name = "vert"
 
     specs = config.geometry.planar_spec()
     eptm = Epithelium("valid", datasets, specs, coords=["x", "y"])
     PlanarGeometry.update_all(eptm)
 
-    ## Epithelium with invalid faces (last 3)
+    # Epithelium with invalid faces (last 3)
     datasets_invalid = datasets.copy()
     datasets_invalid["edge"] = pd.DataFrame(
         data=np.array(tri_edges_invalid), columns=["srce", "trgt", "face"]
     )
     datasets_invalid["edge"].index.name = "edge"
 
-    eptm_invalid = Epithelium("invalid", datasets_invalid, specs, coords=["x", "y"])
+    eptm_invalid = Epithelium(
+        "invalid", datasets_invalid, specs, coords=["x", "y"])
     PlanarGeometry.update_all(eptm_invalid)
 
     eptm.get_valid()
@@ -722,8 +734,8 @@ def test_invalid_valid_sanitize():
     assert not res_invalid_expect_all_false.all()
     assert res_invalid_expect_some_true[6:].all()
 
-    ### testing sanitize
-    ### edges 6 to 9 should be removed.
+    # testing sanitize
+    # edges 6 to 9 should be removed.
     edge_df_before = eptm.edge_df.copy()
     edge_df_invalid_before = eptm_invalid.edge_df.copy()
 
@@ -1428,10 +1440,12 @@ def test_vertex_mesh():
     )
     datasets["edge"].index.name = "edge"
 
-    datasets["face"] = pd.DataFrame(data=np.zeros((3, 3)), columns=["x", "y", "z"])
+    datasets["face"] = pd.DataFrame(
+        data=np.zeros((3, 3)), columns=["x", "y", "z"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y", "z"])
+    datasets["vert"] = pd.DataFrame(
+        data=np.array(tri_verts), columns=["x", "y", "z"])
     datasets["vert"].index.name = "vert"
 
     specs = config.geometry.flat_sheet()
@@ -1439,17 +1453,18 @@ def test_vertex_mesh():
     eptm = Epithelium("vertex_mesh", datasets, specs, coords=["x", "y", "z"])
     SheetGeometry.update_all(eptm)
 
-    ## tested method
+    # tested method
     res_verts, res_faces, res_normals = eptm.vertex_mesh(["x", "y", "z"])
-    res_xy_verts, res_xy_faces = eptm.vertex_mesh(["x", "y", "z"], vertex_normals=False)
+    res_xy_verts, res_xy_faces = eptm.vertex_mesh(
+        ["x", "y", "z"], vertex_normals=False)
     res_faces = list(res_faces)
 
     expected_faces = [[0, 1, 2], [0, 3, 1], [0, 2, 3]]
 
-    ## floating point precision might causes issues here
-    ## when comparing arrays ... there seems to be
-    ## a built-in 1e-10 tolerance in
-    ## the assert_array_equal function.
+    # floating point precision might causes issues here
+    # when comparing arrays ... there seems to be
+    # a built-in 1e-10 tolerance in
+    # the assert_array_equal function.
 
     expected_normals = np.array(
         [
@@ -1461,9 +1476,11 @@ def test_vertex_mesh():
     )
 
     assert_array_equal(res_verts, np.array(tri_verts))
-    assert all([res_faces[i] == expected_faces[i] for i in range(len(expected_faces))])
+    assert all([res_faces[i] == expected_faces[i]
+                for i in range(len(expected_faces))])
     assert_array_equal(
-        np.round(res_normals, decimals=6), np.round(expected_normals, decimals=6)
+        np.round(res_normals, decimals=6), np.round(
+            expected_normals, decimals=6)
     )
 
 
@@ -1491,7 +1508,7 @@ def test_ordered_edges():
         eptm.edge_df.loc[eptm.edge_df["face"] == 98765]
     )
 
-    ## testing the exception case in ordered_vert_idxs :
+    # testing the exception case in ordered_vert_idxs :
     res_invalid_face = _ordered_vert_idxs(
         eptm.edge_df.loc[eptm.edge_df["face"] == 98765]
     )
@@ -1502,7 +1519,8 @@ def test_get_prev_edges():
 
     tri_face = Epithelium("3", *three_faces_sheet())
     prev = get_prev_edges(tri_face).values
-    expected = np.array([5, 0, 1, 2, 3, 4, 11, 6, 7, 8, 9, 10, 17, 12, 13, 14, 15, 16])
+    expected = np.array([5, 0, 1, 2, 3, 4, 11, 6, 7, 8,
+                         9, 10, 17, 12, 13, 14, 15, 16])
     assert_array_equal(prev, expected)
 
 
@@ -1510,5 +1528,49 @@ def test_get_next_edges():
 
     tri_face = Epithelium("3", *three_faces_sheet())
     prev = get_next_edges(tri_face).values
-    expected = np.array([1, 2, 3, 4, 5, 0, 7, 8, 9, 10, 11, 6, 13, 14, 15, 16, 17, 12])
+    expected = np.array([1, 2, 3, 4, 5, 0, 7, 8, 9, 10,
+                         11, 6, 13, 14, 15, 16, 17, 12])
     assert_array_equal(prev, expected)
+
+
+def test_get_force_inference():
+    # INIT TISSUE
+    sheet = Sheet.planar_sheet_2d('jam', 10, 10, 1, 1, noise=0)
+    PlanarGeometry.update_all(sheet)
+
+    model = model_factory(
+        [
+            effectors.FaceAreaElasticity,
+        ], effectors.FaceAreaElasticity)
+
+    sheet.remove(sheet.cut_out([[0, 10], [0, 10]]))
+    sheet.sanitize(trim_borders=True)
+    PlanarGeometry.scale(sheet, sheet.face_df.area.mean()**-0.5, ['x', 'y'])
+    PlanarGeometry.center(sheet)
+    PlanarGeometry.update_all(sheet)
+    sheet.reset_index()
+    sheet.reset_topo()
+    sheet.face_df['area_elasticity'] = 1
+    sheet.face_df['prefered_area'] = 1
+    solver = QSSolver(with_t1=False, with_t3=False, with_collisions=False)
+    res = solver.find_energy_min(
+        sheet, PlanarGeometry, model, options={"gtol": 1e-8})
+
+    sheet.vert_df.y *= 0.5
+    res = solver.find_energy_min(
+        sheet, PlanarGeometry, model, options={"gtol": 1e-8})
+    sheet.get_force_inference(column='tension', free_border_edges=True)
+
+    sheet = sheet.extract_bounding_box(x_boundary=[-2, 2], y_boundary=[-1, 1])
+
+    sheet.edge_df['angle'] = (np.arctan2(sheet.edge_df["dx"],
+                                         sheet.edge_df["dy"]) * 180 / np.pi)
+    sheet.edge_df['angle'] = sheet.edge_df[
+        'angle'].apply(lambda x: 180 + x if x < 0 else x)
+    sheet.edge_df['angle'] = sheet.edge_df[
+        'angle'].apply(lambda x: 180 - x if x > 90 else x)
+
+    for index, edge in sheet.edge_df[sheet.edge_df.angle > 45].iterrows():
+        assert(edge.tension > 1.5)
+    for index, edge in sheet.edge_df[sheet.edge_df.angle < 45].iterrows():
+        assert(edge.tension < 1.5)
