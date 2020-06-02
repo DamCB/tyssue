@@ -310,7 +310,7 @@ class Sheet(Epithelium):
         edges_index = self.east_edges.to_numpy()
         edges_index_opposite = self.west_edges.to_numpy()
         if free_border_edges:
-            edges_lonely = np.setxor1d(self.sgle_edges, edges_index)
+            edges_lonely = self.free_edges.to_numpy()
             edges_index = np.concatenate((edges_index, edges_lonely))
 
         n_edges = len(edges_index)

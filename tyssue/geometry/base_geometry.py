@@ -1,4 +1,5 @@
 import numpy as np
+from ..utils.utils import to_nd
 
 
 class BaseGeometry:
