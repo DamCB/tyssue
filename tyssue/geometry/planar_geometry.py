@@ -82,11 +82,46 @@ class AnnularGeometry(PlanarGeometry):
 
     @staticmethod
     def update_lumen_volume(eptm):
-        srce_pos = eptm.upcast_srce(eptm.vert_df[["x", "y"]]).loc[eptm.apical_edges]
-        trgt_pos = eptm.upcast_trgt(eptm.vert_df[["x", "y"]]).loc[eptm.apical_edges]
+        srce_pos = eptm.upcast_srce(eptm.vert_df[["x", "y"]]).loc[
+            eptm.apical_edges]
+        trgt_pos = eptm.upcast_trgt(eptm.vert_df[["x", "y"]]).loc[
+            eptm.apical_edges]
         apical_edge_pos = (srce_pos + trgt_pos) / 2
         apical_edge_coords = eptm.edge_df.loc[eptm.apical_edges, ["dx", "dy"]]
         eptm.settings["lumen_volume"] = (
             -apical_edge_pos["x"] * apical_edge_coords["dy"]
             + apical_edge_pos["y"] * apical_edge_coords["dx"]
         ).values.sum()
+
+
+class PlanarGeometryPerimeter(PlanarGeometry):
+    """
+    Sphere surrounding the sheet.
+    Sphere compress the tissue at its extremity
+    """
+
+    @classmethod
+    def update_all(cls, eptm):
+        cls.center(eptm)
+        cls.normalize_weights(eptm)
+        super().update_all(eptm)
+
+    @staticmethod
+    def update_perimeters(eptm):
+        """
+        Updates the perimeter of each face according to the weight of each junction.
+        """
+        eptm.edge_df["weighted_length"] = eptm.edge_df.weight * \
+            eptm.edge_df.length
+        eptm.face_df["perimeter"] = eptm.sum_face(
+            eptm.edge_df["weighted_length"])
+
+    @staticmethod
+    def normalize_weights(sheet):
+        sheet.edge_df["num_sides"] = sheet.upcast_face("num_sides")
+        sheet.edge_df["weight"] = (
+            sheet.edge_df.groupby("face")
+            .apply(lambda df: (df["num_sides"] * df["weight"] / df["weight"].sum()))
+            .sort_index(level=1)
+            .to_numpy()
+        )
