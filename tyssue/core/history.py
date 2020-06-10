@@ -392,9 +392,11 @@ class HistoryHdf5(History):
             for element in self.datasets:
                 sheet_datasets[element] = store.select(element, where=f"time == {time}")
 
-        return type(self.sheet)(
+        sheet = type(self.sheet)(
             f"{self.sheet.identifier}_{time:04.3f}", sheet_datasets, self.sheet.specs
         )
+        sheet.edge_df.index.rename("edge", inplace=True)
+        return sheet
 
 
 def _retrieve(dset, time):
