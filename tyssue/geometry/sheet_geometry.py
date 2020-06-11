@@ -214,7 +214,7 @@ class SheetGeometry(PlanarGeometry):
         return rot_pos
 
     @classmethod
-    def face_rotations(cls, sheet, method="normal"):
+    def face_rotations(cls, sheet, method="normal", output='edge'):
         """Returns the (sheet.Ne, 3, 3) array of rotation matrices
         such that each rotation returns a coordinate system (u, v, w) where the face
         vertices are mostly in the u, v plane.
@@ -228,17 +228,21 @@ class SheetGeometry(PlanarGeometry):
         """
 
         if method == "normal":
-            return cls.normal_rotations(sheet)
+            return cls.normal_rotations(sheet, output)
         elif method == "svd":
-            return cls.svd_rotations(sheet)
+            return cls.svd_rotations(sheet, output)
         else:
             raise ValueError("method can be either 'normal' or 'svd' ")
 
     @staticmethod
-    def normal_rotations(sheet):
+    def normal_rotations(sheet, output='edge'):
         """Returns the (sheet.Ne, 3, 3) array of rotation matrices
         such that each rotation aligns the coordinate system along each face normals
 
+        Parameters
+        ----------
+        output: string, default 'edge' Return the (sheet.Ne, 3, 3),
+                            else 'face' Return the (sheet.Nf, 3, 3)
         """
         face_normals = sheet.edge_df.groupby("face")[sheet.ncoords].mean()
         rot_angles = face_normals.eval(
@@ -252,13 +256,14 @@ class SheetGeometry(PlanarGeometry):
         norm = norm.clip(min=1e-10)
         rot_axis /= norm[:, None]
 
-        r_mats = rotation_matrices(rot_angles, rot_axis)
+        rotations = rotation_matrices(rot_angles, rot_axis)
         # upcast
-        rotations = r_mats.take(sheet.edge_df["face"], axis=0)
+        if output == 'edge':
+            rotations = rotations.take(sheet.edge_df["face"], axis=0)
         return rotations
 
     @staticmethod
-    def svd_rotations(sheet):
+    def svd_rotations(sheet, output='edge'):
         """Returns the (sheet.Ne, 3, 3) array of rotation matrices
         such that each rotation aligns the coordinate system according
         to each face vertex SVD
@@ -268,8 +273,10 @@ class SheetGeometry(PlanarGeometry):
         svd_rot = (
             np.concatenate(svd_rot)
             .reshape((-1, 3, 3))
-            .take(sheet.edge_df["face"], axis=0)
         )
+        if output == 'edge':
+            svd_rot = svd_rot.take(sheet.edge_df["face"], axis=0)
+
         return svd_rot
 
     @classmethod
