@@ -94,10 +94,16 @@ class AnnularGeometry(PlanarGeometry):
         ).values.sum()
 
 
-class PlanarGeometryPerimeter(PlanarGeometry):
+class WeightedPerimeterPlanarGeometry(PlanarGeometry):
     """
-    Sphere surrounding the sheet.
-    Sphere compress the tissue at its extremity
+    Geometry methods for 2D planar cell arangements with a calculation
+    of perimeter is based on weight of each junction.
+
+    Meaning if all junction of a cell have the same weight, perimeter is
+    calculated as a usual perimeter calculation (p = l_ij + l_jk + l_km + l_mn + l_ni)
+    Otherwise, weight parameter allowed more or less importance of a junction in the
+    perimeter calculation (p = w_ij*l_ij + w_jk*l_jk + w_km*l_km + w_mn*l_mn + w_ni*l_ni)
+
     """
 
     @classmethod
@@ -118,6 +124,10 @@ class PlanarGeometryPerimeter(PlanarGeometry):
 
     @staticmethod
     def normalize_weights(sheet):
+        """
+        Normalize weight of each cell.
+        Sum of all weights of one cell equals to one.
+        """
         sheet.edge_df["num_sides"] = sheet.upcast_face("num_sides")
         sheet.edge_df["weight"] = (
             sheet.edge_df.groupby("face")

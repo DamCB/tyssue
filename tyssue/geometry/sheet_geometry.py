@@ -214,7 +214,7 @@ class SheetGeometry(PlanarGeometry):
         return rot_pos
 
     @classmethod
-    def face_rotations(cls, sheet, method="normal", output='edge'):
+    def face_rotations(cls, sheet, method="normal", output_as='edge'):
         """Returns the (sheet.Ne, 3, 3) array of rotation matrices
         such that each rotation returns a coordinate system (u, v, w) where the face
         vertices are mostly in the u, v plane.
@@ -225,23 +225,28 @@ class SheetGeometry(PlanarGeometry):
 
         svd is slower but more effective at reducing face dimensionality.
 
+        Parameters
+        ----------
+        output_as: string, default 'edge' Return the (sheet.Ne, 3, 3),
+                            else 'face' Return the (sheet.Nf, 3, 3)
+
         """
 
         if method == "normal":
-            return cls.normal_rotations(sheet, output)
+            return cls.normal_rotations(sheet, output_as)
         elif method == "svd":
-            return cls.svd_rotations(sheet, output)
+            return cls.svd_rotations(sheet, output_as)
         else:
             raise ValueError("method can be either 'normal' or 'svd' ")
 
     @staticmethod
-    def normal_rotations(sheet, output='edge'):
+    def normal_rotations(sheet, output_as='edge'):
         """Returns the (sheet.Ne, 3, 3) array of rotation matrices
         such that each rotation aligns the coordinate system along each face normals
 
         Parameters
         ----------
-        output: string, default 'edge' Return the (sheet.Ne, 3, 3),
+        output_as: string, default 'edge' Return the (sheet.Ne, 3, 3),
                             else 'face' Return the (sheet.Nf, 3, 3)
         """
         face_normals = sheet.edge_df.groupby("face")[sheet.ncoords].mean()
@@ -258,15 +263,20 @@ class SheetGeometry(PlanarGeometry):
 
         rotations = rotation_matrices(rot_angles, rot_axis)
         # upcast
-        if output == 'edge':
+        if output_as == 'edge':
             rotations = rotations.take(sheet.edge_df["face"], axis=0)
         return rotations
 
     @staticmethod
-    def svd_rotations(sheet, output='edge'):
+    def svd_rotations(sheet, output_as='edge'):
         """Returns the (sheet.Ne, 3, 3) array of rotation matrices
         such that each rotation aligns the coordinate system according
         to each face vertex SVD
+
+        Parameters
+        ----------
+        output_as: string, default 'edge' Return the (sheet.Ne, 3, 3),
+                            else 'face' Return the (sheet.Nf, 3, 3)
 
         """
         svd_rot = sheet.edge_df.groupby("face").apply(face_svd_)
@@ -274,7 +284,7 @@ class SheetGeometry(PlanarGeometry):
             np.concatenate(svd_rot)
             .reshape((-1, 3, 3))
         )
-        if output == 'edge':
+        if output_as == 'edge':
             svd_rot = svd_rot.take(sheet.edge_df["face"], axis=0)
 
         return svd_rot
@@ -348,10 +358,21 @@ class EllipsoidGeometry(ClosedSheetGeometry):
         eptm.settings["abc"] = [u * scale for u in eptm.settings["abc"]]
 
 
-class EllipsoidLameGeometry(ClosedSheetGeometry):
+class WeightedPerimeterEllipsoidLameGeometry(ClosedSheetGeometry):
     """
-    Sphere surrounding the sheet.
-    Sphere compress the tissue at its extremity
+    EllipsoidLameGeometry correspond to a super-egg geometry with a calculation
+    of perimeter is based on weight of each junction.
+
+    Meaning if all junction of a cell have the same weight, perimeter is
+    calculated as a usual perimeter calculation (p = l_ij + l_jk + l_km + l_mn + l_ni)
+    Otherwise, weight parameter allowed more or less importance of a junction in the
+    perimeter calculation (p = w_ij*l_ij + w_jk*l_jk + w_km*l_km + w_mn*l_mn + w_ni*l_ni)
+
+    In this geometry, a sphere surrounding the tissue, meaning a force is apply only at
+    the extremity of the tissue; `eptm.vert_df['delta_rho']` is computed as the
+    difference between the vertex radius in a spherical frame of reference
+    and `eptm.settings['barrier_radius']`
+
     """
 
     @classmethod
@@ -371,6 +392,10 @@ class EllipsoidLameGeometry(ClosedSheetGeometry):
 
     @staticmethod
     def normalize_weights(sheet):
+        """
+        Normalize weight of each cell.
+        Sum of all weights of one cell equals to one.
+        """
         sheet.edge_df["num_sides"] = sheet.upcast_face('num_sides')
         sheet.edge_df["weight"] = sheet.edge_df.groupby('face').apply(
             lambda df: (df["num_sides"] * df["weight"] / df["weight"].sum())
