@@ -1,6 +1,12 @@
 ## Core
 - Add force inference algorithm in sheet class, based on method describe in Brodland et al. 2014. 
 
+## Geometry
+- Add two new geometry classes. 
+
+## History 
+- Fix drop index name in retrieve method. 
+
 # What's new in 0.7.0
 
 ## Coordinate system and vertex ordering
