@@ -76,10 +76,10 @@ def detach_vertices(sheet):
     dice5p = np.random.random(rank5p.size)
 
     to_detach = np.concatenate([rank4[dice4 < p_4], rank5p[dice5p < p_5p]])
-    logger.info(f"Detaching {to_detach.size} vertices")
-
-    for vert in to_detach:
-        split_vert(sheet, vert)
+    if to_detach.size:
+        logger.info(f"Detaching {to_detach.size} vertices")
+        for vert in to_detach:
+            split_vert(sheet, vert)
 
 
 def set_value(sheet, element, index, set_value, col):
@@ -342,4 +342,12 @@ def relax(sheet, face, relax_decrease, relax_col="contractility"):
         divide=True,
         bound=(initial_contractility / 2),
     )
-    increase(sheet, "face", face, relax_decrease, "prefered_area", True, bound=(initial_prefered_area * 2))
+    increase(
+        sheet,
+        "face",
+        face,
+        relax_decrease,
+        "prefered_area",
+        True,
+        bound=(initial_prefered_area * 2),
+    )

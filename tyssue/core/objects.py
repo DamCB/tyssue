@@ -753,6 +753,7 @@ class Epithelium:
         self.face_df.index.name = "face"
 
         if "cell" in self.data_names:
+            self.cell_df = self.cell_df.reindex(set(self.edge_df["cell"]))
             new_cidx = pd.Series(
                 np.arange(self.cell_df.shape[0]), index=self.cell_df.index
             )

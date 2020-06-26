@@ -33,6 +33,8 @@ def split_vert(sheet, vert, face, to_rewire, epsilon, recenter=False):
     This will leave opened faces and cells
 
     """
+    logger.debug(f"splitting vertex {vert}")
+
     # Add a vertex
     this_vert = sheet.vert_df.loc[vert:vert]  # avoid type munching
     sheet.vert_df = sheet.vert_df.append(this_vert, ignore_index=True)
@@ -98,6 +100,7 @@ def add_vert(eptm, edge):
     """
 
     srce, trgt = eptm.edge_df.loc[edge, ["srce", "trgt"]]
+    logger.debug(f"adding vertex between {srce} and {trgt}")
     opposites = eptm.edge_df[
         (eptm.edge_df["srce"] == trgt) & (eptm.edge_df["trgt"] == srce)
     ]
@@ -147,12 +150,13 @@ def close_face(eptm, face):
     This function **does not** close the adjacent and opposite
     faces.
     """
+    logger.debug(f"closing face {face}")
     face_edges = eptm.edge_df[eptm.edge_df["face"] == face]
     srces = set(face_edges["srce"])
     trgts = set(face_edges["trgt"])
 
     if srces == trgts:
-        logger.debug("Face {} already closed".format(face))
+        logger.info("Face {} already closed".format(face))
         return
     try:
         single_srce, = srces.difference(trgts)
@@ -179,6 +183,7 @@ def drop_two_sided_faces(eptm):
         return
 
     two_sided = eptm.face_df[num_sides < 3].index
+    logger.debug(f"dropping {two_sided.shape} 2-sided faces")
     edges = eptm.edge_df[eptm.edge_df["face"].isin(two_sided)].index
     eptm.edge_df.drop(edges, axis=0, inplace=True)
     eptm.face_df.drop(two_sided, axis=0, inplace=True)
@@ -187,6 +192,7 @@ def drop_two_sided_faces(eptm):
 def remove_face(sheet, face):
     """Removes a face from the mesh
     """
+    logger.debug(f"removing face {face}")
 
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     verts = edges["srce"].unique()
@@ -226,6 +232,8 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     The edge is collapsed on the smaller of the srce, trgt indexes (to minimize reindexing impact)
 
     """
+    logger.debug(f"collapsing edge {edge}")
+
     srce, trgt = np.sort(sheet.edge_df.loc[edge, ["srce", "trgt"]]).astype(int)
 
     edges = sheet.edge_df[
@@ -247,8 +255,9 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     # all the edges parallel to the original
     collapsed = sheet.edge_df.query("srce == trgt")
     sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
-    if allow_two_sided:
+    if not allow_two_sided:
         drop_two_sided_faces(sheet)
+
     if reindex:
         sheet.reset_index()
         sheet.reset_topo()
@@ -265,6 +274,8 @@ def merge_vertices(sheet, vert0, vert1, reindex=True):
     It is more efficient to call directly `collapse_edge`
 
     """
+    logger.debug(f"merging vertices {vert0, vert1}")
+
     edges = sheet.edge_df[
         ((sheet.edge_df["srce"] == vert0) & (sheet.edge_df["trgt"] == vert1))
         | ((sheet.edge_df["srce"] == vert1) & (sheet.edge_df["trgt"] == vert0))
