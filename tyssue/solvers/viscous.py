@@ -119,6 +119,7 @@ class EulerSolver:
         topo_change_args : tuple, arguments passed to `on_topo_change`
 
         """
+        self.eptm.settings['dt'] = dt
         for t in np.arange(self.prev_t, tf + dt, dt):
             pos = self.current_pos
             dot_r = self.ode_func(t, pos)
