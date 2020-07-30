@@ -66,9 +66,18 @@ def test_retrieve():
     assert sheet_.datasets["face"].loc[0, "area"] == 100.0
 
 
-def test_overwrite_time():
+def test_overwrite_tim_hdf5e():
     sheet = Sheet("3", *three_faces_sheet())
     history = History(sheet)
+    history.record(time_stamp=1)
+    history.record(time_stamp=1)
+    sheet_ = history.retrieve(1)
+    assert sheet_.Nv == sheet.Nv
+
+
+def test_overwrite_time():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = HistoryHdf5(sheet)
     history.record(time_stamp=1)
     history.record(time_stamp=1)
     sheet_ = history.retrieve(1)

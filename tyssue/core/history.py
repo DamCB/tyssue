@@ -42,6 +42,7 @@ class History:
             columns as values. Default None
         save_all : bool
             if True, saves all the data at each time point
+
         """
         if extra_cols is None:
             if save_all:
@@ -223,6 +224,8 @@ class HistoryHdf5(History):
     ):
         """Creates a `SheetHistory` instance.
 
+        Use the `from_archive` class method to re-open a saved history file
+
         Parameters
         ----------
         sheet : a :class:`Sheet` object which we want to record
@@ -232,6 +235,10 @@ class HistoryHdf5(History):
             columns as values. Default None
         hf5file : string, define the path of the HDF5 file
         overwrite : bool, Overwrite or not the file if it is already exist. Default False
+
+
+
+
         """
         if not hf5file:
             warnings.warn(
@@ -369,8 +376,10 @@ class HistoryHdf5(History):
                 kwargs = {"data_columns": ["time"]}
                 if "segment" in df.columns:
                     kwargs["min_itemsize"] = {"segment": 8}
-                with pd.HDFStore(self.hf5file, "a") as file:
-                    file.append(key=element, value=df, **kwargs)
+                with pd.HDFStore(self.hf5file, "a") as store:
+                    if element in store and self.time in store[element]['time'].to_numpy():
+                        store.remove(key=element, where=f"time == {self.time}")
+                    store.append(key=element, value=df, **kwargs)
 
         self.index += 1
 
