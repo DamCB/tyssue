@@ -82,8 +82,8 @@ def type1_transition(
 
     srce, trgt, face = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]].astype(int)
 
-    vert = min(srce, trgt)  # find the vertex that wont be reindexed
-    ret_code = collapse_edge(sheet, edge01, reindex=True)
+    vert = min(srce, trgt)  # find the vertex that won't be reindexed
+    ret_code = collapse_edge(sheet, edge01, reindex=True, allow_two_sided=True)
     if ret_code != 0:
         warnings.warn(f"Collapse of edge {edge01} failed")
         return ret_code
@@ -177,12 +177,6 @@ def get_division_edges(sheet, mother, geom, angle=None, axis="x"):
         angle = np.random.random() * np.pi
 
     m_data = sheet.edge_df[sheet.edge_df["face"] == mother]
-    # if angle == 0:
-    #     face_pos = sheet.face_df.loc[mother, sheet.coords]
-    #     rot_pos = sheet.vert_df[sheet.coords].copy()
-    #     for c in sheet.coords:
-    #         rot_pos.loc[:, c] = rot_pos[c] - face_pos[c]
-    # else:
     rot_pos = geom.face_projected_pos(sheet, mother, psi=angle)
 
     srce_pos = rot_pos.loc[m_data["srce"], axis]

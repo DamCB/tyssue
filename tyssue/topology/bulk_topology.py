@@ -71,7 +71,6 @@ def remove_cell(eptm, cell):
     eptm.vert_df.drop(verts.index, axis=0, inplace=True)
     eptm.reset_index()
     eptm.reset_topo()
-    assert eptm.validate()
     return 0
 
 

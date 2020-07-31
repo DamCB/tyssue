@@ -129,6 +129,9 @@ class Sheet(Epithelium):
         if "opposite" not in self.edge_df.columns:
             self.edge_df["opposite"] = get_opposite(self.edge_df)
 
+        # noise to avoid degeneracies
+        noise = np.random.normal(loc=1.0, scale=1e-10, size=(self.Ne, 2))
+        self.edge_df[self.dcoords] *= noise
         self.dble_edges = self.edge_df[self.edge_df["opposite"] >= 0].index
         theta = np.arctan2(
             self.edge_df.loc[self.dble_edges, "dy"],
@@ -179,6 +182,9 @@ class Sheet(Epithelium):
         # Anti symetric vector (1 at east and free edges, -1 at opposite)
         self.anti_sym = pd.Series(np.ones(self.Ne), index=self.edge_df.index)
         self.anti_sym.loc[self.west_edges] = -1
+        self.edge_df[self.dcoords] /= noise
+
+
 
     def sort_edges_eastwest(self):
         """reorder edges such the free edges are first,
