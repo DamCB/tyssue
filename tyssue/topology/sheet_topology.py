@@ -82,8 +82,8 @@ def type1_transition(
 
     srce, trgt, face = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]].astype(int)
 
-    vert = min(srce, trgt)  # find the vertex that wont be reindexed
-    ret_code = collapse_edge(sheet, edge01, reindex=True)
+    vert = min(srce, trgt)  # find the vertex that won't be reindexed
+    ret_code = collapse_edge(sheet, edge01, reindex=True, allow_two_sided=True)
     if ret_code != 0:
         warnings.warn(f"Collapse of edge {edge01} failed")
         return ret_code

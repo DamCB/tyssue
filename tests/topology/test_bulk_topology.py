@@ -117,6 +117,7 @@ def test_monolayer_division():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d, method="translation")
     eptm = Monolayer("test_volume", datasets, bulk_spec(), coords=["x", "y", "z"])
+    eptm.vert_df[eptm.coords] += np.random.normal(scale=1e-6, size=(eptm.Nv, 3))
     MonolayerGeometry.update_all(eptm)
     for orientation in ["vertical", "horizontal"]:
         daughter = cell_division(eptm, 0, orientation=orientation)

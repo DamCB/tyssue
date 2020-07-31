@@ -256,6 +256,7 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     collapsed = sheet.edge_df.query("srce == trgt")
     sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
     if not allow_two_sided:
+        print('dropped two sided cells')
         drop_two_sided_faces(sheet)
 
     if reindex:
