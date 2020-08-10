@@ -130,7 +130,7 @@ class Sheet(Epithelium):
             self.edge_df["opposite"] = get_opposite(self.edge_df)
 
         # noise to avoid degeneracies
-        noise = np.random.normal(loc=1.0, scale=1e-10, size=(self.Ne, 2))
+        noise = np.random.normal(loc=1.0, scale=1e-10, size=(self.Ne, self.dim))
         self.edge_df[self.dcoords] *= noise
         self.dble_edges = self.edge_df[self.edge_df["opposite"] >= 0].index
         theta = np.arctan2(
