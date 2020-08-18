@@ -337,9 +337,8 @@ class Sheet(Epithelium):
             np.repeat(np.arange(n_edges), ndim))
         )
 
-        g_gamma_matrix = coo_matrix((pos, (col, row))).toarray()
+        g_gamma_matrix = coo_matrix((pos, (row, col))).toarray()
 
-        g_gamma_matrix = g_gamma_matrix.T
         p = np.ones((n_edges + 1, n_edges + 1))
 
         # get g_gamma_matrix.T g_gamma_matrix
