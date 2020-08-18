@@ -32,7 +32,7 @@ def to_nd(df, ndim):
     df_nd : return array reshaped in ndim.
 
     """
-    df_nd = df[:, None]#np.asarray(df).repeat(ndim).reshape((df.size, ndim))
+    df_nd = np.asarray(df).reshape((df.size, 1))
     return df_nd
 
 
