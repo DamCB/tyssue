@@ -30,13 +30,15 @@ def merge_vertices(sheet):
 
     """
     d_min = sheet.settings.get("threshold_length", 1e-3)
-    short = sheet.edge_df[sheet.edge_df["length"] < d_min].index
+    short = sheet.edge_df[sheet.edge_df["length"] < d_min].index.to_numpy()
+    np.random.shuffle(short)
     if not short.shape[0]:
         return -1
     logger.info(f"Collapsing {short.shape[0]} edges")
     while short.shape[0]:
-        collapse_edge(sheet, short[0], allow_two_sided=True)
-        short = sheet.edge_df[sheet.edge_df["length"] < d_min].index
+        collapse_edge(sheet, short[0], allow_two_sided=False)
+        short = sheet.edge_df[sheet.edge_df["length"] < d_min].index.to_numpy()
+        np.random.shuffle(short)
     return 0
 
 
@@ -160,7 +162,7 @@ def exchange(sheet, face, geom, remove_tri_faces=True):
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     shorter = edges.length.idxmin()
     # type1_transition(sheet, shorter, 2 * min(edges.length), remove_tri_faces)
-    type1_transition(sheet, shorter, epsilon=0.1, remove_tri_faces=remove_tri_faces)
+    type1_transition(sheet, shorter, remove_tri_faces=remove_tri_faces)
     geom.update_all(sheet)
 
 

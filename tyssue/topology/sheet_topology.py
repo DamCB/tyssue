@@ -53,7 +53,7 @@ def split_vert(
 
 
 def type1_transition(
-    sheet, edge01, *, epsilon=None, remove_tri_faces=True, multiplier=1.5
+    sheet, edge01, *, remove_tri_faces=True, multiplier=1.5
 ):
     """Performs a type 1 transition around the edge edge01
 
@@ -95,7 +95,6 @@ def type1_transition(
         multiplier=multiplier,
         reindex=True,
         recenter=True,
-        epsilon=epsilon,
     )
 
     if not remove_tri_faces:
