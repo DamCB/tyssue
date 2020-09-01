@@ -105,8 +105,9 @@ def test_historyHDF5_path_warning():
         history = HistoryHdf5(sheet, extra_cols={"edge": ["dx"]}, hf5file="out.hf5")
         history.record(time_stamp=0)
 
-    os.remove("out.hf5")
-    os.remove("out0.hf5")
+    for p in Path(".").glob("out*.hf5"):
+        p.unlink()
+
 
 
 def test_historyHDF5_retrieve():
@@ -126,8 +127,8 @@ def test_historyHDF5_retrieve():
     for elem, dset in sheet_.datasets.items():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
         assert dset.time.unique()[0] == 1
-    os.remove("out.hf5")
-
+    for p in Path(".").glob("out*.hf5"):
+        p.unlink()
 
 def test_historyHDF5_save_every():
     sheet = Sheet("3", *three_faces_sheet())
@@ -152,7 +153,9 @@ def test_historyHDF5_save_every():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
         assert dset.time.unique()[0] == 2
 
-    os.remove("out.hf5")
+    for p in Path(".").glob("out*.hf5"):
+        p.unlink()
+
 
 
 def test_historyHDF5_itemsize():
@@ -182,7 +185,9 @@ def test_historyHDF5_itemsize():
     sheet3_ = history.retrieve(3)
     assert sheet3_.face_df.loc[0, "area"] == 12.0
 
-    os.remove("out.hf5")
+    for p in Path(".").glob("out*.hf5"):
+        p.unlink()
+
 
 
 def test_historyHDF5_save_other_sheet():
@@ -202,7 +207,9 @@ def test_historyHDF5_save_other_sheet():
     sheet2_ = history.retrieve(2)
     assert sheet2_.face_df.loc[0, "area"] == 12.0
 
-    os.remove("out.hf5")
+    for p in Path(".").glob("out*.hf5"):
+        p.unlink()
+
 
 
 def test_historyHDF5_from_archive():

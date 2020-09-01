@@ -1,17 +1,21 @@
 import matplotlib
 import pytest
+import os
 
 matplotlib.use("Agg")
 import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
-
-
+from scipy import ndimage
+from tyssue import config, Sheet, SheetGeometry, History
+from tyssue.dynamics import PlanarModel
+from tyssue.solvers.viscous import EulerSolver
 from tyssue.generation import three_faces_sheet
 from tyssue import Sheet, config
 from tyssue.draw.plt_draw import quick_edge_draw, sheet_view
 from tyssue.draw.plt_draw import _face_color_from_sequence
+from tyssue.draw.plt_draw import create_gif
 
 
 class TestsPlt:
@@ -48,7 +52,8 @@ class TestsPlt:
         )[::-1]
 
         self.draw_specs["edge"]["visible"] = True
-        self.draw_specs["edge"]["color"] = self.sheet.edge_df["rand"]  # [0, 0, 0, 1]
+        self.draw_specs["edge"]["color"] = self.sheet.edge_df[
+            "rand"]  # [0, 0, 0, 1]
         self.draw_specs["edge"]["alpha"] = 1.0
         self.draw_specs["edge"]["color_range"] = 0, 3
         self.draw_specs["edge"]["width"] = 1.0 * np.linspace(
@@ -120,3 +125,34 @@ class TestsPlt:
             self.draw_specs["face"]["color"] = lambda sheet: np.ones(5)
             self.draw_specs["edge"]["color"] = lambda sheet: np.ones(5)
             fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
+
+
+def test_create_gif():
+    geom = SheetGeometry
+    model = PlanarModel
+    sheet = Sheet("3", *three_faces_sheet())
+    geom.update_all(sheet)
+    sheet.settings["threshold_length"] = 0.1
+
+    sheet.update_specs(config.dynamics.quasistatic_plane_spec())
+    sheet.face_df["prefered_area"] = sheet.face_df["area"].mean()
+    history = History(sheet)
+    solver = EulerSolver(sheet,
+                         geom,
+                         model,
+                         history=history,
+                         auto_reconnect=True)
+    sheet.vert_df["viscosity"] = 0.1
+
+    sheet.edge_df.loc[[0, 17], "line_tension"] *= 2
+    sheet.edge_df.loc[[1], "line_tension"] *= 8
+    res = solver.solve(0.5, dt=0.05)
+
+    create_gif(history, 'frames.gif', num_frames=5)
+    create_gif(history, 'interval.gif', interval=(2, 4))
+
+    assert os.path.isfile("frames.gif") == True
+    assert os.path.isfile("interval.gif") == True
+
+    os.remove("frames.gif")
+    os.remove("interval.gif")
