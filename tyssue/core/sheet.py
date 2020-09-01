@@ -126,8 +126,7 @@ class Sheet(Epithelium):
           we'll just assert it worked.
         """
 
-        if "opposite" not in self.edge_df.columns:
-            self.edge_df["opposite"] = get_opposite(self.edge_df)
+        self.edge_df["opposite"] = get_opposite(self.edge_df)
 
         # noise to avoid degeneracies
         noise = np.random.normal(loc=1.0, scale=1e-10, size=(self.Ne, self.dim))
