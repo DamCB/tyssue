@@ -91,8 +91,9 @@ def create_gif(history, output, num_frames=None, interval=None, draw_func=None, 
             sheet = history.retrieve(t)
             try:
                 fig, ax = draw_func(sheet, **draw_kwds)
-            except:
-                pass
+            except Exception as e:
+                print("Droped frame {i}")
+
             if isinstance(ax, plt.Axes) and margin >= 0:
                 ax.set(xlim=xlim, ylim=ylim)
             fig.savefig(graph_dir / f"movie_{i:04d}.png")
