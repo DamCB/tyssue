@@ -25,7 +25,7 @@ from ..utils.utils import spec_updater, get_sub_eptm
 COORDS = ["x", "y"]
 
 
-def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_kwds):
+def create_gif(history, output, num_frames=None, interval=None, draw_func=None, margin=5, **draw_kwds):
     """Creates an animated gif of the recorded history.
 
     You need imagemagick on your system for this function to work.
@@ -36,6 +36,7 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
     history : a :class:`tyssue.History` object
     output : path to the output gif file
     num_frames : int, the number of frames in the gif
+    interval : tuples, define begin and end frame of the gif
     draw_func : a drawing function
          this function must take a `sheet` object as first argument
          and return a `fig, ax` pair. Defaults to quick_edge_draw
@@ -50,6 +51,17 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
         draw_func = sheet_view
         draw_kwds.update({"mode": "quick"})
 
+    time_stamps = history.time_stamps
+    if num_frames is not None:
+        times = np.linspace(time_stamps[0], time_stamps[-1], num_frames)
+    elif interval is not None:
+        times = time_stamps[interval[0]:interval[1] + 1]
+        num_frames = len(times)
+    else:
+        raise ValueError(
+            "Need to define `num_frames` or `interval` parameters."
+        )
+
     graph_dir = pathlib.Path(tempfile.mkdtemp())
     x, y = coords = draw_kwds.get("coords", history.sheet.coords[:2])
     sheet0 = history.retrieve(0)
@@ -58,8 +70,7 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
     margin = delta * margin / 100
     xlim = bounds.loc["min", x] - margin, bounds.loc["max", x] + margin
     ylim = bounds.loc["min", y] - margin, bounds.loc["max", y] + margin
-    time_stamps = history.time_stamps
-    times = np.linspace(time_stamps[0], time_stamps[-1], num_frames)
+
     if len(history) < num_frames:
         for i, (t_, sheet) in enumerate(history):
             fig, ax = draw_func(sheet, **draw_kwds)
@@ -78,7 +89,10 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
     else:
         for i, t in enumerate(times):
             sheet = history.retrieve(t)
-            fig, ax = draw_func(sheet, **draw_kwds)
+            try:
+                fig, ax = draw_func(sheet, **draw_kwds)
+            except:
+                pass
             if isinstance(ax, plt.Axes) and margin >= 0:
                 ax.set(xlim=xlim, ylim=ylim)
             fig.savefig(graph_dir / f"movie_{i:04d}.png")
@@ -162,7 +176,8 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
     collection_specs = parse_face_specs(draw_spec, sheet)
 
     if "visible" in sheet.face_df.columns:
-        edges = sheet.edge_df[sheet.upcast_face(sheet.face_df["visible"])].index
+        edges = sheet.edge_df[sheet.upcast_face(
+            sheet.face_df["visible"])].index
         _sheet = get_sub_eptm(sheet, edges)
         if _sheet is not None:
             sheet = _sheet
@@ -207,14 +222,16 @@ def parse_face_specs(face_draw_specs, sheet):
 def _face_color_from_sequence(face_spec, sheet):
     color_ = face_spec["color"]
     cmap = cm.get_cmap(face_spec.get("colormap", "viridis"))
-    color_min, color_max = face_spec.get("color_range", (color_.min(), color_.max()))
+    color_min, color_max = face_spec.get(
+        "color_range", (color_.min(), color_.max()))
 
     if color_.shape in [(sheet.Nf, 3), (sheet.Nf, 4)]:
         return color_
 
     elif color_.shape == (sheet.Nf,):
         if np.ptp(color_) < 1e-10:
-            warnings.warn("Attempting to draw a colormap " "with a uniform value")
+            warnings.warn(
+                "Attempting to draw a colormap " "with a uniform value")
             return np.ones((sheet.Nf, 3)) * 0.5
 
         normed = (color_ - color_min) / (color_max - color_min)
@@ -254,7 +271,8 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
     if draw_spec.get("head_width"):
 
         app_length = (
-            np.hypot(sheet.edge_df[dx], sheet.edge_df[dy]) * sheet.edge_df.length.mean()
+            np.hypot(sheet.edge_df[dx], sheet.edge_df[
+                     dy]) * sheet.edge_df.length.mean()
         )
         patches = [
             FancyArrow(*edge[[sx, sy, dx, dy]], **arrow_specs)
@@ -262,7 +280,8 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
         ]
         ax.add_collection(PatchCollection(patches, False, **collections_specs))
     else:
-        segments = sheet.edge_df[[sx, sy, tx, ty]].to_numpy().reshape((-1, 2, 2))
+        segments = sheet.edge_df[[sx, sy, tx, ty]
+                                 ].to_numpy().reshape((-1, 2, 2))
         ax.add_collection(LineCollection(segments, **collections_specs))
     return ax
 
@@ -302,13 +321,15 @@ def _wire_color_from_sequence(edge_spec, sheet):
     """
     color_ = edge_spec["color"]
 
-    color_min, color_max = edge_spec.get("color_range", (color_.min(), color_.max()))
+    color_min, color_max = edge_spec.get(
+        "color_range", (color_.min(), color_.max()))
     cmap = cm.get_cmap(edge_spec.get("colormap", "viridis"))
     if color_.shape in [(sheet.Nv, 3), (sheet.Nv, 4)]:
         return (sheet.upcast_srce(color_) + sheet.upcast_trgt(color_)) / 2
     elif color_.shape == (sheet.Nv,):
         if np.ptp(color_) < 1e-10:
-            warnings.warn("Attempting to draw a colormap " "with a uniform value")
+            warnings.warn(
+                "Attempting to draw a colormap " "with a uniform value")
             return np.ones((sheet.Ne, 3)) * 0.7
         if not hasattr(color_, "index"):
             color_ = pd.Series(color_, index=sheet.vert_df.index)
@@ -319,7 +340,8 @@ def _wire_color_from_sequence(edge_spec, sheet):
         return color_
     elif color_.shape == (sheet.Ne,):
         if np.ptp(color_) < 1e-10:
-            warnings.warn("Attempting to draw a colormap " "with a uniform value")
+            warnings.warn(
+                "Attempting to draw a colormap " "with a uniform value")
             return np.ones((sheet.Nv, 3)) * 0.7
         return cmap((color_ - color_min) / (color_max - color_min))
 
@@ -372,7 +394,8 @@ def plot_forces(
         app_grad = approx_grad(sheet, geom, model)
         grad_i = (
             pd.DataFrame(
-                index=sheet.vert_df[sheet.vert_df.is_active.astype(bool)].index,
+                index=sheet.vert_df[
+                    sheet.vert_df.is_active.astype(bool)].index,
                 data=app_grad.reshape((-1, len(sheet.coords))),
                 columns=["g" + c for c in sheet.coords],
             )
@@ -414,7 +437,8 @@ def plot_scaled_energies(sheet, geom, model, scales, ax=None):
     from ..utils import scaled_unscaled
 
     def get_energies():
-        energies = np.array([e.mean() for e in model.compute_energy(sheet, True)])
+        energies = np.array([e.mean()
+                             for e in model.compute_energy(sheet, True)])
 
         return energies
 
@@ -442,9 +466,11 @@ def get_arc_data(sheet):
     e_x = sheet.edge_df["dx"] / sheet.edge_df["length"]
     e_y = sheet.edge_df["dy"] / sheet.edge_df["length"]
 
-    center_x = (srce_pos.x + trgt_pos.x) / 2 - e_y * (radius - sheet.edge_df["sagitta"])
+    center_x = (srce_pos.x + trgt_pos.x) / 2 - e_y * \
+        (radius - sheet.edge_df["sagitta"])
 
-    center_y = (srce_pos.y + trgt_pos.y) / 2 - e_x * (radius - sheet.edge_df["sagitta"])
+    center_y = (srce_pos.y + trgt_pos.y) / 2 - e_x * \
+        (radius - sheet.edge_df["sagitta"])
 
     alpha = sheet.edge_df["arc_chord_angle"]
     beta = sheet.edge_df["chord_orient"]
@@ -497,7 +523,8 @@ def plot_junction(eptm, edge_index, coords=["x", "y"]):
     """
     v10, v11 = eptm.edge_df.loc[edge_index, ["srce", "trgt"]]
     fig, ax = plt.subplots()
-    ax.scatter(*eptm.vert_df.loc[[v10, v11], coords].values.T, marker="+", s=300)
+    ax.scatter(*eptm.vert_df.loc[[v10, v11],
+                                 coords].values.T, marker="+", s=300)
     v10_out = set(eptm.edge_df[eptm.edge_df["srce"] == v10]["trgt"]) - {v11}
     v11_out = set(eptm.edge_df[eptm.edge_df["srce"] == v11]["trgt"]) - {v10}
     verts = v10_out.union(v11_out)

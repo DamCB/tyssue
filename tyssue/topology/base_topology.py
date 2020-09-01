@@ -242,9 +242,6 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     ]
 
     has_3_sides = np.any(sheet.face_df.loc[edges["face"].astype(int), "num_sides"] < 4)
-    if has_3_sides and not allow_two_sided:
-        warnings.warn("""This operation would result in a two sided face, aborting""")
-        return -1
 
     sheet.vert_df.loc[srce, sheet.coords] = sheet.vert_df.loc[
         [srce, trgt], sheet.coords
@@ -256,7 +253,7 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     collapsed = sheet.edge_df.query("srce == trgt")
     sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
     if not allow_two_sided:
-        print('dropped two sided cells')
+        logger.debug('dropped two sided cells')
         drop_two_sided_faces(sheet)
 
     if reindex:
