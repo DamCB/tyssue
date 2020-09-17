@@ -148,6 +148,8 @@ def test_create_gif():
     sheet.edge_df.loc[[1], "line_tension"] *= 8
     res = solver.solve(0.5, dt=0.05)
 
+    with pytest.raises(ValueError):
+        create_gif(history, 'frames.gif')
     create_gif(history, 'frames.gif', num_frames=5)
     create_gif(history, 'interval.gif', interval=(2, 4))
 
