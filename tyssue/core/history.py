@@ -312,9 +312,9 @@ class HistoryHdf5(History):
         return cls(sheet=eptm, hf5file=hf5file, overwrite=True)
 
     @property
-    def time_stamps(self):
+    def time_stamps(self, element="vert"):
         with pd.HDFStore(self.hf5file, "r") as file:
-            times = file.select("vert", columns=["time"])["time"].unique()
+            times = file.select(element, columns=["time"])["time"].unique()
         return times
 
     def record(self, to_record=None, time_stamp=None, sheet=None):
@@ -377,7 +377,7 @@ class HistoryHdf5(History):
                 if "segment" in df.columns:
                     kwargs["min_itemsize"] = {"segment": 8}
                 with pd.HDFStore(self.hf5file, "a") as store:
-                    if element in store and self.time in store[element]['time'].to_numpy():
+                    if element in store and self.time in store.select(element, columns=["time"])["time"].unique():
                         store.remove(key=element, where=f"time == {self.time}")
                     store.append(key=element, value=df, **kwargs)
 
