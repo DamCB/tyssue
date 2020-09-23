@@ -377,7 +377,7 @@ class HistoryHdf5(History):
                 if "segment" in df.columns:
                     kwargs["min_itemsize"] = {"segment": 8}
                 with pd.HDFStore(self.hf5file, "a") as store:
-                    if element in store and len(store.select(element, where=f"time == {self.time}")['time'].unique())>0:
+                    if element in store and store.select(element, where=f"time == {self.time}")['time'].shape[0]>0:
                         store.remove(key=element, where=f"time == {self.time}")
                     store.append(key=element, value=df, **kwargs)
 
