@@ -214,20 +214,26 @@ def sheet_view_GC_colorbar(sheet, coords=COORDS, ax1=None, ax2=None, **draw_spec
     if face_spec["visible"]:
         ax1 = draw_face(sheet, coords, ax1, **face_spec)
 
-    ax1.autoscale()
-    ax1.set_aspect("equal")
-    ax1.grid()
+    axis_spec = draw_specs["axis"]
+    if axis_spec["autoscale"] == True:
+        ax1.autoscale()
+        ax1.set_aspect("equal")
+    else:
+        ax1.set_xlim(axis_spec["x_min"], axis_spec["x_max"])
+        ax1.set_ylim(axis_spec["y_min"], axis_spec["y_max"])
+        ax1.set_aspect("equal")
 
     # gc
     ax2 = fig.add_subplot(grid0[:, 9])
     cmap = cm.get_cmap("viridis")
+    import matplotlib as mpl
     # norm = mpl.colors.Normalize(vmin=np.min(draw_specs['face']['color']), vmax=np.max(draw_specs['face']['color']))
     norm = mpl.colors.Normalize(
         vmin=np.min(sheet.face_df["col"]), vmax=np.max(sheet.face_df["col"])
     )
 
     cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, orientation="vertical")
-    cb1.set_label("Some Units")
+    cb1.set_label("a.u.")
     # plt.tight_layout()
     return fig, ax1, ax2
 
