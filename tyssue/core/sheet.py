@@ -427,7 +427,7 @@ class Sheet(Epithelium):
         return cls(identifier, datasets, specs=flat_sheet(), coords=["x", "y", "z"])
 
 
-def get_opposite(edge_df):
+def get_opposite(edge_df, raise_if_invalid=False):
     """
     Returns the indices opposite to the edges in `edge_df`
     """
@@ -439,12 +439,15 @@ def get_opposite(edge_df):
     flipped.names = ["srce", "trgt"]
     try:
         opposite = st_indexed.reindex(flipped)["edge"].values
-    except ValueError:
+    except ValueError as e:
         dup = flipped.duplicated()
         warnings.warn(
             "Duplicated (`srce`, `trgt`) values in edge_df, maybe sanitize your input"
         )
         opposite = st_indexed[~dup].reindex(flipped)["edge"].values
+        if raise_if_invalid:
+            raise e
+
     opposite[np.isnan(opposite)] = -1
     return opposite.astype(np.int)
 

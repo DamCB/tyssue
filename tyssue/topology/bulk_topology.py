@@ -82,7 +82,7 @@ def close_cell(eptm, cell):
     new_face = eptm.face_df.index[-1]
 
     face_edges = eptm.edge_df[eptm.edge_df["cell"] == cell]
-    oppo = get_opposite(face_edges)
+    oppo = get_opposite(face_edges, raise_if_invalid=True)
     new_edges = face_edges[oppo == -1].copy()
     if not new_edges.shape[0]:
         return 0

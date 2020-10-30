@@ -95,6 +95,7 @@ def _assign_vert_segment(monolayer, vertices):
             monolayer.vert_df.loc[v, "segment"] = "lateral"
 
 
+
 def find_basal_edge(monolayer, apical_edge):
     """Returns the basal edge parallel to the apical edge passed
     in argument.

@@ -13,6 +13,8 @@ from ..geometry.bulk_geometry import BulkGeometry
 logger = logging.getLogger(name=__name__)
 
 
+
+
 class Monolayer(Epithelium):
     """
     3D monolayer epithelium
@@ -116,7 +118,7 @@ class Monolayer(Epithelium):
             self.vert_df.loc[vert, ["segment"]], = intersect
 
     def guess_face_segment(self, face):
-        """Infers the face segment from its surrounding edges.
+        """Infers the face segment.
 
         """
         face_edges = self.edge_df[self.edge_df["face"] == face]
