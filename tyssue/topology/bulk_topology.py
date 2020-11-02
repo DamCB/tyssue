@@ -30,11 +30,11 @@ def check_condition4(func):
         eptm.backup()
         res = func(eptm, *args, **kwargs)
         if len(condition_4i(eptm)) or len(condition_4ii(eptm)):
-            print("Invalid epithelium produced, restoring")
-            # print("4i on", condition_4i(eptm))
-            # print("4ii on", condition_4ii(eptm))
-            eptm.restore()
-            eptm.topo_changed = True
+            # print("Invalid epithelium produced, restoring")
+            print("4i on", condition_4i(eptm))
+            print("4ii on", condition_4ii(eptm))
+            # eptm.restore()
+            # eptm.topo_changed = True
         return res
 
     return decorated
@@ -288,7 +288,7 @@ def get_division_vertices(
     return vertices
 
 
-@check_condition4
+#@check_condition4
 def cell_division(eptm, mother, geom, vertices=None):
 
     if vertices is None:
@@ -442,7 +442,7 @@ def find_HIs(eptm, shorts=None):
     return faces_HI
 
 
-@check_condition4
+#@check_condition4
 def IH_transition(eptm, edge):
     """
     I → H transition as defined in Okuda et al. 2013
@@ -459,7 +459,7 @@ def IH_transition(eptm, edge):
     return 0
 
 
-@check_condition4
+#@check_condition4
 def HI_transition(eptm, face):
     """
     H → I transition as defined in Okuda et al. 2013
