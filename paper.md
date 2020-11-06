@@ -24,8 +24,7 @@ bibliography: paper.bib
 ---
 # Summary
 <div align="justify">
-The tyssue library seeks to provide a unified interface to implement bio-mechanical models of living tissues. It's main focus is on vertex based epithelium models. tyssue allows to model 2D, apical 3D or full 3D epihelium based on two kind of resolutions : quasi-static equilibrium of a potential energy or a viscous solver following Euler resolution. Tissue is a modular library. Starting with the same tissue geometry, the choice of constraints/models/parameters increase the possibility to answer on different biological question.
-
+The `tyssue` Python library seeks to provide a unified interface to implement bio-mechanical models of living tissues. It's main focus is on vertex based epithelium models. `tyssue` allows to model the mechanical behavior of 2D, apical 3D or full 3D epihelia based on the numerical resolution of the equations of motion for the mesh vertices. Biological process are modeled through changes in the topological and dynamical properties of the mesh. `tyssue` is a modular library. Starting with the same tissue geometry, the choice of constraints, energy potential terms and parameters increases the possibility to answer different biological questions and easily explore mechanical hypotheses.
 </div>
 
 
@@ -37,30 +36,41 @@ The tyssue library seeks to provide a unified interface to implement bio-mechani
 # Statement of Need
 <div align="justify">
 
-Studying tissue morphogenesis is complicated. Such as those process are placed at the embryonic stage of development, it can be complicated to perturb them with genetic tools, or even to capture when the process takes only few minutes. To execute complex morphogenetic movements, epithelia are driven by in-plane forces, like constriction of apical cell surface [@Heer:2017], and/or out-plane forces, like the apico-basal cable in apoptotic cell [@Monier:2015]. Modeling those process help to understand how tissue acquires their shape and overstep biological limit. Several vertex models have been developed in the past few years to describe the physics of epithelia [@Alt:2017].
+Studying tissue morphogenesis is complicated. For example, when the process of interest happens at the embryonic stage of development, it can be complicated to perturb them with genetic tools. It can even be hard to simply capture, when the process takes only few minutes. Furthermore, morphogenesis is inherently a mechanical process. To execute complex morphogenetic movements, epithelia are driven by in-plane forces, like constriction of apical cell surface [@Heer:2017], and/or out-plane forces, like the apico-basal cable in apoptotic cell [@Monier:2015]. Modeling those process help us understand how tissue acquires their shape, in complement of the experimental systems, and beyond their limitations. Several vertex models have been developed in the past few years to describe the physics of epithelia (for a review, see [@Alt:2017]), and common features can be identified.
 
-Tyssue is a python library which provide solution to model tissue as a vertex geometry. A vertex model define a tissue as an assembly of vertex and edges, which can form polygonal face (in 2D) or polyhedron (in 3D). Now we assume that cell junction are straight lines, and there is only one edge between two neighbouring cell. The way we construct our model, each edge is defined by two half-edges which belong to one of the two neighbouring cell (**figure2 A**). The library implements concepts and mechanisms common to all vertex models:
+The `tyssue` library defines tissue as meshes. A vertex model defines a tissue as an assembly of vertices and edges, which can form polygonal face (in 2D) or polyhedron (in 3D). For now, we assume that cell junction are straight lines. In `tyssue`, each edge is split, so that every face is limited by oriented "half-edges" (**figure2 A**), in a structure identical to the [Linear Cell Complex](https://doc.cgal.org/latest/Linear_cell_complex/index.html) in the CGAL library. The library implements concepts and mechanisms common to all vertex models, for both topological and mechanical aspects.
 
-### Topological aspect
-Few basic cellular process are implemented in our library such as cell elimination, division or cell neighbouring change. We implemented those process based on previous works.
+### Topology
 
-Cell neighbouring change - also called T1 transition - is based on the junction length. When a junction length goes below a threshold length, cell can swap neighbouring cell. According to Finegan et al. work, cell does not swap as soon as they have junction which reach the threshold rather than according with a probability [@Finegan:2019].
+Common cellular process are implemented in our library such as cell elimination, division or rearangements. We implemented those processes based on previous works.
 
-Cell division is a relative simple process to implement as we suppose that the two daughters cell will have equal area which is half the area of the mother cell. This process occurs according to a plane division axis, which can be aleatory or constraint. The division plane cross two edges of the mother cell and the new junction will be created at the middle of those two junctions [@Brodland:2002].
+Cell division is modeled as the splitting of a cell by a straight line (or plane in 3D) [@Brodland:2002], the angle and position of the division plane can be decided.
 
-Cell elimination append when a cell area reached a small area threshold. When it appens, cell start its elimination process by reduce its number of neighbors until it remains three using T1 transition. Then this cell is eliminated and the three vertex are merged to created a new vertex. [@Okuda:2015]
+Cell elimination happens when a cell area (volume) reaches a low threshold. When this happens, cell starts to loose contact with neighboring cells through series of rearangements. Once the cell is reduced to a triangle (in 2D) or a tetrahedron (in 3D) the remaining vertices are merged to create a new vertex. [@Okuda:2015]
 
-~~Swap occurs according to a certain number of parameters are completed, which we can simplify with a probability of swapping. ~~
+Changes in cell neighbours - also called T1 transition in 2D - happens when the size of the boundary between two neighboring cells passes below a certain threshold length (or area in 3D). In that case, the linked vertices fuse and are separated again, witch can lead to a change in the local topology.
+
+Although it was customary to assume the neighbor exchange to be a single step process, we follow
+the work by Finegan et al. which describes cell exchange as a multistep, stochastic process [@Finegan:2019]. As a consequence, in `tyssue`, vertices are not limited to 3 (in 2D) or 4 (in 3D) linked edges, but can form "rosettes" - see [link to T1 nb, link to rosettes nb]
+
+> **TODO** add links to notebooks
 
 
-### Mechanical aspect
+### Mechanics
 
-Several previous works lay the foundations for more recent models.
-Farhadifar et al. characterize qualitatively and quantitatively the importance of cell proliferation and elimination in the number of neighbouring cell distribution by using energy function with cell elasticity and junctional forces.
+For now, in `tyssue`, the dynamical behavior of an epithelium is described by solving the equation of motions following Newton's principle. At the scales of the studied processes, the inertia is negledgible compared to other forces such as friction, adhesion or contraction of the actin cytoskeleton.
 
-**honda ??**
+Interactions in the epithelium are described as potentials depending on the mesh geometry, as described in Farhadifar et al., who showed that a 2D epithelium geometry and topology can be faithfully repoduced by finding the quasi-static equilibrium of an energy depending on cells areas and junction length.
 
-Bi focused his works on tissue rigidity which allows or not cell deplacement in an epithelium, based on relation between area and perimeter on a cell [@Bi:2015]. This kind of relation permit to calibrate epithelium degree of freedom to permit/facilitate to one cell to move in the tissue or not. tyssue combine all those piece of puzzle to propose the most versatile model to answer to different biological question.
+**Honda et al.**:
+
+* https://doi.org/10.1016/0022-5193(78)90315-6
+* https://doi.org/10.1016/S0074-7696(08)62339-6
+
+
+More recently, Bi et al. focused his work on tissue rigidity which allows or not cell displacement in an epithelium, based on the relation between area and perimeter of a cell [@Bi:2015]. In `tyssue`, it is easy to define custom terms of the potential, through an object oriented model "factory" approach.
+
+This way, it is easy to test various combinations of energy terms, that best fit the observed _in vivo_ dynamics.
 
 
 <center>
@@ -68,19 +78,23 @@ Bi focused his works on tissue rigidity which allows or not cell deplacement in 
 </center>
 
 
-**[Comment c'est implémenté, exemple de déclaration de modèle ou lien vers un nb de la doc]**
+**TODO** [Comment c'est implémenté, exemple de déclaration de modèle ou lien vers un nb de la doc]
 
-tyssue library has already been used in several studies with different context of epithelia morphogenesis, such as leg folding and mesoderm invagination in *Drosophila melanogaster* ([@Monier:2015], [@Gracia:2019], [@Martin:2020]).
+> Peut être un exemple de code ici peut être bien
+
+The `tyssue` library has already been used in several studies with different context of epithelia morphogenesis, such as leg folding and mesoderm invagination in *Drosophila melanogaster* ([@Monier:2015], [@Gracia:2019], [@Martin:2020]).
 
 </div>
 
 # Acknowledgements
 <div align="justify">
-The work of this paper was supported by grants from the European Research Council (ERC) under the European Union Horizon 2020 research and innovation program (grant number EPAF: 648001), and from the Association Nationale de la recherche et de la Technologie (ANRT).
+The work of this paper was supported by grants from the European Research Council (ERC) under the European Union Horizon 2020 research and innovation program (grant number EPAF: 648001), and from the Association Nationale de la recherche et de la Technologie (ANRT). `tyssue` has benefited from the contributions of Hadrien Mary (@Hadim) [**TODO** - completer]
+
+We wish to thank Magali Suzanne and her team for their continuous support and for providing valuable insight on epithelium biology, Cyprien Gay for the discussions on the physics of epithelia, and the scientific python community for the core tools we use in this project.
 </div>
 
 # Correspondence
-Please contact guillaume@morphogenie.fr
+Please contact guillaume@damcb.com
 
 # Code
 <div align="justify">
