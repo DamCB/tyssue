@@ -126,7 +126,8 @@ def data_at_opposite(sheet, edge_data, free_value=None):
         )
     else:
         opposite = pd.DataFrame(
-            np.asarray(edge_data).take(sheet.edge_df["opposite"].to_numpy(), axis=0),
+            np.asarray(edge_data).take(sheet.edge_df[
+                "opposite"].to_numpy(), axis=0),
             index=sheet.edge_df.index
         )
     if free_value is not None:
@@ -322,7 +323,7 @@ def get_next(eptm):
     return next_
 
 
-## small utlity to swap apical and basal segments
+# small utlity to swap apical and basal segments
 def swap_apico_basal(organo):
     """Swap apical and basal segments of an organoid
     """
@@ -331,3 +332,41 @@ def swap_apico_basal(organo):
         swaped.loc[organo.segment_index("apical", elem)] = "basal"
         swaped.loc[organo.segment_index("basal", elem)] = "apical"
         organo.datasets[elem]["segment"] = swaped
+
+
+def face_centered_patch(sheet, face, neighbour_order):
+    """
+    Return subsheet centered on face with a distance of
+    neighbour order around the cell/
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    face : int, id of the center face
+    neighbour_order: int, number of neighbour around the center face
+
+    Returns
+    -------
+    patch: a :class:`Sheet` object
+    """
+    from ..core.sheet import Sheet
+    faces = pd.Series(face).append(
+        sheet.get_neighborhood(face, order=neighbour_order)['face'])
+
+    edges = sheet.edge_df[sheet.edge_df['face'].isin(faces)]
+
+    vertices = sheet.vert_df.loc[set(edges['srce'])]
+    pos = vertices[sheet.coords].values - \
+        vertices[sheet.coords].mean(axis=0).values[None, :]
+    u, v, rotation = np.linalg.svd(pos, full_matrices=False)
+    rot_pos = pd.DataFrame(np.dot(pos, rotation.T),
+                           index=vertices.index,
+                           columns=sheet.coords)
+
+    patch_dset = {'vert': rot_pos,
+                  'face': sheet.face_df.loc[faces].copy(),
+                  'edge': edges.copy()}
+
+    patch = Sheet('patch', patch_dset, sheet.specs)
+    patch.reset_index()
+    return patch
