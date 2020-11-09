@@ -48,10 +48,12 @@ def cell_division(monolayer, mother, orientation="vertical", psi=None):
 or "vertical", not {orientation}"""
         )
 
-    vertices = get_division_vertices(
-        monolayer, mother=mother, plane_normal=plane_normal
+    vertices, mother_verts, daughter_verts = get_division_vertices(
+        monolayer, mother=mother, plane_normal=plane_normal, return_all=True
     )
-    daughter = bulk_division(monolayer, mother, MonolayerGeometry, vertices)
+    daughter = bulk_division(
+        monolayer, mother, MonolayerGeometry, vertices, mother_verts, daughter_verts
+    )
 
     # Correct segment assignations for the septum
     septum = monolayer.face_df.index[-2:]
@@ -95,7 +97,6 @@ def _assign_vert_segment(monolayer, vertices):
             monolayer.vert_df.loc[v, "segment"] = "lateral"
 
 
-
 def find_basal_edge(monolayer, apical_edge):
     """Returns the basal edge parallel to the apical edge passed
     in argument.
@@ -112,17 +113,17 @@ def find_basal_edge(monolayer, apical_edge):
     trgt_segment = monolayer.vert_df.loc[cell_edges["trgt"].values, "segment"]
     trgt_segment.index = cell_edges.index
     try:
-        b_trgt, = cell_edges[
+        (b_trgt,) = cell_edges[
             (srce_segment == "apical")
             & (trgt_segment == "basal")
             & (cell_edges["srce"] == srce)
         ]["trgt"]
-        b_srce, = cell_edges[
+        (b_srce,) = cell_edges[
             (srce_segment == "basal")
             & (trgt_segment == "apical")
             & (cell_edges["trgt"] == trgt)
         ]["srce"]
-        b_edge, = cell_edges[
+        (b_edge,) = cell_edges[
             (cell_edges["srce"] == b_srce) & (cell_edges["trgt"] == b_trgt)
         ].index
     except ValueError:

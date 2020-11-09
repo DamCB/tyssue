@@ -8,12 +8,24 @@ import pandas as pd
 
 from itertools import combinations
 from ..utils.connectivity import face_face_connectivity
+from ..core.sheet import get_opposite
 
 logger = logging.getLogger(name=__name__)
 
 
+def euler_characteristic(edge_df):
+    """Computes the Euler Characteristic number for edge_df"""
+    opp = get_opposite(edge_df)
+    dble = edge_df[opp != -1].shape[0]
+    free = edge_df[opp == -1].shape[0]
+    E = dble // 2 + free
+    V = edge_df["srce"].unique().shape[0]
+    F = edge_df["face"].unique().shape[0]
+    return V - E + F
+
+
 def split_vert(sheet, vert, face, to_rewire, epsilon, recenter=False):
-    """ Creates a new vertex and moves it towards the center of face.
+    """Creates a new vertex and moves it towards the center of face.
 
     The edges in to_rewire will be connected to the new vertex.
 
@@ -159,8 +171,8 @@ def close_face(eptm, face):
         logger.info("Face {} already closed".format(face))
         return
     try:
-        single_srce, = srces.difference(trgts)
-        single_trgt, = trgts.difference(srces)
+        (single_srce,) = srces.difference(trgts)
+        (single_trgt,) = trgts.difference(srces)
     except ValueError as err:
         print("Closing only possible with exactly two dangling vertices")
         raise err
@@ -190,8 +202,7 @@ def drop_two_sided_faces(eptm):
 
 
 def remove_face(sheet, face):
-    """Removes a face from the mesh
-    """
+    """Removes a face from the mesh"""
     logger.debug(f"removing face {face}")
 
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
@@ -253,7 +264,7 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     collapsed = sheet.edge_df.query("srce == trgt")
     sheet.edge_df.drop(collapsed.index, axis=0, inplace=True)
     if not allow_two_sided:
-        logger.debug('dropped two sided cells')
+        logger.debug("dropped two sided cells")
         drop_two_sided_faces(sheet)
 
     if reindex:

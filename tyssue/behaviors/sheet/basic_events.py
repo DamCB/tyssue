@@ -58,7 +58,7 @@ def reconnect(sheet, manager, **kwargs):
     try:
         detach_vertices(sheet)
     except ValueError:
-        logger.info(f"Failed to detach, skipping")
+        logger.error("Failed to detach, skipping")
         pass
     if nv != sheet.Nv:
         logger.info(f"Detached {sheet.Nv - nv} vertices")
@@ -123,8 +123,7 @@ default_contraction_spec = {
 
 @face_lookup
 def contraction(sheet, manager, **kwargs):
-    """Single step contraction event
-    """
+    """Single step contraction event"""
     contraction_spec = default_contraction_spec
     contraction_spec.update(**kwargs)
     face = contraction_spec["face"]
@@ -172,8 +171,7 @@ default_face_elimination_spec = {"face_id": -1, "face": -1, "geom": SheetGeometr
 
 @face_lookup
 def face_elimination(sheet, manager, **kwargs):
-    """Removes the face with if face_id from the sheet
-    """
+    """Removes the face with if face_id from the sheet"""
     face_elimination_spec = default_face_elimination_spec
     face_elimination_spec.update(**kwargs)
     remove(sheet, face_elimination_spec["face"], face_elimination_spec["geom"])

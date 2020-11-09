@@ -17,8 +17,7 @@ log = logging.getLogger(name=__name__)
 
 
 class Epithelium:
-    """Base class defining a connective tissue in 2D or 3D.
-    """
+    """Base class defining a connective tissue in 2D or 3D."""
 
     def __init__(self, identifier, datasets, specs=None, coords=None, maxbackup=5):
         """Creates an epithelium
@@ -251,8 +250,7 @@ class Epithelium:
 
     @property
     def settings(self):
-        """ Accesses the `specs['settings']` dictionnary
-        """
+        """Accesses the `specs['settings']` dictionnary"""
         return self.specs["settings"]
 
     def update_specs(self, new, reset=False):
@@ -298,26 +296,22 @@ class Epithelium:
 
     @property
     def Nv(self):
-        """The number of vertices in the epithelium
-        """
+        """The number of vertices in the epithelium"""
         return self.vert_df.shape[0]
 
     @property
     def Ne(self):
-        """The number of edges in the epithelium
-        """
+        """The number of edges in the epithelium"""
         return self.edge_df.shape[0]
 
     @property
     def Nf(self):
-        """The number of faces in the epithelium
-        """
+        """The number of faces in the epithelium"""
         return self.face_df.shape[0]
 
     @property
     def Nc(self):
-        """The number of cells in the epithelium
-        """
+        """The number of cells in the epithelium"""
         if "cell" not in self.data_names:
             return self.face_df.shape[0]
         return self.cell_df.shape[0]
@@ -355,7 +349,7 @@ class Epithelium:
         return self._upcast(self.edge_df[element], self.datasets[dataset][columns])
 
     def upcast_srce(self, df):
-        """ Reindexes input data to self.edge_df.index
+        """Reindexes input data to self.edge_df.index
         by repeating the values for each source entry.
 
         Parameters
@@ -374,7 +368,7 @@ class Epithelium:
         return self._upcast(self.edge_df["srce"], df)
 
     def upcast_trgt(self, df):
-        """ Reindexes input data to self.edge_df.index
+        """Reindexes input data to self.edge_df.index
         by repeating the values for each target entry
 
         Parameters
@@ -393,7 +387,7 @@ class Epithelium:
         return self._upcast(self.edge_df["trgt"], df)
 
     def upcast_face(self, df):
-        """ Reindexes input data to self.edge_df.index
+        """Reindexes input data to self.edge_df.index
         by repeating the values for each face entry
 
         Parameters
@@ -413,7 +407,7 @@ class Epithelium:
         return self._upcast(self.edge_df["face"], df)
 
     def upcast_cell(self, df):
-        """ Reindexes input data to self.edge_df.index
+        """Reindexes input data to self.edge_df.index
         by repeating the values for each cell entry
 
         Parameters
@@ -581,7 +575,7 @@ class Epithelium:
         return neighbors.reset_index(drop=True).loc[1:]
 
     def face_polygons(self, coords=None):
-        """ Returns a pd.Series of arrays with the coordinates the face polygons
+        """Returns a pd.Series of arrays with the coordinates the face polygons
 
         Each element of the Series is a (num_sides, num_dims) array of points
         ordered counterclockwise.
@@ -627,8 +621,7 @@ class Epithelium:
         return is_valid
 
     def get_invalid(self):
-        """Returns a mask over self.edge_df for invalid faces
-        """
+        """Returns a mask over self.edge_df for invalid faces"""
         is_valid = self.get_valid()
         return ~is_valid
 
@@ -828,7 +821,7 @@ class Epithelium:
         return vertices, triangles, face_mask
 
     def vertex_mesh(self, coords, vertex_normals=True):
-        """ Returns the vertex coordinates and a list of vertex indices
+        """Returns the vertex coordinates and a list of vertex indices
         for each face of the tissue.
         If `vertex_normals` is True, also returns the normals of each vertex
         (set as the average of the vertex' edges), suitable for .OBJ export
@@ -963,7 +956,7 @@ def _is_closed_cell(e_df):
 
 
 def _test_invalid(face):
-    """ Returns True if the source and target sets of the faces polygon
+    """Returns True if the source and target sets of the faces polygon
     are different or if the face polygon is not closed
     """
 
@@ -978,6 +971,5 @@ def _test_invalid(face):
 
 
 def _test_valid(face):
-    """ Returns true iff all sources are also targets for the faces polygon
-    """
+    """Returns true iff all sources are also targets for the faces polygon"""
     return np.logical_not(_test_invalid(face))
