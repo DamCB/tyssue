@@ -86,7 +86,7 @@ def import_mesh(filename):
         mesh = meshio.read(filename)
         vert_ = pd.DataFrame(mesh.points, columns=list('xyz'))
         edge_ = pd.DataFrame(columns=['srce', 'trgt', 'face'])
-        face_ = pd.DataFrame(columns=list('xyz'))
+        face_ = pd.DataFrame(columns=['x', 'y', 'z', 'num_sides'])
         cpt_edge = 0
         cpt_face = 0
 
@@ -98,7 +98,7 @@ def import_mesh(filename):
                     cpt_edge += 1
                 edge_.loc[cpt_edge] = [c[poly - 1], c[0], cpt_face]
                 cpt_edge += 1
-                face_.loc[cpt_face] = [0, 0, 0]
+                face_.loc[cpt_face] = [0, 0, 0, poly]
                 cpt_face += 1
 
         data = {'vert': vert_,
