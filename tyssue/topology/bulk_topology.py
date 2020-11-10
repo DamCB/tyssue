@@ -160,7 +160,7 @@ def split_vert(eptm, vert, face=None, multiplier=1.5):
         _OH_transition(eptm, all_edges, elements, multiplier)
     else:
         raise ValueError(
-            "Cell has too many edges connected to the vertex, try with another"
+            f"Cell {cell} has too many edges connected to the vertex, try with another"
         )
 
     # Tidy up

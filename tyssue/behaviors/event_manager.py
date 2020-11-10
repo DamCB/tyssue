@@ -109,7 +109,7 @@ class EventManager:
                 elem_id = kwargs["elem_id"]
             else:
                 elem_id = -1
-            logger.info(f"{self.clock}, {elem_id}, {behavior.__name__}")
+            logger.debug(f"{self.clock}, {elem_id}, {behavior.__name__}")
             behavior(eptm, self, **kwargs)
 
     def update(self):
@@ -126,8 +126,7 @@ default_wait_spec = {"n_steps": 1}
 
 
 def wait(eptm, manager, **kwargs):
-    """Does nothing for a number of steps n_steps
-    """
+    """Does nothing for a number of steps n_steps"""
     wait_spec = default_wait_spec
     wait_spec.update(**kwargs)
     if kwargs["n_steps"] > 1:
