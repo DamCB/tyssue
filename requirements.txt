@@ -9,3 +9,4 @@ quantities
 ipywidgets
 pythreejs
 ipyvolume
+meshio

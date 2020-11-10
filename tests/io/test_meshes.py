@@ -1,7 +1,7 @@
 import tempfile
 from tyssue.generation import three_faces_sheet
 from tyssue import Sheet
-from tyssue.io import meshio
+from tyssue.io import meshes
 from tyssue import SheetGeometry as geom
 
 
