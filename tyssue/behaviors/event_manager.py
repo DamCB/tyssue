@@ -11,7 +11,6 @@ from collections import deque
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 class EventManager:
@@ -39,11 +38,12 @@ class EventManager:
         self.current.append((wait, {"face_id": -1, "n_steps": 1}))
         self.clock = 0
         if logfile is not None:
+            logger.setLevel(logging.DEBUG)
             fh = logging.FileHandler(logfile)
-            fh.setLevel(logging.INFO)
+            fh.setLevel(logging.DEBUG)
             logger.addHandler(fh)
-            logger.info("# Started logging at %s", datetime.now().isoformat())
-            logger.info(f"time, {self.element} index, event")
+            logger.debug("# Started logging at %s", datetime.now().isoformat())
+            logger.debug(f"time, {self.element} index, event")
 
     def extend(self, events):
         """

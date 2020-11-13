@@ -70,11 +70,11 @@ def test_compute_energy():
 
     Et, Ec, Ev = model.compute_energy(sheet, full_output=True)
     assert_almost_equal(Et.mean(), 0.02458566846202479, decimal=DECIMAL)
-    assert_almost_equal(Ec.mean(), 0.08638339061549484, decimal=DECIMAL)
-    assert_almost_equal(Ev.mean(), 0.06277441190064434, decimal=DECIMAL)
+    assert_almost_equal(Ec.mean(), 0.12093674686179141, decimal=DECIMAL)
+    assert_almost_equal(Ev.mean(), 0.08788417666060594, decimal=DECIMAL)
 
     energy = model.compute_energy(sheet, full_output=False)
-    assert_almost_equal(energy, 15.040138762574534, decimal=DECIMAL)
+    assert_almost_equal(energy, 14.254513236339077, decimal=DECIMAL)
 
 
 def test_compute_gradient():

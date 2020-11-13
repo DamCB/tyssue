@@ -65,7 +65,7 @@ def test_t1_transition():
     geom.update_all(sheet)
     face = sheet.edge_df.loc[84, "face"]
     type1_transition(sheet, 84)
-    assert sheet.edge_df.loc[84, "face"] != face
+    assert sheet.face_df.loc[face, "num_sides"] == 5
 
 
 def test_t1_at_border():
