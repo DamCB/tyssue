@@ -65,12 +65,11 @@ For now, in `tyssue`, the dynamical behavior of an epithelium is described by so
 
 Interactions in the epithelium are described as potentials depending on the mesh geometry, as described in Farhadifar et al., who showed that a 2D epithelium geometry and topology can be faithfully repoduced by finding the quasi-static equilibrium of an energy depending on cells areas and junction length [@Farhadifar:2007].
 
-Honda et al. assume that cells movements respond to mechanical forces in an overdamped manner and the vertices are driven by the sum of interfacial tension on cell boundaries and the resistance force against the deformation of cells [@Honda:1978, @Honda:1983].
+Honda et al. assume that cells movements respond to mechanical forces in an overdamped manner and the vertices are driven by the sum of interfacial tension on cell boundaries and the resistance force against the deformation of cells ([@Honda:1978], [@Honda:1983]).
 
 More recently, Bi et al. focused his work on tissue rigidity which allows or not cell displacement in an epithelium, based on the relation between area and perimeter of a cell [@Bi:2015]. In `tyssue`, it is easy to define custom terms of the potential, through an object oriented model "factory" approach.
 
 This way, it is easy to test various combinations of energy terms, that best fit the observed _in vivo_ dynamics.
-21713438
 
 <center>
 ![figure2](doc/illus/figure2.jpg  "figure2")
