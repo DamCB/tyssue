@@ -2,10 +2,8 @@
 title: 'Tyssue: an epithelium simulation library'
 tags:
   - Python
-  - developmental biology
-  - epithelium
-  -
-  -
+  - Developmental biology
+  - Epithelium
 authors:
   - name: Guillaume Gay
     orcid:
@@ -95,3 +93,5 @@ Please contact guillaume@damcb.com
 <div align="justify">
 tyssue is written in Python 3. Code and detailed installation instructions can be found [here](https://github.com/DamCB/tyssue/blob/master/INSTALL.md). Continuous integration is performed with [Travis](https://travis-ci.org/github/DamCB/tyssue). The associated code coverage can be found at [CodeCov](https://codecov.io/gh/DamCB/tyssue).
 </div>
+
+# References
