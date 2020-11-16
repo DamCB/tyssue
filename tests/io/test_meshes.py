@@ -8,8 +8,8 @@ from tyssue import SheetGeometry as geom
 def test_save_import_triangular_mesh():
     sheet = Sheet("test", *three_faces_sheet())
     fh = tempfile.mktemp(suffix=".obj")
-    meshio.save_triangular_mesh(fh, sheet)
-    data = meshio.import_triangular_mesh(fh)
+    meshes.save_triangular_mesh(fh, sheet)
+    data = meshes.import_triangular_mesh(fh)
     sheet = Sheet('test', data)
     geom.update_all(sheet)
     assert sheet.Nf == 18
@@ -20,8 +20,8 @@ def test_save_import_triangular_mesh():
 def test_save_import_mesh():
     sheet = Sheet("test", *three_faces_sheet())
     fh = tempfile.mktemp(suffix=".ply")
-    meshio.save_mesh(fh, sheet)
-    data = meshio.import_mesh(fh)
+    meshes.save_mesh(fh, sheet)
+    data = meshes.import_mesh(fh)
     sheet = Sheet('test', data)
     geom.update_all(sheet)
     assert sheet.Nf == 3
