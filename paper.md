@@ -9,16 +9,21 @@ tags:
 authors:
   - name: Guillaume Gay
     orcid:
-    affiliation: "1"
+    affiliation: "1, 3"
   - name: Sophie Theis
     orcid: 0000-0003-4206-8153
     affiliation: "1, 2"
+  - name: Magali Suzanne
+    orcid: 0000-0003-0801-3706
+    affiliation: "2"
 affiliations:
  - name: Morphogénie Logiciels, 32110 St Martin d’Armagnac, France.
    index: 1
  - name: LBCMCP, Centre de Biologie Intégrative (CBI), Université de Toulouse, CNRS, UPS, Toulouse 31062, France.
    index: 2
-date: 2 october 2020
+ - name: CENTURI.
+   index: 3
+date: 2 december 2020
 bibliography: paper.bib
 
 ---
@@ -50,39 +55,30 @@ Cell elimination happens when a cell area (volume) reaches a low threshold. When
 
 Changes in cell neighbours - also called T1 transition in 2D - happens when the size of the boundary between two neighboring cells passes below a certain threshold length (or area in 3D). In that case, the linked vertices fuse and are separated again, witch can lead to a change in the local topology.
 
-Although it was customary to assume the neighbor exchange to be a single step process, we follow
-the work by Finegan et al. which describes cell exchange as a multistep, stochastic process [@Finegan:2019]. As a consequence, in `tyssue`, vertices are not limited to 3 (in 2D) or 4 (in 3D) linked edges, but can form "rosettes" - see [link to T1 nb, link to rosettes nb]
+Although it was customary to assume the neighbor exchange to be a single step process, we follow the work by Finegan et al. which describes cell exchange as a multistep, stochastic process [@Finegan:2019]. As a consequence, in `tyssue`, vertices are not limited to 3 (in 2D) or 4 (in 3D) linked edges, but can form "rosettes" - see [type1](https://github.com/DamCB/tyssue-demo/blob/master/06-Type_1_transition.ipynb) and [rosette](https://github.com/DamCB/tyssue-demo/blob/master/08-Rosettes.ipynb) examples.
 
-> **TODO** add links to notebooks
 
 
 ### Mechanics
 
 For now, in `tyssue`, the dynamical behavior of an epithelium is described by solving the equation of motions following Newton's principle. At the scales of the studied processes, the inertia is negledgible compared to other forces such as friction, adhesion or contraction of the actin cytoskeleton.
 
-Interactions in the epithelium are described as potentials depending on the mesh geometry, as described in Farhadifar et al., who showed that a 2D epithelium geometry and topology can be faithfully repoduced by finding the quasi-static equilibrium of an energy depending on cells areas and junction length.
+Interactions in the epithelium are described as potentials depending on the mesh geometry, as described in Farhadifar et al., who showed that a 2D epithelium geometry and topology can be faithfully repoduced by finding the quasi-static equilibrium of an energy depending on cells areas and junction length [@Farhadifar:2007].
 
-**Honda et al.**:
-
-* https://doi.org/10.1016/0022-5193(78)90315-6
-* https://doi.org/10.1016/S0074-7696(08)62339-6
-
+Honda et al. assume that cells movements respond to mechanical forces in an overdamped manner and the vertices are driven by the sum of interfacial tension on cell boundaries and the resistance force against the deformation of cells [@Honda:1978, @Honda:1983].
 
 More recently, Bi et al. focused his work on tissue rigidity which allows or not cell displacement in an epithelium, based on the relation between area and perimeter of a cell [@Bi:2015]. In `tyssue`, it is easy to define custom terms of the potential, through an object oriented model "factory" approach.
 
 This way, it is easy to test various combinations of energy terms, that best fit the observed _in vivo_ dynamics.
-
+21713438
 
 <center>
 ![figure2](doc/illus/figure2.jpg  "figure2")
 </center>
 
+Documentation of the `tyssue` Python library can be found [here](https://tyssue.readthedocs.io/en/latest/). Notebook introduction to how to use `tyssue` library can be found [here](https://github.com/DamCB/tyssue-demo).
 
-**TODO** [Comment c'est implémenté, exemple de déclaration de modèle ou lien vers un nb de la doc]
-
-> Peut être un exemple de code ici peut être bien
-
-The `tyssue` library has already been used in several studies with different context of epithelia morphogenesis, such as leg folding and mesoderm invagination in *Drosophila melanogaster* ([@Monier:2015], [@Gracia:2019], [@Martin:2020]).
+The `tyssue` library has already been used in several studies with different context of epithelia morphogenesis, such as leg folding and mesoderm invagination in *Drosophila melanogaster* ([@Monier:2015], [@Gracia:2019], [@Martin:2020]). Github repository from those publications can be found [here](https://github.com/glyg/leg-joint) and [here](https://github.com/suzannelab/invagination).
 
 </div>
 
@@ -98,5 +94,5 @@ Please contact guillaume@damcb.com
 
 # Code
 <div align="justify">
-tyssue is written in Python 3. Code and detailed installation instructions can be found [here](https://github.com/DamCB/tyssue/blob/master/INSTALL.md). Continuous integration is performed with [Travis](**adresse**). The associated code coverage can be found at [CodeCov](**adresse**).
+tyssue is written in Python 3. Code and detailed installation instructions can be found [here](https://github.com/DamCB/tyssue/blob/master/INSTALL.md). Continuous integration is performed with [Travis](https://travis-ci.org/github/DamCB/tyssue). The associated code coverage can be found at [CodeCov](https://codecov.io/gh/DamCB/tyssue).
 </div>
