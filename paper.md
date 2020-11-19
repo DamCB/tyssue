@@ -5,15 +5,15 @@ tags:
   - Developmental biology
   - Epithelium
 authors:
-  - name: Guillaume Gay
-    orcid:
-    affiliation: "1, 3"
   - name: Sophie Theis
     orcid: 0000-0003-4206-8153
     affiliation: "1, 2"
   - name: Magali Suzanne
     orcid: 0000-0003-0801-3706
     affiliation: "2"
+  - name: Guillaume Gay
+    orcid:
+    affiliation: "1, 3"
 affiliations:
  - name: Morphogénie Logiciels, 32110 St Martin d’Armagnac, France.
    index: 1
@@ -39,7 +39,7 @@ The `tyssue` Python library seeks to provide a unified interface to implement bi
 # Statement of Need
 <div align="justify">
 
-Studying tissue morphogenesis is complicated. For example, when the process of interest happens at the embryonic stage of development, it can be complicated to perturb them with genetic tools. It can even be hard to simply capture, when the process takes only few minutes. Furthermore, morphogenesis is inherently a mechanical process. To execute complex morphogenetic movements, epithelia are driven by in-plane forces, like constriction of apical cell surface [@Heer:2017], and/or out-plane forces, like the apico-basal cable in apoptotic cell [@Monier:2015]. Modeling those process help us understand how tissue acquires their shape, in complement of the experimental systems, and beyond their limitations. Several vertex models have been developed in the past few years to describe the physics of epithelia (for a review, see [@Alt:2017]), and common features can be identified.
+Tissue remodelling is a complex process integrating a large number of input such as gene expression pattern, cell adherent properties, cell mechanics. It can be difficult to manipulate specific aspects genetically. It can even be hard to simply capture, when the process takes only few minutes. Furthermore, morphogenesis is inherently a mechanical process. To execute complex morphogenetic movements, epithelia are driven by in-plane forces, like constriction of apical cell surface [@Heer:2017], and/or out-plane forces, such as the apico-basal cable in apoptotic cell [@Monier:2015, @Gracia:2019] or lateral tension [@Sherrard:2010, @Sui:2018]. Modeling those process help us understand how tissue acquires their shape, in complement of the experimental systems, and beyond their limitations. Several vertex models have been developed in the past few years to describe the physics of epithelia (for a review, see [@Alt:2017]), and common features can be identified.
 
 The `tyssue` library defines tissue as meshes. A vertex model defines a tissue as an assembly of vertices and edges, which can form polygonal face (in 2D) or polyhedron (in 3D). For now, we assume that cell junction are straight lines. In `tyssue`, each edge is split, so that every face is limited by oriented "half-edges" (**figure2 A**), in a structure identical to the [Linear Cell Complex](https://doc.cgal.org/latest/Linear_cell_complex/index.html) in the CGAL library. The library implements concepts and mechanisms common to all vertex models, for both topological and mechanical aspects.
 
