@@ -334,6 +334,28 @@ def condition_4ii(eptm):
     """
     Return an array of face pairs sharing more than two half-edges, as defined
     in Okuda et al. 2013 condition 4 ii
+
+    Note
+    ----
+    An indication way to solve this:
+    ::
+        faces = condition_4ii(eptm)
+
+        pairs = set(frozenset(p) for p in faces)
+
+
+        cols = ['srce', 'trgt', 'face', 'cell', 'length', 'sub_area']
+        edges = eptm.edge_df[eptm.edge_df["face"].isin(faces[0])][cols].sort_values("face")
+        all_edges = eptm.edge_df.loc[eptm.edge_df["face"].isin(set(faces.ravel())), cols].sort_values("face")
+
+        all_edges['single'] = all_edges[["srce", "trgt"]].apply(frozenset, axis=1)
+
+        ufaces = set(faces.ravel())
+
+        com_vs = set(all_edges.srce)
+        for face in ufaces:
+            com_vs = com_vs.intersection(all_edges.loc[all_edges["face"] == face, "srce"])
+
     """
     conmat = face_face_connectivity(eptm, exclude_opposites=True)
     return np.vstack(np.where(conmat > 2)).T

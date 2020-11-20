@@ -17,7 +17,8 @@ from tyssue.core.sheet import get_opposite
 def test_get_next():
     sheet = Sheet("emin", *three_faces_sheet())
     next_ = utils.get_next(sheet)
-    expected = np.array([1, 2, 3, 4, 5, 0, 7, 8, 9, 10, 11, 6, 13, 14, 15, 16, 17, 12])
+    expected = np.array([1, 2, 3, 4, 5, 0, 7, 8, 9, 10,
+                         11, 6, 13, 14, 15, 16, 17, 12])
     np.testing.assert_array_equal(next_, expected)
 
 
@@ -62,7 +63,8 @@ def test_data_at_opposite():
     sheet = Sheet("emin", *three_faces_sheet())
     geom.update_all(sheet)
     sheet.get_opposite()
-    opp = utils.data_at_opposite(sheet, sheet.edge_df["length"], free_value=None)
+    opp = utils.data_at_opposite(
+        sheet, sheet.edge_df["length"], free_value=None)
 
     assert opp.shape == (sheet.Ne,)
     assert opp.loc[0] == 1.0
@@ -70,11 +72,13 @@ def test_data_at_opposite():
     opp = utils.data_at_opposite(sheet, sheet.edge_df["length"], free_value=-1)
     assert opp.loc[1] == -1.0
 
+
 def test_data_at_opposite_df():
     sheet = Sheet("emin", *three_faces_sheet())
     geom.update_all(sheet)
     sheet.get_opposite()
-    opp = utils.data_at_opposite(sheet, sheet.edge_df[["dx", "dy"]], free_value=None)
+    opp = utils.data_at_opposite(
+        sheet, sheet.edge_df[["dx", "dy"]], free_value=None)
 
     assert opp.shape == (sheet.Ne, 2)
     assert list(opp.columns) == ["dx", "dy"]
@@ -84,10 +88,12 @@ def test_data_at_opposite_array():
     sheet = Sheet("emin", *three_faces_sheet())
     geom.update_all(sheet)
     sheet.get_opposite()
-    opp = utils.data_at_opposite(sheet, sheet.edge_df[["dx", "dy"]].to_numpy(), free_value=None)
+    opp = utils.data_at_opposite(
+        sheet, sheet.edge_df[["dx", "dy"]].to_numpy(), free_value=None)
 
     assert opp.shape == (sheet.Ne, 2)
     assert_array_equal(opp.index, sheet.edge_df.index)
+
 
 def test_single_cell():
     grid = hexa_grid3d(6, 4, 3)
@@ -133,8 +139,10 @@ def test_modify():
     }
 
     utils.modify_segments(mono, modifiers)
-    assert mono.edge_df.loc[mono.apical_edges, "line_tension"].unique()[0] == 1.0
-    assert mono.edge_df.loc[mono.basal_edges, "line_tension"].unique()[0] == 3.0
+    assert mono.edge_df.loc[mono.apical_edges, "line_tension"].unique()[
+        0] == 1.0
+    assert mono.edge_df.loc[mono.basal_edges, "line_tension"].unique()[
+        0] == 3.0
 
 
 def test_ar_calculation():
@@ -144,3 +152,13 @@ def test_ar_calculation():
     sheet.vert_df["x"] = sheet.vert_df["x"] * 2
     sheet.face_df["AR2"] = utils.ar_calculation(sheet, coords=["x", "y"])
     assert_allclose(sheet.face_df["AR2"], 2 * sheet.face_df["AR"])
+
+
+def test_face_centered_patch():
+    grid = hexa_grid2d(6, 4, 3, 3)
+    datasets = from_2d_voronoi(Voronoi(grid))
+    sheet = Sheet("test", datasets)
+
+    subsheet = utils.face_centered_patch(sheet, 5, 2)
+
+    assert(subsheet.Nf == 6)
