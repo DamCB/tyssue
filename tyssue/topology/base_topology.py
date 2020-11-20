@@ -13,17 +13,6 @@ from ..core.sheet import get_opposite
 logger = logging.getLogger(name=__name__)
 
 
-def euler_characteristic(edge_df):
-    """Computes the Euler Characteristic number for edge_df"""
-    opp = get_opposite(edge_df)
-    dble = edge_df[opp != -1].shape[0]
-    free = edge_df[opp == -1].shape[0]
-    E = dble // 2 + free
-    V = edge_df["srce"].unique().shape[0]
-    F = edge_df["face"].unique().shape[0]
-    return V - E + F
-
-
 def split_vert(sheet, vert, face, to_rewire, epsilon, recenter=False):
     """Creates a new vertex and moves it towards the center of face.
 

@@ -1,11 +1,43 @@
+# What's new in 0.8.0
+
+##
+
 ## Core
-- Add force inference algorithm in sheet class, based on method describe in Brodland et al. 2014. 
 
-## Geometry
-- Add two new geometry classes. 
+- Set an `"id"` column by default
+- Add force inference algorithm in sheet class, based on method describe in Brodland et al. 2014.
+- New `get_simple_index` to "quickly" get a non-oriented, full edge representation of the epithelium
+- New `euler_characteristic` function to asses wether polyhedrons are closed
 
-## History 
-- Fix drop index name in retrieve method. 
+
+### Geometry
+- Add two new geometry classes.
+
+### History
+
+- Fix drop index name in retrieve method.
+- Make HistoryHdf5 record every columns by default
+
+
+## Behaviors
+
+- Removes the `sheet_events.relax` deprecated function
+
+## Dynamics
+
+- More coherent use of `is_active`
+
+## Topology
+
+- close_cell now raises an error if the cell has more than one hole
+- changed the algorythm for 3D cell division to have a more robust
+  way to attribute faces to the daughter cells (see `return_verts` argument in `get_division_edges`)
+- do not check for condition_4 on division
+
+
+## Generation
+
+- Adds a Lloyd relaxation step for spherical sheet generation (needs to be generalized)
 
 # What's new in 0.7.0
 

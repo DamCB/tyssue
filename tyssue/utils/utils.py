@@ -332,6 +332,8 @@ def swap_apico_basal(organo):
         swaped.loc[organo.segment_index("apical", elem)] = "basal"
         swaped.loc[organo.segment_index("basal", elem)] = "apical"
         organo.datasets[elem]["segment"] = swaped
+
+
 def face_centered_patch(sheet, face, neighbour_order):
     """
     Return subsheet centered on face with a distance of
@@ -348,49 +350,29 @@ def face_centered_patch(sheet, face, neighbour_order):
     patch: a :class:`Sheet` object
     """
     from ..core.sheet import Sheet
+
     faces = pd.Series(face).append(
-        sheet.get_neighborhood(face, order=neighbour_order)['face'])
+        sheet.get_neighborhood(face, order=neighbour_order)["face"]
+    )
 
-    edges = sheet.edge_df[sheet.edge_df['face'].isin(faces)]
+    edges = sheet.edge_df[sheet.edge_df["face"].isin(faces)]
 
-    vertices = sheet.vert_df.loc[set(edges['srce'])]
-    pos = vertices[sheet.coords].values - \
-        vertices[sheet.coords].mean(axis=0).values[None, :]
+    vertices = sheet.vert_df.loc[set(edges["srce"])]
+    pos = (
+        vertices[sheet.coords].values
+        - vertices[sheet.coords].mean(axis=0).values[None, :]
+    )
     u, v, rotation = np.linalg.svd(pos, full_matrices=False)
-    rot_pos = pd.DataFrame(np.dot(pos, rotation.T),
-                           index=vertices.index,
-                           columns=sheet.coords)
+    rot_pos = pd.DataFrame(
+        np.dot(pos, rotation.T), index=vertices.index, columns=sheet.coords
+    )
 
-    patch_dset = {'vert': rot_pos,
-                  'face': sheet.face_df.loc[faces].copy(),
-                  'edge': edges.copy()}
+    patch_dset = {
+        "vert": rot_pos,
+        "face": sheet.face_df.loc[faces].copy(),
+        "edge": edges.copy(),
+    }
 
-    patch = Sheet('patch', patch_dset, sheet.specs)
+    patch = Sheet("patch", patch_dset, sheet.specs)
     patch.reset_index()
     return patch
-
-def get_single_index(edge_df):
-    """Returns a subset of edge_df index with only one half-edge per vertex pair
-
-    Said otherwise, returns an index over a non-oriented graph representation
-    of edge_df.
-    """
-    srted = np.sort(edge_df[["srce", "trgt"]].to_numpy(), axis=1)
-    shift = np.ceil(np.log10(edge_df.srce.max()))
-    multi = int(10 ** (shift))
-    st_hash = srted[:, 0] * multi + srted[:, 1]
-    st_hash = pd.Series(st_hash, index=edge_df.index)
-    return st_hash.drop_duplicates().index.values
-
-
-def Euler_characteristic(edge_df):
-    """Returns the Euler characteristic number of the
-    polygon represented by edge_df., e.g V - E + F where
-    V is the number of vertices, E the number of (single) edges
-    and F the number of faces.
-
-    """
-    V = edge_df["srce"].unique().shape[0]
-    F = edge_df["face"].unique().shape[0]
-    E = get_single_index(edge_df).shape[0]
-    return V - E + F
