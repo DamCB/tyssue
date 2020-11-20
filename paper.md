@@ -49,25 +49,24 @@ Common cellular process are implemented in our library such as cell elimination,
 
 Cell division is modeled as the splitting of a cell by a straight line (or plane in 3D) [@Brodland:2002], the angle and position of the division plane can be decided.
 
-Cell elimination happens when a cell area (volume) reaches a low threshold. When this happens, cell starts to loose contact with neighboring cells through series of rearangements. Once the cell is reduced to a triangle (in 2D) or a tetrahedron (in 3D) the remaining vertices are merged to create a new vertex. [@Okuda:2015]
+Changes in cell neighbours - also called rearangements - happen when the size of the boundary between two neighboring cells passes below a certain threshold length in 2D (type 1 transition), or area in 3D (I-H or H-I transition)  [@Okuda:2015]. In that case, the linked vertices fuse and are separated again, witch can lead to a change in the local topology.
 
-Changes in cell neighbours - also called T1 transition in 2D - happens when the size of the boundary between two neighboring cells passes below a certain threshold length (or area in 3D). In that case, the linked vertices fuse and are separated again, witch can lead to a change in the local topology.
+Cell elimination happens when a cell area (volume) reaches a low threshold. When this happens, cell starts to loose contact with neighboring cells through series of rearangements. Once the cell is reduced to a triangle (in 2D) or a tetrahedron (in 3D) the remaining vertices are merged to create a new vertex.
 
 Although it was customary to assume the neighbor exchange to be a single step process, we follow the work by Finegan et al. which describes cell exchange as a multistep, stochastic process [@Finegan:2019]. As a consequence, in `tyssue`, vertices are not limited to 3 (in 2D) or 4 (in 3D) linked edges, but can form "rosettes" - see [type1](https://github.com/DamCB/tyssue-demo/blob/master/06-Type_1_transition.ipynb) and [rosette](https://github.com/DamCB/tyssue-demo/blob/master/08-Rosettes.ipynb) examples.
 
 
-
 ### Mechanics
 
-For now, in `tyssue`, the dynamical behavior of an epithelium is described by solving the equation of motions following Newton's principle. At the scales of the studied processes, the inertia is negledgible compared to other forces such as friction, adhesion or contraction of the actin cytoskeleton.
+In `tyssue`, the dynamical behavior of an epithelium is described by solving the equation of motions following Newton's principle. At the scales of the studied processes, the inertia is negligible compared to other forces such as friction, adhesion or contraction of the actin cytoskeleton.
 
-Interactions in the epithelium are described as potentials depending on the mesh geometry, as described in Farhadifar et al., who showed that a 2D epithelium geometry and topology can be faithfully repoduced by finding the quasi-static equilibrium of an energy depending on cells areas and junction length [@Farhadifar:2007].
+Honda et al. assume that cell movements respond to mechanical forces in an overdamped manner and the vertices are driven by the sum of interfacial tension on cell boundaries and the resistance force against the deformation of cells ([@Honda:1978], [@Honda:1983]). The `EulerSolver` class in `tyssue` allows to simulate such an overdamped movement.
 
-Honda et al. assume that cells movements respond to mechanical forces in an overdamped manner and the vertices are driven by the sum of interfacial tension on cell boundaries and the resistance force against the deformation of cells ([@Honda:1978], [@Honda:1983]).
+Interactions in the epithelium are described as potentials depending on the mesh geometry, as described in Farhadifar et al., who showed that a 2D epithelium geometry and topology can be faithfully repoduced by finding the quasi-static equilibrium of an energy depending on cell areas and junction lengths [@Farhadifar:2007]. The `QSSolver` class allows to solve this gradient descent problem. 
 
-More recently, Bi et al. focused his work on tissue rigidity which allows or not cell displacement in an epithelium, based on the relation between area and perimeter of a cell [@Bi:2015]. In `tyssue`, it is easy to define custom terms of the potential, through an object oriented model "factory" approach.
+More recently, Bi et al. focused his work on tissue rigidity which allows or not cell displacement in an epithelium, based on the relation between area and perimeter of a cell [@Bi:2015]. In `tyssue`, it is easy to define custom terms of the potential, through an object oriented model "factory" design, and use them to solve either the overdamped or gradient descent problem. 
 
-This way, it is easy to test various combinations of energy terms, that best fit the observed _in vivo_ dynamics.
+This way, it is easy to test various combinations of energy terms and find those that best fit the observed _in vivo_ dynamics.
 
 <center>
 ![figure2](doc/illus/figure2.jpg  "figure2")
@@ -81,7 +80,7 @@ The `tyssue` library has already been used in several studies with different con
 
 # Acknowledgements
 <div align="justify">
-The work of this paper was supported by grants from the European Research Council (ERC) under the European Union Horizon 2020 research and innovation program (grant number EPAF: 648001), and from the Association Nationale de la recherche et de la Technologie (ANRT). `tyssue` has benefited from the contributions of Hadrien Mary (@Hadim) [**TODO** - completer]
+The work of this paper was supported by grants from the European Research Council (ERC) under the European Union Horizon 2020 research and innovation program (grant number EPAF: 648001), and from the Association Nationale de la recherche et de la Technologie (ANRT). `tyssue` has benefited from the contributions of Hadrien Mary (@Hadim), George Courcoubetis (@gcourcou), Bertrand Caré (@bcare) and Félix Quinton (@felixquinton).
 
 We wish to thank Magali Suzanne and her team for their continuous support and for providing valuable insight on epithelium biology, Cyprien Gay for the discussions on the physics of epithelia, and the scientific python community for the core tools we use in this project.
 </div>
