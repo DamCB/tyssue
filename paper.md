@@ -12,14 +12,14 @@ authors:
     orcid: 0000-0003-0801-3706
     affiliation: "2"
   - name: Guillaume Gay
-    orcid:
+    orcid: 0000-0002-3957-2474
     affiliation: "1, 3"
 affiliations:
  - name: Morphogénie Logiciels, 32110 St Martin d’Armagnac, France.
    index: 1
  - name: LBCMCP, Centre de Biologie Intégrative (CBI), Université de Toulouse, CNRS, UPS, Toulouse 31062, France.
    index: 2
- - name: CENTURI.
+ - name: Turing Center for Living Systems, Marseille, France
    index: 3
 date: 2 december 2020
 bibliography: paper.bib
