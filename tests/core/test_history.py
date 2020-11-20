@@ -13,8 +13,7 @@ from tyssue.generation import three_faces_sheet, extrude
 
 
 def test_simple_history():
-    """
-    """
+    """"""
     sheet = Sheet("3", *three_faces_sheet())
     history = History(sheet)
     assert "dx" in history.datasets["edge"].columns
@@ -36,8 +35,9 @@ def test_warning():
 
     sheet = Sheet("3", *three_faces_sheet())
     with pytest.warns(UserWarning):
-        history = History(sheet, extra_cols={"edge": ["dx"], "face": [
-                          "area"], "vert": ["segment"]})
+        history = History(
+            sheet, extra_cols={"edge": ["dx"], "face": ["area"], "vert": ["segment"]}
+        )
 
 
 def test_retrieve():
@@ -47,7 +47,8 @@ def test_retrieve():
     for elem, dset in sheet_.datasets.items():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
     assert "area" in sheet_.datasets["face"].columns
-    sheet_ = history.retrieve(1)
+    with pytest.warns(UserWarning):
+        sheet_ = history.retrieve(1)
     for elem, dset in sheet_.datasets.items():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
 
@@ -96,7 +97,7 @@ def test_retrieve_bulk():
 
 
 def test_historyHDF5_path_warning():
- 
+
     sheet = Sheet("3", *three_faces_sheet())
     with pytest.warns(UserWarning):
         history = HistoryHdf5(sheet)
@@ -129,6 +130,7 @@ def test_historyHDF5_retrieve():
         assert dset.time.unique()[0] == 1
     for p in Path(".").glob("out*.hf5"):
         p.unlink()
+
 
 def test_historyHDF5_save_every():
     sheet = Sheet("3", *three_faces_sheet())
@@ -195,11 +197,13 @@ def test_historyHDF5_itemsize():
         p.unlink()
 
 
-
 def test_historyHDF5_save_other_sheet():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet, save_only={"edge": ["dx"], "face": [
-                          "area"], "vert": ["segment"]})
+    history = HistoryHdf5(
+        sheet,
+        save_only={"edge": ["dx"], "face": ["area"], "vert": ["segment"]},
+        hf5file="out.hf5",
+    )
 
     for element in sheet.datasets:
         assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
@@ -216,7 +220,6 @@ def test_historyHDF5_save_other_sheet():
 
     for p in Path(".").glob("out*.hf5"):
         p.unlink()
-
 
 
 def test_historyHDF5_from_archive():
