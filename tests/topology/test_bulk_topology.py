@@ -48,6 +48,32 @@ def test_close_cell():
     assert mono.Ne == Nei
 
 
+def test_close_already_closed(caplog):
+
+    dsets = hdf5.load_datasets(Path(stores_dir) / "with_4sided_cell.hf5")
+    mono = Monolayer("4", dsets)
+    cell = mono.cell_df.query("num_faces != 4").index[0]
+    close_cell(mono, cell)
+    assert caplog.record_tuples[-1][2] == "cell %s is already closed" % cell
+
+
+def test_close_two_holes():
+    dsets = hdf5.load_datasets(Path(stores_dir) / "small_ellipsoid.hf5")
+    mono = Monolayer("4", dsets)
+    cell = mono.cell_df.query("num_faces != 4").index[0]
+    Nfi = mono.cell_df.loc[cell, "num_faces"]
+    Nei = mono.Ne
+    edges = mono.edge_df.query(f"cell == {cell}")
+    faces = edges["face"].iloc[[0, 8]]
+    face_edges = edges[edges["face"].isin(faces)].index
+    mono.face_df.drop(faces, axis=0, inplace=True)
+    mono.edge_df.drop(face_edges, axis=0, inplace=True)
+    mono.reset_index()
+    mono.reset_topo()
+    with pytest.raises(ValueError):
+        close_cell(mono, cell)
+
+
 def test_remove_cell():
     dsets = hdf5.load_datasets(Path(stores_dir) / "with_4sided_cell.hf5")
     mono = Monolayer("4", dsets)

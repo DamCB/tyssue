@@ -19,6 +19,8 @@ from ..geometry.sheet_geometry import (
     SheetGeometry,
     ClosedSheetGeometry,
 )
+from ..geometry.utils import update_spherical
+
 
 try:
     from .cpp import mesh_generation
@@ -68,7 +70,7 @@ class AnnularSheet(Sheet):
 
 
 def generate_ring(Nf, R_in, R_out, R_vit=None, apical="in"):
-    """ Generates a 2D tyssue object aranged in a ring of Nf tetragonal cells
+    """Generates a 2D tyssue object aranged in a ring of Nf tetragonal cells
     with inner diameter R_in and outer diameter R_out
 
     Parameters
@@ -281,7 +283,7 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
     return eptm
 
 
-def spherical_sheet(radius, Nf, **kwargs):
+def spherical_sheet(radius, Nf, Lloyd_relax=False, **kwargs):
     """Returns a spherical sheet with the given radius and (approximately)
     the given number of cells
     """
@@ -293,17 +295,22 @@ def spherical_sheet(radius, Nf, **kwargs):
     ClosedSheetGeometry.scale(eptm, radius / rhos, eptm.coords)
 
     ClosedSheetGeometry.update_all(eptm)
+    if Lloyd_relax:
+        eptm = Lloyd_relaxation(
+            eptm, ClosedSheetGeometry, steps=100, update_method=update_on_sphere
+        )
+
     return eptm
 
 
-def spherical_monolayer(R_in, R_out, Nc, apical="out"):
+def spherical_monolayer(R_in, R_out, Nc, apical="out", Lloyd_relax=False):
     """Returns a spherical monolayer with the given inner and
     outer radii, and approximately the gieven number of cells.
 
     The `apical` argument can be 'in' out 'out' to specify wether
     the apical face of the cells faces inward or outward, reespectively.
     """
-    sheet = spherical_sheet(R_in, Nc)
+    sheet = spherical_sheet(R_in, Nc, Lloyd_relax=Lloyd_relax)
     delta_R = R_out - R_in
     mono = Monolayer("mono", extrude(sheet.datasets, method="normals", scale=-delta_R))
     if apical == "out":
@@ -315,7 +322,7 @@ def spherical_monolayer(R_in, R_out, Nc, apical="out"):
     return mono
 
 
-def sheet_from_cell_centers(points, noise=0):
+def sheet_from_cell_centers(points, noise=0, interp_s=1e-4):
     """Returns a Sheet object from the Voronoï tessalation
     of the cell centers.
 
@@ -332,6 +339,8 @@ def sheet_from_cell_centers(points, noise=0):
         the x, y, z coordinates of the cell centers
     noise : float, default 0.0
         addiditve normal noise stdev
+    interp_s : float, default 1e-4
+        interpolation smoothing factor (might need to set higher)
 
     Returns
     -------
@@ -381,7 +390,7 @@ def sheet_from_cell_centers(points, noise=0):
     eptm.face_df["rho"] = np.linalg.norm(eptm.face_df[["x", "y", "z"]], axis=1)
     eptm.face_df["theta"] = np.arcsin(eptm.face_df.z / eptm.face_df["rho"])
     _itrp = interpolate.SmoothSphereBivariateSpline(
-        thetas + np.pi / 2, phis + np.pi, rhos, s=1e-4
+        thetas + np.pi / 2, phis + np.pi, rhos, s=interp_s
     )
     eptm.face_df["rho"] = _itrp(
         eptm.face_df["theta"] + np.pi / 2, eptm.face_df["phi"] + np.pi, grid=False
@@ -412,3 +421,41 @@ def sheet_from_cell_centers(points, noise=0):
         null_length = eptm.edge_df.query("length == 0")
 
     return eptm
+
+
+def Lloyd_relaxation(sheet, geom, steps=10, coords=None, update_method=None):
+    """Performs Lloyd relaxation on the sheet"""
+    if coords is None:
+        coords = sheet.coords
+    geom.update_all(sheet)
+    mean_area0 = sheet.face_df.area.mean()
+
+    for i in range(steps):
+        if update_method:
+            centers = update_method(sheet)
+        else:
+            centers = sheet.face_df[coords].to_numpy()
+        sheet_ = sheet_from_cell_centers(centers, interp_s=1e-3)
+        geom.update_all(sheet)
+        mean_area = sheet_.face_df.area.mean()
+        delta = (mean_area0 / mean_area) ** 0.5
+        geom.scale(sheet_, delta, coords)
+        sheet = sheet_
+        geom.update_all(sheet)
+    return sheet
+
+
+def update_on_sphere(sheet):
+
+    update_spherical(sheet)
+
+    thetas = sheet.face_df["theta"].to_numpy()
+    phis = sheet.face_df["phi"].to_numpy()
+    centers = np.array(
+        [
+            np.sin(thetas) * np.cos(phis),
+            np.sin(thetas) * np.sin(phis),
+            np.cos(thetas),
+        ]
+    ).T
+    return centers

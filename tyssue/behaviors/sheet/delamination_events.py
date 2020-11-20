@@ -9,7 +9,8 @@ import random
 import numpy as np
 
 from ...utils.decorators import face_lookup
-from .actions import relax, contract, ab_pull
+from .actions import increase, decrease
+from .actions import ab_pull
 from .basic_events import contraction
 
 
@@ -77,12 +78,13 @@ def constriction(sheet, manager, **kwargs):
         face_area = sheet.face_df.loc[face, "area"]
 
         if face_area > constriction_spec["critical_area"]:
-            contract(
+            increase(
                 sheet,
+                "face",
                 face,
                 contract_rate,
-                True,
                 constriction_spec["contraction_column"],
+                True,
             )
             # if sheet.face_df.loc[face, 'prefered_area'] > 6:
             #    sheet.face_df.loc[face, 'prefered_area'] -= 0.5

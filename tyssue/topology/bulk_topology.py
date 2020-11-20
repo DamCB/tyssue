@@ -17,6 +17,7 @@ from .base_topology import (
 )
 from .base_topology import split_vert as base_split_vert
 from ..geometry.utils import rotation_matrix
+from ..core.objects import euler_characteristic
 from ..core.monolayer import Monolayer
 from ..core.sheet import get_opposite
 
@@ -75,11 +76,20 @@ def remove_cell(eptm, cell):
 
 def close_cell(eptm, cell):
     """Closes the cell by adding a face. Assumes a single face is missing"""
-    eptm.face_df = eptm.face_df.append(eptm.face_df.loc[0:0], ignore_index=True)
-
-    new_face = eptm.face_df.index[-1]
 
     face_edges = eptm.edge_df[eptm.edge_df["cell"] == cell]
+    euler_c = euler_characteristic(face_edges)
+
+    if euler_c == 2:
+        logger.warning("cell %s is already closed", cell)
+        return 0
+
+    if euler_c != 1:
+        raise ValueError("Cell has more than one hole")
+
+    eptm.face_df = eptm.face_df.append(eptm.face_df.loc[0:0], ignore_index=True)
+    new_face = eptm.face_df.index[-1]
+
     oppo = get_opposite(face_edges, raise_if_invalid=True)
     new_edges = face_edges[oppo == -1].copy()
     if not new_edges.shape[0]:

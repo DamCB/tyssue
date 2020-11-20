@@ -1,17 +1,10 @@
-import numpy as np
 import pandas as pd
-from numpy.testing import assert_array_equal, assert_array_almost_equal
 
 from tyssue import config
 from tyssue.core import Epithelium
-from tyssue.generation import (
-    three_faces_sheet,
-    extrude,
-    hexa_grid3d,
-    hexa_grid2d,
-    subdivide_faces,
-)
-from tyssue.geometry.bulk_geometry import BulkGeometry, MonoLayerGeometry
+from tyssue.generation import three_faces_sheet, extrude
+
+from tyssue.geometry.bulk_geometry import BulkGeometry
 
 
 def test_bulk_update_vol():

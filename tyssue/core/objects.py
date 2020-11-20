@@ -846,8 +846,9 @@ class Epithelium:
         return vertices.to_numpy(), faces.to_numpy()
 
     def validate_closed_cells(self):
-        is_closed = self.edge_df.groupby("cell").apply(_is_closed_cell)
-        return is_closed
+        """returns True if all cells of the epithelium are closed"""
+        euler_chars = self.edge_df.groupby("cell").apply(euler_characteristic)
+        return np.array_equal(np.unique(euler_chars), 2)
 
     def get_opposite_faces(self):
         """Populates the 'opposite' column of self.face_df with the index of
@@ -860,8 +861,8 @@ class Epithelium:
         cardinal = grouped.apply(len)
         if cardinal.max() > 2:
             raise ValueError(
-                "Invalid topology, faces have more than one neighbor: {}".format(
-                    list(face_v2[cardinal > 2].index)
+                "Invalid topology, the following faces have more than one neighbor: {}".format(
+                    face_v2[cardinal > 2].to_list()
                 )
             )
         self.face_df["opposite"] = -1
@@ -933,6 +934,41 @@ def get_prev_edges(sheet):
     return prev_e.sort_index()
 
 
+def get_simple_index(edge_df):
+    """
+    returns a subset of the edge_df index corresponding
+    to the non oriented edges (aka full edges).
+
+    This is faster than `get_extra_indices` and works also in 3D
+
+    """
+    srted = np.sort(edge_df[["srce", "trgt"]].to_numpy(), axis=1)
+    shift = np.ceil(np.log10(edge_df.srce.max()))
+    multi = int(10 ** (shift))
+    st_hash = srted[:, 0] * multi + srted[:, 1]
+    st_hash = pd.Series(st_hash, index=edge_df.index)
+    return st_hash.drop_duplicates().index.values
+
+
+def euler_characteristic(edge_df):
+    """Returns the Euler characteristic of the (non oriented) mesh
+    represented by edge_df.
+
+    The Euler characteristic is
+    the number of vertices minus the number of edges plus the number of faces
+
+    It is equal to 2 for a closed-on-itself mesh (topologicaly eq. to a sphere),
+    1 to a mesh with a border. It is not unique for monoloyers or bulk epithelia
+    but provides a way to check wether a cell is closed.
+
+    """
+
+    V = edge_df["srce"].unique().shape[0]
+    F = edge_df["face"].unique().shape[0]
+    E = get_simple_index(edge_df).shape[0]
+    return V - E + F
+
+
 def _next_edge(edf):
 
     edf["edge"] = edf.index
@@ -948,11 +984,7 @@ def _prev_edge(edf):
 
 
 def _is_closed_cell(e_df):
-    edges = e_df[["srce", "trgt"]]
-    for _, (srce, trgt) in edges.iterrows():
-        if edges[(edges["srce"] == trgt) & (edges["trgt"] == srce)].index.size != 1:
-            return False
-    return True
+    return euler_characteristic(e_df) == 2
 
 
 def _test_invalid(face):

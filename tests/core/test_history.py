@@ -20,21 +20,16 @@ def test_simple_history():
     assert "dx" in history.datasets["edge"].columns
 
     for element in sheet.datasets:
-        assert sheet.datasets[element].shape[
-            0] == history.datasets[element].shape[0]
+        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
     history.record()
-    assert sheet.datasets["vert"].shape[0] * \
-        2 == history.datasets["vert"].shape[0]
+    assert sheet.datasets["vert"].shape[0] * 2 == history.datasets["vert"].shape[0]
     history.record()
-    assert sheet.datasets["vert"].shape[0] * \
-        3 == history.datasets["vert"].shape[0]
-    assert sheet.datasets["face"].shape[0] * \
-        3 == history.datasets["face"].shape[0]
+    assert sheet.datasets["vert"].shape[0] * 3 == history.datasets["vert"].shape[0]
+    assert sheet.datasets["face"].shape[0] * 3 == history.datasets["face"].shape[0]
     mono = Epithelium("eptm", extrude(sheet.datasets))
     histo2 = History(mono)
     for element in mono.datasets:
-        assert mono.datasets[element].shape[
-            0] == histo2.datasets[element].shape[0]
+        assert mono.datasets[element].shape[0] == histo2.datasets[element].shape[0]
 
 
 def test_warning():
@@ -72,7 +67,7 @@ def test_retrieve():
     assert sheet_.datasets["face"].loc[0, "area"] == 100.0
 
 
-def test_overwrite_tim_hdf5e():
+def test_overwrite_time():
     sheet = Sheet("3", *three_faces_sheet())
     history = History(sheet)
     history.record(time_stamp=1)
@@ -81,12 +76,13 @@ def test_overwrite_tim_hdf5e():
     assert sheet_.Nv == sheet.Nv
 
 
-def test_overwrite_time():
+def test_overwrite_tim_hdf5e():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet)
+    history = HistoryHdf5(sheet, hf5file="out.hf5")
     history.record(time_stamp=1)
     history.record(time_stamp=1)
     sheet_ = history.retrieve(1)
+    os.remove("out.hf5")
     assert sheet_.Nv == sheet.Nv
 
 
@@ -100,8 +96,7 @@ def test_retrieve_bulk():
 
 
 def test_historyHDF5_path_warning():
-    """
-    """
+ 
     sheet = Sheet("3", *three_faces_sheet())
     with pytest.warns(UserWarning):
         history = HistoryHdf5(sheet)
@@ -117,11 +112,10 @@ def test_historyHDF5_path_warning():
 
 def test_historyHDF5_retrieve():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet)
+    history = HistoryHdf5(sheet, hf5file="out.hf5")
 
     for element in sheet.datasets:
-        assert sheet.datasets[element].shape[
-            0] == history.datasets[element].shape[0]
+        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
     history.record(time_stamp=0)
     history.record(time_stamp=1)
     sheet_ = history.retrieve(0)
@@ -136,14 +130,18 @@ def test_historyHDF5_retrieve():
     for p in Path(".").glob("out*.hf5"):
         p.unlink()
 
-
 def test_historyHDF5_save_every():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet, save_every=2, dt=1)
+
+    history = HistoryHdf5(
+        sheet,
+        save_every=2,
+        dt=1,
+        hf5file="out.hf5",
+    )
 
     for element in sheet.datasets:
-        assert sheet.datasets[element].shape[
-            0] == history.datasets[element].shape[0]
+        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
     for i in range(6):
         history.record(time_stamp=i)
     sheet_ = history.retrieve(0)
@@ -168,11 +166,13 @@ def test_historyHDF5_save_every():
 def test_historyHDF5_itemsize():
     sheet = Sheet("3", *three_faces_sheet())
     sheet.vert_df["segment"] = "apical"
-    history = HistoryHdf5(sheet)
+    history = HistoryHdf5(
+        sheet,
+        hf5file="out.hf5",
+    )
 
     for element in sheet.datasets:
-        assert sheet.datasets[element].shape[
-            0] == history.datasets[element].shape[0]
+        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
     sheet.vert_df.loc[0, "segment"] = ""
     history.record(time_stamp=1)
 
@@ -195,14 +195,14 @@ def test_historyHDF5_itemsize():
         p.unlink()
 
 
+
 def test_historyHDF5_save_other_sheet():
     sheet = Sheet("3", *three_faces_sheet())
     history = HistoryHdf5(sheet, save_only={"edge": ["dx"], "face": [
                           "area"], "vert": ["segment"]})
 
     for element in sheet.datasets:
-        assert sheet.datasets[element].shape[
-            0] == history.datasets[element].shape[0]
+        assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
     sheet.face_df.loc[0, "area"] = 1.0
     history.record(time_stamp=1)
 
@@ -216,6 +216,7 @@ def test_historyHDF5_save_other_sheet():
 
     for p in Path(".").glob("out*.hf5"):
         p.unlink()
+
 
 
 def test_historyHDF5_from_archive():

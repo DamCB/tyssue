@@ -117,18 +117,19 @@ def data_at_opposite(sheet, edge_data, free_value=None):
     """
     if isinstance(edge_data, pd.Series):
         opposite = pd.Series(
-            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(), index=edge_data.index
+            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(),
+            index=edge_data.index,
         )
     elif isinstance(edge_data, pd.DataFrame):
         opposite = pd.DataFrame(
-            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(), index=edge_data.index,
-            columns=edge_data.columns
+            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(),
+            index=edge_data.index,
+            columns=edge_data.columns,
         )
     else:
         opposite = pd.DataFrame(
-            np.asarray(edge_data).take(sheet.edge_df[
-                "opposite"].to_numpy(), axis=0),
-            index=sheet.edge_df.index
+            np.asarray(edge_data).take(sheet.edge_df["opposite"].to_numpy(), axis=0),
+            index=sheet.edge_df.index,
         )
     if free_value is not None:
         opposite = opposite.replace(np.nan, free_value)
@@ -285,7 +286,7 @@ def _compute_ar(df, coords):
 
 
 def ar_calculation(sheet, coords=["x", "y"]):
-    """ Calculates the aspect ratio of each face of the sheet
+    """Calculates the aspect ratio of each face of the sheet
 
     Parameters
     ----------
@@ -323,17 +324,14 @@ def get_next(eptm):
     return next_
 
 
-# small utlity to swap apical and basal segments
+## small utlity to swap apical and basal segments
 def swap_apico_basal(organo):
-    """Swap apical and basal segments of an organoid
-    """
+    """Swap apical and basal segments of an organoid"""
     for elem in ["vert", "face", "edge"]:
         swaped = organo.datasets[elem]["segment"].copy()
         swaped.loc[organo.segment_index("apical", elem)] = "basal"
         swaped.loc[organo.segment_index("basal", elem)] = "apical"
         organo.datasets[elem]["segment"] = swaped
-
-
 def face_centered_patch(sheet, face, neighbour_order):
     """
     Return subsheet centered on face with a distance of
@@ -370,3 +368,29 @@ def face_centered_patch(sheet, face, neighbour_order):
     patch = Sheet('patch', patch_dset, sheet.specs)
     patch.reset_index()
     return patch
+
+def get_single_index(edge_df):
+    """Returns a subset of edge_df index with only one half-edge per vertex pair
+
+    Said otherwise, returns an index over a non-oriented graph representation
+    of edge_df.
+    """
+    srted = np.sort(edge_df[["srce", "trgt"]].to_numpy(), axis=1)
+    shift = np.ceil(np.log10(edge_df.srce.max()))
+    multi = int(10 ** (shift))
+    st_hash = srted[:, 0] * multi + srted[:, 1]
+    st_hash = pd.Series(st_hash, index=edge_df.index)
+    return st_hash.drop_duplicates().index.values
+
+
+def Euler_characteristic(edge_df):
+    """Returns the Euler characteristic number of the
+    polygon represented by edge_df., e.g V - E + F where
+    V is the number of vertices, E the number of (single) edges
+    and F the number of faces.
+
+    """
+    V = edge_df["srce"].unique().shape[0]
+    F = edge_df["face"].unique().shape[0]
+    E = get_single_index(edge_df).shape[0]
+    return V - E + F

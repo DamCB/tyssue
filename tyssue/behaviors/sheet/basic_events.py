@@ -15,8 +15,6 @@ from ...geometry.sheet_geometry import SheetGeometry
 from ...topology.sheet_topology import cell_division
 
 from .actions import (
-    grow,
-    contract,
     exchange,
     remove,
     merge_vertices,
@@ -59,7 +57,7 @@ def reconnect(sheet, manager, **kwargs):
         detach_vertices(sheet)
     except ValueError as e:
         logger.error("Failed to detach, skipping")
-        raise e
+
     if nv != sheet.Nv:
         logger.info(f"Detached {sheet.Nv - nv} vertices")
 
@@ -102,7 +100,9 @@ def division(sheet, manager, **kwargs):
     print(sheet.face_df.loc[face, "vol"], division_spec["critical_vol"])
 
     if sheet.face_df.loc[face, "vol"] < division_spec["critical_vol"]:
-        grow(sheet, face, division_spec["growth_rate"])
+        increase(
+            sheet, "face", face, division_spec["growth_rate"], "prefered_vol", True
+        )
         manager.append(division, **division_spec)
     else:
         daughter = cell_division(sheet, face, division_spec["geom"])

@@ -1,4 +1,5 @@
 """
+
 Basic monolayer event module
 =======================
 
@@ -9,6 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# noqa
 from ..sheet.actions import merge_vertices, detach_vertices
 
 
@@ -68,8 +70,7 @@ def contract_apical_face(
     multiply=False,
     contraction_column="contractility",
 ):
-    """Single step contraction event for apical face only
-    """
+    """Single step contraction event for apical face only"""
     face = monolayer.idx_lookup(face_id, "face")
     if face is None:
         return
