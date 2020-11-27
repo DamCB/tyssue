@@ -565,7 +565,7 @@ class Epithelium:
 
         for k in range(order + 1):
             for neigh in neighbors[neighbors["order"] == k - 1][elem]:
-                new_neighs = self.get_neighbors(neigh)
+                new_neighs = self.get_neighbors(neigh, elem)
                 new_neighs = set(new_neighs).difference(neighbors[elem])
                 orders = np.ones(len(new_neighs), dtype=np.int) * (k)
                 new_neighs = pd.DataFrame.from_dict(
