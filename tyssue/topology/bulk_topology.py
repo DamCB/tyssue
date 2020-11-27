@@ -17,7 +17,7 @@ from .base_topology import (
 )
 from .base_topology import split_vert as base_split_vert
 from ..geometry.utils import rotation_matrix
-from ..core.objects import euler_characteristic
+from ..core.objects import euler_characteristic, _is_closed_cell
 from ..core.monolayer import Monolayer
 from ..core.sheet import get_opposite
 
@@ -643,3 +643,39 @@ def _set_new_pos_HI(eptm, fa, v10, v11):
     Dl_th = eptm.settings["threshold_length"] * 1.01
     eptm.vert_df.loc[v10, eptm.coords] = r0 + Dl_th / 2 * norm_b
     eptm.vert_df.loc[v11, eptm.coords] = r0 + Dl_th / 2 * norm_a
+
+
+def fix_pinch(eptm):
+    """In some cases, due to rearangements, some faces in an epithelium
+    will have more than one  opposite face.
+
+    This method fixes the issue so we can have a valid epithelium back
+
+    """
+    logger.debug("Fixing pinch")
+    face_v = eptm.edge_df.groupby("face").apply(lambda df: frozenset(df["srce"]))
+    face_v2 = pd.Series(data=face_v.index, index=face_v.values)
+    grouped = face_v2.groupby(level=0)
+    cardinal = grouped.apply(len)
+    faces = face_v2[cardinal > 2].to_list()
+    if not faces:
+        logger.debug("no pinch found")
+        return
+    cells = eptm.edge_df.loc[eptm.edge_df["face"].isin(faces), "cell"].unique()
+    bad_cells = []
+    for cell in cells:
+
+        if not _is_closed_cell(eptm.edge_df.query(f"cell == {cell}")):
+            bad_cells.append(cell)
+    logger.info(bad_cells)
+    to_remove = eptm.edge_df.loc[
+        eptm.edge_df["face"].isin(faces) & (eptm.edge_df["cell"].isin(bad_cells))
+    ]
+
+    bad_faces = to_remove["face"].unique()
+    bad_edges = to_remove.index.values
+
+    eptm.edge_df = eptm.edge_df.drop(bad_edges)
+    eptm.face_df = eptm.face_df.drop(bad_faces)
+    eptm.reset_index()
+    eptm.reset_topo()

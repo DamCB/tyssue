@@ -14,6 +14,7 @@ from tyssue.topology.bulk_topology import (
     HI_transition,
     remove_cell,
     close_cell,
+    fix_pinch,
 )
 from tyssue.topology.monolayer_topology import cell_division
 from tyssue.stores import stores_dir
@@ -152,3 +153,16 @@ def test_monolayer_division():
 
         assert eptm.validate()
     assert eptm.Nc == 5
+
+
+def test_fix_pinch():
+    dsets = hdf5.load_datasets(Path(stores_dir) / "with_pinch.hf5")
+    pinched = Monolayer("pinched", dsets)
+    assert not pinched.validate()
+    fix_pinch(pinched)
+    assert pinched.validate()
+    edf = pinched.edge_df[["srce", "trgt", "face", "cell"]].copy()
+    # Nothing happens here
+    fix_pinch(pinched)
+    assert pinched.validate()
+    assert np.all(pinched.edge_df[["srce", "trgt", "face", "cell"]] == edf)
