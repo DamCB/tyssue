@@ -146,13 +146,13 @@ def test_monolayer_division():
     eptm = Monolayer("test_volume", datasets, bulk_spec(), coords=["x", "y", "z"])
     eptm.vert_df[eptm.coords] += np.random.normal(scale=1e-6, size=(eptm.Nv, 3))
     MonolayerGeometry.update_all(eptm)
-    for orientation in ["vertical", "horizontal"]:
+    for orientation in ["vertical", "horizontal", "apical"]:
         daughter = cell_division(eptm, 0, orientation=orientation)
         eptm.reset_topo()
         eptm.reset_index()
 
         assert eptm.validate()
-    assert eptm.Nc == 5
+    assert eptm.Nc == 6
 
 
 def test_fix_pinch():

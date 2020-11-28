@@ -116,6 +116,7 @@ class EventManager:
         """
         Replaces `self.current` by `self.next` and clears `self.next`.
         """
+        self.clock += 1
         random.shuffle(self.next)
         self.current = self.next.copy()
         self.next.clear()

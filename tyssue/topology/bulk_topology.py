@@ -169,10 +169,7 @@ def split_vert(eptm, vert, face=None, multiplier=1.5):
         logger.info(f"OH for face {face} of cell {cell}")
         _OH_transition(eptm, all_edges, elements, multiplier)
     else:
-        raise ValueError(
-            f"Cell {cell} has too many edges connected to the vertex, try with another"
-        )
-
+        return 1
     # Tidy up
     for face in all_edges["face"].unique():
         close_face(eptm, face)
@@ -183,7 +180,7 @@ def split_vert(eptm, vert, face=None, multiplier=1.5):
         try:
             close_cell(eptm, cell)
         except ValueError as e:
-            print(f"Close failed for cell {cell}")
+            logger.error(f"Close failed for cell {cell}")
             raise e
 
     eptm.reset_index()
@@ -194,7 +191,7 @@ def split_vert(eptm, vert, face=None, multiplier=1.5):
             eptm.guess_vert_segment(vert_)
         for face_ in eptm.face_df.index[-2:]:
             eptm.guess_face_segment(face_)
-
+    return 0
 
 def _OI_transition(eptm, all_edges, elements, multiplier=1.5, recenter=False):
 
