@@ -312,7 +312,7 @@ def cell_division(
     eptm.cell_df = eptm.cell_df.append(cell_cols, ignore_index=True)
     eptm.cell_df.index.name = "cell"
     daughter = eptm.cell_df.index[-1]
-    if not "id" in eptm.cell_df.columns:
+    if "id" not in eptm.cell_df.columns:
         warnings.warn(
             """Adding 'id' columns to cell_df, as dataframe index is not a reliable
 identifier. Consider doing this at initialisation time
