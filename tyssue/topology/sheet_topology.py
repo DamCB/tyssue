@@ -52,9 +52,7 @@ def split_vert(
     return 0
 
 
-def type1_transition(
-    sheet, edge01, *, remove_tri_faces=True, multiplier=1.5
-):
+def type1_transition(sheet, edge01, *, remove_tri_faces=True, multiplier=1.5):
     """Performs a type 1 transition around the edge edge01
 
     See ../../doc/illus/t1_transition.png for a sketch of the definition
@@ -112,7 +110,7 @@ def type1_transition(
 
 
 def cell_division(sheet, mother, geom, angle=None):
-    """ Causes a cell to divide
+    """Causes a cell to divide
 
     Parameters
     ----------
@@ -221,12 +219,17 @@ def face_division(sheet, mother, vert_a, vert_b):
     daughter_edges = [new_edge_d]
     srce, trgt = vert_a, vert_b
     srces, trgts = m_data[["srce", "trgt"]].values.T
+    spins = 0
 
     while trgt != vert_a:
         srce, trgt = trgt, trgts[srces == trgt][0]
+
         daughter_edges.append(
             m_data[(m_data["srce"] == srce) & (m_data["trgt"] == trgt)].index[0]
         )
+        spins += 1
+        if spins > m_data.shape[0]:
+            raise ValueError(f"The face {mother} has an invalid topology, \n")
     sheet.edge_df.loc[daughter_edges, "face"] = daughter
     sheet.edge_df.index.name = "edge"
     sheet.reset_topo()

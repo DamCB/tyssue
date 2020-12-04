@@ -52,8 +52,7 @@ class TestsPlt:
         )[::-1]
 
         self.draw_specs["edge"]["visible"] = True
-        self.draw_specs["edge"]["color"] = self.sheet.edge_df[
-            "rand"]  # [0, 0, 0, 1]
+        self.draw_specs["edge"]["color"] = self.sheet.edge_df["rand"]  # [0, 0, 0, 1]
         self.draw_specs["edge"]["alpha"] = 1.0
         self.draw_specs["edge"]["color_range"] = 0, 3
         self.draw_specs["edge"]["width"] = 1.0 * np.linspace(
@@ -111,12 +110,14 @@ class TestsPlt:
 
     def test_sheet_view_invalid_color_array(self):
         with pytest.raises(ValueError):
-            self.draw_specs["face"]["color"] = np.ones(5)
+            self.draw_specs["face"]["color"] = np.arange(5)
+            self.draw_specs["edge"]["color"] = np.arange(self.sheet.Nv)
             fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
 
     def test_per_vertex_edge_colors(self):
 
         self.draw_specs["face"]["color"] = "red"
+        self.sheet.face_df["visible"] = True
         self.draw_specs["edge"]["color"] = np.random.random(self.sheet.Nv)
         fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
 
@@ -137,11 +138,7 @@ def test_create_gif():
     sheet.update_specs(config.dynamics.quasistatic_plane_spec())
     sheet.face_df["prefered_area"] = sheet.face_df["area"].mean()
     history = History(sheet)
-    solver = EulerSolver(sheet,
-                         geom,
-                         model,
-                         history=history,
-                         auto_reconnect=True)
+    solver = EulerSolver(sheet, geom, model, history=history, auto_reconnect=True)
     sheet.vert_df["viscosity"] = 0.1
 
     sheet.edge_df.loc[[0, 17], "line_tension"] *= 2
@@ -149,9 +146,9 @@ def test_create_gif():
     res = solver.solve(0.5, dt=0.05)
 
     with pytest.raises(ValueError):
-        create_gif(history, 'frames.gif')
-    create_gif(history, 'frames.gif', num_frames=5)
-    create_gif(history, 'interval.gif', interval=(2, 4))
+        create_gif(history, "frames.gif")
+    create_gif(history, "frames.gif", num_frames=5)
+    create_gif(history, "interval.gif", interval=(2, 4))
 
     assert os.path.isfile("frames.gif") == True
     assert os.path.isfile("interval.gif") == True

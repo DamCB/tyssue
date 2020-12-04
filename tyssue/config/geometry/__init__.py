@@ -26,6 +26,7 @@ def planar_sheet():
             "area": 0.0,
             "x": 0.0,
             "num_sides": 6,
+            "id": 0,
         },
         "settings": {"geometry": "planar"},
     }
@@ -53,6 +54,7 @@ def sheet_spec():
             "area": 1.0,
             "perimeter": 1.0,
             "is_alive": 1,
+            "id": 0,
         },
         "vert": {
             "x": 0.0,
@@ -97,16 +99,13 @@ def periodic_sheet():
 
 
 def cylindrical_sheet():
-    """Geometry specification of a sheet in a 3D space
-    """
+    """Geometry specification of a sheet in a 3D space."""
     spec = sheet_spec()
     return spec
 
 
 def rod_sheet():
-    """Geomtetry specs of a rod sheet in 3D space
-
-    """
+    """Geomtetry specs of a rod sheet in 3D space."""
     spec = sheet_spec()
     spec["settings"].update({"geometry": "rod", "height_axis": "z", "ab": [0.0, 0.0]})
     spec["vert"].update({"left_tip": False, "right_tip": False})
@@ -115,9 +114,7 @@ def rod_sheet():
 
 
 def flat_sheet():
-    """Geometry specification of a sheet in a 3D space
-
-    """
+    """Geometry specification of a sheet in a 3D space."""
     spec = sheet_spec()
     spec["settings"].update({"geometry": "flat"})
     return spec
@@ -137,9 +134,7 @@ def spherical_sheet():
 
 
 def bulk_spec():
-    """ Geometry specification for bulk tissues
-
-    """
+    """Geometry specification for bulk tissues."""
     spec = sheet_spec()
 
     spec["edge"].update({"cx": 0.0, "cy": 0.0, "cz": 0.0, "cell": 0, "sub_vol": 0.0})
@@ -152,5 +147,6 @@ def bulk_spec():
         "vol": 0.0,
         "num_faces": 6,
         "is_alive": 1,
+        "id": 0,
     }
     return spec

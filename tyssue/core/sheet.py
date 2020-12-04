@@ -61,13 +61,12 @@ class Sheet(Epithelium):
     def get_opposite(self):
         self.edge_df["opposite"] = get_opposite(self.edge_df)
 
-    def get_neighbors(self, face):
-        """Returns the faces adjacent to `face`
-        """
-        return super().get_neighbors(face, elem="face")
+    def get_neighbors(self, face, elem="face"):
+        """Returns the faces adjacent to `face`."""
+        return super().get_neighbors(face, elem=elem)
 
-    def get_neighborhood(self, face, order):
-        """Returns `face` neighborhood up to a degree of `order`
+    def get_neighborhood(self, face, order, elem="face"):
+        """Returns `face` neighborhood up to a degree of `order`.
 
         For example, if `order` is 2, it wil return the adjacent, faces
         and theses faces neighbors.
@@ -79,7 +78,7 @@ class Sheet(Epithelium):
 
         """
         # Start with the face so that it's not gathered later
-        return super().get_neighborhood(face, order, elem="face")
+        return super().get_neighborhood(face, order, elem=elem)
 
     def get_extra_indices(self):
         """Computes extra indices:
@@ -183,8 +182,6 @@ class Sheet(Epithelium):
         self.anti_sym.loc[self.west_edges] = -1
         self.edge_df[self.dcoords] /= noise
 
-
-
     def sort_edges_eastwest(self):
         """reorder edges such the free edges are first,
         then the first half of the double edges, then the other half of
@@ -198,7 +195,7 @@ class Sheet(Epithelium):
         self.get_extra_indices()
 
     def extract(self, face_mask, coords=["x", "y", "z"]):
-        """ Extract a new sheet from the sheet
+        """Extract a new sheet from the sheet
         that correspond to a key word that define a face.
 
         Parameters
@@ -320,20 +317,21 @@ class Sheet(Epithelium):
 
         n_edges = len(edges_index)
 
-        srce, trgt = self.edge_df.loc[edges_index, ['srce', 'trgt']].to_numpy().T
+        srce, trgt = self.edge_df.loc[edges_index, ["srce", "trgt"]].to_numpy().T
 
         # Fill gamma matrix to measure tension
         pos = self.edge_df.loc[edges_index, ucoords].to_numpy()
 
         pos = np.concatenate((pos, -pos)).flatten()
 
-        row = np.concatenate((
-            np.vstack([srce * ndim + i for i in range(ndim)]).T.flatten(),
-            np.vstack([trgt * ndim + i for i in range(ndim)]).T.flatten())
+        row = np.concatenate(
+            (
+                np.vstack([srce * ndim + i for i in range(ndim)]).T.flatten(),
+                np.vstack([trgt * ndim + i for i in range(ndim)]).T.flatten(),
+            )
         )
-        col = np.concatenate((
-            np.repeat(np.arange(n_edges), ndim),
-            np.repeat(np.arange(n_edges), ndim))
+        col = np.concatenate(
+            (np.repeat(np.arange(n_edges), ndim), np.repeat(np.arange(n_edges), ndim))
         )
 
         g_gamma_matrix = coo_matrix((pos, (row, col))).toarray()
@@ -359,7 +357,7 @@ class Sheet(Epithelium):
         edges_tensions = np.full([self.Ne], np.nan)
         edges_tensions[edges_index] = tension
         if free_border_edges:
-            edges_tensions[edges_index_opposite] = tension[:len(edges_index_opposite)]
+            edges_tensions[edges_index_opposite] = tension[: len(edges_index_opposite)]
         else:
             edges_tensions[edges_index_opposite] = tension
 
@@ -427,7 +425,7 @@ class Sheet(Epithelium):
         return cls(identifier, datasets, specs=flat_sheet(), coords=["x", "y", "z"])
 
 
-def get_opposite(edge_df):
+def get_opposite(edge_df, raise_if_invalid=False):
     """
     Returns the indices opposite to the edges in `edge_df`
     """
@@ -439,12 +437,15 @@ def get_opposite(edge_df):
     flipped.names = ["srce", "trgt"]
     try:
         opposite = st_indexed.reindex(flipped)["edge"].values
-    except ValueError:
+    except ValueError as e:
         dup = flipped.duplicated()
         warnings.warn(
             "Duplicated (`srce`, `trgt`) values in edge_df, maybe sanitize your input"
         )
         opposite = st_indexed[~dup].reindex(flipped)["edge"].values
+        if raise_if_invalid:
+            raise e
+
     opposite[np.isnan(opposite)] = -1
     return opposite.astype(np.int)
 

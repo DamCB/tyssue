@@ -1,7 +1,7 @@
 import os
 import tempfile
 import numpy as np
-import pandas as pd
+import pytest
 
 from tyssue.core.sheet import Sheet
 from tyssue.stores import stores_dir
@@ -20,7 +20,6 @@ from tyssue.behaviors.sheet.basic_events import (
 )
 from tyssue.behaviors.sheet.actions import (
     ab_pull,
-    relax,
     set_value,
     increase,
     decrease,
@@ -296,16 +295,6 @@ def test_remove_face():
     assert sheet.Ne == 10
 
 
-def test_relax():
-
-    sheet = Sheet("emin", *three_faces_sheet())
-    sheet.face_df["contractility"] = 1.12
-    sheet.face_df["prefered_area"] = 1.0
-    relax(sheet, 0, 2)
-    assert sheet.face_df.loc[0, "contractility"] == 0.56
-    assert sheet.face_df.loc[0, "prefered_area"] == 2.0
-
-
 def test_ab_pull():
 
     sheet = Sheet("emin", *three_faces_sheet())
@@ -362,5 +351,6 @@ def test_increase_line_tension():
 def test_grow():
     sheet = Sheet("emin", *three_faces_sheet())
     sheet.face_df["prefered_vol"] = 1.0
-    grow(sheet, 0, 1.2)
-    assert sheet.face_df.loc[0, "prefered_vol"] == 1.2
+    with pytest.warns(UserWarning):
+        grow(sheet, 0, 1.2)
+        assert sheet.face_df.loc[0, "prefered_vol"] == 1.2

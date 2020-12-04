@@ -1,3 +1,5 @@
+import os
+
 import pytest
 import numpy as np
 import pandas as pd
@@ -6,10 +8,12 @@ from pytest import raises
 
 from tyssue.core import Epithelium
 from tyssue.core.sheet import Sheet, get_opposite
+from tyssue.stores import stores_dir
+from tyssue.io.hdf5 import load_datasets
 
 from tyssue.generation import three_faces_sheet
 from tyssue.core.objects import _ordered_edges, _ordered_vert_idxs
-from tyssue.core.objects import get_next_edges, get_prev_edges
+from tyssue.core.objects import get_next_edges, get_prev_edges, get_simple_index
 from tyssue import config
 from tyssue.geometry.planar_geometry import PlanarGeometry
 from tyssue.geometry.sheet_geometry import SheetGeometry
@@ -72,8 +76,7 @@ def test_opposite():
     )
     assert_array_equal(true_opp, opposites)
 
-    edge_df = datasets["edge"].append(
-        datasets["edge"].loc[0], ignore_index=True)
+    edge_df = datasets["edge"].append(datasets["edge"].loc[0], ignore_index=True)
     edge_df.index.name = "edge"
     with pytest.warns(UserWarning):
         opposites = get_opposite(edge_df)
@@ -127,8 +130,7 @@ def test_extra_indices():
     datasets["face"] = pd.DataFrame(data=np.zeros((3, 2)), columns=["x", "y"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(
-        data=np.array(tri_verts), columns=["x", "y"])
+    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y"])
     datasets["vert"].index.name = "vert"
     specs = config.geometry.planar_spec()
     eptm = Sheet("extra", datasets, specs, coords=["x", "y"])
@@ -161,6 +163,31 @@ def test_extra_indices():
         assert opp[0] in eptm.east_edges
 
 
+def test_extra_indices_hexabug():
+    # GH #192
+
+    with pytest.raises(AssertionError):
+        h5store = os.path.join(stores_dir, "small_hexagonal_snaped.hf5")
+
+        datasets = load_datasets(h5store)
+        specs = config.geometry.cylindrical_sheet()
+        sheet = Sheet("emin", datasets, specs)
+
+        SheetGeometry.update_all(sheet)
+        sheet.sanitize()
+        sheet.get_extra_indices()
+
+    h5store = os.path.join(stores_dir, "small_hexagonal.hf5")
+
+    datasets = load_datasets(h5store)
+    specs = config.geometry.cylindrical_sheet()
+    sheet = Sheet("emin", datasets, specs)
+
+    SheetGeometry.update_all(sheet)
+    sheet.sanitize()
+    sheet.get_extra_indices()
+
+
 def test_sort_eastwest():
     datasets = {}
     tri_verts = [[0, 0], [1, 0], [-0.5, 3 ** 0.5 / 2], [-0.5, -(3 ** 0.5) / 2]]
@@ -184,8 +211,7 @@ def test_sort_eastwest():
     datasets["face"] = pd.DataFrame(data=np.zeros((3, 2)), columns=["x", "y"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(
-        data=np.array(tri_verts), columns=["x", "y"])
+    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y"])
     datasets["vert"].index.name = "vert"
     specs = config.geometry.planar_spec()
     eptm = Sheet("extra", datasets, specs, coords=["x", "y"])
@@ -202,8 +228,7 @@ def test_update_rank():
     sheet = Sheet("3", *three_faces_sheet())
     sheet.update_rank()
     np.testing.assert_array_equal(
-        np.array([3, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2]
-                 ), sheet.vert_df["rank"]
+        np.array([3, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2]), sheet.vert_df["rank"]
     )
 
     mono = Epithelium("3", extrude(sheet.datasets))
@@ -444,10 +469,8 @@ def test_orbits():
     datasets = extrude(datasets_2d)
     eptm = Epithelium("3faces_3D", datasets, specs)
 
-    expected_res_cell = datasets["edge"].groupby(
-        "srce").apply(lambda df: df["cell"])
-    expected_res_face = datasets["edge"].groupby(
-        "face").apply(lambda df: df["trgt"])
+    expected_res_cell = datasets["edge"].groupby("srce").apply(lambda df: df["cell"])
+    expected_res_face = datasets["edge"].groupby("face").apply(lambda df: df["trgt"])
     assert_array_equal(expected_res_cell, eptm.get_orbits("srce", "cell"))
     assert_array_equal(expected_res_face, eptm.get_orbits("face", "trgt"))
 
@@ -653,8 +676,7 @@ def test_face_polygons_exception():
     datasets["face"] = pd.DataFrame(data=np.zeros((3, 2)), columns=["x", "y"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(
-        data=np.array(tri_verts), columns=["x", "y"])
+    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y"])
     datasets["vert"].index.name = "vert"
 
     specs = config.geometry.planar_spec()
@@ -704,8 +726,7 @@ def test_invalid_valid_sanitize():
     datasets["face"] = pd.DataFrame(data=np.zeros((3, 2)), columns=["x", "y"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(
-        data=np.array(tri_verts), columns=["x", "y"])
+    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y"])
     datasets["vert"].index.name = "vert"
 
     specs = config.geometry.planar_spec()
@@ -719,8 +740,7 @@ def test_invalid_valid_sanitize():
     )
     datasets_invalid["edge"].index.name = "edge"
 
-    eptm_invalid = Epithelium(
-        "invalid", datasets_invalid, specs, coords=["x", "y"])
+    eptm_invalid = Epithelium("invalid", datasets_invalid, specs, coords=["x", "y"])
     PlanarGeometry.update_all(eptm_invalid)
 
     eptm.get_valid()
@@ -751,339 +771,6 @@ def test_remove():
     datasets = extrude(datasets, method="translation")
 
     eptm = Epithelium("3Faces_3D", datasets, specs)
-
-    dict_before = {
-        "srce": {
-            0: 0,
-            1: 1,
-            2: 2,
-            3: 3,
-            4: 4,
-            5: 5,
-            6: 0,
-            7: 5,
-            8: 6,
-            9: 7,
-            10: 8,
-            11: 9,
-            12: 0,
-            13: 9,
-            14: 10,
-            15: 11,
-            16: 12,
-            17: 1,
-            18: 14,
-            19: 15,
-            20: 16,
-            21: 17,
-            22: 18,
-            23: 13,
-            24: 18,
-            25: 19,
-            26: 20,
-            27: 21,
-            28: 22,
-            29: 13,
-            30: 22,
-            31: 23,
-            32: 24,
-            33: 25,
-            34: 14,
-            35: 13,
-            36: 1,
-            37: 0,
-            38: 13,
-            39: 14,
-            40: 2,
-            41: 1,
-            42: 14,
-            43: 15,
-            44: 3,
-            45: 2,
-            46: 15,
-            47: 16,
-            48: 4,
-            49: 3,
-            50: 16,
-            51: 17,
-            52: 5,
-            53: 4,
-            54: 17,
-            55: 18,
-            56: 0,
-            57: 5,
-            58: 18,
-            59: 13,
-            60: 5,
-            61: 0,
-            62: 13,
-            63: 18,
-            64: 6,
-            65: 5,
-            66: 18,
-            67: 19,
-            68: 7,
-            69: 6,
-            70: 19,
-            71: 20,
-            72: 8,
-            73: 7,
-            74: 20,
-            75: 21,
-            76: 9,
-            77: 8,
-            78: 21,
-            79: 22,
-            80: 0,
-            81: 9,
-            82: 22,
-            83: 13,
-            84: 9,
-            85: 0,
-            86: 13,
-            87: 22,
-            88: 10,
-            89: 9,
-            90: 22,
-            91: 23,
-            92: 11,
-            93: 10,
-            94: 23,
-            95: 24,
-            96: 12,
-            97: 11,
-            98: 24,
-            99: 25,
-            100: 1,
-            101: 12,
-            102: 25,
-            103: 14,
-            104: 0,
-            105: 1,
-            106: 14,
-            107: 13,
-        },
-        "trgt": {
-            0: 1,
-            1: 2,
-            2: 3,
-            3: 4,
-            4: 5,
-            5: 0,
-            6: 5,
-            7: 6,
-            8: 7,
-            9: 8,
-            10: 9,
-            11: 0,
-            12: 9,
-            13: 10,
-            14: 11,
-            15: 12,
-            16: 1,
-            17: 0,
-            18: 13,
-            19: 14,
-            20: 15,
-            21: 16,
-            22: 17,
-            23: 18,
-            24: 13,
-            25: 18,
-            26: 19,
-            27: 20,
-            28: 21,
-            29: 22,
-            30: 13,
-            31: 22,
-            32: 23,
-            33: 24,
-            34: 25,
-            35: 14,
-            36: 0,
-            37: 13,
-            38: 14,
-            39: 1,
-            40: 1,
-            41: 14,
-            42: 15,
-            43: 2,
-            44: 2,
-            45: 15,
-            46: 16,
-            47: 3,
-            48: 3,
-            49: 16,
-            50: 17,
-            51: 4,
-            52: 4,
-            53: 17,
-            54: 18,
-            55: 5,
-            56: 5,
-            57: 18,
-            58: 13,
-            59: 0,
-            60: 0,
-            61: 13,
-            62: 18,
-            63: 5,
-            64: 5,
-            65: 18,
-            66: 19,
-            67: 6,
-            68: 6,
-            69: 19,
-            70: 20,
-            71: 7,
-            72: 7,
-            73: 20,
-            74: 21,
-            75: 8,
-            76: 8,
-            77: 21,
-            78: 22,
-            79: 9,
-            80: 9,
-            81: 22,
-            82: 13,
-            83: 0,
-            84: 0,
-            85: 13,
-            86: 22,
-            87: 9,
-            88: 9,
-            89: 22,
-            90: 23,
-            91: 10,
-            92: 10,
-            93: 23,
-            94: 24,
-            95: 11,
-            96: 11,
-            97: 24,
-            98: 25,
-            99: 12,
-            100: 12,
-            101: 25,
-            102: 14,
-            103: 1,
-            104: 1,
-            105: 14,
-            106: 13,
-            107: 0,
-        },
-        "face": {
-            0: 0,
-            1: 0,
-            2: 0,
-            3: 0,
-            4: 0,
-            5: 0,
-            6: 1,
-            7: 1,
-            8: 1,
-            9: 1,
-            10: 1,
-            11: 1,
-            12: 2,
-            13: 2,
-            14: 2,
-            15: 2,
-            16: 2,
-            17: 2,
-            18: 3,
-            19: 3,
-            20: 3,
-            21: 3,
-            22: 3,
-            23: 3,
-            24: 4,
-            25: 4,
-            26: 4,
-            27: 4,
-            28: 4,
-            29: 4,
-            30: 5,
-            31: 5,
-            32: 5,
-            33: 5,
-            34: 5,
-            35: 5,
-            36: 6,
-            37: 6,
-            38: 6,
-            39: 6,
-            40: 7,
-            41: 7,
-            42: 7,
-            43: 7,
-            44: 8,
-            45: 8,
-            46: 8,
-            47: 8,
-            48: 9,
-            49: 9,
-            50: 9,
-            51: 9,
-            52: 10,
-            53: 10,
-            54: 10,
-            55: 10,
-            56: 11,
-            57: 11,
-            58: 11,
-            59: 11,
-            60: 12,
-            61: 12,
-            62: 12,
-            63: 12,
-            64: 13,
-            65: 13,
-            66: 13,
-            67: 13,
-            68: 14,
-            69: 14,
-            70: 14,
-            71: 14,
-            72: 15,
-            73: 15,
-            74: 15,
-            75: 15,
-            76: 16,
-            77: 16,
-            78: 16,
-            79: 16,
-            80: 17,
-            81: 17,
-            82: 17,
-            83: 17,
-            84: 18,
-            85: 18,
-            86: 18,
-            87: 18,
-            88: 19,
-            89: 19,
-            90: 19,
-            91: 19,
-            92: 20,
-            93: 20,
-            94: 20,
-            95: 20,
-            96: 21,
-            97: 21,
-            98: 21,
-            99: 21,
-            100: 22,
-            101: 22,
-            102: 22,
-            103: 22,
-            104: 23,
-            105: 23,
-            106: 23,
-            107: 23,
-        },
-    }
 
     dict_after = {
         "srce": {
@@ -1310,7 +997,6 @@ def test_remove():
         },
     }
 
-    sft_before = pd.DataFrame.from_dict(dict_before)
     sft_after = pd.DataFrame.from_dict(dict_after)
 
     eptm.remove([0])
@@ -1321,11 +1007,10 @@ def test_remove():
 
 
 def test_cut_out():
-    datasets_2d, specs = three_faces_sheet()
+    datasets_2d, _ = three_faces_sheet()
     datasets = extrude(datasets_2d, method="translation")
 
     eptm = Epithelium("3faces_3D", datasets)
-    eptm_ordered = eptm.copy(deep_copy=True)
 
     bounding_box_xy = np.array([[-1.0, 10.0], [-1.5, 1.5]])
     bounding_box_yx = np.array([[-1.5, 1.5], [-1.0, 10.0]])
@@ -1440,12 +1125,10 @@ def test_vertex_mesh():
     )
     datasets["edge"].index.name = "edge"
 
-    datasets["face"] = pd.DataFrame(
-        data=np.zeros((3, 3)), columns=["x", "y", "z"])
+    datasets["face"] = pd.DataFrame(data=np.zeros((3, 3)), columns=["x", "y", "z"])
     datasets["face"].index.name = "face"
 
-    datasets["vert"] = pd.DataFrame(
-        data=np.array(tri_verts), columns=["x", "y", "z"])
+    datasets["vert"] = pd.DataFrame(data=np.array(tri_verts), columns=["x", "y", "z"])
     datasets["vert"].index.name = "vert"
 
     specs = config.geometry.flat_sheet()
@@ -1455,8 +1138,7 @@ def test_vertex_mesh():
 
     # tested method
     res_verts, res_faces, res_normals = eptm.vertex_mesh(["x", "y", "z"])
-    res_xy_verts, res_xy_faces = eptm.vertex_mesh(
-        ["x", "y", "z"], vertex_normals=False)
+    eptm.vertex_mesh(["x", "y", "z"], vertex_normals=False)
     res_faces = list(res_faces)
 
     expected_faces = [[0, 1, 2], [0, 3, 1], [0, 2, 3]]
@@ -1476,11 +1158,9 @@ def test_vertex_mesh():
     )
 
     assert_array_equal(res_verts, np.array(tri_verts))
-    assert all([res_faces[i] == expected_faces[i]
-                for i in range(len(expected_faces))])
+    assert all([res_faces[i] == expected_faces[i] for i in range(len(expected_faces))])
     assert_array_equal(
-        np.round(res_normals, decimals=6), np.round(
-            expected_normals, decimals=6)
+        np.round(res_normals, decimals=6), np.round(expected_normals, decimals=6)
     )
 
 
@@ -1519,8 +1199,7 @@ def test_get_prev_edges():
 
     tri_face = Epithelium("3", *three_faces_sheet())
     prev = get_prev_edges(tri_face).values
-    expected = np.array([5, 0, 1, 2, 3, 4, 11, 6, 7, 8,
-                         9, 10, 17, 12, 13, 14, 15, 16])
+    expected = np.array([5, 0, 1, 2, 3, 4, 11, 6, 7, 8, 9, 10, 17, 12, 13, 14, 15, 16])
     assert_array_equal(prev, expected)
 
 
@@ -1528,49 +1207,63 @@ def test_get_next_edges():
 
     tri_face = Epithelium("3", *three_faces_sheet())
     prev = get_next_edges(tri_face).values
-    expected = np.array([1, 2, 3, 4, 5, 0, 7, 8, 9, 10,
-                         11, 6, 13, 14, 15, 16, 17, 12])
+    expected = np.array([1, 2, 3, 4, 5, 0, 7, 8, 9, 10, 11, 6, 13, 14, 15, 16, 17, 12])
     assert_array_equal(prev, expected)
+
+
+def test_get_simple_index():
+    tri_face = Epithelium("3", *three_faces_sheet())
+    idx = get_simple_index(tri_face.edge_df)
+    assert idx.shape == (15,)
+
+    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets = extrude(datasets_2d, scale=1 / 3.0)
+    eptm = Epithelium("3faces_3D", datasets, specs)
+    idx = get_simple_index(eptm.edge_df)
+    assert idx.shape == (43,)
 
 
 def test_get_force_inference():
     # INIT TISSUE
-    sheet = Sheet.planar_sheet_2d('jam', 10, 10, 1, 1, noise=0)
+    sheet = Sheet.planar_sheet_2d("jam", 10, 10, 1, 1, noise=0)
     PlanarGeometry.update_all(sheet)
 
     model = model_factory(
         [
             effectors.FaceAreaElasticity,
-        ], effectors.FaceAreaElasticity)
+        ],
+        effectors.FaceAreaElasticity,
+    )
 
     sheet.remove(sheet.cut_out([[0, 10], [0, 10]]))
     sheet.sanitize(trim_borders=True)
-    PlanarGeometry.scale(sheet, sheet.face_df.area.mean()**-0.5, ['x', 'y'])
+    PlanarGeometry.scale(sheet, sheet.face_df.area.mean() ** -0.5, ["x", "y"])
     PlanarGeometry.center(sheet)
     PlanarGeometry.update_all(sheet)
     sheet.reset_index()
     sheet.reset_topo()
-    sheet.face_df['area_elasticity'] = 1
-    sheet.face_df['prefered_area'] = 1
+    sheet.face_df["area_elasticity"] = 1
+    sheet.face_df["prefered_area"] = 1
     solver = QSSolver(with_t1=False, with_t3=False, with_collisions=False)
-    res = solver.find_energy_min(
-        sheet, PlanarGeometry, model, options={"gtol": 1e-8})
+    solver.find_energy_min(sheet, PlanarGeometry, model, options={"gtol": 1e-8})
 
     sheet.vert_df.y *= 0.5
-    res = solver.find_energy_min(
-        sheet, PlanarGeometry, model, options={"gtol": 1e-8})
-    sheet.get_force_inference(column='tension', free_border_edges=True)
+    solver.find_energy_min(sheet, PlanarGeometry, model, options={"gtol": 1e-8})
+    sheet.get_force_inference(column="tension", free_border_edges=True)
 
     sheet = sheet.extract_bounding_box(x_boundary=[-2, 2], y_boundary=[-1, 1])
 
-    sheet.edge_df['angle'] = (np.arctan2(sheet.edge_df["dx"],
-                                         sheet.edge_df["dy"]) * 180 / np.pi)
-    sheet.edge_df['angle'] = sheet.edge_df[
-        'angle'].apply(lambda x: 180 + x if x < 0 else x)
-    sheet.edge_df['angle'] = sheet.edge_df[
-        'angle'].apply(lambda x: 180 - x if x > 90 else x)
+    sheet.edge_df["angle"] = (
+        np.arctan2(sheet.edge_df["dx"], sheet.edge_df["dy"]) * 180 / np.pi
+    )
+    sheet.edge_df["angle"] = sheet.edge_df["angle"].apply(
+        lambda x: 180 + x if x < 0 else x
+    )
+    sheet.edge_df["angle"] = sheet.edge_df["angle"].apply(
+        lambda x: 180 - x if x > 90 else x
+    )
 
-    for index, edge in sheet.edge_df[sheet.edge_df.angle > 45].iterrows():
-        assert(edge.tension > 1.5)
-    for index, edge in sheet.edge_df[sheet.edge_df.angle < 45].iterrows():
-        assert(edge.tension < 1.5)
+    for _, edge in sheet.edge_df[sheet.edge_df.angle > 45].iterrows():
+        assert edge.tension > 1.5
+    for _, edge in sheet.edge_df[sheet.edge_df.angle < 45].iterrows():
+        assert edge.tension < 1.5

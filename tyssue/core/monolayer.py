@@ -8,6 +8,7 @@ import pandas as pd
 from scipy.spatial import cKDTree
 from .objects import Epithelium
 from .sheet import Sheet
+
 from ..geometry.bulk_geometry import BulkGeometry
 
 logger = logging.getLogger(name=__name__)
@@ -25,7 +26,7 @@ class Monolayer(Epithelium):
         self.cell_df["is_alive"] = 1
         self.face_df["is_alive"] = 1
         self.reset_topo()
-        BulkGeometry.update_all(self)
+        # BulkGeometry.update_all(self)
 
     @classmethod
     def from_flat_sheet(cls, name, apical_sheet, specs, thickness=1):
@@ -80,7 +81,7 @@ class Monolayer(Epithelium):
         return self.segment_index("lateral", "vert")
 
     def get_sub_sheet(self, segment):
-        """ Returns a :class:`Sheet` object of the corresponding
+        """Returns a :class:`Sheet` object of the corresponding
         segment
 
         Parameters
@@ -96,9 +97,7 @@ class Monolayer(Epithelium):
         return Sheet(self.identifier + segment, datasets, specs)
 
     def guess_vert_segment(self, vert):
-        """Infers the vertex segment from its surrounding edges.
-
-        """
+        """Infers the vertex segment from its surrounding edges."""
         v_edges = self.edge_df[self.edge_df["srce"] == vert]
         if v_edges.shape[0] == 0:
             logger.info("Vertex %d not found", vert)
@@ -113,12 +112,10 @@ class Monolayer(Epithelium):
         elif not intersect:
             self.vert_df.loc[vert, ["segment"]] = "lateral"
         else:  # intersect is {"apical"} or {"basal"}
-            self.vert_df.loc[vert, ["segment"]], = intersect
+            (self.vert_df.loc[vert, ["segment"]],) = intersect
 
     def guess_face_segment(self, face):
-        """Infers the face segment from its surrounding edges.
-
-        """
+        """Infers the face segment."""
         face_edges = self.edge_df[self.edge_df["face"] == face]
         if face_edges.shape[0] == 0:
             logger.info("face %d not found", face)
@@ -126,7 +123,7 @@ class Monolayer(Epithelium):
         if len(v_segments) == 2:
             self.face_df.loc[face, "segment"] = "lateral"
         elif len(v_segments) == 1:
-            new_segment, = v_segments
+            (new_segment,) = v_segments
             self.face_df.loc[face, "segment"] = new_segment
 
 

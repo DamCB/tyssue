@@ -117,18 +117,19 @@ def data_at_opposite(sheet, edge_data, free_value=None):
     """
     if isinstance(edge_data, pd.Series):
         opposite = pd.Series(
-            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(), index=edge_data.index
+            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(),
+            index=edge_data.index,
         )
     elif isinstance(edge_data, pd.DataFrame):
         opposite = pd.DataFrame(
-            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(), index=edge_data.index,
-            columns=edge_data.columns
+            edge_data.reindex(sheet.edge_df["opposite"]).to_numpy(),
+            index=edge_data.index,
+            columns=edge_data.columns,
         )
     else:
         opposite = pd.DataFrame(
-            np.asarray(edge_data).take(sheet.edge_df[
-                "opposite"].to_numpy(), axis=0),
-            index=sheet.edge_df.index
+            np.asarray(edge_data).take(sheet.edge_df["opposite"].to_numpy(), axis=0),
+            index=sheet.edge_df.index,
         )
     if free_value is not None:
         opposite = opposite.replace(np.nan, free_value)
@@ -285,7 +286,7 @@ def _compute_ar(df, coords):
 
 
 def ar_calculation(sheet, coords=["x", "y"]):
-    """ Calculates the aspect ratio of each face of the sheet
+    """Calculates the aspect ratio of each face of the sheet
 
     Parameters
     ----------
@@ -323,10 +324,9 @@ def get_next(eptm):
     return next_
 
 
-# small utlity to swap apical and basal segments
+## small utlity to swap apical and basal segments
 def swap_apico_basal(organo):
-    """Swap apical and basal segments of an organoid
-    """
+    """Swap apical and basal segments of an organoid."""
     for elem in ["vert", "face", "edge"]:
         swaped = organo.datasets[elem]["segment"].copy()
         swaped.loc[organo.segment_index("apical", elem)] = "basal"
@@ -334,10 +334,67 @@ def swap_apico_basal(organo):
         organo.datasets[elem]["segment"] = swaped
 
 
+def elem_centered_patch(eptm, elem_idx, neighbour_order, elem):
+    """
+    Return subeptm centered on the element (cell or face) with index elem_idx
+    with neighbour_order neighbours around it.
+
+    Parameters
+    ----------
+    eptm : a :class:`Epithelim` instance
+    index : int, id of the center element
+    neighbour_order: int,
+        neighbourhood 'degree' around the center element
+
+    Returns
+    -------
+    patch: an object with the same class as eptm
+
+    """
+    if elem not in ("face", "cell"):
+        raise ValueError
+
+    elems = pd.Series(elem_idx).append(
+        eptm.get_neighborhood(elem_idx, neighbour_order, elem)[elem]
+    )
+    print(elems, elem)
+    edges = eptm.edge_df[eptm.edge_df[elem].isin(elems)].copy()
+
+    vertices = eptm.vert_df.loc[set(edges["srce"])].copy()
+
+    if elem == "cell":
+        faces = eptm.face_df.loc[set(edges["face"])].copy()
+        cells = eptm.cell_df.loc[elems].copy()
+
+    elif "cell" in edges.columns:
+
+        faces = eptm.face_df.loc[elems].copy()
+        cells = eptm.cell_df.loc[set(edges["cell"])].copy()
+    else:
+        faces = eptm.face_df.loc[elems].copy()
+        cells = None
+
+    pos = (
+        vertices[eptm.coords].values
+        - vertices[eptm.coords].mean(axis=0).values[None, :]
+    )
+    u, v, rotation = np.linalg.svd(pos, full_matrices=False)
+
+    vertices[eptm.coords] = np.dot(pos, rotation.T)
+    patch_dset = {"vert": vertices, "face": faces, "edge": edges}
+
+    if cells is not None:
+        patch_dset["cell"] = cells
+
+    patch = eptm.__class__("patch", patch_dset, eptm.specs)
+    patch.reset_index()
+    return patch
+
+
 def face_centered_patch(sheet, face, neighbour_order):
     """
     Return subsheet centered on face with a distance of
-    neighbour order around the cell/
+    neighbour order around the face
 
     Parameters
     ----------
@@ -347,26 +404,24 @@ def face_centered_patch(sheet, face, neighbour_order):
 
     Returns
     -------
-    patch: a :class:`Sheet` object
+    patch: an object of the same class as the input object
     """
-    from ..core.sheet import Sheet
-    faces = pd.Series(face).append(
-        sheet.get_neighborhood(face, order=neighbour_order)['face'])
+    return elem_centered_patch(sheet, face, neighbour_order, "face")
 
-    edges = sheet.edge_df[sheet.edge_df['face'].isin(faces)]
 
-    vertices = sheet.vert_df.loc[set(edges['srce'])]
-    pos = vertices[sheet.coords].values - \
-        vertices[sheet.coords].mean(axis=0).values[None, :]
-    u, v, rotation = np.linalg.svd(pos, full_matrices=False)
-    rot_pos = pd.DataFrame(np.dot(pos, rotation.T),
-                           index=vertices.index,
-                           columns=sheet.coords)
+def cell_centered_patch(eptm, cell, neighbour_order):
+    """
+    Return subsheet centered on cell with a distance of
+    neighbour order around the cell
 
-    patch_dset = {'vert': rot_pos,
-                  'face': sheet.face_df.loc[faces].copy(),
-                  'edge': edges.copy()}
+    Parameters
+    ----------
+    eptm : a :class:`Epithelium` instance
+    face : int, id of the center face
+    neighbour_order: int, number of neighbour around the center face
 
-    patch = Sheet('patch', patch_dset, sheet.specs)
-    patch.reset_index()
-    return patch
+    Returns
+    -------
+    patch: an object of the same class as the input object
+    """
+    return elem_centered_patch(eptm, cell, neighbour_order, "cell")

@@ -17,8 +17,7 @@ log = logging.getLogger(name=__name__)
 
 
 class Epithelium:
-    """Base class defining a connective tissue in 2D or 3D.
-    """
+    """Base class defining a connective tissue in 2D or 3D."""
 
     def __init__(self, identifier, datasets, specs=None, coords=None, maxbackup=5):
         """Creates an epithelium
@@ -251,8 +250,7 @@ class Epithelium:
 
     @property
     def settings(self):
-        """ Accesses the `specs['settings']` dictionnary
-        """
+        """Accesses the `specs['settings']` dictionnary."""
         return self.specs["settings"]
 
     def update_specs(self, new, reset=False):
@@ -298,26 +296,22 @@ class Epithelium:
 
     @property
     def Nv(self):
-        """The number of vertices in the epithelium
-        """
+        """The number of vertices in the epithelium."""
         return self.vert_df.shape[0]
 
     @property
     def Ne(self):
-        """The number of edges in the epithelium
-        """
+        """The number of edges in the epithelium."""
         return self.edge_df.shape[0]
 
     @property
     def Nf(self):
-        """The number of faces in the epithelium
-        """
+        """The number of faces in the epithelium."""
         return self.face_df.shape[0]
 
     @property
     def Nc(self):
-        """The number of cells in the epithelium
-        """
+        """The number of cells in the epithelium."""
         if "cell" not in self.data_names:
             return self.face_df.shape[0]
         return self.cell_df.shape[0]
@@ -355,7 +349,7 @@ class Epithelium:
         return self._upcast(self.edge_df[element], self.datasets[dataset][columns])
 
     def upcast_srce(self, df):
-        """ Reindexes input data to self.edge_df.index
+        """Reindexes input data to self.edge_df.index
         by repeating the values for each source entry.
 
         Parameters
@@ -374,7 +368,7 @@ class Epithelium:
         return self._upcast(self.edge_df["srce"], df)
 
     def upcast_trgt(self, df):
-        """ Reindexes input data to self.edge_df.index
+        """Reindexes input data to self.edge_df.index
         by repeating the values for each target entry
 
         Parameters
@@ -393,7 +387,7 @@ class Epithelium:
         return self._upcast(self.edge_df["trgt"], df)
 
     def upcast_face(self, df):
-        """ Reindexes input data to self.edge_df.index
+        """Reindexes input data to self.edge_df.index
         by repeating the values for each face entry
 
         Parameters
@@ -413,7 +407,7 @@ class Epithelium:
         return self._upcast(self.edge_df["face"], df)
 
     def upcast_cell(self, df):
-        """ Reindexes input data to self.edge_df.index
+        """Reindexes input data to self.edge_df.index
         by repeating the values for each cell entry
 
         Parameters
@@ -571,7 +565,7 @@ class Epithelium:
 
         for k in range(order + 1):
             for neigh in neighbors[neighbors["order"] == k - 1][elem]:
-                new_neighs = self.get_neighbors(neigh)
+                new_neighs = self.get_neighbors(neigh, elem)
                 new_neighs = set(new_neighs).difference(neighbors[elem])
                 orders = np.ones(len(new_neighs), dtype=np.int) * (k)
                 new_neighs = pd.DataFrame.from_dict(
@@ -581,7 +575,7 @@ class Epithelium:
         return neighbors.reset_index(drop=True).loc[1:]
 
     def face_polygons(self, coords=None):
-        """ Returns a pd.Series of arrays with the coordinates the face polygons
+        """Returns a pd.Series of arrays with the coordinates the face polygons
 
         Each element of the Series is a (num_sides, num_dims) array of points
         ordered counterclockwise.
@@ -627,8 +621,7 @@ class Epithelium:
         return is_valid
 
     def get_invalid(self):
-        """Returns a mask over self.edge_df for invalid faces
-        """
+        """Returns a mask over self.edge_df for invalid faces."""
         is_valid = self.get_valid()
         return ~is_valid
 
@@ -828,7 +821,7 @@ class Epithelium:
         return vertices, triangles, face_mask
 
     def vertex_mesh(self, coords, vertex_normals=True):
-        """ Returns the vertex coordinates and a list of vertex indices
+        """Returns the vertex coordinates and a list of vertex indices
         for each face of the tissue.
         If `vertex_normals` is True, also returns the normals of each vertex
         (set as the average of the vertex' edges), suitable for .OBJ export
@@ -853,8 +846,9 @@ class Epithelium:
         return vertices.to_numpy(), faces.to_numpy()
 
     def validate_closed_cells(self):
-        is_closed = self.edge_df.groupby("cell").apply(_is_closed_cell)
-        return is_closed
+        """Returns True if all cells of the epithelium are closed."""
+        euler_chars = self.edge_df.groupby("cell").apply(euler_characteristic)
+        return np.array_equal(np.unique(euler_chars), 2)
 
     def get_opposite_faces(self):
         """Populates the 'opposite' column of self.face_df with the index of
@@ -867,8 +861,8 @@ class Epithelium:
         cardinal = grouped.apply(len)
         if cardinal.max() > 2:
             raise ValueError(
-                "Invalid topology, faces have more than one neighbor: {}".format(
-                    list(face_v2[cardinal > 2].index)
+                "Invalid topology, the following faces have more than one neighbor: {}".format(
+                    face_v2[cardinal > 2].to_list()
                 )
             )
         self.face_df["opposite"] = -1
@@ -940,6 +934,39 @@ def get_prev_edges(sheet):
     return prev_e.sort_index()
 
 
+def get_simple_index(edge_df):
+    """
+    returns a subset of the edge_df index corresponding
+    to the non oriented edges (aka full edges).
+
+    This is faster than `get_extra_indices` and works also in 3D
+
+    """
+    srted = np.sort(edge_df[["srce", "trgt"]].to_numpy(), axis=1)
+    shift = np.ceil(np.log10(edge_df.srce.max()))
+    multi = int(10 ** (shift))
+    st_hash = srted[:, 0] * multi + srted[:, 1]
+    st_hash = pd.Series(st_hash, index=edge_df.index)
+    return st_hash.drop_duplicates().index.values
+
+
+def euler_characteristic(edge_df):
+    """Returns the Euler characteristic of the (non oriented) mesh represented by edge_df.
+
+    The Euler characteristic is
+    the number of vertices minus the number of edges plus the number of faces
+
+    It is equal to 2 for a closed-on-itself mesh (topologicaly eq. to a sphere),
+    1 to a mesh with a border. It is not unique for monoloyers or bulk epithelia
+    but provides a way to check wether a cell is closed.
+
+    """
+    V = edge_df["srce"].unique().shape[0]
+    F = edge_df["face"].unique().shape[0]
+    E = get_simple_index(edge_df).shape[0]
+    return V - E + F
+
+
 def _next_edge(edf):
 
     edf["edge"] = edf.index
@@ -955,15 +982,11 @@ def _prev_edge(edf):
 
 
 def _is_closed_cell(e_df):
-    edges = e_df[["srce", "trgt"]]
-    for _, (srce, trgt) in edges.iterrows():
-        if edges[(edges["srce"] == trgt) & (edges["trgt"] == srce)].index.size != 1:
-            return False
-    return True
+    return euler_characteristic(e_df) == 2
 
 
 def _test_invalid(face):
-    """ Returns True if the source and target sets of the faces polygon
+    """Returns True if the source and target sets of the faces polygon
     are different or if the face polygon is not closed
     """
 
@@ -978,6 +1001,5 @@ def _test_invalid(face):
 
 
 def _test_valid(face):
-    """ Returns true iff all sources are also targets for the faces polygon
-    """
+    """Returns true iff all sources are also targets for the faces polygon."""
     return np.logical_not(_test_invalid(face))

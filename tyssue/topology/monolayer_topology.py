@@ -23,10 +23,12 @@ def cell_division(monolayer, mother, orientation="vertical", psi=None):
     ----------
     * monolayer: a :class:`Monolayer` instance
     * mother: int, the index of the cell to devide
-    * orientation: str, {"vertical" | "horizontal"}
+    * orientation: str, {"vertical" | "horizontal" | "apical"}
       if "horizontal", performs a division in the equatorial
       plane of the cell. If "vertical" (the default), performs
-      a division along the basal-apical axis of the cell
+      a division along the basal-apical axis of the cell.
+      If "apical", performs a division cutting the apical face
+      perpendicularly to its principal axis
     * psi: float, default 0
       extra rotation angle of the division plane
       around the basal-apical plane
@@ -42,16 +44,28 @@ def cell_division(monolayer, mother, orientation="vertical", psi=None):
         plane_normal = np.asarray(ab_axis)
     elif orientation == "vertical":
         plane_normal = _vertical_plane_normal(ab_axis, psi=psi)
+    elif orientation == "apical":
+        rcoords = ['r'+c for c in monolayer.coords]
+        apical_pos = monolayer.edge_df.loc[
+            (monolayer.edge_df['cell'] == mother)
+            & (monolayer.edge_df['segment'] == "apical"),
+            rcoords
+        ]
+        _, _, vh = np.linalg.svd(apical_pos)
+        plane_normal = vh[0, :]
+
     else:
         raise ValueError(
-            f"""orientation argument not understood, should be either "horizontal"
-or "vertical", not {orientation}"""
+            f"""orientation argument not understood, should be either "horizontal",
+"vertical" or "apical", not {orientation}"""
         )
 
-    vertices = get_division_vertices(
-        monolayer, mother=mother, plane_normal=plane_normal
+    vertices, mother_verts, daughter_verts = get_division_vertices(
+        monolayer, mother=mother, plane_normal=plane_normal, return_all=True
     )
-    daughter = bulk_division(monolayer, mother, MonolayerGeometry, vertices)
+    daughter = bulk_division(
+        monolayer, mother, MonolayerGeometry, vertices, mother_verts, daughter_verts
+    )
 
     # Correct segment assignations for the septum
     septum = monolayer.face_df.index[-2:]
@@ -111,17 +125,17 @@ def find_basal_edge(monolayer, apical_edge):
     trgt_segment = monolayer.vert_df.loc[cell_edges["trgt"].values, "segment"]
     trgt_segment.index = cell_edges.index
     try:
-        b_trgt, = cell_edges[
+        (b_trgt,) = cell_edges[
             (srce_segment == "apical")
             & (trgt_segment == "basal")
             & (cell_edges["srce"] == srce)
         ]["trgt"]
-        b_srce, = cell_edges[
+        (b_srce,) = cell_edges[
             (srce_segment == "basal")
             & (trgt_segment == "apical")
             & (cell_edges["trgt"] == trgt)
         ]["srce"]
-        b_edge, = cell_edges[
+        (b_edge,) = cell_edges[
             (cell_edges["srce"] == b_srce) & (cell_edges["trgt"] == b_trgt)
         ].index
     except ValueError:

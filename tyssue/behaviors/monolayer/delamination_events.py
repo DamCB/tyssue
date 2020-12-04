@@ -1,11 +1,8 @@
 import logging
-import random
-import numpy as np
 
 from ...utils.decorators import cell_lookup
 from ...topology.bulk_topology import IH_transition, HI_transition
-from .actions import shrink, contract, relax, ab_pull, ab_pull_edge
-from .basic_events import contraction
+from .actions import shrink, contract, ab_pull_edge
 from ..sheet.basic_events import contraction as sheet_contraction
 from ..sheet.delamination_events import _neighbor_contractile_increase
 

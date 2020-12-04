@@ -182,7 +182,7 @@ def remove(sheet, face, geom):
 
 
 def ab_pull(sheet, face, radial_tension, distributed=False):
-    """ Adds radial_tension to the face's vertices radial_tension
+    """Adds radial_tension to the face's vertices radial_tension
 
     Parameters
     ----------
@@ -313,43 +313,5 @@ def contract(
                 contract_col need to exist in face_df. Default 'contractility'
 
     """
-    warnings.warn("deprecated, use increase function")
+    warnings.warn("contract is deprecated, use increase function")
     increase(sheet, "face", face, contractile_increase, contract_col, multiply)
-
-
-def relax(sheet, face, relax_decrease, relax_col="contractility"):
-    """
-    Relax the face by decreasing the relax_col parameter
-    by relax_decrease
-
-    Parameters
-    ----------
-    sheet : a :class:`Sheet` object
-    face : index of face
-    relax_decrease : rate use to divide value of relax_col of face.
-    relax_col : column from face dataframe which apply relax_decrease.
-                relax_col need to exist in face_df. Default 'contractility'
-
-    """
-
-    warnings.warn("deprecated, use decrease function")
-    initial_contractility = 1.12
-    initial_prefered_area = 28
-    decrease(
-        sheet,
-        "face",
-        face,
-        relax_decrease,
-        col=relax_col,
-        divide=True,
-        bound=(initial_contractility / 2),
-    )
-    increase(
-        sheet,
-        "face",
-        face,
-        relax_decrease,
-        "prefered_area",
-        True,
-        bound=(initial_prefered_area * 2),
-    )
