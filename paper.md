@@ -63,7 +63,7 @@ More recently, Bi et al. focused his work on tissue rigidity which allows or not
 This way, it is easy to test various combinations of energy terms and find those that best fit the observed _in vivo_ dynamics.
 
 <center>
-![figure 1: overview of epithelium representations in tyssue](doc/illus/Figure1.svg  "Figure 1")
+![figure 1: overview of epithelium representations in tyssue](doc/illus/Figure1.png  "Figure 1")
 </center>
 
 Documentation of the `tyssue` Python library can be found [here](https://tyssue.readthedocs.io/en/latest/). Notebook introduction to how to use `tyssue` library can be found [here](https://github.com/DamCB/tyssue-demo).
