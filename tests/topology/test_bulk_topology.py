@@ -3,9 +3,10 @@ import numpy as np
 
 from pathlib import Path
 
-from tyssue.core.monolayer import Monolayer
+from tyssue import Epithelium, Monolayer
+
 from tyssue.geometry.bulk_geometry import BulkGeometry, MonolayerGeometry
-from tyssue import Sheet
+from tyssue import Sheet, Epithelium
 from tyssue.config.geometry import bulk_spec
 
 from tyssue.generation import extrude, three_faces_sheet
@@ -15,10 +16,45 @@ from tyssue.topology.bulk_topology import (
     remove_cell,
     close_cell,
     fix_pinch,
+    cell_division,
+    find_rearangements,
+    find_IHs,
+    find_HIs,
 )
-from tyssue.topology.monolayer_topology import cell_division
+
+from tyssue.topology.monolayer_topology import cell_division as monolayer_division
+from tyssue.topology.base_topology import drop_two_sided_faces
+
 from tyssue.stores import stores_dir
 from tyssue.io import hdf5
+
+from tyssue.generation import from_3d_voronoi, hexa_grid3d
+from scipy.spatial import Voronoi
+
+
+def test_bulk_division():
+
+    cells = hexa_grid3d(4, 4, 6)
+    datasets = from_3d_voronoi(Voronoi(cells))
+    specs = bulk_spec()
+    bulk = Epithelium("bulk", datasets, specs)
+    bulk.reset_topo()
+    bulk.reset_index()
+    bulk.sanitize()
+    bulk.reset_topo()
+    bulk.reset_index()
+    with pytest.raises(ValueError):
+        daughter = cell_division(bulk, 4, BulkGeometry)
+
+    dsets = hdf5.load_datasets(Path(stores_dir) / "with_4sided_cell.hf5")
+    bulk = Monolayer("4", dsets)
+
+    BulkGeometry.update_all(bulk)
+
+    # daughter = cell_division(bulk, 12, BulkGeometry)
+    with pytest.warns(UserWarning):
+        daughter = cell_division(bulk, 4, BulkGeometry)
+        assert bulk.validate()
 
 
 def test_close_cell():
@@ -140,6 +176,39 @@ def test_HI_transition():
     assert np.alltrue(eptm.edge_df["sub_vol"] > 0)
 
 
+def test_find_transitions():
+
+    sheet = Sheet.planar_sheet_3d("sheet", 5, 5, 1, 1)
+    sheet.sanitize()
+    datasets = extrude(sheet.datasets, method="translation")
+
+    eptm = Monolayer("test_IHt", datasets, bulk_spec())
+    BulkGeometry.update_all(eptm)
+    Nc, Nf, Ne, Nv = eptm.Nc, eptm.Nf, eptm.Ne, eptm.Nv
+    eptm.settings["threshold_length"] = 1e-3
+    IH_transition(eptm, 26)
+    BulkGeometry.update_all(eptm)
+
+    eptm.settings["threshold_length"] = 1e-2
+    ih, hi = find_rearangements(eptm)
+
+    assert len(ih) == 0
+    assert len(hi) == 2
+    assert len(find_HIs(eptm))
+
+    face = eptm.face_df.index[-1]
+    HI_transition(eptm, face)
+    BulkGeometry.update_all(eptm)
+
+    eptm.settings["threshold_length"] = 2e-1
+
+    ih, hi = find_rearangements(eptm)
+    assert len(ih) == 1
+    assert len(hi) == 0
+
+    assert len(find_IHs(eptm))
+
+
 def test_monolayer_division():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d, method="translation")
@@ -147,7 +216,7 @@ def test_monolayer_division():
     eptm.vert_df[eptm.coords] += np.random.normal(scale=1e-6, size=(eptm.Nv, 3))
     MonolayerGeometry.update_all(eptm)
     for orientation in ["vertical", "horizontal", "apical"]:
-        daughter = cell_division(eptm, 0, orientation=orientation)
+        daughter = monolayer_division(eptm, 0, orientation=orientation)
         eptm.reset_topo()
         eptm.reset_index()
 

@@ -25,22 +25,6 @@ logger = logging.getLogger(name=__name__)
 MAX_ITER = 10
 
 
-def check_condition4(func):
-    @wraps(func)
-    def decorated(eptm, *args, **kwargs):
-        eptm.backup()
-        res = func(eptm, *args, **kwargs)
-        if len(condition_4i(eptm)) or len(condition_4ii(eptm)):
-            # print("Invalid epithelium produced, restoring")
-            print("4i on", condition_4i(eptm))
-            print("4ii on", condition_4ii(eptm))
-            # eptm.restore()
-            # eptm.topo_changed = True
-        return res
-
-    return decorated
-
-
 def remove_cell(eptm, cell):
     """Removes a tetrahedral cell from the epithelium"""
     eptm.get_opposite_faces()
@@ -92,8 +76,6 @@ def close_cell(eptm, cell):
 
     oppo = get_opposite(face_edges, raise_if_invalid=True)
     new_edges = face_edges[oppo == -1].copy()
-    if not new_edges.shape[0]:
-        return 0
     logger.info("closing cell %d", cell)
     new_edges[["srce", "trgt"]] = new_edges[["trgt", "srce"]]
     new_edges["face"] = new_face
@@ -193,6 +175,7 @@ def split_vert(eptm, vert, face=None, multiplier=1.5):
             eptm.guess_face_segment(face_)
     return 0
 
+
 def _OI_transition(eptm, all_edges, elements, multiplier=1.5, recenter=False):
 
     epsilon = eptm.settings.get("threshold_length", 0.1) * multiplier
@@ -252,6 +235,9 @@ def get_division_edges(
 
 
     """
+    if plane_normal is None:
+        plane_normal = np.random.normal(size=3)
+
     plane_normal = np.asarray(plane_normal)
     if plane_center is None:
         plane_center = eptm.cell_df.loc[mother, eptm.coords]
@@ -300,7 +286,6 @@ def get_division_vertices(
     plane_center=None,
     return_all=False,
 ):
-
     if division_edges is None:
         division_edges, mother_verts, daughter_verts = get_division_edges(
             eptm, mother, plane_normal, plane_center, return_verts=True
@@ -321,14 +306,12 @@ def get_division_vertices(
 def cell_division(
     eptm, mother, geom, vertices=None, mother_verts=None, daughter_verts=None
 ):
-
     if vertices is None:
         vertices, mother_verts, daughter_verts = get_division_vertices(
             eptm,
             mother=mother,
             return_all=True,
         )
-
     cell_cols = eptm.cell_df.loc[mother:mother]
     eptm.cell_df = eptm.cell_df.append(cell_cols, ignore_index=True)
     eptm.cell_df.index.name = "cell"
@@ -351,8 +334,9 @@ identifier. Consider doing this at initialisation time
         if v1 != v2
     }
 
-    # devide existing faces-
+    # divide existing faces-
     daughter_faces = []
+
     for v1, v2 in pairs:
         v1_faces = eptm.edge_df[eptm.edge_df["srce"] == v1]["face"]
         v2_faces = eptm.edge_df[eptm.edge_df["srce"] == v2]["face"]
@@ -536,110 +520,6 @@ def HI_transition(eptm, face):
 
     logger.info(f"HI transition on edge {face}")
     return 0
-
-
-def _add_edge_to_existing(eptm, cell, vi, vj, new_srce, new_trgt):
-    """
-    Add edges between vertices v7, v8 and v9 to the existing faces
-    """
-    cell_edges = eptm.edge_df[eptm.edge_df["cell"] == cell]
-    for f, data in cell_edges.groupby("face"):
-        if {vi, vj, new_srce, new_trgt}.issubset(set(data["srce"]).union(data["trgt"])):
-            good_f = f
-            break
-    else:
-        raise ValueError(
-            "no face with vertices {}, {}, {} and {}"
-            " was found for cell {}".format(vi, vj, new_srce, new_trgt, cell)
-        )
-    eptm.edge_df = eptm.edge_df.append(cell_edges.iloc[-1], ignore_index=True)
-    new_e = eptm.edge_df.index[-1]
-    eptm.edge_df.loc[new_e, ["srce", "trgt", "face", "cell"]] = (
-        new_srce,
-        new_trgt,
-        good_f,
-        cell,
-    )
-
-
-def _set_new_pos_IH(eptm, e_1011, vertices):
-    """Okuda 2013 equations 46 to 56"""
-    Dl_th = eptm.settings["threshold_length"]
-
-    (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11) = vertices
-
-    # eq. 49
-    r_1011 = -eptm.edge_df.loc[e_1011, eptm.dcoords].values
-    u_T = r_1011 / np.linalg.norm(r_1011)
-    # eq. 50
-    r0 = eptm.vert_df.loc[[v10, v11], eptm.coords].mean(axis=0).values
-
-    v_0ns = []
-    for vi, vj, vk in zip((v1, v2, v3), (v4, v5, v6), (v7, v8, v9)):
-        # eq. 54 - 56
-        r0i, r0j = eptm.vert_df.loc[[vi, vj], eptm.coords].values - r0[np.newaxis, :]
-        w_0k = (r0i / np.linalg.norm(r0i) + r0j / np.linalg.norm(r0j)) / 2
-        # eq. 51 - 53
-        v_0k = w_0k - (np.dot(w_0k, u_T)) * u_T
-        v_0ns.append(v_0k)
-
-    # see definition of l_max bellow eq. 56
-    l_max = np.max(
-        [np.linalg.norm(v_n - v_m) for (v_n, v_m) in itertools.combinations(v_0ns, 2)]
-    )
-    # eq. 46 - 49
-    for vk, v_0k in zip((v7, v8, v9), v_0ns):
-        eptm.vert_df.loc[vk, eptm.coords] = r0 + (Dl_th / l_max) * v_0k
-
-
-def _get_vertex_pairs_IH(eptm, e_1011):
-
-    srce_face_orbits = eptm.get_orbits("srce", "face")
-    v10, v11 = eptm.edge_df.loc[e_1011, ["srce", "trgt"]]
-    common_faces = set(srce_face_orbits.loc[v10]).intersection(
-        srce_face_orbits.loc[v11]
-    )
-    if eptm.face_df.loc[common_faces, "num_sides"].min() < 4:
-        logger.warning(
-            "Edge %i has adjacent triangular faces"
-            " can't perform IH transition, aborting",
-            e_1011,
-        )
-        return None
-
-    v10_out = set(eptm.edge_df[eptm.edge_df["srce"] == v10]["trgt"]) - {v11}
-    faces_123 = {
-        v: set(srce_face_orbits.loc[v])  # .intersection(srce_face_orbits.loc[v10])
-        for v in v10_out
-    }
-
-    v11_out = set(eptm.edge_df[eptm.edge_df["srce"] == v11]["trgt"]) - {v10}
-    faces_456 = {
-        v: set(srce_face_orbits.loc[v])  # .intersection(srce_face_orbits.loc[v11])
-        for v in v11_out
-    }
-    v_pairs = []
-    for vi in v10_out:
-        for vj in v11_out:
-            common_face = faces_123[vi].intersection(faces_456[vj])
-            if common_face:
-                v_pairs.append((vi, vj))
-                break
-        else:
-            return None
-    return v_pairs
-
-
-def _set_new_pos_HI(eptm, fa, v10, v11):
-
-    r0 = eptm.face_df.loc[fa, eptm.coords].values
-
-    norm_a = eptm.edge_df[eptm.edge_df["face"] == fa][eptm.ncoords].mean(axis=0).values
-    norm_a = norm_a / np.linalg.norm(norm_a)
-    norm_b = -norm_a
-    Dl_th = eptm.settings["threshold_length"] * 1.01
-    eptm.vert_df.loc[v10, eptm.coords] = r0 + Dl_th / 2 * norm_b
-    eptm.vert_df.loc[v11, eptm.coords] = r0 + Dl_th / 2 * norm_a
 
 
 def fix_pinch(eptm):
