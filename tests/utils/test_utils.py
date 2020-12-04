@@ -168,6 +168,7 @@ def test_face_centered_patch():
 def test_cell_centered_patch():
     grid = hexa_grid2d(6, 4, 3, 3)
     datasets = from_2d_voronoi(Voronoi(grid))
+    _ = Sheet("test", datasets)
 
     extruded = extrude(datasets, method="translation")
     mono = Monolayer("test", extruded, config.geometry.bulk_spec())
