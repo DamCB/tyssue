@@ -1,7 +1,6 @@
 import logging
 import warnings
 import itertools
-from functools import wraps
 
 import numpy as np
 import pandas as pd
@@ -10,8 +9,6 @@ from .sheet_topology import face_division
 from .base_topology import (
     add_vert,
     close_face,
-    condition_4i,
-    condition_4ii,
     collapse_edge,
     remove_face,
 )
@@ -26,11 +23,11 @@ MAX_ITER = 10
 
 
 def remove_cell(eptm, cell):
-    """Removes a tetrahedral cell from the epithelium"""
+    """Removes a tetrahedral cell from the epithelium."""
     eptm.get_opposite_faces()
     edges = eptm.edge_df.query(f"cell == {cell}")
     if not edges.shape[0] == 12:
-        warnings.warn(f"{cell} is not a tetrahedral cell, aborting")
+        warnings.warn(f"{cell} is not a tetrahedral cell, aborting.")
         return -1
     faces = eptm.face_df.loc[edges["face"].unique()]
     oppo = faces["opposite"][faces["opposite"] != -1]
@@ -60,7 +57,6 @@ def remove_cell(eptm, cell):
 
 def close_cell(eptm, cell):
     """Closes the cell by adding a face. Assumes a single face is missing"""
-
     face_edges = eptm.edge_df[eptm.edge_df["cell"] == cell]
     euler_c = euler_characteristic(face_edges)
 
@@ -523,11 +519,9 @@ def HI_transition(eptm, face):
 
 
 def fix_pinch(eptm):
-    """In some cases, due to rearangements, some faces in an epithelium
-    will have more than one  opposite face.
+    """Due to rearangements, some faces in an epithelium will have more than one opposite face.
 
-    This method fixes the issue so we can have a valid epithelium back
-
+    This method fixes the issue so we can have a valid epithelium back.
     """
     logger.debug("Fixing pinch")
     face_v = eptm.edge_df.groupby("face").apply(lambda df: frozenset(df["srce"]))
@@ -541,10 +535,10 @@ def fix_pinch(eptm):
     cells = eptm.edge_df.loc[eptm.edge_df["face"].isin(faces), "cell"].unique()
     bad_cells = []
     for cell in cells:
-
         if not _is_closed_cell(eptm.edge_df.query(f"cell == {cell}")):
             bad_cells.append(cell)
-    logger.info(bad_cells)
+
+    logger.info("Fixing pinch for cells %s", bad_cells)
     to_remove = eptm.edge_df.loc[
         eptm.edge_df["face"].isin(faces) & (eptm.edge_df["cell"].isin(bad_cells))
     ]

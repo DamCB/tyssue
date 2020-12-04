@@ -1,19 +1,14 @@
-import warnings
 import pytest
 import os
-import subprocess
 from pathlib import Path
 
 
-import pandas as pd
-
-from tyssue import Sheet, History, config, Epithelium, RNRGeometry
+from tyssue import Sheet, History, Epithelium, RNRGeometry
 from tyssue.core.history import HistoryHdf5
 from tyssue.generation import three_faces_sheet, extrude
 
 
 def test_simple_history():
-    """"""
     sheet = Sheet("3", *three_faces_sheet())
     history = History(sheet)
     assert "dx" in history.datasets["edge"].columns
@@ -35,7 +30,7 @@ def test_warning():
 
     sheet = Sheet("3", *three_faces_sheet())
     with pytest.warns(UserWarning):
-        history = History(
+        History(
             sheet, extra_cols={"edge": ["dx"], "face": ["area"], "vert": ["segment"]}
         )
 

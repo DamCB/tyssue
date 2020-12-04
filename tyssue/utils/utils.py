@@ -326,7 +326,7 @@ def get_next(eptm):
 
 ## small utlity to swap apical and basal segments
 def swap_apico_basal(organo):
-    """Swap apical and basal segments of an organoid"""
+    """Swap apical and basal segments of an organoid."""
     for elem in ["vert", "face", "edge"]:
         swaped = organo.datasets[elem]["segment"].copy()
         swaped.loc[organo.segment_index("apical", elem)] = "basal"

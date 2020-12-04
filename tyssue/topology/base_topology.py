@@ -8,7 +8,6 @@ import pandas as pd
 
 from itertools import combinations
 from ..utils.connectivity import face_face_connectivity
-from ..core.sheet import get_opposite
 
 logger = logging.getLogger(name=__name__)
 
@@ -191,7 +190,7 @@ def drop_two_sided_faces(eptm):
 
 
 def remove_face(sheet, face):
-    """Removes a face from the mesh"""
+    """Removes a face from the mesh."""
     logger.debug(f"removing face {face}")
 
     edges = sheet.edge_df[sheet.edge_df["face"] == face]

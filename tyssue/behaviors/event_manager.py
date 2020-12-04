@@ -127,7 +127,7 @@ default_wait_spec = {"n_steps": 1}
 
 
 def wait(eptm, manager, **kwargs):
-    """Does nothing for a number of steps n_steps"""
+    """Does nothing for a number of steps n_steps."""
     wait_spec = default_wait_spec
     wait_spec.update(**kwargs)
     if kwargs["n_steps"] > 1:

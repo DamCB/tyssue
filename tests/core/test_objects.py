@@ -1245,7 +1245,7 @@ def test_get_force_inference():
     sheet.face_df["area_elasticity"] = 1
     sheet.face_df["prefered_area"] = 1
     solver = QSSolver(with_t1=False, with_t3=False, with_collisions=False)
-    res = solver.find_energy_min(sheet, PlanarGeometry, model, options={"gtol": 1e-8})
+    solver.find_energy_min(sheet, PlanarGeometry, model, options={"gtol": 1e-8})
 
     sheet.vert_df.y *= 0.5
     res = solver.find_energy_min(sheet, PlanarGeometry, model, options={"gtol": 1e-8})

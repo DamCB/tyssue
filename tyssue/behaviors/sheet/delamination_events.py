@@ -9,7 +9,7 @@ import random
 import numpy as np
 
 from ...utils.decorators import face_lookup
-from .actions import increase, decrease
+from .actions import increase
 from .actions import ab_pull
 from .basic_events import contraction
 
@@ -69,10 +69,6 @@ def constriction(sheet, manager, **kwargs):
     face = constriction_spec["face"]
     contract_rate = constriction_spec["contract_rate"]
     current_traction = constriction_spec["current_traction"]
-
-    if "is_relaxation" in sheet.face_df.columns:
-        if sheet.face_df.loc[face, "is_relaxation"]:
-            relax(sheet, face, contract_rate, constriction_spec["contraction_column"])
 
     if sheet.face_df.loc[face, "is_mesoderm"]:
         face_area = sheet.face_df.loc[face, "area"]

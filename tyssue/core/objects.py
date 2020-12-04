@@ -17,6 +17,7 @@ log = logging.getLogger(name=__name__)
 
 
 class Epithelium:
+
     """Base class defining a connective tissue in 2D or 3D."""
 
     def __init__(self, identifier, datasets, specs=None, coords=None, maxbackup=5):
@@ -250,7 +251,7 @@ class Epithelium:
 
     @property
     def settings(self):
-        """Accesses the `specs['settings']` dictionnary"""
+        """Accesses the `specs['settings']` dictionnary."""
         return self.specs["settings"]
 
     def update_specs(self, new, reset=False):
@@ -296,22 +297,22 @@ class Epithelium:
 
     @property
     def Nv(self):
-        """The number of vertices in the epithelium"""
+        """The number of vertices in the epithelium."""
         return self.vert_df.shape[0]
 
     @property
     def Ne(self):
-        """The number of edges in the epithelium"""
+        """The number of edges in the epithelium."""
         return self.edge_df.shape[0]
 
     @property
     def Nf(self):
-        """The number of faces in the epithelium"""
+        """The number of faces in the epithelium."""
         return self.face_df.shape[0]
 
     @property
     def Nc(self):
-        """The number of cells in the epithelium"""
+        """The number of cells in the epithelium."""
         if "cell" not in self.data_names:
             return self.face_df.shape[0]
         return self.cell_df.shape[0]
@@ -621,7 +622,7 @@ class Epithelium:
         return is_valid
 
     def get_invalid(self):
-        """Returns a mask over self.edge_df for invalid faces"""
+        """Returns a mask over self.edge_df for invalid faces."""
         is_valid = self.get_valid()
         return ~is_valid
 
@@ -846,7 +847,7 @@ class Epithelium:
         return vertices.to_numpy(), faces.to_numpy()
 
     def validate_closed_cells(self):
-        """returns True if all cells of the epithelium are closed"""
+        """returns True if all cells of the epithelium are closed."""
         euler_chars = self.edge_df.groupby("cell").apply(euler_characteristic)
         return np.array_equal(np.unique(euler_chars), 2)
 
@@ -951,8 +952,7 @@ def get_simple_index(edge_df):
 
 
 def euler_characteristic(edge_df):
-    """Returns the Euler characteristic of the (non oriented) mesh
-    represented by edge_df.
+    """Returns the Euler characteristic of the (non oriented) mesh represented by edge_df.
 
     The Euler characteristic is
     the number of vertices minus the number of edges plus the number of faces
@@ -1003,5 +1003,5 @@ def _test_invalid(face):
 
 
 def _test_valid(face):
-    """Returns true iff all sources are also targets for the faces polygon"""
+    """Returns true iff all sources are also targets for the faces polygon."""
     return np.logical_not(_test_invalid(face))

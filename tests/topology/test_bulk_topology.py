@@ -3,10 +3,9 @@ import numpy as np
 
 from pathlib import Path
 
-from tyssue import Epithelium, Monolayer
+from tyssue import Sheet, Epithelium, Monolayer
 
 from tyssue.geometry.bulk_geometry import BulkGeometry, MonolayerGeometry
-from tyssue import Sheet, Epithelium
 from tyssue.config.geometry import bulk_spec
 
 from tyssue.generation import extrude, three_faces_sheet
@@ -23,7 +22,6 @@ from tyssue.topology.bulk_topology import (
 )
 
 from tyssue.topology.monolayer_topology import cell_division as monolayer_division
-from tyssue.topology.base_topology import drop_two_sided_faces
 
 from tyssue.stores import stores_dir
 from tyssue.io import hdf5
@@ -44,7 +42,7 @@ def test_bulk_division():
     bulk.reset_topo()
     bulk.reset_index()
     with pytest.raises(ValueError):
-        daughter = cell_division(bulk, 4, BulkGeometry)
+        cell_division(bulk, 4, BulkGeometry)
 
     dsets = hdf5.load_datasets(Path(stores_dir) / "with_4sided_cell.hf5")
     bulk = Monolayer("4", dsets)
@@ -98,8 +96,6 @@ def test_close_two_holes():
     dsets = hdf5.load_datasets(Path(stores_dir) / "small_ellipsoid.hf5")
     mono = Monolayer("4", dsets)
     cell = mono.cell_df.query("num_faces != 4").index[0]
-    Nfi = mono.cell_df.loc[cell, "num_faces"]
-    Nei = mono.Ne
     edges = mono.edge_df.query(f"cell == {cell}")
     faces = edges["face"].iloc[[0, 8]]
     face_edges = edges[edges["face"].isin(faces)].index
@@ -184,7 +180,6 @@ def test_find_transitions():
 
     eptm = Monolayer("test_IHt", datasets, bulk_spec())
     BulkGeometry.update_all(eptm)
-    Nc, Nf, Ne, Nv = eptm.Nc, eptm.Nf, eptm.Ne, eptm.Nv
     eptm.settings["threshold_length"] = 1e-3
     IH_transition(eptm, 26)
     BulkGeometry.update_all(eptm)
@@ -210,13 +205,13 @@ def test_find_transitions():
 
 
 def test_monolayer_division():
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d, method="translation")
     eptm = Monolayer("test_volume", datasets, bulk_spec(), coords=["x", "y", "z"])
     eptm.vert_df[eptm.coords] += np.random.normal(scale=1e-6, size=(eptm.Nv, 3))
     MonolayerGeometry.update_all(eptm)
     for orientation in ["vertical", "horizontal", "apical"]:
-        daughter = monolayer_division(eptm, 0, orientation=orientation)
+        monolayer_division(eptm, 0, orientation=orientation)
         eptm.reset_topo()
         eptm.reset_index()
 

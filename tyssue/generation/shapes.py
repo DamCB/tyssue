@@ -424,13 +424,13 @@ def sheet_from_cell_centers(points, noise=0, interp_s=1e-4):
 
 
 def Lloyd_relaxation(sheet, geom, steps=10, coords=None, update_method=None):
-    """Performs Lloyd relaxation on the sheet"""
+    """Performs Lloyd relaxation on the sheet."""
     if coords is None:
         coords = sheet.coords
     geom.update_all(sheet)
     mean_area0 = sheet.face_df.area.mean()
 
-    for i in range(steps):
+    for _ in range(steps):
         if update_method:
             centers = update_method(sheet)
         else:

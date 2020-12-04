@@ -251,7 +251,7 @@ def _face_color_from_sequence(face_spec, sheet):
 
 
 def draw_vert(sheet, coords, ax, **draw_spec_kw):
-    """Draw junction vertices in matplotlib"""
+    """Draw junction vertices in matplotlib."""
     draw_spec = sheet_spec()["vert"]
     draw_spec.update(**draw_spec_kw)
 
@@ -514,7 +514,7 @@ def curved_view(sheet, radius_cutoff=1e3):
 
 
 def plot_junction(eptm, edge_index, coords=["x", "y"]):
-    """Plots local graph around a junction, for debugging purposes"""
+    """Plots local graph around a junction, for debugging purposes."""
     v10, v11 = eptm.edge_df.loc[edge_index, ["srce", "trgt"]]
     fig, ax = plt.subplots()
     ax.scatter(*eptm.vert_df.loc[[v10, v11], coords].values.T, marker="+", s=300)

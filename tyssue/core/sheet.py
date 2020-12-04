@@ -62,11 +62,11 @@ class Sheet(Epithelium):
         self.edge_df["opposite"] = get_opposite(self.edge_df)
 
     def get_neighbors(self, face, elem="face"):
-        """Returns the faces adjacent to `face`"""
+        """Returns the faces adjacent to `face`."""
         return super().get_neighbors(face, elem=elem)
 
     def get_neighborhood(self, face, order, elem="face"):
-        """Returns `face` neighborhood up to a degree of `order`
+        """Returns `face` neighborhood up to a degree of `order`.
 
         For example, if `order` is 2, it wil return the adjacent, faces
         and theses faces neighbors.
