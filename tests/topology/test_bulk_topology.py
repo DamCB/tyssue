@@ -51,7 +51,7 @@ def test_bulk_division():
 
     # daughter = cell_division(bulk, 12, BulkGeometry)
     with pytest.warns(UserWarning):
-        daughter = cell_division(bulk, 4, BulkGeometry)
+        cell_division(bulk, 4, BulkGeometry)
         assert bulk.validate()
 
 

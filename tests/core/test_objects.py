@@ -1248,7 +1248,7 @@ def test_get_force_inference():
     solver.find_energy_min(sheet, PlanarGeometry, model, options={"gtol": 1e-8})
 
     sheet.vert_df.y *= 0.5
-    res = solver.find_energy_min(sheet, PlanarGeometry, model, options={"gtol": 1e-8})
+    solver.find_energy_min(sheet, PlanarGeometry, model, options={"gtol": 1e-8})
     sheet.get_force_inference(column="tension", free_border_edges=True)
 
     sheet = sheet.extract_bounding_box(x_boundary=[-2, 2], y_boundary=[-1, 1])
@@ -1263,7 +1263,7 @@ def test_get_force_inference():
         lambda x: 180 - x if x > 90 else x
     )
 
-    for index, edge in sheet.edge_df[sheet.edge_df.angle > 45].iterrows():
+    for _, edge in sheet.edge_df[sheet.edge_df.angle > 45].iterrows():
         assert edge.tension > 1.5
-    for index, edge in sheet.edge_df[sheet.edge_df.angle < 45].iterrows():
+    for _, edge in sheet.edge_df[sheet.edge_df.angle < 45].iterrows():
         assert edge.tension < 1.5

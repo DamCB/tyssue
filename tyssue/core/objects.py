@@ -17,7 +17,6 @@ log = logging.getLogger(name=__name__)
 
 
 class Epithelium:
-
     """Base class defining a connective tissue in 2D or 3D."""
 
     def __init__(self, identifier, datasets, specs=None, coords=None, maxbackup=5):
@@ -847,7 +846,7 @@ class Epithelium:
         return vertices.to_numpy(), faces.to_numpy()
 
     def validate_closed_cells(self):
-        """returns True if all cells of the epithelium are closed."""
+        """Returns True if all cells of the epithelium are closed."""
         euler_chars = self.edge_df.groupby("cell").apply(euler_characteristic)
         return np.array_equal(np.unique(euler_chars), 2)
 
@@ -962,7 +961,6 @@ def euler_characteristic(edge_df):
     but provides a way to check wether a cell is closed.
 
     """
-
     V = edge_df["srce"].unique().shape[0]
     F = edge_df["face"].unique().shape[0]
     E = get_simple_index(edge_df).shape[0]
