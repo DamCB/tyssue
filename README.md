@@ -187,7 +187,7 @@ If GPL licencing is too restrictive for your intended usage, please contact the 
 
 ## Bibliography
 
-* There is a [Bibtex file here](bibliography/tyssue.bib) with collected relevant publications.
+* There is a [Bibtex file here](doc/bibliography/tyssue.bib) with collected relevant publications.
 
 The tyssue library stemed from a refactoring of the `leg-joint` code used in [monier2015apico].
 
