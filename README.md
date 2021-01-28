@@ -173,6 +173,8 @@ You can also install tyssue from PyPi, this is a CGAL-less version (pure python)
 
 `python -m pip install --user --upgrade tyssue`
 
+### From source
+
 See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary python environment.
 
 

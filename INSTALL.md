@@ -35,47 +35,35 @@ With an Debian like system, this is achieved by:
 sudo apt install build-essential cmake g++
 ```
 
-
-### Install CGAL
-
-You can use a pre-packaged version for your OS. For Debian:
-```bash
-sudo apt install libcgal-dev
-```
-Note that you need version 4.7 or higher.
-
-If you need to install CGAL from source, here is a `cmake` command sufficient to later compile tyssue:
-
-```bash
-cd CGAL # This is the directory where the CGAL archive was uncompressed
-mkdir build && cd build
-
-# needs qt5 for imageio
-cmake \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_PREFIX_PATH=${PREFIX} \
-  -DCMAKE_INSTALL_PREFIX=${PREFIX} \
-  -DCGAL_INSTALL_LIB_DIR=lib \
-  -DWITH_CGAL_ImageIO=OFF -DWITH_CGAL_Qt5=OFF \
-  ..
-make install -j${CPU_COUNT}
-```
-
-
 ### Download and install `tyssue` from source
 
 If you want to do that, I assume you allready know how to manage
-dependencies on your platform.
+dependencies on your platform. The simplest way to manage dependencies is to use [`conda`](https://docs.conda.io/en/latest/miniconda.html) to manage the dependencies (you can use [`mamba`](https://github.com/mamba-org/mamba) as a faster alternative to conda).
+
+Start by cloning tyssue recursively to also grab pybind11:
 
 ```bash
 git clone --recursive https://github.com/damcb/tyssue.git
-cd tyssue/
+cd tyssue
+```
+
+Then create a virtual environement:
+
+```bash
+conda env create -f environment.yml
+```
+
+Then install python:
+```
 python setup.py install
 ```
+
+
 
 If all went well, you have successfully installed tyssue.
 
 ### Install testing utilities
+
 ```sh
 pip install pytest pytest-cov nbval
 ```
