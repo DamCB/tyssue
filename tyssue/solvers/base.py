@@ -15,5 +15,7 @@ def set_pos(eptm, geom, pos):
         # reset the switch and interupt what we were doing
         eptm.topo_changed = False
         raise TopologyChangeError
-    eptm.vert_df.loc[eptm.active_verts, eptm.coords] = pos.reshape((-1, eptm.dim))
+    eptm.vert_df.loc[eptm.vert_df.is_active.astype(bool), eptm.coords] = pos.reshape(
+        (-1, eptm.dim)
+    )
     geom.update_all(eptm)

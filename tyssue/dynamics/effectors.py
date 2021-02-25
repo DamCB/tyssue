@@ -537,7 +537,7 @@ class BorderElasticity(AbstractEffector):
 class LumenAreaElasticity(AbstractEffector):
     """
 
-    .. math:: \frac{K_Y}{2}(A_{\mathrm{lumen}} - A_{0,\mathrm{lumen}})^2
+    ..math: \frac{K_Y}{2}(A_{\mathrm{lumen}} - A_{0,\mathrm{lumen}})^2
 
     """
 
@@ -577,27 +577,25 @@ class RadialTension(AbstractEffector):
     """
 
     dimensions = units.line_tension
-    magnitude = 'radial_tension'
-    label = 'Apical basal tension'
-    element = 'face'
-    specs = {'face': {'height',
-                      'radial_tension'}}
+    magnitude = "radial_tension"
+    label = "Apical basal tension"
+    element = "face"
+    specs = {"face": {"height": 1.0, "radial_tension": 1.0}}
 
     @staticmethod
     def energy(eptm):
-        return eptm.face_df.eval(
-            'height * radial_tension')
+        return eptm.face_df.eval("height * radial_tension")
 
     @staticmethod
     def gradient(eptm):
-        upcast_f = eptm.upcast_face(
-            eptm.face_df[['radial_tension', 'num_sides']])
-        upcast_tension = (upcast_f['radial_tension'] / upcast_f['num_sides'])
+        upcast_tension = eptm.upcast_face(
+            eptm.face_df.eval("radial_tension / num_sides")
+        )
 
         upcast_height = eptm.upcast_srce(height_grad(eptm))
         grad_srce = to_nd(upcast_tension, 3) * upcast_height
         grad_srce.columns = ["g" + u for u in eptm.coords]
-        return grad_srce, pd.DataFrame(0, index=np.arange(eptm.Ne), columns=[''])
+        return grad_srce / 2, grad_srce / 2
 
 
 class BarrierElasticity(AbstractEffector):
@@ -606,26 +604,23 @@ class BarrierElasticity(AbstractEffector):
     """
 
     dimensions = units.line_elasticity
-    magnitude = 'barrier_elasticity'
-    label = 'Barrier elasticity'
-    element = 'vert'
+    magnitude = "barrier_elasticity"
+    label = "Barrier elasticity"
+    element = "vert"
     specs = {
-        'vert': {
-            'barrier_elasticity',
-            'is_active',
-            'delta_rho'}
+        "vert": {"barrier_elasticity": 1.0, "is_active": 1, "delta_rho": 0.0}
     }  # distance to a barrier membrane
 
     @staticmethod
     def energy(eptm):
-        return eptm.vert_df.eval(
-            'delta_rho**2 * barrier_elasticity/2')
+        return eptm.vert_df.eval("delta_rho**2 * barrier_elasticity/2")
 
     @staticmethod
     def gradient(eptm):
         grad = height_grad(eptm) * to_nd(
-            eptm.vert_df.eval('barrier_elasticity * delta_rho'), 3)
-        grad.columns = ['g' + c for c in eptm.coords]
+            eptm.vert_df.eval("barrier_elasticity * delta_rho"), 3
+        )
+        grad.columns = ["g" + c for c in eptm.coords]
         return grad, None
 
 

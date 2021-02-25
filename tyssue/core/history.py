@@ -1,6 +1,7 @@
 import os
 import warnings
 import traceback
+import logging
 import pandas as pd
 import numpy as np
 
@@ -9,6 +10,8 @@ from pathlib import Path
 from collections import defaultdict
 from .sheet import Sheet
 from .objects import Epithelium
+
+logger = logging.getLogger(name=__name__)
 
 
 def _filter_columns(cols_hist, cols_in, element):
@@ -30,7 +33,7 @@ class History:
 
     """
 
-    def __init__(self, sheet, save_every=None, dt=None, extra_cols=None):
+    def __init__(self, sheet, save_every=None, dt=None, save_only=None, extra_cols=None, save_all=True):
         """Creates a `SheetHistory` instance.
 
         Parameters
@@ -38,12 +41,24 @@ class History:
         sheet : a :class:`Sheet` object which we want to record
         save_every : float, set every time interval to save the sheet
         dt : float, time step
+        save_only: dict : dictionnary with sheet.datasets as keys and list of
+            columns as values. Default None
+
         extra_cols : dictionnary with sheet.datasets as keys and list of
             columns as values. Default None
+        save_all : bool
+            if True, saves all the data at each time point
+
         """
-        if extra_cols is None:
-            extra_cols = defaultdict(list)
-        else:
+        if extra_cols is not None:
+            warnings.warn(
+                "extra_cols and save_all parameters are deprecated. Use save_only instead. ")
+
+        extra_cols = {
+            k: list(sheet.datasets[k].columns) for k in sheet.datasets
+        }
+
+        if save_only is not None:
             extra_cols = defaultdict(list, **extra_cols)
 
         self.sheet = sheet
@@ -105,8 +120,12 @@ class History:
 
         """
         with pd.HDFStore(hf5file, "a") as store:
+
             for key, df in self.datasets.items():
-                store.append(key=key, value=df, data_columns=["time"])
+                kwargs = {"data_columns": ["time"]}
+                if "segment" in df.columns:
+                    kwargs["min_itemsize"] = {"segment": 7}
+                store.append(key=key, value=df, **kwargs)
 
     @property
     def time_stamps(self):
@@ -128,15 +147,13 @@ class History:
     def cell_h(self):
         return self.datasets.get("cell", None)
 
-    def record(self, to_record=None, time_stamp=None):
+    def record(self, time_stamp=None):
         """Appends a copy of the sheet datasets to the history instance.
 
         Parameters
         ----------
-        to_report : deprecated
+        time_stamp : float, save specific timestamp
         """
-        if to_record is not None:
-            warnings.warn("Deprecated all the data will be saved")
 
         if time_stamp is not None:
             self.time = time_stamp
@@ -151,13 +168,16 @@ class History:
                 cols = self.columns[element]
                 df = self.sheet.datasets[element][cols].reset_index(drop=False)
                 if not "time" in cols:
-                    times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
-                    df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
+                    times = pd.Series(
+                        np.ones((df.shape[0],)) * self.time, name="time")
+                    df = pd.concat(
+                        [df, times], ignore_index=False, axis=1, sort=False)
                 if self.time in hist["time"]:
                     # erase previously recorded time point
                     hist = hist[hist["time"] != self.time]
 
-                hist = pd.concat([hist, df], ignore_index=True, axis=0, sort=False)
+                hist = pd.concat(
+                    [hist, df], ignore_index=True, axis=0, sort=False)
 
                 self.datasets[element] = hist
 
@@ -206,22 +226,31 @@ class HistoryHdf5(History):
         sheet=None,
         save_every=None,
         dt=None,
-        extra_cols=None,
+        save_only=None,
         hf5file="",
         overwrite=False,
     ):
         """Creates a `SheetHistory` instance.
+
+        Use the `from_archive` class method to re-open a saved history file
 
         Parameters
         ----------
         sheet : a :class:`Sheet` object which we want to record
         save_every : float, set every time interval to save the sheet
         dt : float, time step
-        extra_cols : dictionnary with sheet.datasets as keys and list of
+        save_only : dictionnary with sheet.datasets as keys and list of
             columns as values. Default None
         hf5file : string, define the path of the HDF5 file
         overwrite : bool, Overwrite or not the file if it is already exist. Default False
+
+
+
+
         """
+        logger.warning(
+            "extra_cols and save_all parameters are deprecated. Use save_only instead. ")
+
         if not hf5file:
             warnings.warn(
                 "No directory is given. The HDF5 file will be saved in the working directory as out.hf5."
@@ -262,7 +291,7 @@ class HistoryHdf5(History):
             if "\cell" in keys:
                 sheet = Epithelium
 
-        History.__init__(self, sheet, save_every, dt, extra_cols)
+        History.__init__(self, sheet, save_every, dt, save_only)
         self.dtypes = {
             k: df[self.columns[k]].dtypes for k, df in sheet.datasets.items()
         }
@@ -294,24 +323,20 @@ class HistoryHdf5(History):
         return cls(sheet=eptm, hf5file=hf5file, overwrite=True)
 
     @property
-    def time_stamps(self):
+    def time_stamps(self, element="vert"):
         with pd.HDFStore(self.hf5file, "r") as file:
-            times = file.select("vert", columns=["time"])["time"].unique()
+            times = file.select(element, columns=["time"])["time"].unique()
         return times
 
-    def record(self, to_record=None, time_stamp=None, sheet=None):
+    def record(self, time_stamp=None, sheet=None):
         """Appends a copy of the sheet datasets to the history HDF file.
 
         Parameters
         ----------
-        to_report : Deprecated - list of strings
-            the datasets from self.sheet to be saved
         sheet: a :class:`Sheet` object which we want to record. This argument can
         be used if the sheet object is different at each time point.
 
         """
-        if to_record is not None:
-            warnings.warn("Deprecated, all the datasets will be saved anyway")
 
         if sheet is not None:
             self.sheet = sheet
@@ -334,24 +359,36 @@ class HistoryHdf5(History):
                     )
                 )
             else:
-                if dtypes_[element].to_dict() != self.dtypes[element].to_dict():
-                    change_type = {k: self.dtypes[element].to_dict()[k] for k in self.dtypes[element].to_dict() if k in dtypes_[
-                        element].to_dict() and self.dtypes[element].to_dict()[k] != dtypes_[element].to_dict()[k]}
+                old_types = self.dtypes[element].to_dict()
+                new_types = dtypes_[element].to_dict()
+                if new_types != old_types:
+                    changed_type = {
+                        k: old_types[k]
+                        for k in old_types
+                        if k in new_types and old_types[k] != new_types[k]
+                    }
                     raise ValueError(
                         "There is a change of datatype in {} table in {} columns".format(
-                            element, change_type)
+                            element, changed_type
+                        )
                     )
 
         if (self.save_every is None) or (
             self.index % (int(self.save_every / self.dt)) == 0
         ):
             for element, df in self.sheet.datasets.items():
-                times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
+                times = pd.Series(
+                    np.ones((df.shape[0],)) * self.time, name="time")
                 df = df[self.columns[element]]
-                df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
-
-                with pd.HDFStore(self.hf5file, "a") as file:
-                    file.append(key=element, value=df, data_columns=["time"])
+                df = pd.concat([df, times], ignore_index=False,
+                               axis=1, sort=False)
+                kwargs = {"data_columns": ["time"]}
+                if "segment" in df.columns:
+                    kwargs["min_itemsize"] = {"segment": 8}
+                with pd.HDFStore(self.hf5file, "a") as store:
+                    if element in store and store.select(element, where=f"time == {self.time}")['time'].shape[0] > 0:
+                        store.remove(key=element, where=f"time == {self.time}")
+                    store.append(key=element, value=df, **kwargs)
 
         self.index += 1
 
@@ -373,9 +410,11 @@ class HistoryHdf5(History):
             for element in self.datasets:
                 sheet_datasets[element] = store.select(element, where=f"time == {time}")
 
-        return type(self.sheet)(
+        sheet = type(self.sheet)(
             f"{self.sheet.identifier}_{time:04.3f}", sheet_datasets, self.sheet.specs
         )
+        sheet.edge_df.index.rename("edge", inplace=True)
+        return sheet
 
 
 def _retrieve(dset, time):

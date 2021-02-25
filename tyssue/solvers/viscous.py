@@ -96,7 +96,9 @@ class EulerSolver:
 
     @property
     def current_pos(self):
-        return self.eptm.vert_df[self.eptm.coords].values.ravel()
+        return self.eptm.vert_df.loc[
+            self.eptm.active_verts, self.eptm.coords
+        ].values.ravel()
 
     def set_pos(self, pos):
         """Updates the eptm vertices position
@@ -119,6 +121,7 @@ class EulerSolver:
         topo_change_args : tuple, arguments passed to `on_topo_change`
 
         """
+        self.eptm.settings["dt"] = dt
         for t in np.arange(self.prev_t, tf + dt, dt):
             pos = self.current_pos
             dot_r = self.ode_func(t, pos)
@@ -148,12 +151,15 @@ class EulerSolver:
         dot_r : 1D np.ndarray of shape (self.eptm.Nv * self.eptm.dim, )
 
         .. math::
-        \frac{dr_i}{dt} = \frac{\nabla U_i}{\eta_i}
+        \frac{dr_i}{dt} = -\frac{\nabla U_i}{\eta_i}
 
         """
 
-        grad_U = -self.model.compute_gradient(self.eptm)
-        return (grad_U.values / self.eptm.vert_df["viscosity"].values[:, None]).ravel()
+        grad_U = self.model.compute_gradient(self.eptm).loc[self.eptm.active_verts]
+        return (
+            -grad_U.values
+            / self.eptm.vert_df.loc[self.eptm.active_verts, "viscosity"].values[:, None]
+        ).ravel()
 
 
 class IVPSolver:

@@ -15,6 +15,7 @@ from tyssue.stores import stores_dir
 from tyssue.io.hdf5 import load_datasets
 from tyssue.topology.sheet_topology import cell_division, type1_transition, split_vert
 from tyssue.config.geometry import cylindrical_sheet
+from tyssue.draw import sheet_view
 
 
 def test_condition4i():
@@ -64,7 +65,7 @@ def test_t1_transition():
     geom.update_all(sheet)
     face = sheet.edge_df.loc[84, "face"]
     type1_transition(sheet, 84)
-    assert sheet.edge_df.loc[84, "face"] != face
+    assert sheet.face_df.loc[face, "num_sides"] == 5
 
 
 def test_t1_at_border():
@@ -72,17 +73,16 @@ def test_t1_at_border():
     sheet = Sheet("3cells_2D", datasets, specs)
     geom.update_all(sheet)
     # double half edge with no right cell (aka cell c)
-    type1_transition(sheet, 0, epsilon=0.4)
+    type1_transition(sheet, 0, multiplier=4.0)
     sheet.reset_index()
     assert sheet.validate()
-    # single half edge with no bottom cell (aka cell d)
     geom.update_all(sheet)
-    type1_transition(sheet, 16, epsilon=0.5)
+    # single half edge with no bottom cell (aka cell d)
+    type1_transition(sheet, 16, multiplier=5.0)
     geom.update_all(sheet)
     assert sheet.validate()
     # single half edge with no left cell (aka cell a)
-    geom.update_all(sheet)
-    type1_transition(sheet, 17, epsilon=0.5)
+    type1_transition(sheet, 17, multiplier=5.0)
     geom.update_all(sheet)
     assert sheet.validate()
 
@@ -93,7 +93,7 @@ def test_split_vert():
     sheet = Sheet("3cells_2D", datasets, specs)
     geom.update_all(sheet)
 
-    split_vert(sheet, 0, epsilon=1e-1)
+    split_vert(sheet, 0, multiplier=10)
     geom.update_all(sheet)
     assert sheet.Nv == 14
     assert sheet.Ne == 20

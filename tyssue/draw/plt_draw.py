@@ -16,8 +16,8 @@ import matplotlib as mpl
 
 from matplotlib import cm
 from matplotlib.path import Path
-from matplotlib.patches import Polygon, FancyArrow, Arc, PathPatch
-from matplotlib.collections import PatchCollection, PolyCollection
+from matplotlib.patches import FancyArrow, Arc, PathPatch
+from matplotlib.collections import PatchCollection, PolyCollection, LineCollection
 
 from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater, get_sub_eptm
@@ -25,7 +25,15 @@ from ..utils.utils import spec_updater, get_sub_eptm
 COORDS = ["x", "y"]
 
 
-def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_kwds):
+def create_gif(
+    history,
+    output,
+    num_frames=None,
+    interval=None,
+    draw_func=None,
+    margin=5,
+    **draw_kwds,
+):
     """Creates an animated gif of the recorded history.
 
     You need imagemagick on your system for this function to work.
@@ -36,6 +44,7 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
     history : a :class:`tyssue.History` object
     output : path to the output gif file
     num_frames : int, the number of frames in the gif
+    interval : tuples, define begin and end frame of the gif
     draw_func : a drawing function
          this function must take a `sheet` object as first argument
          and return a `fig, ax` pair. Defaults to quick_edge_draw
@@ -50,6 +59,15 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
         draw_func = sheet_view
         draw_kwds.update({"mode": "quick"})
 
+    time_stamps = history.time_stamps
+    if num_frames is not None:
+        times = np.linspace(time_stamps[0], time_stamps[-1], num_frames)
+    elif interval is not None:
+        times = time_stamps[interval[0] : interval[1] + 1]
+        num_frames = len(times)
+    else:
+        raise ValueError("Need to define `num_frames` or `interval` parameters.")
+
     graph_dir = pathlib.Path(tempfile.mkdtemp())
     x, y = coords = draw_kwds.get("coords", history.sheet.coords[:2])
     sheet0 = history.retrieve(0)
@@ -58,7 +76,7 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
     margin = delta * margin / 100
     xlim = bounds.loc["min", x] - margin, bounds.loc["max", x] + margin
     ylim = bounds.loc["min", y] - margin, bounds.loc["max", y] + margin
-    times = np.linspace(history.time_stamps[0], history.time_stamps[-1], num_frames)
+
     if len(history) < num_frames:
         for i, (t_, sheet) in enumerate(history):
             fig, ax = draw_func(sheet, **draw_kwds)
@@ -71,13 +89,17 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
             figs.sort()
 
         for i, t in enumerate(times):
-            index = np.where(history.time_stamps >= t)[0][0]
+            index = np.where(time_stamps >= t)[0][0]
             fig = figs[index]
             shutil.copy(fig, graph_dir / f"movie_{i:04d}.png")
     else:
         for i, t in enumerate(times):
             sheet = history.retrieve(t)
-            fig, ax = draw_func(sheet, **draw_kwds)
+            try:
+                fig, ax = draw_func(sheet, **draw_kwds)
+            except Exception as e:
+                print("Droped frame {i}")
+
             if isinstance(ax, plt.Axes) and margin >= 0:
                 ax.set(xlim=xlim, ylim=ylim)
             fig.savefig(graph_dir / f"movie_{i:04d}.png")
@@ -98,7 +120,7 @@ def create_gif(history, output, num_frames=60, draw_func=None, margin=5, **draw_
 
 
 def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
-    """ Base view function, parametrizable
+    """Base view function, parametrizable
     through draw_secs
 
     The default sheet_spec specification is:
@@ -276,15 +298,22 @@ def draw_face(sheet, coords, ax, **draw_spec_kw):
 
     if "visible" in sheet.face_df.columns:
         edges = sheet.edge_df[sheet.upcast_face(sheet.face_df["visible"])].index
-        _sheet = get_sub_eptm(sheet, edges)
-        if _sheet is not None:
+        if edges.shape[0]:
+            _sheet = get_sub_eptm(sheet, edges)
             sheet = _sheet
             color = collection_specs["facecolors"]
             if isinstance(color, np.ndarray):
                 faces = sheet.face_df["face_o"].values.astype(np.uint32)
                 collection_specs["facecolors"] = color.take(faces, axis=0)
+        else:
+            warnings.warn("No face is visible")
 
-    polys = sheet.face_polygons(coords)
+    if not sheet.is_ordered:
+        sheet_ = sheet.copy()
+        sheet_.reset_index(order=True)
+        polys = sheet_.face_polygons(coords)
+    else:
+        polys = sheet.face_polygons(coords)
     p = PolyCollection(polys, closed=True, **collection_specs)
     ax.add_collection(p)
     return ax
@@ -336,8 +365,7 @@ def _face_color_from_sequence(face_spec, sheet):
 
 
 def draw_vert(sheet, coords, ax, **draw_spec_kw):
-    """Draw junction vertices in matplotlib
-    """
+    """Draw junction vertices in matplotlib."""
     draw_spec = sheet_spec()["vert"]
     draw_spec.update(**draw_spec_kw)
 
@@ -351,47 +379,50 @@ def draw_vert(sheet, coords, ax, **draw_spec_kw):
 
 
 def draw_edge(sheet, coords, ax, **draw_spec_kw):
-    """
-    """
+    """"""
     draw_spec = sheet_spec()["edge"]
     draw_spec.update(**draw_spec_kw)
-
-    x, y = coords
+    arrow_specs, collections_specs = _parse_edge_specs(draw_spec, sheet)
     dx, dy = ("d" + c for c in coords)
-    app_length = np.hypot(sheet.edge_df[dx], sheet.edge_df[dy])
+    sx, sy = ("s" + c for c in coords)
+    tx, ty = ("t" + c for c in coords)
 
-    patches = []
-    arrow_specs, collections_specs = parse_edge_specs(draw_spec, sheet)
+    if draw_spec.get("head_width"):
 
-    for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows():
-        srce = int(edge["srce"])
-        arrow = FancyArrow(
-            sheet.vert_df.loc[srce, x],
-            sheet.vert_df.loc[srce, y],
-            sheet.edge_df.loc[idx, dx],
-            sheet.edge_df.loc[idx, dy],
-            **arrow_specs,
+        app_length = (
+            np.hypot(sheet.edge_df[dx], sheet.edge_df[dy]) * sheet.edge_df.length.mean()
         )
-        patches.append(arrow)
-    ax.add_collection(PatchCollection(patches, False, **collections_specs))
+        patches = [
+            FancyArrow(*edge[[sx, sy, dx, dy]], **arrow_specs)
+            for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows()
+        ]
+        ax.add_collection(PatchCollection(patches, False, **collections_specs))
+    else:
+        segments = sheet.edge_df[[sx, sy, tx, ty]].to_numpy().reshape((-1, 2, 2))
+        ax.add_collection(LineCollection(segments, **collections_specs))
     return ax
 
 
-def parse_edge_specs(edge_draw_specs, sheet):
+def _parse_edge_specs(edge_draw_specs, sheet):
 
     arrow_keys = ["head_width", "length_includes_head", "shape"]
     arrow_specs = {
         key: val for key, val in edge_draw_specs.items() if key in arrow_keys
     }
     collection_specs = {}
+    if arrow_specs.get("head_width"):  # draw arrows
+        color_key = "edgecolors"
+    else:
+        color_key = "colors"
+
     if "color" in edge_draw_specs:
         if callable(edge_draw_specs["color"]):
             edge_draw_specs["color"] = edge_draw_specs["color"](sheet)
 
         if isinstance(edge_draw_specs["color"], str):
-            collection_specs["edgecolors"] = edge_draw_specs["color"]
+            collection_specs[color_key] = edge_draw_specs["color"]
         elif hasattr(edge_draw_specs["color"], "__len__"):
-            collection_specs["edgecolors"] = _wire_color_from_sequence(
+            collection_specs[color_key] = _wire_color_from_sequence(
                 edge_draw_specs, sheet
             )
 
@@ -403,8 +434,7 @@ def parse_edge_specs(edge_draw_specs, sheet):
 
 
 def _wire_color_from_sequence(edge_spec, sheet):
-    """
-    """
+    """"""
     color_ = edge_spec["color"]
 
     color_min, color_max = edge_spec.get("color_range", (color_.min(), color_.max()))
@@ -477,16 +507,15 @@ def plot_forces(
         app_grad = approx_grad(sheet, geom, model)
         grad_i = (
             pd.DataFrame(
-                index=sheet.active_verts,
+                index=sheet.vert_df[sheet.vert_df.is_active.astype(bool)].index,
                 data=app_grad.reshape((-1, len(sheet.coords))),
                 columns=["g" + c for c in sheet.coords],
             )
             * scaling
         )
-
     else:
         grad_i = model.compute_gradient(sheet, components=False) * scaling
-
+        grad_i = grad_i.loc[sheet.vert_df["is_active"].astype(bool)]
     arrows = pd.DataFrame(columns=coords + gcoords, index=sheet.vert_df.index)
     arrows[coords] = sheet.vert_df[coords]
     arrows[gcoords] = -grad_i[gcoords]  # F = -grad E
@@ -599,8 +628,7 @@ def curved_view(sheet, radius_cutoff=1e3):
 
 
 def plot_junction(eptm, edge_index, coords=["x", "y"]):
-    """Plots local graph around a junction, for debugging purposes
-    """
+    """Plots local graph around a junction, for debugging purposes."""
     v10, v11 = eptm.edge_df.loc[edge_index, ["srce", "trgt"]]
     fig, ax = plt.subplots()
     ax.scatter(*eptm.vert_df.loc[[v10, v11], coords].values.T, marker="+", s=300)

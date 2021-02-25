@@ -3,8 +3,11 @@ channels:
 - conda-forge
 
 dependencies:
+- pip
 - boost-cpp
 - mpfr
+- gmp
+- cgal
 - python>=3.6
 - numpy
 - scipy
@@ -18,3 +21,4 @@ dependencies:
 - pythreejs
 - ipyvolume
 - vispy
+- meshio

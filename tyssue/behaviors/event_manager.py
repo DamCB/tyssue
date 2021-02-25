@@ -11,7 +11,6 @@ from collections import deque
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 class EventManager:
@@ -39,11 +38,12 @@ class EventManager:
         self.current.append((wait, {"face_id": -1, "n_steps": 1}))
         self.clock = 0
         if logfile is not None:
+            logger.setLevel(logging.DEBUG)
             fh = logging.FileHandler(logfile)
-            fh.setLevel(logging.INFO)
+            fh.setLevel(logging.DEBUG)
             logger.addHandler(fh)
-            logger.info("# Started logging at %s", datetime.now().isoformat())
-            logger.info(f"time, {self.element} index, event")
+            logger.debug("# Started logging at %s", datetime.now().isoformat())
+            logger.debug(f"time, {self.element} index, event")
 
     def extend(self, events):
         """
@@ -109,13 +109,14 @@ class EventManager:
                 elem_id = kwargs["elem_id"]
             else:
                 elem_id = -1
-            logger.info(f"{self.clock}, {elem_id}, {behavior.__name__}")
+            logger.debug(f"{self.clock}, {elem_id}, {behavior.__name__}")
             behavior(eptm, self, **kwargs)
 
     def update(self):
         """
         Replaces `self.current` by `self.next` and clears `self.next`.
         """
+        self.clock += 1
         random.shuffle(self.next)
         self.current = self.next.copy()
         self.next.clear()
@@ -126,8 +127,7 @@ default_wait_spec = {"n_steps": 1}
 
 
 def wait(eptm, manager, **kwargs):
-    """Does nothing for a number of steps n_steps
-    """
+    """Does nothing for a number of steps n_steps."""
     wait_spec = default_wait_spec
     wait_spec.update(**kwargs)
     if kwargs["n_steps"] > 1:

@@ -1,5 +1,5 @@
-from tyssue.generation import extrude, three_faces_sheet
-from tyssue import Monolayer, config, Sheet
+from tyssue.generation import three_faces_sheet
+from tyssue import Monolayer, config, Sheet, MonolayerGeometry
 
 from tyssue.utils import testing
 
@@ -39,6 +39,7 @@ def test_effectors():
     sheet_dsets, specs = three_faces_sheet()
     sheet = Sheet("test", sheet_dsets, specs)
     mono = Monolayer.from_flat_sheet("test", sheet, config.geometry.bulk_spec())
+    MonolayerGeometry.update_all(mono)
 
     for effector in sheet_effectors:
         testing.effector_tester(sheet, effector)

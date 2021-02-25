@@ -61,11 +61,11 @@ Sheet (2D 1/2)
    :members:
    :undoc-members:
 
-.. autoclass:: tyssue.geometry.sheet_geometry.ClosedSheetGeometry
+.. autoclass:: tyssue.ClosedSheetGeometry
    :members:
    :undoc-members:
 
-.. autoclass:: tyssue.geometry.sheet_geometry.EllipsoidSheetGeometry
+.. autoclass:: tyssue.geometry.sheet_geometry.EllipsoidGeometry
    :members:
    :undoc-members:
 
@@ -81,7 +81,7 @@ Bulk (3D)
    :members:
    :undoc-members:
 
-.. autoclass:: tyssue.geometry.monolayer_geometry.ClosedMonolayerGeometry
+.. autoclass:: tyssue.ClosedMonolayerGeometry
    :members:
    :undoc-members:
 

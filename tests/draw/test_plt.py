@@ -1,17 +1,21 @@
 import matplotlib
 import pytest
+import os
 
 matplotlib.use("Agg")
 import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
-
-
+from scipy import ndimage
+from tyssue import config, Sheet, SheetGeometry, History
+from tyssue.dynamics import PlanarModel
+from tyssue.solvers.viscous import EulerSolver
 from tyssue.generation import three_faces_sheet
 from tyssue import Sheet, config
 from tyssue.draw.plt_draw import quick_edge_draw, sheet_view
 from tyssue.draw.plt_draw import _face_color_from_sequence
+from tyssue.draw.plt_draw import create_gif
 
 
 class TestsPlt:
@@ -62,6 +66,14 @@ class TestsPlt:
         assert ax.collections[2].get_edgecolors().shape == (0, 4)
         assert ax.collections[2].get_facecolors().shape == (3, 4)
 
+        self.draw_specs["edge"]["head_width"] = 1.0
+        fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
+        assert len(ax.collections) == 3
+        assert ax.collections[0].get_edgecolors().shape == (13, 4)
+        assert ax.collections[1].get_edgecolors().shape == (18, 4)
+        assert ax.collections[2].get_edgecolors().shape == (0, 4)
+        assert ax.collections[2].get_facecolors().shape == (3, 4)
+
     def test_sheet_view_color_string(self):
         self.draw_specs["edge"]["color"] = "k"
         self.draw_specs["face"]["color"] = "red"
@@ -98,12 +110,14 @@ class TestsPlt:
 
     def test_sheet_view_invalid_color_array(self):
         with pytest.raises(ValueError):
-            self.draw_specs["face"]["color"] = np.ones(5)
+            self.draw_specs["face"]["color"] = np.arange(5)
+            self.draw_specs["edge"]["color"] = np.arange(self.sheet.Nv)
             fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
 
     def test_per_vertex_edge_colors(self):
 
         self.draw_specs["face"]["color"] = "red"
+        self.sheet.face_df["visible"] = True
         self.draw_specs["edge"]["color"] = np.random.random(self.sheet.Nv)
         fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
 
@@ -112,3 +126,32 @@ class TestsPlt:
             self.draw_specs["face"]["color"] = lambda sheet: np.ones(5)
             self.draw_specs["edge"]["color"] = lambda sheet: np.ones(5)
             fig, ax = sheet_view(self.sheet, ["x", "y"], **self.draw_specs)
+
+
+def test_create_gif():
+    geom = SheetGeometry
+    model = PlanarModel
+    sheet = Sheet("3", *three_faces_sheet())
+    geom.update_all(sheet)
+    sheet.settings["threshold_length"] = 0.1
+
+    sheet.update_specs(config.dynamics.quasistatic_plane_spec())
+    sheet.face_df["prefered_area"] = sheet.face_df["area"].mean()
+    history = History(sheet)
+    solver = EulerSolver(sheet, geom, model, history=history, auto_reconnect=True)
+    sheet.vert_df["viscosity"] = 0.1
+
+    sheet.edge_df.loc[[0, 17], "line_tension"] *= 2
+    sheet.edge_df.loc[[1], "line_tension"] *= 8
+    res = solver.solve(0.5, dt=0.05)
+
+    with pytest.raises(ValueError):
+        create_gif(history, "frames.gif")
+    create_gif(history, "frames.gif", num_frames=5)
+    create_gif(history, "interval.gif", interval=(2, 4))
+
+    assert os.path.isfile("frames.gif") == True
+    assert os.path.isfile("interval.gif") == True
+
+    os.remove("frames.gif")
+    os.remove("interval.gif")

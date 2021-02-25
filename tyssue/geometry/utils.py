@@ -95,7 +95,6 @@ def rotation_matrices(angle, direction):
     rots : np.ndarray of shape (N, 3, 3)
         the array of rotation matrices
     """
-    direction = direction / np.linalg.norm(direction, axis=1)[:, None]
 
     sint, cost = np.sin(angle), np.cos(angle)
 

@@ -30,7 +30,6 @@ def split_vert(
             "The length of the new edge should be set by "
             "`sheet.settings['threshold_length]*multiplier` "
         )
-
     if face is None:
         face = np.random.choice(sheet.edge_df[sheet.edge_df["srce"] == vert]["face"])
 
@@ -53,9 +52,7 @@ def split_vert(
     return 0
 
 
-def type1_transition(
-    sheet, edge01, *, epsilon=None, remove_tri_faces=True, multiplier=1.5
-):
+def type1_transition(sheet, edge01, *, remove_tri_faces=True, multiplier=1.5):
     """Performs a type 1 transition around the edge edge01
 
     See ../../doc/illus/t1_transition.png for a sketch of the definition
@@ -81,10 +78,10 @@ def type1_transition(
 
     """
 
-    srce, trgt, face = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]]
+    srce, trgt, face = sheet.edge_df.loc[edge01, ["srce", "trgt", "face"]].astype(int)
 
     vert = min(srce, trgt)  # find the vertex that won't be reindexed
-    ret_code = collapse_edge(sheet, edge01, reindex=True)
+    ret_code = collapse_edge(sheet, edge01, reindex=True, allow_two_sided=True)
     if ret_code != 0:
         warnings.warn(f"Collapse of edge {edge01} failed")
         return ret_code
@@ -96,7 +93,6 @@ def type1_transition(
         multiplier=multiplier,
         reindex=True,
         recenter=True,
-        epsilon=epsilon,
     )
 
     if not remove_tri_faces:
@@ -114,26 +110,26 @@ def type1_transition(
 
 
 def cell_division(sheet, mother, geom, angle=None):
-    """ Causes a cell to divide
+    """Causes a cell to divide
 
     Parameters
     ----------
-    
+
     sheet : a 'Sheet' instance
-    mother : face index of target dividing cell 
+    mother : face index of target dividing cell
     geom : a 2D geometry
     angle : division angle for newly formed edge
-    
+
     Returns
     -------
-    daughter: face index of new cell 
-    
+    daughter: face index of new cell
+
     Notes
     -----
-    - Function checks for perodic boundaries if there are, it checks if dividing cell 
-      rests on an edge of the periodic boundaries if so, it displaces the boundaries 
-      by a half a period and moves the target cell in the bulk of the tissue. It then 
-      performs cell division normally and reverts the periodic boundaries to the original 
+    - Function checks for perodic boundaries if there are, it checks if dividing cell
+      rests on an edge of the periodic boundaries if so, it displaces the boundaries
+      by a half a period and moves the target cell in the bulk of the tissue. It then
+      performs cell division normally and reverts the periodic boundaries to the original
       configuration
     """
 
@@ -178,12 +174,6 @@ def get_division_edges(sheet, mother, geom, angle=None, axis="x"):
         angle = np.random.random() * np.pi
 
     m_data = sheet.edge_df[sheet.edge_df["face"] == mother]
-    # if angle == 0:
-    #     face_pos = sheet.face_df.loc[mother, sheet.coords]
-    #     rot_pos = sheet.vert_df[sheet.coords].copy()
-    #     for c in sheet.coords:
-    #         rot_pos.loc[:, c] = rot_pos[c] - face_pos[c]
-    # else:
     rot_pos = geom.face_projected_pos(sheet, mother, psi=angle)
 
     srce_pos = rot_pos.loc[m_data["srce"], axis]
@@ -208,12 +198,12 @@ def face_division(sheet, mother, vert_a, vert_b):
     """
     # mother = sheet.edge_df.loc[edge_a, 'face']
 
-    face_cols = sheet.face_df.loc[mother]
+    face_cols = sheet.face_df.loc[mother:mother]
     sheet.face_df = sheet.face_df.append(face_cols, ignore_index=True)
     sheet.face_df.index.name = "face"
     daughter = int(sheet.face_df.index[-1])
 
-    edge_cols = sheet.edge_df[sheet.edge_df["face"] == mother].iloc[0]
+    edge_cols = sheet.edge_df[sheet.edge_df["face"] == mother].iloc[0:1]
     sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
     new_edge_m = sheet.edge_df.index[-1]
     sheet.edge_df.loc[new_edge_m, "srce"] = vert_b
@@ -229,12 +219,17 @@ def face_division(sheet, mother, vert_a, vert_b):
     daughter_edges = [new_edge_d]
     srce, trgt = vert_a, vert_b
     srces, trgts = m_data[["srce", "trgt"]].values.T
+    spins = 0
 
     while trgt != vert_a:
         srce, trgt = trgt, trgts[srces == trgt][0]
+
         daughter_edges.append(
             m_data[(m_data["srce"] == srce) & (m_data["trgt"] == trgt)].index[0]
         )
+        spins += 1
+        if spins > m_data.shape[0]:
+            raise ValueError(f"The face {mother} has an invalid topology, \n")
     sheet.edge_df.loc[daughter_edges, "face"] = daughter
     sheet.edge_df.index.name = "edge"
     sheet.reset_topo()

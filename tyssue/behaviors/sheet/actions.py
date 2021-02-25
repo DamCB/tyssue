@@ -30,13 +30,15 @@ def merge_vertices(sheet):
 
     """
     d_min = sheet.settings.get("threshold_length", 1e-3)
-    short = sheet.edge_df[sheet.edge_df["length"] < d_min].index
+    short = sheet.edge_df[sheet.edge_df["length"] < d_min].index.to_numpy()
+    np.random.shuffle(short)
     if not short.shape[0]:
         return -1
     logger.info(f"Collapsing {short.shape[0]} edges")
     while short.shape[0]:
-        collapse_edge(sheet, short[0], allow_two_sided=True)
-        short = sheet.edge_df[sheet.edge_df["length"] < d_min].index
+        collapse_edge(sheet, short[0], allow_two_sided=False)
+        short = sheet.edge_df[sheet.edge_df["length"] < d_min].index.to_numpy()
+        np.random.shuffle(short)
     return 0
 
 
@@ -76,10 +78,10 @@ def detach_vertices(sheet):
     dice5p = np.random.random(rank5p.size)
 
     to_detach = np.concatenate([rank4[dice4 < p_4], rank5p[dice5p < p_5p]])
-    logger.info(f"Detaching {to_detach.size} vertices")
-
-    for vert in to_detach:
-        split_vert(sheet, vert)
+    if to_detach.size:
+        logger.info(f"Detaching {to_detach.size} vertices")
+        for vert in to_detach:
+            split_vert(sheet, vert)
 
 
 def set_value(sheet, element, index, set_value, col):
@@ -160,7 +162,7 @@ def exchange(sheet, face, geom, remove_tri_faces=True):
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     shorter = edges.length.idxmin()
     # type1_transition(sheet, shorter, 2 * min(edges.length), remove_tri_faces)
-    type1_transition(sheet, shorter, epsilon=0.1, remove_tri_faces=remove_tri_faces)
+    type1_transition(sheet, shorter, remove_tri_faces=remove_tri_faces)
     geom.update_all(sheet)
 
 
@@ -180,7 +182,7 @@ def remove(sheet, face, geom):
 
 
 def ab_pull(sheet, face, radial_tension, distributed=False):
-    """ Adds radial_tension to the face's vertices radial_tension
+    """Adds radial_tension to the face's vertices radial_tension
 
     Parameters
     ----------
@@ -311,34 +313,5 @@ def contract(
                 contract_col need to exist in face_df. Default 'contractility'
 
     """
-    warnings.warn("deprecated, use increase function")
+    warnings.warn("contract is deprecated, use increase function")
     increase(sheet, "face", face, contractile_increase, contract_col, multiply)
-
-
-def relax(sheet, face, relax_decrease, relax_col="contractility"):
-    """
-    Relax the face by decreasing the relax_col parameter
-    by relax_decrease
-
-    Parameters
-    ----------
-    sheet : a :class:`Sheet` object
-    face : index of face
-    relax_decrease : rate use to divide value of relax_col of face.
-    relax_col : column from face dataframe which apply relax_decrease.
-                relax_col need to exist in face_df. Default 'contractility'
-
-    """
-
-    warnings.warn("deprecated, use decrease function")
-    initial_contractility = 1.12
-    decrease(
-        sheet,
-        "face",
-        face,
-        relax_decrease,
-        col=relax_col,
-        divide=True,
-        bound=(initial_contractility / 2),
-    )
-    increase(sheet, "face", face, relax_decrease, "prefered_area", True)

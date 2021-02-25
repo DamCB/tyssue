@@ -15,8 +15,6 @@ from ...geometry.sheet_geometry import SheetGeometry
 from ...topology.sheet_topology import cell_division
 
 from .actions import (
-    grow,
-    contract,
     exchange,
     remove,
     merge_vertices,
@@ -55,11 +53,10 @@ def reconnect(sheet, manager, **kwargs):
     if nv != sheet.Nv:
         logger.info(f"Merged {nv - sheet.Nv+1} vertices")
     nv = sheet.Nv
-    try:
-        detach_vertices(sheet)
-    except ValueError:
-        logger.info(f"Failed to detach, skipping")
-        pass
+    retval = detach_vertices(sheet)
+    if retval:
+        logger.info("Failed to detach, skipping")
+
     if nv != sheet.Nv:
         logger.info(f"Detached {sheet.Nv - nv} vertices")
 
@@ -102,7 +99,9 @@ def division(sheet, manager, **kwargs):
     print(sheet.face_df.loc[face, "vol"], division_spec["critical_vol"])
 
     if sheet.face_df.loc[face, "vol"] < division_spec["critical_vol"]:
-        grow(sheet, face, division_spec["growth_rate"])
+        increase(
+            sheet, "face", face, division_spec["growth_rate"], "prefered_vol", True
+        )
         manager.append(division, **division_spec)
     else:
         daughter = cell_division(sheet, face, division_spec["geom"])
@@ -123,8 +122,7 @@ default_contraction_spec = {
 
 @face_lookup
 def contraction(sheet, manager, **kwargs):
-    """Single step contraction event
-    """
+    """Single step contraction event."""
     contraction_spec = default_contraction_spec
     contraction_spec.update(**kwargs)
     face = contraction_spec["face"]
@@ -172,8 +170,7 @@ default_face_elimination_spec = {"face_id": -1, "face": -1, "geom": SheetGeometr
 
 @face_lookup
 def face_elimination(sheet, manager, **kwargs):
-    """Removes the face with if face_id from the sheet
-    """
+    """Removes the face with if face_id from the sheet."""
     face_elimination_spec = default_face_elimination_spec
     face_elimination_spec.update(**kwargs)
     remove(sheet, face_elimination_spec["face"], face_elimination_spec["geom"])

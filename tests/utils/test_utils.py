@@ -26,7 +26,7 @@ def test_to_nd():
     datasets = from_2d_voronoi(Voronoi(grid))
     sheet = Sheet("test", datasets)
     result = utils._to_3d(sheet.face_df["x"])
-    assert (sheet.face_df[['x', 'y', 'z']] * result).shape[1] == 3
+    assert (sheet.face_df[["x", "y", "z"]] * result).shape[1] == 3
 
 
 def test_spec_updater():
@@ -70,6 +70,7 @@ def test_data_at_opposite():
     opp = utils.data_at_opposite(sheet, sheet.edge_df["length"], free_value=-1)
     assert opp.loc[1] == -1.0
 
+
 def test_data_at_opposite_df():
     sheet = Sheet("emin", *three_faces_sheet())
     geom.update_all(sheet)
@@ -84,10 +85,13 @@ def test_data_at_opposite_array():
     sheet = Sheet("emin", *three_faces_sheet())
     geom.update_all(sheet)
     sheet.get_opposite()
-    opp = utils.data_at_opposite(sheet, sheet.edge_df[["dx", "dy"]].to_numpy(), free_value=None)
+    opp = utils.data_at_opposite(
+        sheet, sheet.edge_df[["dx", "dy"]].to_numpy(), free_value=None
+    )
 
     assert opp.shape == (sheet.Ne, 2)
     assert_array_equal(opp.index, sheet.edge_df.index)
+
 
 def test_single_cell():
     grid = hexa_grid3d(6, 4, 3)
@@ -144,3 +148,37 @@ def test_ar_calculation():
     sheet.vert_df["x"] = sheet.vert_df["x"] * 2
     sheet.face_df["AR2"] = utils.ar_calculation(sheet, coords=["x", "y"])
     assert_allclose(sheet.face_df["AR2"], 2 * sheet.face_df["AR"])
+
+
+def test_face_centered_patch():
+    grid = hexa_grid2d(6, 4, 3, 3)
+    datasets = from_2d_voronoi(Voronoi(grid))
+    sheet = Sheet("test", datasets)
+
+    subsheet = utils.face_centered_patch(sheet, 5, 2)
+
+    assert subsheet.Nf == 6
+
+    extruded = extrude(datasets, method="translation")
+    mono = Monolayer("test", extruded, config.geometry.bulk_spec())
+    submono = utils.face_centered_patch(mono, 15, 1)
+    assert submono.Nf == 19
+
+
+def test_cell_centered_patch():
+    grid = hexa_grid2d(6, 4, 3, 3)
+    datasets = from_2d_voronoi(Voronoi(grid))
+    _ = Sheet("test", datasets)
+
+    extruded = extrude(datasets, method="translation")
+    mono = Monolayer("test", extruded, config.geometry.bulk_spec())
+    submono = utils.cell_centered_patch(mono, 5, 1)
+
+    assert submono.Nc == 4
+
+
+def test_patch_raises():
+
+    sheet = Sheet("3faces_3D", *three_faces_sheet())
+    with pytest.raises(ValueError):
+        utils.elem_centered_patch(sheet, 0, 1, "not")

@@ -19,6 +19,8 @@ A dynamical model derived from Monier, Gettings et al. 2015 is provided in
 import warnings
 import numpy as np
 import pandas as pd
+import scipy.linalg as linalg
+from scipy.sparse import coo_matrix
 
 from .objects import Epithelium
 from ..config.geometry import flat_sheet
@@ -59,13 +61,12 @@ class Sheet(Epithelium):
     def get_opposite(self):
         self.edge_df["opposite"] = get_opposite(self.edge_df)
 
-    def get_neighbors(self, face):
-        """Returns the faces adjacent to `face`
-        """
-        return super().get_neighbors(face, elem="face")
+    def get_neighbors(self, face, elem="face"):
+        """Returns the faces adjacent to `face`."""
+        return super().get_neighbors(face, elem=elem)
 
-    def get_neighborhood(self, face, order):
-        """Returns `face` neighborhood up to a degree of `order`
+    def get_neighborhood(self, face, order, elem="face"):
+        """Returns `face` neighborhood up to a degree of `order`.
 
         For example, if `order` is 2, it wil return the adjacent, faces
         and theses faces neighbors.
@@ -77,7 +78,7 @@ class Sheet(Epithelium):
 
         """
         # Start with the face so that it's not gathered later
-        return super().get_neighborhood(face, order, elem="face")
+        return super().get_neighborhood(face, order, elem=elem)
 
     def get_extra_indices(self):
         """Computes extra indices:
@@ -124,9 +125,11 @@ class Sheet(Epithelium):
           we'll just assert it worked.
         """
 
-        if "opposite" not in self.edge_df.columns:
-            self.edge_df["opposite"] = get_opposite(self.edge_df)
+        self.edge_df["opposite"] = get_opposite(self.edge_df)
 
+        # noise to avoid degeneracies
+        noise = np.random.normal(loc=1.0, scale=1e-10, size=(self.Ne, self.dim))
+        self.edge_df[self.dcoords] *= noise
         self.dble_edges = self.edge_df[self.edge_df["opposite"] >= 0].index
         theta = np.arctan2(
             self.edge_df.loc[self.dble_edges, "dy"],
@@ -177,6 +180,7 @@ class Sheet(Epithelium):
         # Anti symetric vector (1 at east and free edges, -1 at opposite)
         self.anti_sym = pd.Series(np.ones(self.Ne), index=self.edge_df.index)
         self.anti_sym.loc[self.west_edges] = -1
+        self.edge_df[self.dcoords] /= noise
 
     def sort_edges_eastwest(self):
         """reorder edges such the free edges are first,
@@ -186,12 +190,12 @@ class Sheet(Epithelium):
         """
         self.get_extra_indices()
         self.edge_df = self.edge_df.loc[self.srtd_edges]
-        self.reset_index()
+        self.reset_index(order=False)
         self.reset_topo()
         self.get_extra_indices()
 
     def extract(self, face_mask, coords=["x", "y", "z"]):
-        """ Extract a new sheet from the sheet
+        """Extract a new sheet from the sheet
         that correspond to a key word that define a face.
 
         Parameters
@@ -311,7 +315,6 @@ class Sheet(Epithelium):
         for index,row in self.face_df.iterrows():
             if ellipse_boundary(row)== False:
                 datasets["face"] =datasets["face"].drop(index)
-        
 
         datasets["edge"] = self.edge_df[
             self.edge_df["face"].isin(datasets["face"].index)
@@ -323,7 +326,97 @@ class Sheet(Epithelium):
         subsheet.reset_index()
         subsheet.reset_topo()
         return subsheet
-       
+
+    def get_force_inference(self, coords=None, column=None, free_border_edges=False):
+        """Measure force based on Brodland method.
+
+        g_gamma_matrix*tension_vector = 0
+        Equation is homogenous and to avoid tension_vectors = 0,
+        Construction and solve the constrained least-squares equation system
+        [[g_gamma_matrix.T g_gamma_matrix, C^T_1],
+         [C_1, 0]]
+         où C1 = {1....1}
+
+        shape of g_gamma_matrix = (Ne/2, Nv*len(coords))
+
+         .. note:: Results might not be consistens for highly curved epithelium
+
+        Parameters
+        ----------
+        coords: coordinates
+        column: None, specify a column name in edge_df to put tension value
+        free_border_edges: bool, default False, take into account edges in the
+        border of the tissue if True
+
+        Returns
+        -------
+        edges_tensions: tension values array if `column` not define
+
+        """
+        if coords is None:
+            coords = self.coords
+        ndim = len(coords)
+        ucoords = ["u" + c for c in coords]
+
+        self.get_extra_indices()
+        edges_index = self.east_edges.to_numpy()
+        edges_index_opposite = self.west_edges.to_numpy()
+        if free_border_edges:
+            edges_lonely = self.free_edges.to_numpy()
+            edges_index = np.concatenate((edges_index, edges_lonely))
+
+        n_edges = len(edges_index)
+
+        srce, trgt = self.edge_df.loc[edges_index, ["srce", "trgt"]].to_numpy().T
+
+        # Fill gamma matrix to measure tension
+        pos = self.edge_df.loc[edges_index, ucoords].to_numpy()
+
+        pos = np.concatenate((pos, -pos)).flatten()
+
+        row = np.concatenate(
+            (
+                np.vstack([srce * ndim + i for i in range(ndim)]).T.flatten(),
+                np.vstack([trgt * ndim + i for i in range(ndim)]).T.flatten(),
+            )
+        )
+        col = np.concatenate(
+            (np.repeat(np.arange(n_edges), ndim), np.repeat(np.arange(n_edges), ndim))
+        )
+
+        g_gamma_matrix = coo_matrix((pos, (row, col))).toarray()
+
+        p = np.ones((n_edges + 1, n_edges + 1))
+
+        # get g_gamma_matrix.T g_gamma_matrix
+        g_gamma_matrix_dot = np.dot(g_gamma_matrix.T, g_gamma_matrix)
+        p[0:n_edges, 0:n_edges] = g_gamma_matrix_dot
+        p[n_edges, n_edges] = 0
+
+        q = np.zeros((n_edges + 1, 1))
+        q[n_edges, 0] = n_edges
+
+        # Compute QR decomposition of a matrix.
+        r1, r2 = linalg.qr(p)
+        y = np.dot(r1.T, q)
+
+        x = linalg.solve(r2, y)
+
+        tension = x[0:n_edges][:, 0]
+
+        edges_tensions = np.full([self.Ne], np.nan)
+        edges_tensions[edges_index] = tension
+        if free_border_edges:
+            edges_tensions[edges_index_opposite] = tension[: len(edges_index_opposite)]
+        else:
+            edges_tensions[edges_index_opposite] = tension
+
+        if column is None:
+            return edges_tensions
+        else:
+            self.edge_df[column] = edges_tensions
+
+
     @classmethod
     def planar_sheet_2d(cls, identifier, nx, ny, distx, disty, noise=None):
         """Creates a planar sheet from an hexagonal grid of cells.
@@ -383,7 +476,7 @@ class Sheet(Epithelium):
         return cls(identifier, datasets, specs=flat_sheet(), coords=["x", "y", "z"])
 
 
-def get_opposite(edge_df):
+def get_opposite(edge_df, raise_if_invalid=False):
     """
     Returns the indices opposite to the edges in `edge_df`
     """
@@ -395,12 +488,15 @@ def get_opposite(edge_df):
     flipped.names = ["srce", "trgt"]
     try:
         opposite = st_indexed.reindex(flipped)["edge"].values
-    except ValueError:
+    except ValueError as e:
         dup = flipped.duplicated()
         warnings.warn(
             "Duplicated (`srce`, `trgt`) values in edge_df, maybe sanitize your input"
         )
         opposite = st_indexed[~dup].reindex(flipped)["edge"].values
+        if raise_if_invalid:
+            raise e
+
     opposite[np.isnan(opposite)] = -1
     return opposite.astype(np.int)
 

@@ -58,3 +58,19 @@ def test_center():
     np.testing.assert_allclose(
         sheet.vert_df[sheet.coords].mean(axis=0), [0, 0, 0], atol=1e-7
     )
+
+
+def test_rotations():
+    h5store = os.path.join(stores_dir, "small_hexagonal.hf5")
+    datasets = load_datasets(h5store, data_names=["face", "vert", "edge"])
+    specs = config.geometry.cylindrical_sheet()
+
+    sheet = Sheet("emin", datasets, specs)
+    sgeom.update_all(sheet)
+    sheet.sanitize()
+    sgeom.update_all(sheet)
+    sgeom.center(sheet)
+    assert sgeom.face_rotations(sheet, method='normal', output_as='edge').shape[0] == sheet.Ne
+    assert sgeom.face_rotations(sheet, method='normal', output_as='face').shape[0] == sheet.Nf
+    assert sgeom.face_rotations(sheet, method='svd', output_as='edge').shape[0] == sheet.Ne
+    assert sgeom.face_rotations(sheet, method='svd', output_as='face').shape[0] == sheet.Nf

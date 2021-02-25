@@ -23,6 +23,7 @@ class SheetGeometry(PlanarGeometry):
 
         """
         cls.update_dcoords(sheet)
+        cls.update_ucoords(sheet)
         cls.update_length(sheet)
         cls.update_centroid(sheet)
         cls.update_height(sheet)
@@ -38,10 +39,8 @@ class SheetGeometry(PlanarGeometry):
         center of mass.
         """
         coords = sheet.coords
-        face_pos = sheet.edge_df[["f" + c for c in coords]].to_numpy()
-        srce_pos = sheet.edge_df[["s" + c for c in coords]].to_numpy()
         r_ij = sheet.edge_df[["d" + c for c in coords]].to_numpy()
-        r_ai = srce_pos - face_pos
+        r_ai = sheet.edge_df[["r" + c for c in coords]].to_numpy()
         normals = np.cross(r_ai, r_ij)
         sheet.edge_df[sheet.ncoords] = normals
 
@@ -53,13 +52,6 @@ class SheetGeometry(PlanarGeometry):
         sheet.edge_df["sub_area"] = (
             np.linalg.norm(sheet.edge_df[sheet.ncoords], axis=1) / 2
         )
-        # face_normals = sheet.upcast_face(
-        #     sheet.edge_df.groupby("face")[sheet.ncoords].mean()
-        # )
-        # edge_orient = np.sign(
-        #     np.sum(sheet.edge_df[sheet.ncoords] * face_normals, axis=0)
-        # )
-        # sheet.edge_df["sub_area"] *= edge_orient
         sheet.face_df["area"] = sheet.sum_face(sheet.edge_df["sub_area"])
 
     @staticmethod
@@ -70,7 +62,8 @@ class SheetGeometry(PlanarGeometry):
 
         """
         sheet.edge_df["sub_vol"] = (
-            sheet.upcast_srce(sheet.vert_df["height"]) * sheet.edge_df["sub_area"]
+            sheet.upcast_srce(
+                sheet.vert_df["height"]) * sheet.edge_df["sub_area"]
         )
         sheet.face_df["vol"] = sheet.sum_face(sheet.edge_df["sub_vol"])
 
@@ -94,11 +87,6 @@ class SheetGeometry(PlanarGeometry):
              distance to the coordinate height axis if between the focii, and
              from the closest focus otherwise. The focii positions are updated
              before the height update.
-                 ---------------
-               /                 \
-               |  *          *   |
-               \                 /
-                 ---------------
         In all the cases, this distance is shifted by an amount of
         `sheet.vert_df['basal_shift']`
         """
@@ -112,12 +100,14 @@ class SheetGeometry(PlanarGeometry):
             sheet.vert_df["rho"] = sheet.vert_df[w]
 
         elif geometry == "spherical":
-            sheet.vert_df["rho"] = np.linalg.norm(sheet.vert_df[sheet.coords], axis=1)
+            sheet.vert_df["rho"] = np.linalg.norm(
+                sheet.vert_df[sheet.coords], axis=1)
         elif geometry == "rod":
 
             a, b = sheet.settings["ab"]
             w0 = b - a
-            sheet.vert_df["rho"] = np.linalg.norm(sheet.vert_df[[u, v]], axis=1)
+            sheet.vert_df["rho"] = np.linalg.norm(
+                sheet.vert_df[[u, v]], axis=1)
             sheet.vert_df["left_tip"] = sheet.vert_df[w] < -w0
             sheet.vert_df["right_tip"] = sheet.vert_df[w] > w0
             l_mask = sheet.vert_df[sheet.vert_df["left_tip"] == 1].index
@@ -133,7 +123,8 @@ class SheetGeometry(PlanarGeometry):
         elif sheet.settings["geometry"] == "surfacic":
             sheet.vert_df["rho"] = 1.0
 
-        sheet.vert_df["height"] = sheet.vert_df["rho"] - sheet.vert_df["basal_shift"]
+        sheet.vert_df["height"] = sheet.vert_df[
+            "rho"] - sheet.vert_df["basal_shift"]
 
         edge_height = sheet.upcast_srce(sheet.vert_df[["height", "rho"]])
         edge_height.set_index(sheet.edge_df["face"], append=True, inplace=True)
@@ -175,7 +166,8 @@ class SheetGeometry(PlanarGeometry):
           The rotation matrix
 
         """
-        normal = sheet.edge_df[sheet.edge_df["face"] == face][sheet.ncoords].mean()
+        normal = sheet.edge_df[sheet.edge_df[
+            "face"] == face][sheet.ncoords].mean()
         normal = normal / np.linalg.norm(normal)
         n_xy = np.linalg.norm(normal[["nx", "ny"]])
         theta = -np.arctan2(n_xy, normal.nz)
@@ -208,65 +200,114 @@ class SheetGeometry(PlanarGeometry):
         """
 
         face_orbit = sheet.edge_df[sheet.edge_df["face"] == face]["srce"]
-        # n_sides = face_orbit.shape[0]
-        # face_pos = np.repeat(
-        #     sheet.face_df.loc[face, sheet.coords].values,
-        #     n_sides).reshape(len(sheet.coords), n_sides).T
         rel_pos = (
             sheet.vert_df.loc[face_orbit.to_numpy(), sheet.coords].to_numpy()
             - sheet.face_df.loc[face, sheet.coords].to_numpy()
         )
-        _, _, rotation = np.linalg.svd(rel_pos.astype(np.float), full_matrices=False)
-        # rotation = cls.face_rotation(sheet, face, psi=psi)
-        if psi != 0:
+        _, _, rotation = np.linalg.svd(
+            rel_pos.astype(np.float), full_matrices=False)
+        if psi:
             rotation = np.dot(rotation_matrix(psi, [0, 0, 1]), rotation)
         rot_pos = pd.DataFrame(
             np.dot(rel_pos, rotation.T), index=face_orbit, columns=sheet.coords
         )
         return rot_pos
 
-    @staticmethod
-    def face_rotations(sheet):
+    @classmethod
+    def face_rotations(cls, sheet, method="normal", output_as='edge'):
         """Returns the (sheet.Ne, 3, 3) array of rotation matrices
-        such that each rotation aligns the coordinate system along face normals
+        such that each rotation returns a coordinate system (u, v, w) where the face
+        vertices are mostly in the u, v plane.
+
+        If method is 'normal', face is oriented with it's normal along w
+        if method is 'svd', the u, v, w is determined through singular value decompostion
+        of the face vertices relative  positions.
+
+        svd is slower but more effective at reducing face dimensionality.
+
+        Parameters
+        ----------
+        output_as: string, default 'edge' Return the (sheet.Ne, 3, 3),
+                            else 'face' Return the (sheet.Nf, 3, 3)
 
         """
-        normals = sheet.edge_df.groupby("face")[sheet.ncoords].mean()
-        normals = normals / np.linalg.norm(normals, axis=0)
-        normals = sheet.upcast_face(normals)
 
-        n_xy = np.linalg.norm(normals[["nx", "ny"]])
-        theta = -np.arctan2(n_xy, normals.nz)
+        if method == "normal":
+            return cls.normal_rotations(sheet, output_as)
+        elif method == "svd":
+            return cls.svd_rotations(sheet, output_as)
+        else:
+            raise ValueError("method can be either 'normal' or 'svd' ")
 
-        direction = np.array(
-            [normals.ny.to_numpy(), -normals.nx.to_numpy(), np.zeros(sheet.Ne)]
-        ).T
-        rots = rotation_matrices(theta, direction)
+    @staticmethod
+    def normal_rotations(sheet, output_as='edge'):
+        """Returns the (sheet.Ne, 3, 3) array of rotation matrices
+        such that each rotation aligns the coordinate system along each face normals
 
-        return rots
+        Parameters
+        ----------
+        output_as: string, default 'edge' Return the (sheet.Ne, 3, 3),
+                            else 'face' Return the (sheet.Nf, 3, 3)
+        """
+        face_normals = sheet.edge_df.groupby("face")[sheet.ncoords].mean()
+        rot_angles = face_normals.eval(
+            "-arctan2((nx**2 + ny**2), nz)").to_numpy()
+        rot_axis = np.vstack(
+            [face_normals.ny, -face_normals.nx, np.zeros(sheet.Nf)]).T
+        norm = np.linalg.norm(rot_axis, axis=1)
+        if abs(norm).max() < 1e-10:
+            # No rotation needed
+            return
+        norm = norm.clip(min=1e-10)
+        rot_axis /= norm[:, None]
+
+        rotations = rotation_matrices(rot_angles, rot_axis)
+        # upcast
+        if output_as == 'edge':
+            rotations = rotations.take(sheet.edge_df["face"], axis=0)
+        return rotations
+
+    @staticmethod
+    def svd_rotations(sheet, output_as='edge'):
+        """Returns the (sheet.Ne, 3, 3) array of rotation matrices
+        such that each rotation aligns the coordinate system according
+        to each face vertex SVD
+
+        Parameters
+        ----------
+        output_as: string, default 'edge' Return the (sheet.Ne, 3, 3),
+                            else 'face' Return the (sheet.Nf, 3, 3)
+
+        """
+        svd_rot = sheet.edge_df.groupby("face").apply(face_svd_)
+        svd_rot = (
+            np.concatenate(svd_rot)
+            .reshape((-1, 3, 3))
+        )
+        if output_as == 'edge':
+            svd_rot = svd_rot.take(sheet.edge_df["face"], axis=0)
+
+        return svd_rot
 
     @classmethod
-    def get_phis(cls, sheet):
-        """Returns the 'latitude' of the vertices in the plane perpendicular
+    def get_phis(cls, sheet, method="normal"):
+        """Returns the angle of the vertices in the plane perpendicular
         to each face normal. For not-too-deformed faces, sorting vertices by this
         gives clockwize orientation.
 
         I think not-too-deformed means starconvex here.
 
+        The 'method' argument is passed to face_rotations
+
         """
-        rots = cls.face_rotations(sheet)
 
-        rel_srce_pos = (
-            sheet.edge_df[["sx", "sy", "sz"]]
-            - sheet.edge_df[["fx", "fy", "fz"]].to_numpy()
-        ).to_numpy()
-        rotated = np.einsum("ikj, ik -> ij", rots, rel_srce_pos)
+        rel_srce_pos = sheet.edge_df[["r" + c for c in sheet.coords]]
+        rots = cls.face_rotations(sheet, method)
+        if rots is None:
+            rotated = rel_srce_pos.to_numpy()
+        else:
+            rotated = np.einsum("ikj, ik -> ij", rots, rel_srce_pos)
         return np.arctan2(rotated[:, 1], rotated[:, 0])
-
-    @classmethod
-    def sort_oriented_edges(cls, sheet):
-        phis = cls.get_phis(sheet)
-        sheet.edge_df = sheet.edge_df.sort_values(["face", phis]).reset_index()
 
 
 class ClosedSheetGeometry(SheetGeometry):
@@ -283,15 +324,18 @@ class ClosedSheetGeometry(SheetGeometry):
 
     @staticmethod
     def update_lumen_vol(sheet):
-        lumen_pos_faces = sheet.edge_df[["f" + c for c in sheet.coords]].to_numpy()
+        lumen_pos_faces = sheet.edge_df[
+            ["f" + c for c in sheet.coords]].to_numpy()
         lumen_sub_vol = (
-            np.sum((lumen_pos_faces) * sheet.edge_df[sheet.ncoords].to_numpy(), axis=1)
+            np.sum((lumen_pos_faces) *
+                   sheet.edge_df[sheet.ncoords].to_numpy(), axis=1)
             / 6
         )
         sheet.settings["lumen_vol"] = sum(lumen_sub_vol)
 
 
 class EllipsoidGeometry(ClosedSheetGeometry):
+
     @staticmethod
     def update_height(eptm):
 
@@ -312,3 +356,64 @@ class EllipsoidGeometry(ClosedSheetGeometry):
     def scale(eptm, scale, coords):
         SheetGeometry.scale(eptm, scale, coords)
         eptm.settings["abc"] = [u * scale for u in eptm.settings["abc"]]
+
+
+class WeightedPerimeterEllipsoidLameGeometry(ClosedSheetGeometry):
+    """
+    EllipsoidLameGeometry correspond to a super-egg geometry with a calculation
+    of perimeter is based on weight of each junction.
+
+    Meaning if all junction of a cell have the same weight, perimeter is
+    calculated as a usual perimeter calculation (p = l_ij + l_jk + l_km + l_mn + l_ni)
+    Otherwise, weight parameter allowed more or less importance of a junction in the
+    perimeter calculation (p = w_ij*l_ij + w_jk*l_jk + w_km*l_km + w_mn*l_mn + w_ni*l_ni)
+
+    In this geometry, a sphere surrounding the tissue, meaning a force is apply only at
+    the extremity of the tissue; `eptm.vert_df['delta_rho']` is computed as the
+    difference between the vertex radius in a spherical frame of reference
+    and `eptm.settings['barrier_radius']`
+
+    """
+
+    @classmethod
+    def update_all(cls, eptm):
+        cls.center(eptm)
+        super().update_all(eptm)
+
+    @staticmethod
+    def update_perimeters(eptm):
+        """
+        Updates the perimeter of each face according to the weight of each junction.
+        """
+        eptm.edge_df['weighted_length'] = eptm.edge_df.weight * \
+            eptm.edge_df.length
+        eptm.face_df["perimeter"] = eptm.sum_face(
+            eptm.edge_df["weighted_length"])
+
+    @staticmethod
+    def normalize_weights(sheet):
+        """
+        Normalize weight of each cell.
+        Sum of all weights of one cell equals to one.
+        """
+        sheet.edge_df["num_sides"] = sheet.upcast_face('num_sides')
+        sheet.edge_df["weight"] = sheet.edge_df.groupby('face').apply(
+            lambda df: (df["num_sides"] * df["weight"] / df["weight"].sum())
+        ).sort_index(level=1).to_numpy()
+
+    @staticmethod
+    def update_height(eptm):
+
+        eptm.vert_df["rho"] = np.linalg.norm(
+            eptm.vert_df[eptm.coords], axis=1)
+        r = eptm.settings['barrier_radius']
+        eptm.vert_df["delta_rho"] = (eptm.vert_df["rho"] - r).clip(0)
+        eptm.vert_df["height"] = eptm.vert_df["rho"]
+
+
+def face_svd_(faces):
+
+    rel_pos = faces[["rx", "ry", "rz"]]
+    _, _, rotation = np.linalg.svd(
+        rel_pos.astype(np.float), full_matrices=False)
+    return rotation

@@ -1,4 +1,5 @@
 """
+
 Basic monolayer event module
 =======================
 
@@ -9,13 +10,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# noqa
 from ..sheet.actions import merge_vertices, detach_vertices
 
 
 def grow(monolayer, cell, grow_rate):
-    """Multiplies the equilibrium volume of face
-    by a factor (1+shrink_rate)
-    """
+    """Multiplies the equilibrium volume of face by a factor (1+shrink_rate)."""
     factor = 1 + grow_rate
     monolayer.cell_df.loc[cell, "prefered_vol"] *= factor
     monolayer.cell_df.loc[cell, "prefered_area"] *= factor ** (2 / 3)
@@ -68,8 +68,7 @@ def contract_apical_face(
     multiply=False,
     contraction_column="contractility",
 ):
-    """Single step contraction event for apical face only
-    """
+    """Single step contraction event for apical face only."""
     face = monolayer.idx_lookup(face_id, "face")
     if face is None:
         return

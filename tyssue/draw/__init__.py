@@ -5,6 +5,7 @@ from .ipv_draw import browse_history
 
 from .plt_draw import sheet_view as sheet_view_2d
 from .ipv_draw import sheet_view as sheet_view_3d
+from .vispy_draw import sheet_view as sheet_view_vispy
 from .plt_draw import create_gif
 
 from .plt_draw import sheet_view_GC_colorbar as sheet_view_GC_colorbar_2d
@@ -20,7 +21,7 @@ def sheet_view(sheet, coords=["x", "y", "z"], ax=None, mode="2D", **draw_specs_k
      the coordinates over which to do the plot
     ax: :class:matplotlib.Axes instance, default None
      axis over which to plot the sheet, for quick and
-    mode: str, {'2D'|'quick'|'3D'}, default '2D'
+    mode: str, {'2D'|'quick'|'3D'|'vispy'}, default '2D'
      the type of graph to plot (see bellow)
 
     Returns
@@ -32,16 +33,17 @@ def sheet_view(sheet, coords=["x", "y", "z"], ax=None, mode="2D", **draw_specs_k
 
     if mode == "2D":
         return sheet_view_2d(sheet, coords[:2], ax, **draw_specs_kw)
-    elif mode == "quick":
+    if mode == "quick":
         edge_kw = draw_specs_kw.get("edge", {})
         return quick_edge_draw(sheet, coords[:2], ax, **edge_kw)
-    elif mode == "3D":
+    if mode == "3D":
         return sheet_view_3d(sheet, coords, **draw_specs_kw)
-
+    if mode == "vispy":
+        return sheet_view_vispy(sheet, coords, **draw_specs_kw)
     return ValueError(
         """
 Argument `mode` not understood,
-should be either '2D', '3D' or 'quick', got %s""",
+should be either '2D', '3D', 'quick' or 'vispy', got %s""",
         mode,
     )
 

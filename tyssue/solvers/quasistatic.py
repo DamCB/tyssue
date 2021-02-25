@@ -94,7 +94,9 @@ class QSSolver:
         for i in count():
             if i == MAX_ITER:
                 return self.res
-            pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.flatten()
+            pos0 = eptm.vert_df.loc[
+                eptm.vert_df.is_active.astype(bool), eptm.coords
+            ].values.flatten()
             try:
                 self.res = optimize.minimize(
                     self._opt_energy,
@@ -121,15 +123,19 @@ class QSSolver:
         if self.rearange and eptm.topo_changed:
             raise TopologyChangeError("Topology changed before gradient evaluation")
         grad_i = model.compute_gradient(eptm)
-        return grad_i.loc[eptm.active_verts].values.ravel()
+        return grad_i.loc[eptm.vert_df.is_active.astype(bool)].values.ravel()
 
     def approx_grad(self, eptm, geom, model):
-        pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.ravel()
+        pos0 = eptm.vert_df.loc[
+            eptm.vert_df.is_active.astype(bool), eptm.coords
+        ].values.ravel()
         grad = optimize.approx_fprime(pos0, self._opt_energy, 1e-9, eptm, geom, model)
         return grad
 
     def check_grad(self, eptm, geom, model):
-        pos0 = eptm.vert_df.loc[eptm.active_verts, eptm.coords].values.ravel()
+        pos0 = eptm.vert_df.loc[
+            eptm.vert_df.is_active.astype(bool), eptm.coords
+        ].values.ravel()
         grad_err = optimize.check_grad(
             self._opt_energy, self._opt_grad, pos0.flatten(), eptm, geom, model
         )
@@ -144,6 +150,7 @@ class QSSolver:
             upper_bound_x = eptm.specs["settings"]["boundaries"]["x"][1]
             upper_bound_y = eptm.specs["settings"]["boundaries"]["y"][1]
             pos0 = np.append(pos0, [upper_bound_x, upper_bound_y])
+
             try:
                 self.res = optimize.minimize(
                     self._opt_energy_pbc,
@@ -165,6 +172,7 @@ class QSSolver:
         eptm.specs["settings"]["boundaries"]["x"][1] = pos[-2]
         eptm.specs["settings"]["boundaries"]["y"][1] = pos[-1]
         self.set_pos(eptm, geom, pos[0:-2])
+
         geom.update_all(eptm)
         e = model.compute_energy(eptm)
         return e
@@ -183,7 +191,6 @@ class QSSolver:
             model must provide `compute_energy` and `compute_gradient` methods
             that take `eptm` as first and unique positional argument.
         box_increment: size of displacement of box size to approximate gradient of box size variable
-        
         """
         if self.rearange and eptm.topo_changed:
             raise TopologyChangeError("Topology changed before gradient evaluation")

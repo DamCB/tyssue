@@ -1,4 +1,5 @@
 import numpy as np
+from ..utils.utils import to_nd
 
 
 class BaseGeometry:
@@ -38,6 +39,12 @@ class BaseGeometry:
             update_periodic_dcoords(sheet)
 
     @staticmethod
+    def update_ucoords(sheet):
+        sheet.edge_df[sheet.ucoords] = sheet.edge_df[sheet.dcoords] / to_nd(
+            sheet.edge_df["length"], sheet.dim
+        )
+
+    @staticmethod
     def update_length(sheet):
         """
         Updates the edge_df `length` column on the `coords` basis
@@ -61,7 +68,9 @@ class BaseGeometry:
         scoords = ["s" + c for c in sheet.coords]
         sheet.face_df[sheet.coords] = sheet.edge_df.groupby("face")[scoords].mean()
         face_pos = sheet.upcast_face(sheet.face_df[sheet.coords])
-        sheet.edge_df[["f" + c for c in sheet.coords]] = face_pos
+        for c in sheet.coords:
+            sheet.edge_df["f" + c] = face_pos[c]
+            sheet.edge_df["r" + c] = sheet.edge_df["s" + c] - sheet.edge_df["f" + c]
 
     @staticmethod
     def center(eptm):

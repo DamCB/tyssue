@@ -8,13 +8,13 @@ Apoptosis event module
 from ...utils.decorators import face_lookup
 from ...geometry.sheet_geometry import SheetGeometry
 
-from .actions import shrink, ab_pull, exchange, remove
+from .actions import decrease, ab_pull, exchange, remove
 from .basic_events import contraction
 
 default_apoptosis_spec = {
     "face_id": -1,
     "face": -1,
-    "shrink_rate": 0.1,
+    "shrink_rate": 1.1,
     "critical_area": 1e-2,
     "radial_tension": 0.1,
     "contractile_increase": 0.1,
@@ -55,8 +55,11 @@ def apoptosis(sheet, manager, **kwargs):
 
     if sheet.face_df.loc[face, "area"] > apoptosis_spec["critical_area"]:
         # Shrink and pull
-        shrink(sheet, face, apoptosis_spec["shrink_rate"])
+        decrease(
+            sheet, "face", face, apoptosis_spec["shrink_rate"], "prefered_vol", True
+        )
         ab_pull(sheet, face, apoptosis_spec["radial_tension"])
+
         # contract neighbors
         neighbors = sheet.get_neighborhood(
             face, apoptosis_spec["contract_span"]
