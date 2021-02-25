@@ -228,9 +228,14 @@ def sheet_view_GC_colorbar(sheet, coords=COORDS, ax1=None, ax2=None, **draw_spec
     cmap = cm.get_cmap("viridis")
     import matplotlib as mpl
     # norm = mpl.colors.Normalize(vmin=np.min(draw_specs['face']['color']), vmax=np.max(draw_specs['face']['color']))
-    norm = mpl.colors.Normalize(
-        vmin=np.min(sheet.face_df["col"]), vmax=np.max(sheet.face_df["col"])
-    )
+    if draw_specs["face"]["color_bar_range"]==False:
+        norm = mpl.colors.Normalize(
+            vmin=np.min(sheet.face_df["col"]), vmax=np.max(sheet.face_df["col"])
+        )
+    else:
+        norm = mpl.colors.Normalize(
+            vmin=draw_specs["face"]["color_bar_range"][0], vmax=draw_specs["face"]["color_bar_range"][1]
+        )
 
     cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, orientation="vertical")
     cb1.set_label("a.u.")
