@@ -39,6 +39,21 @@ Most of the time, models are developed for a specific biological question and ar
 
 The `tyssue` library defines tissue as meshes. A vertex model defines a tissue as an assembly of vertices and edges, which can form polygonal face (in 2D) or polyhedron (in 3D). For now, we assume that cell junction are straight lines. In `tyssue`, each edge is split, so that every face is limited by oriented "half-edges" (see figure 1 A), in a structure identical to the [Linear Cell Complex](https://doc.cgal.org/latest/Linear_cell_complex/index.html) in the CGAL library. The `tyssue` library  allows to produce different kind of tissue, from 2D to 3D tissue (see figure 1 B). The library implements concepts and mechanisms common to all vertex models, for both topological and mechanical aspects. 
 
+
+<!--
+<center>
+![figure 1: overview of epithelium representations in tyssue](doc/illus/Figure1.png  "Figure 1")
+</center>
+-->
+
+<center>
+    <figure>
+        <img src="doc/illus/Figure1.png" alt="Figure 1"/>
+        <figcaption>_*Description of tyssue geometry.* A-Composition of a tissue from a vertex to a cell. B-Three kind of geometry that can be used in tyssue. C-Example of cell dynamics usable in 2D and 3D._</figcaption>
+    </figure>
+</center>
+
+
 ### Topology
 
 Common cellular process are implemented in our library such as cell elimination, division or rearangements. We implemented those processes based on previous works.
@@ -64,18 +79,13 @@ More recently, Bi et al. focused his work on tissue rigidity which allows or not
 
 This way, it is easy to test various combinations of energy terms and find those that best fit the observed _in vivo_ dynamics.
 
-<!--
-<center>
-![figure 1: overview of epithelium representations in tyssue](doc/illus/Figure1.png  "Figure 1")
-</center>
--->
-
 <center>
     <figure>
-        <img src="doc/illus/Figure1.png" alt="Figure 1"/>
-        <figcaption>_*Description of tyssue geometry.* A-Composition of a tissue from a vertex to a cell. B-Three kind of geometry that can be used in tyssue. C-Example of cell dynamics usable in 2D and 3D._</figcaption>
+        <img src="doc/illus/Figure2.png" alt="Figure 2"/>
+        <figcaption>*Organisation of different part of tyssue*</figcaption>
     </figure>
 </center>
+
 
 Documentation of the `tyssue` Python library can be found [here](https://tyssue.readthedocs.io/en/latest/). Notebook introduction to how to use `tyssue` library can be found [here](https://github.com/DamCB/tyssue-demo).
 
