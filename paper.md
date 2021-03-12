@@ -33,9 +33,15 @@ The `tyssue` Python library seeks to provide a unified interface to implement bi
 # Statement of Need
 <div align="justify">
 
-Tissue remodelling is a complex process integrating a large number of input such as gene expression pattern, cell adherent properties, cell mechanics. It can be difficult to manipulate specific aspects genetically. It can even be hard to simply capture, when the process takes only few minutes. Furthermore, morphogenesis is inherently a mechanical process. To execute complex morphogenetic movements, epithelia are driven by in-plane forces, like constriction of apical cell surface [@Heer:2017], and/or out-plane forces, such as the apico-basal cable in apoptotic cell [@Monier:2015, @Gracia:2019] or lateral tension [@Sherrard:2010, @Sui:2018]. Modeling those process help us understand how tissue acquires their shape, in complement of the experimental systems, and beyond their limitations. Several vertex models have been developed in the past few years to describe the physics of epithelia (for a review, see [@Alt:2017]), and common features can be identified.
+Tissue remodelling is a complex process integrating a large number of input such as gene expression pattern, cell adherent properties, cell mechanics. It can be difficult to manipulate specific aspects genetically. It can even be hard to simply capture, when the process takes only few minutes. Furthermore, morphogenesis is inherently a mechanical process. To execute complex morphogenetic movements, epithelia are driven by in-plane forces, like constriction of apical cell surface [@Heer:2017], and/or out-of-plane forces, such as the apico-basal cable in apoptotic cell [@Monier:2015, @Gracia:2019] or lateral tension [@Sherrard:2010, @Sui:2018]. Modeling these processes help us understand how tissue acquire their shape, in complement of the experimental systems, and beyond their limitations. Several vertex models have been developed in the past few years to describe the physics of epithelia (for a review, see [@Alt:2017]), and common features can be identified. Several kinds of models have already been published. The apical vertex model has been used several times to study topology changes during morphogenetic movement in _Drosophila, Hydra and Xenopus_([@Staple:2010], [@Farhadifar:2007], [@Aegerter:2012]). Associated with protein dynamics, it has been used to study the effect of protein position on tissue organisation in zebrafish retina ([@Salbreux:2012]). 3D vertex model have been used to study epithelium deformation due to normal development or to cancer development ([@Okuda:2015], [@Eritano:2020]). Most of the time, models are developed for a specific biological question and are difficult to adapt to an other system, for severals reasons. However, there is some exception like Chaste [@Mirams:2013], which propose an open source C++ library to model cell populations or how specific events arise at the system level. With the `tyssue` library, we propose models which are adaptable and scalable with the fied research and the biological question. Topology and mechanics are implement independantly to improve the versatility of models.
 
-The `tyssue` library defines tissue as meshes. A vertex model defines a tissue as an assembly of vertices and edges, which can form polygonal face (in 2D) or polyhedron (in 3D)  (see figure 1 B),. For now, we assume that cell junction are straight lines. In `tyssue`, each edge is split, so that every face is limited by oriented "half-edges" (see figure 1 A), in a structure identical to the [Linear Cell Complex](https://doc.cgal.org/latest/Linear_cell_complex/index.html) in the CGAL library. The library implements concepts and mechanisms common to all vertex models, for both topological and mechanical aspects.
+The `tyssue` library defines epitheliums as meshes. A vertex model defines a tissue as an assembly of vertices and edges, which can form polygonal face (in 2D) or polyhedron (in 3D). For now, we assume that cell junction are straight lines. In `tyssue`, each edge is split, so that every face is limited by oriented "half-edges" (see figure 1 A), in a structure identical to the [Linear Cell Complex](https://doc.cgal.org/latest/Linear_cell_complex/index.html) in the CGAL library. The `tyssue` library  allows to produce different kinds of tissue, from 2D to 3D tissue (see figure 1 B). The library implements concepts and mechanisms common to all vertex models, for both topological and mechanical aspects. 
+
+
+<center>
+![figure 1: overview of epithelium representations in tyssue](doc/illus/Figure1.png  "Figure 1")
+</center>
+**Figure 1: Description of tyssue geometry.** _A-Composition of a tissue from a vertex to a cell. B-Three kind of geometry that can be used in tyssue. C-Example of cell dynamics usable in 2D and 3D._
 
 ### Topology
 
@@ -63,12 +69,14 @@ More recently, Bi et al. focused his work on tissue rigidity which allows or not
 This way, it is easy to test various combinations of energy terms and find those that best fit the observed _in vivo_ dynamics.
 
 <center>
-![figure 1: overview of epithelium representations in tyssue](doc/illus/Figure1.png  "Figure 1")
+![figure 2: Organisation of tyssue](doc/illus/Figure2.png  "Figure 2")
 </center>
+**Figure 2: Organisation of different part of tyssue**
+
 
 Documentation of the `tyssue` Python library can be found [here](https://tyssue.readthedocs.io/en/latest/). Notebook introduction to how to use `tyssue` library can be found [here](https://github.com/DamCB/tyssue-demo).
 
-The `tyssue` library has already been used in several studies with different context of epithelia morphogenesis, such as leg folding and mesoderm invagination in *Drosophila melanogaster* ([@Monier:2015], [@Gracia:2019], [@Martin:2020]). Github repository from those publications can be found [here](https://github.com/glyg/leg-joint) and [here](https://github.com/suzannelab/invagination).
+The `tyssue` library has already been used in several studies with different context of epithelia morphogenesis, such as leg folding and mesoderm invagination in *Drosophila melanogaster* ([@Monier:2015], [@Gracia:2019], [@Martin:2021]). Github repository from those publications can be found [here](https://github.com/glyg/leg-joint), [here](https://github.com/suzannelab/invagination) and [here](https://github.com/suzannelab/polarity) respectively.
 
 </div>
 
