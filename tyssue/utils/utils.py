@@ -58,7 +58,7 @@ def spec_updater(specs, new):
     specs: specification that will be modified
     new: dictionary of new specification
     """
-    for key, spec in new.items():
+    for key in new.keys():
         if specs.get(key) is not None:
             specs[key].update(new[key])
         else:
