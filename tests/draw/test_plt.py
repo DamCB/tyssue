@@ -157,14 +157,17 @@ def test_create_gif():
     os.remove("interval.gif")
 
 
-def test_plot_force():
+def test_plot_forces():
     geom = SheetGeometry
     model = PlanarModel
     sheet = Sheet("3", *three_faces_sheet())
+    sheet.update_specs(model.specs) 
     geom.update_all(sheet)
     fig, ax = plot_forces(sheet,
                          geom,
                          model,
                          list('xy'),
-                         0.5,
-                         **{'extract': {'z_boundary': (-10, 10)}})
+                         0.05,
+                         **{'extract': {'x_boundary': (-10, 10)}})
+
+    assert ax.lines[0].get_xydata().shape == (54, 2)
