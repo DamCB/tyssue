@@ -15,7 +15,7 @@ from tyssue.generation import three_faces_sheet
 from tyssue import Sheet, config
 from tyssue.draw.plt_draw import quick_edge_draw, sheet_view
 from tyssue.draw.plt_draw import _face_color_from_sequence
-from tyssue.draw.plt_draw import create_gif, plot_forceœ
+from tyssue.draw.plt_draw import create_gif, plot_force
 
 
 class TestsPlt:
