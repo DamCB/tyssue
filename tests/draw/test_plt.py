@@ -15,7 +15,7 @@ from tyssue.generation import three_faces_sheet
 from tyssue import Sheet, config
 from tyssue.draw.plt_draw import quick_edge_draw, sheet_view
 from tyssue.draw.plt_draw import _face_color_from_sequence
-from tyssue.draw.plt_draw import create_gif
+from tyssue.draw.plt_draw import create_gif, plot_forces
 
 
 class TestsPlt:
@@ -51,7 +51,7 @@ class TestsPlt:
             0.0, 1.0, num=self.sheet.edge_df.shape[0]
         )[::-1]
 
-        self.draw_specs["edge"]["visible"] = True
+        self.draw_specs["edge"]["visible"] = True 
         self.draw_specs["edge"]["color"] = self.sheet.edge_df["rand"]  # [0, 0, 0, 1]
         self.draw_specs["edge"]["alpha"] = 1.0
         self.draw_specs["edge"]["color_range"] = 0, 3
@@ -155,3 +155,19 @@ def test_create_gif():
 
     os.remove("frames.gif")
     os.remove("interval.gif")
+
+
+def test_plot_forces():
+    geom = SheetGeometry
+    model = PlanarModel
+    sheet = Sheet("3", *three_faces_sheet())
+    sheet.update_specs(model.specs) 
+    geom.update_all(sheet)
+    fig, ax = plot_forces(sheet,
+                         geom,
+                         model,
+                         list('xy'),
+                         0.05,
+                         **{'extract': {'x_boundary': (-10, 10)}})
+
+    assert ax.lines[0].get_xydata().shape == (54, 2)

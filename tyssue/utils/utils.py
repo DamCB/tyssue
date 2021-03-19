@@ -58,9 +58,12 @@ def spec_updater(specs, new):
     specs: specification that will be modified
     new: dictionary of new specification
     """
-    for key, spec in specs.items():
-        if new.get(key) is not None:
-            spec.update(new[key])
+    for key in new.keys():
+        if specs.get(key) is not None:
+            specs[key].update(new[key])
+        else:
+            specs[key] = new[key]
+
 
 
 def set_data_columns(datasets, specs, reset=False):

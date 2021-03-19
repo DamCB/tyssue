@@ -402,15 +402,17 @@ def plot_forces(
     else:
         grad_i = model.compute_gradient(sheet, components=False) * scaling
         grad_i = grad_i.loc[sheet.vert_df["is_active"].astype(bool)]
-    arrows = pd.DataFrame(columns=coords + gcoords, index=sheet.vert_df.index)
-    arrows[coords] = sheet.vert_df[coords]
-    arrows[gcoords] = -grad_i[gcoords]  # F = -grad E
+    sheet.vert_df[gcoords]=-grad_i[gcoords] # F = -grad E
+
+    if 'extract' in draw_specs:
+        sheet = sheet.extract_bounding_box(**draw_specs['extract'])
 
     if ax is None:
         fig, ax = quick_edge_draw(sheet, coords)
     else:
         fig = ax.get_figure()
 
+    arrows = sheet.vert_df[coords+gcoords]
     for _, arrow in arrows.iterrows():
         ax.arrow(*arrow, **draw_specs["grad"])
     return fig, ax

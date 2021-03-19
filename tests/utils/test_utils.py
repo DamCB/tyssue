@@ -39,6 +39,11 @@ def test_spec_updater():
     print(specs)
     assert specs["face"]["geometry"] == new_specs["face"]["geometry"]
 
+    new_specs = {"extract":{"z_boundary":(-10,10)}}
+    utils.spec_updater(specs, new_specs)
+    assert "extract" in specs
+    assert specs["extract"]['z_boundary'] == new_specs["extract"]['z_boundary']
+
 
 def test_set_data_columns():
     dsets, _ = three_faces_sheet()
