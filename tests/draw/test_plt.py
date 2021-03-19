@@ -15,7 +15,7 @@ from tyssue.generation import three_faces_sheet
 from tyssue import Sheet, config
 from tyssue.draw.plt_draw import quick_edge_draw, sheet_view
 from tyssue.draw.plt_draw import _face_color_from_sequence
-from tyssue.draw.plt_draw import create_gif, plot_force
+from tyssue.draw.plt_draw import create_gif, plot_forces
 
 
 class TestsPlt:
@@ -162,7 +162,7 @@ def test_plot_force():
     model = PlanarModel
     sheet = Sheet("3", *three_faces_sheet())
     geom.update_all(sheet)
-    fig, ax = plot_force(sheet,
+    fig, ax = plot_forces(sheet,
                          geom,
                          model,
                          list('xy'),
