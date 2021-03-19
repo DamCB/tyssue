@@ -1,0 +1,9 @@
+title: "Tyssue, an epithelium simulation library"
+logo: illus/logo.png
+execute:
+  execute_notebooks: "auto"
+
+
+sphinx:
+  extra_extensions:
+    - sphinx.ext.autodoc

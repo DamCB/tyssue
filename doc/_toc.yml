@@ -1,0 +1,15 @@
+- file: index
+- file: notebooks/00-Basic_Usage.ipynb
+- file: notebooks/01-Geometry.ipynb
+- file: notebooks/02-Visualization.ipynb
+- file: notebooks/03-Dynamics.ipynb
+- file: notebooks/04-Solvers.ipynb
+- file: notebooks/05-EventManager.ipynb
+- file: notebooks/06-Type_1_transition.ipynb
+- file: notebooks/08-Rosettes.ipynb
+- file: notebooks/12-FarhadifarModel.ipynb
+- file: notebooks/A-ReversibleNetworkReconnection.ipynb
+- file: notebooks/B-Cell_Division.ipynb
+- file: notebooks/C-Apoptosis.ipynb
+- file: notebooks/D-2DMigration.ipynb
+- file: API
