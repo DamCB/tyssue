@@ -107,7 +107,8 @@ fig, ax = sheet_view(sheet)
 
 ### Documentation
 
-* The documentation is browsable online [here](http://tyssue.readthedocs.io/en/latest/)
+* The documentation is now browsable on [tyssue.io](http://tyssue.io)
+* The old documentation is still browsable online [here](http://tyssue.readthedocs.io/en/latest/)
 * Introduction notebooks are available [here](https://github.com/DamCB/tyssue-demo).
 
 ### Mailing list:
