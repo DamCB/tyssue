@@ -1,0 +1,1341 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Energy minimization for a 2.5D sheet in 3D &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Core objects" href="../API.html" />
+    <link rel="prev" title="Packing and influence on cell motility" href="C-2DMigration.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/notebooks/D-FarhadifarModel.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/notebooks/D-FarhadifarModel.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="energy-minimization-for-a-2-5d-sheet-in-3d">
+<h1>Energy minimization for a 2.5D sheet in 3D<a class="headerlink" href="#energy-minimization-for-a-2-5d-sheet-in-3d" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">optimize</span>
+
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">Sheet</span>
+
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">SheetGeometry</span> <span class="k">as</span> <span class="n">geom</span>
+<span class="kn">from</span> <span class="nn">tyssue.dynamics.sheet_vertex_model</span> <span class="kn">import</span> <span class="n">SheetModel</span> <span class="k">as</span> <span class="n">model</span> 
+<span class="kn">from</span> <span class="nn">tyssue.solvers.quasistatic</span> <span class="kn">import</span> <span class="n">QSSolver</span>
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">tyssue.solvers.isotropic_solver</span> <span class="kn">import</span> <span class="n">bruteforce_isotropic_relax</span>
+
+<span class="kn">from</span> <span class="nn">tyssue.draw.plt_draw</span> <span class="kn">import</span> <span class="n">sheet_view</span>
+<span class="kn">import</span> <span class="nn">tyssue.draw.plt_draw</span> <span class="k">as</span> <span class="nn">draw</span>
+<span class="kn">from</span> <span class="nn">tyssue.io</span> <span class="kn">import</span> <span class="n">hdf5</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h5store</span> <span class="o">=</span> <span class="s1">&#39;data/small_hexagonal.hf5&#39;</span>
+
+<span class="n">datasets</span> <span class="o">=</span> <span class="n">hdf5</span><span class="o">.</span><span class="n">load_datasets</span><span class="p">(</span><span class="n">h5store</span><span class="p">,</span>
+                              <span class="n">data_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;face&#39;</span><span class="p">,</span> <span class="s1">&#39;vert&#39;</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">])</span>
+<span class="n">specs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">cylindrical_sheet</span><span class="p">()</span>
+<span class="n">sheet</span> <span class="o">=</span> <span class="n">Sheet</span><span class="p">(</span><span class="s1">&#39;emin&#39;</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">specs</span><span class="p">)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">sanitize</span><span class="p">(</span><span class="n">trim_borders</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>y</th>
+      <th>is_active</th>
+      <th>z</th>
+      <th>x</th>
+      <th>rho</th>
+      <th>old_idx</th>
+      <th>basal_shift</th>
+      <th>height</th>
+      <th>radial_tension</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>8.000000e+01</td>
+      <td>80.000000</td>
+      <td>8.000000e+01</td>
+      <td>8.000000e+01</td>
+      <td>8.000000e+01</td>
+      <td>80.000000</td>
+      <td>8.000000e+01</td>
+      <td>8.000000e+01</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>1.110223e-15</td>
+      <td>0.800000</td>
+      <td>8.881784e-17</td>
+      <td>-2.620126e-15</td>
+      <td>8.071634e+00</td>
+      <td>103.425000</td>
+      <td>2.216705e+00</td>
+      <td>5.854929e+00</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>5.743517e+00</td>
+      <td>0.402524</td>
+      <td>8.027290e+00</td>
+      <td>5.743517e+00</td>
+      <td>4.968335e-15</td>
+      <td>27.759261</td>
+      <td>4.468911e-16</td>
+      <td>5.000389e-15</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>area</th>
+      <th>z</th>
+      <th>y</th>
+      <th>is_alive</th>
+      <th>x</th>
+      <th>perimeter</th>
+      <th>old_idx</th>
+      <th>num_sides</th>
+      <th>vol</th>
+      <th>prefered_area</th>
+      <th>prefered_vol</th>
+      <th>contractility</th>
+      <th>vol_elasticity</th>
+      <th>prefered_height</th>
+      <th>basal_shift</th>
+      <th>basal_height</th>
+      <th>height</th>
+      <th>rho</th>
+      <th>id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>40.000000</td>
+      <td>4.000000e+01</td>
+      <td>4.000000e+01</td>
+      <td>40.0</td>
+      <td>4.000000e+01</td>
+      <td>40.000000</td>
+      <td>40.000000</td>
+      <td>40.000000</td>
+      <td>40.000000</td>
+      <td>40.0</td>
+      <td>40.0</td>
+      <td>40.000000</td>
+      <td>40.0</td>
+      <td>40.0</td>
+      <td>40.000000</td>
+      <td>40.000000</td>
+      <td>4.000000e+01</td>
+      <td>4.000000e+01</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>31.948614</td>
+      <td>-1.850372e-18</td>
+      <td>1.132427e-15</td>
+      <td>1.0</td>
+      <td>-2.642331e-15</td>
+      <td>21.447238</td>
+      <td>27.500000</td>
+      <td>5.600000</td>
+      <td>187.056872</td>
+      <td>12.0</td>
+      <td>288.0</td>
+      <td>76.076404</td>
+      <td>1.0</td>
+      <td>24.0</td>
+      <td>2.500252</td>
+      <td>-3.246161</td>
+      <td>5.854929e+00</td>
+      <td>8.071634e+00</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>2.890942</td>
+      <td>7.446702e+00</td>
+      <td>5.463498e+00</td>
+      <td>0.0</td>
+      <td>5.463498e+00</td>
+      <td>0.549335</td>
+      <td>16.306362</td>
+      <td>0.496139</td>
+      <td>16.926260</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>2.520187e-15</td>
+      <td>2.544151e-15</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dz</th>
+      <th>length</th>
+      <th>dx</th>
+      <th>dy</th>
+      <th>srce</th>
+      <th>trgt</th>
+      <th>face</th>
+      <th>old_jv0</th>
+      <th>old_jv1</th>
+      <th>old_cell</th>
+      <th>...</th>
+      <th>sz</th>
+      <th>tx</th>
+      <th>ty</th>
+      <th>tz</th>
+      <th>fx</th>
+      <th>fy</th>
+      <th>fz</th>
+      <th>rx</th>
+      <th>ry</th>
+      <th>rz</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>2.240000e+02</td>
+      <td>224.000000</td>
+      <td>2.240000e+02</td>
+      <td>2.240000e+02</td>
+      <td>224.000000</td>
+      <td>224.000000</td>
+      <td>224.000000</td>
+      <td>224.000000</td>
+      <td>224.000000</td>
+      <td>224.000000</td>
+      <td>...</td>
+      <td>224.000000</td>
+      <td>2.240000e+02</td>
+      <td>2.240000e+02</td>
+      <td>224.000000</td>
+      <td>2.240000e+02</td>
+      <td>2.240000e+02</td>
+      <td>224.000000</td>
+      <td>2.240000e+02</td>
+      <td>2.240000e+02</td>
+      <td>2.240000e+02</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>3.965082e-18</td>
+      <td>3.829864</td>
+      <td>-1.982541e-17</td>
+      <td>-7.930164e-18</td>
+      <td>39.500000</td>
+      <td>39.500000</td>
+      <td>19.500000</td>
+      <td>99.348214</td>
+      <td>106.031250</td>
+      <td>27.500000</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>-2.727977e-15</td>
+      <td>1.268826e-15</td>
+      <td>0.000000</td>
+      <td>-2.569373e-15</td>
+      <td>1.015061e-15</td>
+      <td>0.000000</td>
+      <td>-1.982541e-17</td>
+      <td>3.965082e-18</td>
+      <td>2.973812e-17</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>2.593865e+00</td>
+      <td>0.652700</td>
+      <td>2.053231e+00</td>
+      <td>2.053231e+00</td>
+      <td>23.111351</td>
+      <td>23.111351</td>
+      <td>11.563046</td>
+      <td>27.073959</td>
+      <td>27.627631</td>
+      <td>16.132856</td>
+      <td>...</td>
+      <td>7.530508</td>
+      <td>5.720290e+00</td>
+      <td>5.720290e+00</td>
+      <td>7.530508</td>
+      <td>5.409339e+00</td>
+      <td>5.409339e+00</td>
+      <td>7.117109</td>
+      <td>1.860313e+00</td>
+      <td>1.860313e+00</td>
+      <td>2.460756e+00</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 33 columns</p>
+</div></div></div>
+</div>
+</div>
+<div class="section" id="non-dimensionalisation-and-isotropic-model">
+<h1>Non dimensionalisation and isotropic model<a class="headerlink" href="#non-dimensionalisation-and-isotropic-model" title="Permalink to this headline">¶</a></h1>
+<p>For our 2D1/2 model, for a tissue energy is expressed as:
+$<span class="math notranslate nohighlight">\(
+E = N_f\frac{K}{2}(V - V_0)^2 + N_f \frac{\Gamma}{2}L^2 + 3N_f\Lambda \ell 
+\)</span><span class="math notranslate nohighlight">\(
+In the case of a regular, infinite hexagonal lattice, There 6 edges per cell, each shared bteween 2 cells, hence \)</span>Ne = 3N_f$</p>
+<p>We can write this equation as a dimension-less one by dividing it by <span class="math notranslate nohighlight">\(N_f K V_0^2\)</span>. We define the dimension-less values: <span class="math notranslate nohighlight">\(\bar\Gamma = \Gamma/K V_0^{4/3}\)</span> and <span class="math notranslate nohighlight">\(\bar\Lambda = \Lambda/K V_0^{5/3}\)</span></p>
+<div class="math notranslate nohighlight">
+\[
+\bar{E} = \frac{\left(V/V_0 - 1\right)^2}{2} + \bar\Gamma \frac{V_0^{-2/3}}{2}L^2 + 3\bar\Lambda V_0^{-1/3} \ell
+\]</div>
+<p>We define the scaling factor <span class="math notranslate nohighlight">\(\delta\)</span> such that <span class="math notranslate nohighlight">\(V/V_0 = \delta^3\)</span>. On a regular hexagonal grid, the perimeter <span class="math notranslate nohighlight">\(L=6\ell\)</span> and the area is A=<span class="math notranslate nohighlight">\(3\sqrt{3}/2\,\ell^2\)</span>. The volume is <span class="math notranslate nohighlight">\(V = Ah\)</span>. As the (pseudo-)height is arbitrary, we can chose its prefered value. We set <span class="math notranslate nohighlight">\(h_0 = V_0^{1/3}\)</span>.</p>
+<p>We thus have <span class="math notranslate nohighlight">\(A_0 = V_0^{2/3}\)</span>, <span class="math notranslate nohighlight">\(A = \delta^2 V_0^{2/3}\)</span> and
+<span class="math notranslate nohighlight">\(\ell = \delta (\frac{2}{3\sqrt{3}})^{1/2} V_0^{1/3}\)</span>. We define the constant <span class="math notranslate nohighlight">\(\mu = 2^{3/2}3^{1/4}\)</span> to simplify further the equation:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{eqnarray}
+\bar{E} &amp;=&amp; \frac{(\delta^3 - 1)^2}{2} + \frac{12}{\sqrt{3}}\bar\Gamma\delta^2 + \frac{6}{\sqrt{3}}\bar\Lambda \delta \\
+\bar{E} &amp;=&amp; \frac{(\delta^3 - 1)^2}{2} + \frac{\mu^2}{2}\bar\Gamma\delta^2 + \frac{\mu}{2}\bar\Lambda \delta \\
+\end{eqnarray}
+\end{split}\]</div>
+<p>The root of this polynomial corresponds to the lowest energy possible for this set of paramters.</p>
+<p>### This analytic model is implemented bellow</p>
+<p>It is now a bit too specific to warrant a module in tyssue, and was thus removed</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Isotropic energy model from Farhadifar et al. 2007 article</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">mu</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">**</span> <span class="mf">0.25</span>
+
+
+<span class="k">def</span> <span class="nf">elasticity</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">delta</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+
+<span class="k">def</span> <span class="nf">contractility</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+
+<span class="k">def</span> <span class="nf">tension</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">lbda</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">lbda</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+
+<span class="k">def</span> <span class="nf">isotropic_energies</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">deltas</span><span class="p">,</span> <span class="n">nondim_specs</span><span class="p">):</span>
+
+    <span class="c1"># bck_face_shift = sheet.face_df[&#39;basal_shift&#39;]</span>
+    <span class="c1"># bck_vert_shift = sheet.vert_df[&#39;basal_shift&#39;]</span>
+    <span class="c1"># ## Faces only area and height</span>
+
+    <span class="n">V_0</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">specs</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">][</span><span class="s2">&quot;prefered_vol&quot;</span><span class="p">]</span>
+    <span class="n">vol_avg</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s2">&quot;is_alive&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">rho_avg</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="o">.</span><span class="n">rho</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="c1"># ## Set height and volume to height0 and V0</span>
+    <span class="n">delta_0</span> <span class="o">=</span> <span class="p">(</span><span class="n">V_0</span> <span class="o">/</span> <span class="n">vol_avg</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">delta_0</span><span class="p">,</span> <span class="n">sheet</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+
+    <span class="n">h_0</span> <span class="o">=</span> <span class="n">V_0</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s2">&quot;basal_shift&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rho_avg</span> <span class="o">*</span> <span class="n">delta_0</span> <span class="o">-</span> <span class="n">h_0</span>
+    <span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="p">[</span><span class="s2">&quot;basal_shift&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rho_avg</span> <span class="o">*</span> <span class="n">delta_0</span> <span class="o">-</span> <span class="n">h_0</span>
+    <span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+
+    <span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">deltas</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">delta</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">deltas</span><span class="p">):</span>
+        <span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">sheet</span><span class="o">.</span><span class="n">coords</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;basal_shift&quot;</span><span class="p">])</span>
+        <span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+        <span class="n">Et</span><span class="p">,</span> <span class="n">Ec</span><span class="p">,</span> <span class="n">Ev</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">energies</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Et</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">Ec</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">Ev</span><span class="o">.</span><span class="n">sum</span><span class="p">()]</span>
+        <span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">delta</span><span class="p">,</span> <span class="n">sheet</span><span class="o">.</span><span class="n">coords</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;basal_shift&quot;</span><span class="p">])</span>
+        <span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+    <span class="n">energies</span> <span class="o">/=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s2">&quot;is_alive&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">isotropic_relax</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">nondim_specs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">energies</span>
+
+
+<span class="k">def</span> <span class="nf">isotropic_relax</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">nondim_specs</span><span class="p">,</span> <span class="n">geom</span><span class="o">=</span><span class="n">geom</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Deforms the sheet so that the faces pseudo-volume is at their</span>
+<span class="sd">    isotropic optimum (on average)</span>
+<span class="sd">    The specified model specs is assumed to be non-dimentional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">vol0</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s2">&quot;prefered_vol&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">h_0</span> <span class="o">=</span> <span class="n">vol0</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">live_faces</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">is_alive</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">vol_avg</span> <span class="o">=</span> <span class="n">live_faces</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">rho_avg</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="o">.</span><span class="n">rho</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="c1"># ## Set height and volume to height0 and vol0</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">vol0</span> <span class="o">/</span> <span class="n">vol_avg</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">sheet</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+    <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s2">&quot;basal_shift&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rho_avg</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">-</span> <span class="n">h_0</span>
+    <span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="p">[</span><span class="s2">&quot;basal_shift&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rho_avg</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">-</span> <span class="n">h_0</span>
+    <span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+
+    <span class="c1"># ## Optimal value for delta</span>
+    <span class="n">delta_o</span> <span class="o">=</span> <span class="n">find_grad_roots</span><span class="p">(</span><span class="n">nondim_specs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">delta_o</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid parameters values&quot;</span><span class="p">)</span>
+    <span class="n">sheet</span><span class="o">.</span><span class="n">delta_o</span> <span class="o">=</span> <span class="n">delta_o</span>
+    <span class="c1"># ## Scaling</span>
+    <span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">delta_o</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">sheet</span><span class="o">.</span><span class="n">coords</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;basal_shift&quot;</span><span class="p">])</span>
+    <span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">isotropic_energy</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">mod_specs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the theoritical energy per face for the given</span>
+<span class="sd">    parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lbda</span> <span class="o">=</span> <span class="n">mod_specs</span><span class="p">[</span><span class="s2">&quot;edge&quot;</span><span class="p">][</span><span class="s2">&quot;line_tension&quot;</span><span class="p">]</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">mod_specs</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">][</span><span class="s2">&quot;contractility&quot;</span><span class="p">]</span>
+    <span class="n">elasticity_</span> <span class="o">=</span> <span class="p">(</span><span class="n">delta</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">contractility_</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">tension_</span> <span class="o">=</span> <span class="n">lbda</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">elasticity_</span> <span class="o">+</span> <span class="n">contractility_</span> <span class="o">+</span> <span class="n">tension_</span>
+    <span class="k">return</span> <span class="n">energy</span>
+
+
+<span class="k">def</span> <span class="nf">isotropic_grad_poly</span><span class="p">(</span><span class="n">mod_specs</span><span class="p">):</span>
+    <span class="n">lbda</span> <span class="o">=</span> <span class="n">mod_specs</span><span class="p">[</span><span class="s2">&quot;edge&quot;</span><span class="p">][</span><span class="s2">&quot;line_tension&quot;</span><span class="p">]</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">mod_specs</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">][</span><span class="s2">&quot;contractility&quot;</span><span class="p">]</span>
+
+    <span class="n">grad_poly</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">mu</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">lbda</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">grad_poly</span>
+
+
+<span class="k">def</span> <span class="nf">isotropic_grad</span><span class="p">(</span><span class="n">mod_specs</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+    <span class="n">grad_poly</span> <span class="o">=</span> <span class="n">isotropic_grad_poly</span><span class="p">(</span><span class="n">mod_specs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">grad_poly</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">find_grad_roots</span><span class="p">(</span><span class="n">mod_specs</span><span class="p">):</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">isotropic_grad_poly</span><span class="p">(</span><span class="n">mod_specs</span><span class="p">)</span>
+    <span class="n">roots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roots</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+    <span class="n">good_roots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">([</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roots</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="n">r</span><span class="p">])</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">good_roots</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">good_roots</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">good_roots</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">good_roots</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">good_roots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nondim_specs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">quasistatic_sheet_spec</span><span class="p">()</span>
+<span class="n">dim_model_specs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dimensionalize</span><span class="p">(</span><span class="n">nondim_specs</span><span class="p">)</span>
+
+<span class="n">sheet</span><span class="o">.</span><span class="n">update_specs</span><span class="p">(</span><span class="n">dim_model_specs</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">upcast_face</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">is_alive</span><span class="p">)</span>
+                           <span class="o">&amp;</span> <span class="n">sheet</span><span class="o">.</span><span class="n">upcast_srce</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="o">.</span><span class="n">is_active</span><span class="p">))</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">bruteforce_isotropic_relax</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column contractility of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column vol_elasticity of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column prefered_height of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column prefered_area of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column prefered_vol of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column radial_tension of the vert dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column is_active of the vert dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column ux of the edge dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column uy of the edge dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column uz of the edge dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column line_tension of the edge dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column is_active of the edge dataset with new specs
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Et</span><span class="p">,</span> <span class="n">Ec</span><span class="p">,</span> <span class="n">Ev</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">energy</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total energy: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">energy</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total energy: 18.662021831602555
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_analytical_to_numeric_comp</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">nondim_specs</span><span class="p">):</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+    <span class="n">deltas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.8</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+    <span class="n">lbda</span> <span class="o">=</span> <span class="n">nondim_specs</span><span class="p">[</span><span class="s2">&quot;edge&quot;</span><span class="p">][</span><span class="s2">&quot;line_tension&quot;</span><span class="p">]</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">nondim_specs</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">][</span><span class="s2">&quot;contractility&quot;</span><span class="p">]</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">deltas</span><span class="p">,</span>
+        <span class="n">isotropic_energy</span><span class="p">(</span><span class="n">deltas</span><span class="p">,</span> <span class="n">nondim_specs</span><span class="p">),</span>
+        <span class="s2">&quot;k-&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Analytical total&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">delta_o</span><span class="p">,</span> <span class="n">isotropic_energy</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">delta_o</span><span class="p">,</span> <span class="n">nondim_specs</span><span class="p">),</span> <span class="s2">&quot;ro&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">deltas</span><span class="p">,</span> <span class="n">elasticity</span><span class="p">(</span><span class="n">deltas</span><span class="p">),</span> <span class="s2">&quot;b-&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Analytical volume elasticity&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">deltas</span><span class="p">,</span>
+        <span class="n">contractility</span><span class="p">(</span><span class="n">deltas</span><span class="p">,</span> <span class="n">gamma</span><span class="p">),</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span>
+        <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Analytical contractility&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">deltas</span><span class="p">,</span> <span class="n">tension</span><span class="p">(</span><span class="n">deltas</span><span class="p">,</span> <span class="n">lbda</span><span class="p">),</span> <span class="s2">&quot;g-&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Analytical line tension&quot;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Isotropic scaling $\delta$&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Isotropic energie $\bar E$&quot;</span><span class="p">)</span>
+
+    <span class="n">energies</span> <span class="o">=</span> <span class="n">isotropic_energies</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">deltas</span><span class="p">,</span> <span class="n">nondim_specs</span><span class="p">)</span>
+    <span class="c1"># energies = energies / norm</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">deltas</span><span class="p">,</span>
+        <span class="n">energies</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;bo:&quot;</span><span class="p">,</span>
+        <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Computed volume elasticity&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">deltas</span><span class="p">,</span> <span class="n">energies</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;go:&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Computed line tension&quot;</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">deltas</span><span class="p">,</span>
+        <span class="n">energies</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Computed contractility&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">deltas</span><span class="p">,</span> <span class="n">energies</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;ko:&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Computed total&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">delta_o</span><span class="p">,</span> <span class="n">deltas</span><span class="p">[</span><span class="n">energies</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()])</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_analytical_to_numeric_comp</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">nondim_specs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.8865926873873902 0.8979591836734694
+</pre></div>
+</div>
+<img alt="../_images/D-FarhadifarModel_11_1.png" src="../_images/D-FarhadifarModel_11_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">labels</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;Line tension&#39;, &#39;Contractility&#39;, &#39;Volume elasticity&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gradients</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_gradient</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">gradients</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="p">(</span><span class="n">srce</span><span class="p">,</span> <span class="n">trgt</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="p">(</span><span class="n">srce</span><span class="p">,</span> <span class="n">trgt</span><span class="p">)</span>
+             <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="n">gradients</span><span class="p">)}</span>
+<span class="n">gradients</span><span class="p">[</span><span class="s1">&#39;Line tension&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gx</th>
+      <th>gy</th>
+      <th>gz</th>
+    </tr>
+    <tr>
+      <th>edge</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-0.000000</td>
+      <td>-0.000000</td>
+      <td>-668.132926</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-0.000000</td>
+      <td>-0.000000</td>
+      <td>668.132926</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>112.700882</td>
+      <td>566.585593</td>
+      <td>335.679736</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-112.700882</td>
+      <td>566.585593</td>
+      <td>-335.679736</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>112.700882</td>
+      <td>-566.585593</td>
+      <td>335.679736</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grad_i</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_gradient</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">grad_i</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gx</th>
+      <th>gy</th>
+      <th>gz</th>
+    </tr>
+    <tr>
+      <th>srce</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-0.008983</td>
+      <td>-3.720720e-03</td>
+      <td>-0.001010</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-0.008983</td>
+      <td>3.720720e-03</td>
+      <td>-0.001010</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-0.018412</td>
+      <td>7.626655e-03</td>
+      <td>-0.009825</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-0.013376</td>
+      <td>-7.127358e-17</td>
+      <td>-0.008121</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-0.018412</td>
+      <td>-7.626655e-03</td>
+      <td>-0.009825</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">sheet</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+<span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scale</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">draw</span><span class="o">.</span><span class="n">plot_forces</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">scale</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="p">(</span><span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">)</span> <span class="ow">in</span> <span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="p">[</span><span class="n">sheet</span><span class="o">.</span><span class="n">coords</span><span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">shift</span> <span class="o">=</span> <span class="mf">0.6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">vy</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">vz</span><span class="o">+</span><span class="n">shift</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">vx</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+<span class="n">app_grad_specs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">draw</span><span class="o">.</span><span class="n">sheet_spec</span><span class="p">()[</span><span class="s1">&#39;grad&#39;</span><span class="p">]</span>
+<span class="n">app_grad_specs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;color&#39;</span><span class="p">:</span><span class="s1">&#39;r&#39;</span><span class="p">})</span>
+
+<span class="n">solver</span> <span class="o">=</span> <span class="n">QSSolver</span><span class="p">()</span>    
+<span class="n">sheet</span><span class="o">.</span><span class="n">topo_changed</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">draw_approx_force</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">draw</span><span class="o">.</span><span class="n">plot_forces</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
+                              <span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">scaling</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                              <span class="n">approx_grad</span><span class="o">=</span><span class="n">solver</span><span class="o">.</span><span class="n">approx_grad</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s1">&#39;grad&#39;</span><span class="p">:</span><span class="n">app_grad_specs</span><span class="p">})</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+<span class="c1">## Uncomment bellow to recompute</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">draw_approx_force</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1">#fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/D-FarhadifarModel_16_0.png" src="../_images/D-FarhadifarModel_16_0.png" />
+</div>
+</div>
+<p><a class="reference external" href="http://scipy.github.io/devdocs/generated/scipy.optimize.check_grad.html#scipy.optimize.check_grad">http://scipy.github.io/devdocs/generated/scipy.optimize.check_grad.html#scipy.optimize.check_grad</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grad_err</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">check_grad</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="n">grad_err</span> <span class="o">/=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">Nv</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error on the gradient (non-dim, per vertex): </span><span class="si">{:.3e}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">grad_err</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Error on the gradient (non-dim, per vertex): 1.689e-05
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;disp&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="s1">&#39;ftol&#39;</span><span class="p">:</span><span class="mf">1e-5</span><span class="p">,</span>
+                    <span class="s1">&#39;gtol&#39;</span><span class="p">:</span><span class="mf">1e-5</span><span class="p">},</span>
+        <span class="p">}</span>
+
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">find_energy_min</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;fun&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">is_alive</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.4314576758601875
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">draw</span><span class="o">.</span><span class="n">plot_forces</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/D-FarhadifarModel_23_0.png" src="../_images/D-FarhadifarModel_23_0.png" />
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="C-2DMigration.html" title="previous page">Packing and influence on cell motility</a>
+    <a class='right-next' id="next-link" href="../API.html" title="next page">Core objects</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

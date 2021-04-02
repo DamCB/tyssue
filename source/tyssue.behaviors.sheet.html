@@ -1,0 +1,764 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tyssue.behaviors.sheet package &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/source/tyssue.behaviors.sheet.rst"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#submodules">
+   Submodules
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.behaviors.sheet.actions">
+   tyssue.behaviors.sheet.actions module
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#basic-event-module">
+     Basic event module
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.behaviors.sheet.apoptosis_events">
+   tyssue.behaviors.sheet.apoptosis_events module
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#apoptosis-event-module">
+     Apoptosis event module
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.behaviors.sheet.basic_events">
+   tyssue.behaviors.sheet.basic_events module
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#small-event-module">
+     Small event module
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.behaviors.sheet.delamination_events">
+   tyssue.behaviors.sheet.delamination_events module
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#mesoderm-invagination-event-module">
+     Mesoderm invagination event module
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.behaviors.sheet">
+   Module contents
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="tyssue-behaviors-sheet-package">
+<h1>tyssue.behaviors.sheet package<a class="headerlink" href="#tyssue-behaviors-sheet-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tyssue.behaviors.sheet.actions">
+<span id="tyssue-behaviors-sheet-actions-module"></span><h2>tyssue.behaviors.sheet.actions module<a class="headerlink" href="#module-tyssue.behaviors.sheet.actions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="basic-event-module">
+<h3>Basic event module<a class="headerlink" href="#basic-event-module" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.ab_pull">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">ab_pull</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_tension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distributed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.ab_pull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds radial_tension to the face’s vertices radial_tension</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+face : index of face
+radial_tension :
+distributed : bool: If true devide radial_tension by number of vertices, and apply this new radial tension to each vertices. Default not distributed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.contract">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">contract</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contractile_increase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiply</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contract_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'contractility'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.contract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contract the face by increasing the ‘contractility’ parameter
+by contractile_increase</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+face : index of face
+contractile_increase : rate use to multiply/add value of contraction_col of face.
+multiply : contractile_increase is multiply/add to the current contract_col value.</p>
+<blockquote>
+<div><p>Default False.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>contract_col<span class="classifier">column from face dataframe which apply contractile_increase.</span></dt><dd><p>contract_col need to exist in face_df. Default ‘contractility’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.decrease">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">decrease</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decrease_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">divide</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.decrease" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrease the value in the dataset at position index/col.</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+element : str: ‘cell’ or ‘face’ or ‘edge’ or ‘vert’
+index : index in the datasets[element]
+decrease_rate : rate use to divide value in the column col.
+col : column from element which apply decrease_rate.
+divide : bool: if true the current col value is divide by decrease_rate. If false it is substracted. Default divide.
+bound: lower limit of the modify value. Default None.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.detach_vertices">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">detach_vertices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.detach_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stochastically detaches vertices from rosettes.</p>
+<p>Uses two probabilities <cite>p_4</cite> and <cite>p_5p</cite> stored in
+sheet.settings.</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.exchange">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">exchange</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_tri_faces</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.exchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a type1 transition on the shorter edge of a face.</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+face : index of the face
+geom : a Geometry class
+remove_tri_faces : remove automaticaly triangular faces if existed. Default True.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.grow">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">grow</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">growth_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">growth_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prefered_vol'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.grow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplies the grow columns of face by a factor.</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+face : index of face
+growth_rate : rate use to multiply value of growth_col of face.
+growth_col : column from face dataframe which apply growth_rate.</p>
+<blockquote>
+<div><p>growth_col need to exist in face_df. Default ‘prefered_vol’</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="n">face</span><span class="p">,</span> <span class="s1">&#39;prefered_vol&#39;</span><span class="p">])</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grow</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">,</span> <span class="s1">&#39;prefered_vol&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="n">face</span><span class="p">,</span> <span class="s1">&#39;prefered_vol&#39;</span><span class="p">])</span>
+<span class="go">17.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.increase">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">increase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increase_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiply</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.increase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increase the value in the dataset at position index/col.</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+element : str: ‘cell’ or ‘face’ or ‘edge’ or ‘vert’
+index : index in the datasets[element]
+increase_rate : rate use to multiply value in the column col.
+col : column from dataset which apply increase_rate.
+multiply : bool: if true, the current col value is multiplied by increase_rate. if false it is added. Default multiply.
+bound: Higher limit of the modify value. Default None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.increase_linear_tension">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">increase_linear_tension</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_tension_increase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiply</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7853981633974483</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.increase_linear_tension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increase edges line tension from face isotropic or according to an angle.</p>
+<p>face : index of face
+line_tension_increase : factor for increase line tension value
+multiply : line_tension_increase is multiply or add to the current</p>
+<blockquote>
+<div><p>line_tension value. Default True.</p>
+</div></blockquote>
+<p>isotropic : all edges are increase, or only a subset of edges. Default True.
+angle : angle below edges are increase by line_tension_increase if</p>
+<blockquote>
+<div><p>isotropic is False. Default pi/4</p>
+</div></blockquote>
+<p>limit : line_tension stay below this limit value</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.merge_vertices">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">merge_vertices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.merge_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges all the vertices that are closer than the threshold length</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.remove">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">remove</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the face and updates the geometry</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+face : index of the face
+geom : a Geometry class</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.set_value">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">set_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the value in the dataset at position index/col.</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+element : str: ‘cell’ or ‘face’ or ‘edge’ or ‘vert’
+index : index in the datasets[element]
+set_value : value to set.
+col : column from dataset which apply increase_rate.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.actions.shrink">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.actions.</span></code><code class="sig-name descname"><span class="pre">shrink</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shrink_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shrink_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prefered_vol'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.actions.shrink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Devides the shrink_col of face by a factor.</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+face : index of face
+shrink_rate : rate use to multiply value of shrink_col of face.
+shrink_col : column from face dataframe which apply shrink_rate.</p>
+<blockquote>
+<div><p>shrink_col need to exist in face_df. Default ‘prefered_vol’</p>
+</div></blockquote>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-tyssue.behaviors.sheet.apoptosis_events">
+<span id="tyssue-behaviors-sheet-apoptosis-events-module"></span><h2>tyssue.behaviors.sheet.apoptosis_events module<a class="headerlink" href="#module-tyssue.behaviors.sheet.apoptosis_events" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="apoptosis-event-module">
+<h3>Apoptosis event module<a class="headerlink" href="#apoptosis-event-module" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.apoptosis_events.apoptosis">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.apoptosis_events.</span></code><code class="sig-name descname"><span class="pre">apoptosis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.apoptosis_events.apoptosis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apoptotic behavior</p>
+<p>While the cell’s apical area is bigger than a threshold, the
+cell shrinks, and the contractility of its neighbors is increased.
+once the critical area is reached, the cell is eliminated
+from the apical surface through successive type 1 transition. Once
+only three sides are left, the cell is eliminated from the tissue.</p>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object
+manager : a <code class="xref py py-class docutils literal notranslate"><span class="pre">EventManager</span></code> object
+face_id : int,</p>
+<blockquote>
+<div><p>the id of the apoptotic cell</p>
+</div></blockquote>
+<dl class="simple">
+<dt>shrink_rate<span class="classifier">float, default 0.1</span></dt><dd><p>the rate of reduction of the cell’s prefered volume
+e.g. the prefered volume is devided by a factor 1+shrink_rate</p>
+</dd>
+</dl>
+<p>critical_area : area at which the face is eliminated from the sheet
+radial_tension : amount of radial tension added at each contraction steps
+contractile_increase : increase in contractility at the cell neighbors
+contract_span : number of neighbors affected by the contracitity increase
+geom : the geometry class used</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-tyssue.behaviors.sheet.basic_events">
+<span id="tyssue-behaviors-sheet-basic-events-module"></span><h2>tyssue.behaviors.sheet.basic_events module<a class="headerlink" href="#module-tyssue.behaviors.sheet.basic_events" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="small-event-module">
+<h3>Small event module<a class="headerlink" href="#small-event-module" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.basic_events.check_tri_faces">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.basic_events.</span></code><code class="sig-name descname"><span class="pre">check_tri_faces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.basic_events.check_tri_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Three neighbourghs cell elimination
+Add all cells with three neighbourghs in the manager
+to be eliminated at the next time step.
+Parameters
+———-
+sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.sheet</span></code> object
+manager : a <code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.events.EventManager</span></code> object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.basic_events.contraction">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.basic_events.</span></code><code class="sig-name descname"><span class="pre">contraction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.basic_events.contraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single step contraction event.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.basic_events.contraction_line_tension">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.basic_events.</span></code><code class="sig-name descname"><span class="pre">contraction_line_tension</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.basic_events.contraction_line_tension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single step contraction event</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.basic_events.division">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.basic_events.</span></code><code class="sig-name descname"><span class="pre">division</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.basic_events.division" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell division happens through cell growth up to a critical volume,
+followed by actual division of the face.</p>
+<p>sheet : a <cite>Sheet</cite> object
+manager : an <cite>EventManager</cite> instance
+face_id : int,</p>
+<blockquote>
+<div><p>index of the mother face</p>
+</div></blockquote>
+<dl class="simple">
+<dt>growth_rate<span class="classifier">float, default 0.1</span></dt><dd><p>rate of increase of the prefered volume</p>
+</dd>
+<dt>critical_vol<span class="classifier">float, default 2.</span></dt><dd><p>volume at which the cells stops to grow and devides</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.basic_events.face_elimination">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.basic_events.</span></code><code class="sig-name descname"><span class="pre">face_elimination</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.basic_events.face_elimination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the face with if face_id from the sheet.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.basic_events.reconnect">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.basic_events.</span></code><code class="sig-name descname"><span class="pre">reconnect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.basic_events.reconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs reconnections (vertex merging / splitting) following Finegan et al. 2019</p>
+<p>kwargs overwrite their corresponding <cite>sheet.settings</cite> entries</p>
+<p>threshold_length : the threshold length at which vertex merging is performed
+p_4 : the probability per unit time to perform a detachement from a rank 4 vertex
+p_5p : the probability per unit time to perform a detachement from a rank 5 or more vertex</p>
+<p><strong>The tricellular vertex-specific adhesion molecule Sidekick
+facilitates polarised cell intercalation during Drosophila axis
+extension</strong> _Tara M Finegan, Nathan Hervieux, Alexander
+Nestor-Bergmann, Alexander G. Fletcher, Guy B Blanchard, Benedicte
+<a href="#id1"><span class="problematic" id="id2">Sanson_</span></a> bioRxiv 704932; doi: <a class="reference external" href="https://doi.org/10.1101/704932">https://doi.org/10.1101/704932</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.basic_events.type1_transition">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.basic_events.</span></code><code class="sig-name descname"><span class="pre">type1_transition</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.basic_events.type1_transition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom type 1 transition event that tests if
+the the shorter edge of the face is smaller than
+the critical length.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-tyssue.behaviors.sheet.delamination_events">
+<span id="tyssue-behaviors-sheet-delamination-events-module"></span><h2>tyssue.behaviors.sheet.delamination_events module<a class="headerlink" href="#module-tyssue.behaviors.sheet.delamination_events" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mesoderm-invagination-event-module">
+<h3>Mesoderm invagination event module<a class="headerlink" href="#mesoderm-invagination-event-module" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="tyssue.behaviors.sheet.delamination_events.constriction">
+<code class="sig-prename descclassname"><span class="pre">tyssue.behaviors.sheet.delamination_events.</span></code><code class="sig-name descname"><span class="pre">constriction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.behaviors.sheet.delamination_events.constriction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constriction process
+This function corresponds to the process called “apical constriction”
+in the manuscript
+The cell undergoing delamination first contracts its apical
+area until it reaches a critical area. A probability
+dependent to the apical area allow an apico-basal
+traction of the cell. The cell can pull during max_traction
+time step, not necessarily consecutively.
+Parameters
+———-
+sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.sheet</span></code> object
+manager : a <code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.events.EventManager</span></code> object
+face_id : int</p>
+<blockquote>
+<div><p>the Id of the face undergoing delamination.</p>
+</div></blockquote>
+<dl>
+<dt>contract_rate<span class="classifier">float, default 2</span></dt><dd><p>rate of increase of the face contractility.</p>
+</dd>
+<dt>critical_area<span class="classifier">float, default 1e-2</span></dt><dd><p>face’s area under which the cell starts loosing sides.</p>
+</dd>
+<dt>radial_tension<span class="classifier">float, default 1.</span></dt><dd><p>tension applied on the face vertices along the
+apical-basal axis.</p>
+</dd>
+<dt>contract_neighbors<span class="classifier">bool, default <cite>False</cite></span></dt><dd><p>if True, the face contraction triggers contraction of the neighbor
+faces.</p>
+</dd>
+<dt>contract_span<span class="classifier">int, default 2</span></dt><dd><p>rank of neighbors contracting if contract_neighbor is True. Contraction
+rate for the neighbors is equal to <cite>contract_rate</cite> devided by
+the rank.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-tyssue.behaviors.sheet">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tyssue.behaviors.sheet" title="Permalink to this headline">¶</a></h2>
+<p>Sheet behavior definitions
+Each top level event is a series of actions leading to
+the completion of an event.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./source"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

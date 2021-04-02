@@ -1,0 +1,785 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Single Cell apoptosis &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Packing and influence on cell motility" href="C-2DMigration.html" />
+    <link rel="prev" title="Reversible Network Reconnection Model" href="A-ReversibleNetworkReconnection.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/notebooks/B-Apoptosis.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/notebooks/B-Apoptosis.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#loading-the-datasets-and-specifications">
+   Loading the datasets and specifications
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#first-energy-minimization">
+   First energy minimization
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#custom-display-function">
+   Custom display function
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#choosing-an-apoptotic-cell">
+   Choosing an apoptotic cell
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#d-view-with-ipyvolume">
+   3D view with ipyvolume
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="single-cell-apoptosis">
+<h1>Single Cell apoptosis<a class="headerlink" href="#single-cell-apoptosis" title="Permalink to this headline">¶</a></h1>
+<p>As decribed in <a class="reference external" href="http://www.nature.com/nature/journal/v518/n7538/full/nature14152.html">Monier et al. 2015</a>.</p>
+<p>We start with a simple hexagonal apical mesh with cylindrical symmetry.</p>
+<div class="section" id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">Image</span>
+
+<span class="kn">import</span> <span class="nn">tyssue</span>
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">Sheet</span><span class="p">,</span> <span class="n">History</span>
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">config</span>
+
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">SheetGeometry</span> <span class="k">as</span> <span class="n">geom</span>
+<span class="kn">from</span> <span class="nn">tyssue.dynamics.sheet_vertex_model</span> <span class="kn">import</span> <span class="n">SheetModel</span> <span class="k">as</span> <span class="n">basemodel</span>
+<span class="kn">from</span> <span class="nn">tyssue.dynamics.apoptosis_model</span> <span class="kn">import</span> <span class="n">SheetApoptosisModel</span> <span class="k">as</span> <span class="n">model</span>
+<span class="kn">from</span> <span class="nn">tyssue.solvers.quasistatic</span> <span class="kn">import</span> <span class="n">QSSolver</span>
+
+
+<span class="kn">from</span> <span class="nn">tyssue.draw</span> <span class="kn">import</span> <span class="n">sheet_view</span><span class="p">,</span> <span class="n">create_gif</span><span class="p">,</span> <span class="n">browse_history</span>
+<span class="kn">from</span> <span class="nn">tyssue.io.hdf5</span> <span class="kn">import</span> <span class="n">load_datasets</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">tyssue</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.8.1
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="loading-the-datasets-and-specifications">
+<h2>Loading the datasets and specifications<a class="headerlink" href="#loading-the-datasets-and-specifications" title="Permalink to this headline">¶</a></h2>
+<p>Here it is a cylindrical hexagonal mesh.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read pre-recorded datasets</span>
+<span class="n">h5store</span> <span class="o">=</span> <span class="s1">&#39;data/small_hexagonal.hf5&#39;</span>
+<span class="kn">from</span> <span class="nn">tyssue.io.hdf5</span> <span class="kn">import</span> <span class="n">save_datasets</span><span class="p">,</span> <span class="n">load_datasets</span>
+
+<span class="n">datasets</span> <span class="o">=</span> <span class="n">load_datasets</span><span class="p">(</span><span class="n">h5store</span><span class="p">,</span>
+                         <span class="n">data_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;face&#39;</span><span class="p">,</span> <span class="s1">&#39;vert&#39;</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">])</span>
+<span class="c1"># Corresponding specifications</span>
+<span class="n">specs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">cylindrical_sheet</span><span class="p">()</span>
+<span class="n">sheet</span> <span class="o">=</span> <span class="n">Sheet</span><span class="p">(</span><span class="s1">&#39;emin&#39;</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">specs</span><span class="p">)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">sanitize</span><span class="p">(</span><span class="n">trim_borders</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+<span class="c1"># Model</span>
+<span class="n">nondim_specs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">quasistatic_sheet_spec</span><span class="p">()</span>
+<span class="n">dim_model_specs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dimensionalize</span><span class="p">(</span><span class="n">nondim_specs</span><span class="p">)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">update_specs</span><span class="p">(</span><span class="n">dim_model_specs</span><span class="p">)</span>
+
+<span class="n">sheet</span><span class="o">.</span><span class="n">get_opposite</span><span class="p">()</span>
+<span class="n">live_edges</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;opposite&#39;</span><span class="p">]</span><span class="o">==-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+<span class="n">dead_src</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">live_edges</span><span class="p">,</span> <span class="s1">&#39;srce&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+
+<span class="c1">### Boundary conditions</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dead_src</span><span class="p">,</span> <span class="s1">&#39;is_active&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;is_active&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">upcast_srce</span><span class="p">(</span><span class="s1">&#39;is_active&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">sheet</span><span class="o">.</span><span class="n">upcast_trgt</span><span class="p">(</span><span class="s1">&#39;is_active&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="first-energy-minimization">
+<h2>First energy minimization<a class="headerlink" href="#first-energy-minimization" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">min_settings</span> <span class="o">=</span> <span class="p">{</span>
+<span class="c1">#    &quot;minimize&quot;:{</span>
+        <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;ftol&#39;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+            <span class="s1">&#39;gtol&#39;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">},</span>
+<span class="c1">#    }</span>
+<span class="p">}</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">QSSolver</span><span class="p">()</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">find_energy_min</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">min_settings</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="custom-display-function">
+<h2>Custom display function<a class="headerlink" href="#custom-display-function" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">leg_joint_view</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]):</span>
+    
+    <span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">coords</span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;face&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;vert&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">edge_z</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">upcast_srce</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="p">[</span><span class="n">z</span><span class="p">])</span> <span class="o">+</span>
+                    <span class="n">sheet</span><span class="o">.</span><span class="n">upcast_trgt</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="p">[</span><span class="n">z</span><span class="p">]))</span>
+    <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">][</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_z</span>
+    <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    
+    <span class="n">tmp_sheet</span> <span class="o">=</span> <span class="n">Sheet</span><span class="p">(</span><span class="s1">&#39;tmp&#39;</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span>
+                      <span class="n">sheet</span><span class="o">.</span><span class="n">specs</span><span class="p">)</span>
+    <span class="n">tmp_sheet</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">draw_specs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;vert&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;visible&#39;</span><span class="p">:</span> <span class="kc">False</span>
+            <span class="p">},</span>
+        <span class="s1">&#39;edge&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">tmp_sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="n">z</span><span class="p">],</span>
+            <span class="c1">#&#39;zorder&#39;: depth.values</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span><span class="n">tmp_sheet</span><span class="p">,</span> <span class="n">coords</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;2D&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">draw_specs</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;#404040&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">leg_joint_view</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/B-Apoptosis_8_0.png" src="../_images/B-Apoptosis_8_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="choosing-an-apoptotic-cell">
+<h2>Choosing an apoptotic cell<a class="headerlink" href="#choosing-an-apoptotic-cell" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">apoptotic_cell</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Apoptotic cell position:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">apoptotic_cell</span><span class="p">,</span> <span class="n">sheet</span><span class="o">.</span><span class="n">coords</span><span class="p">]))</span>
+<span class="n">apoptotic_edges</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;face&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">apoptotic_cell</span><span class="p">]</span>
+<span class="n">apoptotic_verts</span> <span class="o">=</span> <span class="n">apoptotic_edges</span><span class="p">[</span><span class="s1">&#39;srce&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Indices of the apoptotic vertices: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">apoptotic_verts</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Apoptotic cell position:
+x   -7.994251
+y    3.348658
+z   -4.493606
+Name: 16, dtype: float64
+Indices of the apoptotic vertices: [33 42 34 41 43 44]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Cell behaviours, such as division or apoptosis, are defined as a series of unit changes in the tissue, such as the cell growth, or the abscission of the cell face once division is complete. For a given behavior, the next step often depends on the current state. This is managed by an <code class="docutils literal notranslate"><span class="pre">EventManager</span></code> object, which runs the behaviour.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tyssue.behaviors.sheet</span> <span class="kn">import</span> <span class="n">apoptosis</span>
+<span class="kn">from</span> <span class="nn">tyssue.behaviors</span> <span class="kn">import</span> <span class="n">EventManager</span>
+
+
+<span class="n">manager</span> <span class="o">=</span> <span class="n">EventManager</span><span class="p">(</span><span class="s1">&#39;face&#39;</span><span class="p">)</span>
+
+
+<span class="n">sheet</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;apoptosis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;shrink_rate&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span>
+    <span class="s1">&#39;critical_area&#39;</span><span class="p">:</span> <span class="mf">8.</span><span class="p">,</span>
+    <span class="s1">&#39;radial_tension&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+    <span class="s1">&#39;contractile_increase&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="s1">&#39;contract_span&#39;</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="p">}</span>
+
+<span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+<span class="n">manager</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">apoptosis</span><span class="p">,</span> <span class="n">face_id</span><span class="o">=</span><span class="n">apoptotic_cell</span><span class="p">,</span> <span class="o">**</span><span class="n">sheet</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;apoptosis&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here is the code for the apoptosis behavior:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">apoptosis</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">manager</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Apoptotic behavior</span>
+
+<span class="sd">    While the cell&#39;s apical area is bigger than a threshold, the</span>
+<span class="sd">    cell shrinks, and the contractility of its neighbors is increased.</span>
+<span class="sd">    once the critical area is reached, the cell is eliminated</span>
+<span class="sd">    from the apical surface through successive type 1 transition. Once</span>
+<span class="sd">    only three sides are left, the cell is eliminated from the tissue.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sheet : a :class:`Sheet` object</span>
+<span class="sd">    manager : a :class:`EventManager` object</span>
+<span class="sd">    face_id : int,</span>
+<span class="sd">        the id of the apoptotic cell</span>
+<span class="sd">    shrink_rate : float, default 0.1</span>
+<span class="sd">        the rate of reduction of the cell&#39;s prefered volume</span>
+<span class="sd">        e.g. the prefered volume is devided by a factor 1+shrink_rate</span>
+<span class="sd">    critical_area : area at which the face is eliminated from the sheet</span>
+<span class="sd">    radial_tension : amount of radial tension added at each contraction steps</span>
+<span class="sd">    contractile_increase : increase in contractility at the cell neighbors</span>
+<span class="sd">    contract_span : number of neighbors affected by the contracitity increase</span>
+<span class="sd">    geom : the geometry class used</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">apoptosis_spec</span> <span class="o">=</span> <span class="n">default_apoptosis_spec</span>
+    <span class="n">apoptosis_spec</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">apoptosis_spec</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">face</span><span class="p">,</span> <span class="s2">&quot;area&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">apoptosis_spec</span><span class="p">[</span><span class="s2">&quot;critical_area&quot;</span><span class="p">]:</span>
+        <span class="c1"># Shrink and pull</span>
+        <span class="n">shrink</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="n">apoptosis_spec</span><span class="p">[</span><span class="s2">&quot;shrink_rate&quot;</span><span class="p">])</span>
+        <span class="n">ab_pull</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="n">apoptosis_spec</span><span class="p">[</span><span class="s2">&quot;radial_tension&quot;</span><span class="p">])</span>
+        <span class="c1"># contract neighbors</span>
+        <span class="n">neighbors</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">get_neighborhood</span><span class="p">(</span>
+            <span class="n">face</span><span class="p">,</span> <span class="n">apoptosis_spec</span><span class="p">[</span><span class="s2">&quot;contract_span&quot;</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">neighbors</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">neighbors</span><span class="o">.</span><span class="n">face</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">manager</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="n">contraction</span><span class="p">,</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;face_id&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;contractile_increase&quot;</span><span class="p">:</span> <span class="p">(</span>
+                            <span class="n">apoptosis_spec</span><span class="p">[</span><span class="s2">&quot;contractile_increase&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;order&quot;</span><span class="p">],</span>
+                        <span class="p">),</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">face</span><span class="p">,</span> <span class="s2">&quot;num_sides&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">exchange</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="n">apoptosis_spec</span><span class="p">[</span><span class="s2">&quot;geom&quot;</span><span class="p">])</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">remove</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="n">apoptosis_spec</span><span class="p">[</span><span class="s2">&quot;geom&quot;</span><span class="p">])</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+        <span class="n">manager</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">apoptosis</span><span class="p">,</span> <span class="o">**</span><span class="n">apoptosis_spec</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We perform the events at each time points to run the simulation</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">stop</span><span class="o">=</span><span class="mi">100</span>
+
+<span class="n">progress</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntProgress</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">stop</span><span class="p">)</span>
+<span class="n">progress</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">display</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+
+<span class="n">history</span> <span class="o">=</span> <span class="n">History</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+
+<span class="k">while</span> <span class="n">manager</span><span class="o">.</span><span class="n">current</span> <span class="ow">and</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">stop</span><span class="p">:</span>
+    <span class="n">manager</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">progress</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">t</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">find_energy_min</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">min_settings</span><span class="p">)</span>
+    <span class="n">history</span><span class="o">.</span><span class="n">record</span><span class="p">()</span>
+    <span class="n">manager</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"version_major": 2, "version_minor": 0, "model_id": "4b68ceb4adba4a85b87a9d141ab05254"}
+</script></div>
+</div>
+</div>
+<div class="section" id="d-view-with-ipyvolume">
+<h2>3D view with ipyvolume<a class="headerlink" href="#d-view-with-ipyvolume" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">color</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">vert_df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">mesh</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">edge</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span><span class="n">color</span><span class="p">},</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;3D&quot;</span><span class="p">)</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"version_major": 2, "version_minor": 0, "model_id": "7a0bf7c79cd44b1e9cec148da478e7d4"}
+</script></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">browse_history</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span><span class="k">lambda</span> <span class="n">s</span> <span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">]})</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"version_major": 2, "version_minor": 0, "model_id": "6602cd9c0ebb43c39f8021a8dce65059"}
+</script><script type="application/vnd.jupyter.widget-view+json">
+{"version_major": 2, "version_minor": 0, "model_id": "47e509969c7a4b8bb2496f32260bb551"}
+</script></div>
+</div>
+<p>Provided you have ImageMagick installed, we can convert the output to a nice gif, like so:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">create_gif</span><span class="p">(</span>
+    <span class="n">history</span><span class="p">,</span>
+    <span class="s1">&#39;single_apopto.gif&#39;</span><span class="p">,</span>
+    <span class="n">num_frames</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">draw_func</span><span class="o">=</span><span class="n">leg_joint_view</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Image</span><span class="p">(</span><span class="s2">&quot;single_apopto.gif&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;IPython.core.display.Image object&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"60f3317556a74258b22ea78fcebf9316": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "9cffd64e617f492abd370d80af882d9d": {"model_name": "ProgressStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "4b68ceb4adba4a85b87a9d141ab05254": {"model_name": "IntProgressModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "IntProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "ProgressView", "bar_style": "", "description": "", "description_tooltip": null, "layout": "IPY_MODEL_60f3317556a74258b22ea78fcebf9316", "max": 100, "min": 0, "orientation": "horizontal", "style": "IPY_MODEL_9cffd64e617f492abd370d80af882d9d", "value": 17}}, "cdd2e8b51fd54c3ca067bc8df7e5a3f1": {"model_name": "PerspectiveCameraModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "PerspectiveCameraModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "aspect": 1.0, "castShadow": false, "children": [], "far": 2000.0, "focus": 10.0, "fov": 45.0, "frustumCulled": true, "matrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixAutoUpdate": true, "matrixWorld": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixWorldInverse": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixWorldNeedsUpdate": false, "modelViewMatrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "name": "", "near": 0.1, "normalMatrix": [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0], "position": [0.0, 0.0, 2.0], "projectionMatrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "quaternion": [0.0, 0.0, 0.0, 1.0], "receiveShadow": false, "renderOrder": 0, "rotation": [0.0, 0.0, 0.0, "XYZ"], "scale": [1.0, 1.0, 1.0], "type": "PerspectiveCamera", "up": [0.0, 1.0, 0.0], "visible": true, "zoom": 1.0}}, "3ba63313ec8a40368a6d5009b68f818e": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "c1b8c308a64a4b22bd48cbe52948476d": {"model_name": "LinearScaleModel", "model_module": "bqplot", "model_module_version": "^0.5.23", "state": {"_model_module": "bqplot", "_model_module_version": "^0.5.23", "_model_name": "LinearScaleModel", "_view_count": null, "_view_module": "bqplot", "_view_module_version": "^0.5.23", "_view_name": "LinearScale", "allow_padding": true, "max": 14.091312782079644, "mid_range": 0.8, "min": -14.091312782079644, "min_range": 0.6, "reverse": false, "stabilized": false}}, "0025e854fc1e4b10b6a2c54fd50c3b69": {"model_name": "LinearScaleModel", "model_module": "bqplot", "model_module_version": "^0.5.23", "state": {"_model_module": "bqplot", "_model_module_version": "^0.5.23", "_model_name": "LinearScaleModel", "_view_count": null, "_view_module": "bqplot", "_view_module_version": "^0.5.23", "_view_name": "LinearScale", "allow_padding": true, "max": 14.091312782079644, "mid_range": 0.8, "min": -14.091312782079644, "min_range": 0.6, "reverse": false, "stabilized": false}}, "e7b6e912b5e8492ea5788a0baed5030a": {"model_name": "LinearScaleModel", "model_module": "bqplot", "model_module_version": "^0.5.23", "state": {"_model_module": "bqplot", "_model_module_version": "^0.5.23", "_model_name": "LinearScaleModel", "_view_count": null, "_view_module": "bqplot", "_view_module_version": "^0.5.23", "_view_name": "LinearScale", "allow_padding": true, "max": 14.091312782079644, "mid_range": 0.8, "min": -14.091312782079644, "min_range": 0.6, "reverse": false, "stabilized": false}}, "b0b3555627b64613983d6ebd05cfc452": {"model_name": "SceneModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "SceneModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "autoUpdate": true, "background": null, "castShadow": false, "children": [], "fog": null, "frustumCulled": true, "matrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixAutoUpdate": true, "matrixWorld": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixWorldNeedsUpdate": false, "modelViewMatrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "name": "", "normalMatrix": [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0], "overrideMaterial": null, "position": [0.0, 0.0, 0.0], "quaternion": [0.0, 0.0, 0.0, 1.0], "receiveShadow": false, "renderOrder": 0, "rotation": [0.0, 0.0, 0.0, "XYZ"], "scale": [1.0, 1.0, 1.0], "type": "Scene", "up": [0.0, 1.0, 0.0], "visible": true}}, "7a0bf7c79cd44b1e9cec148da478e7d4": {"model_name": "FigureModel", "model_module": "ipyvolume", "model_module_version": "~0.6.0-alpha.5", "state": {"_dom_classes": [], "_model_module": "ipyvolume", "_model_module_version": "~0.6.0-alpha.5", "_model_name": "FigureModel", "_view_count": null, "_view_module": "ipyvolume", "_view_module_version": "~0.6.0-alpha.5", "_view_name": "FigureView", "ambient_coefficient": 0.5, "animation": 1000.0, "animation_exponent": 1.0, "camera": "IPY_MODEL_cdd2e8b51fd54c3ca067bc8df7e5a3f1", "camera_center": [0.0, 0.0, 0.0], "camera_control": "trackball", "camera_fov": 45.0, "capture_fps": null, "controls": null, "cube_resolution": 512, "diffuse_coefficient": 0.8, "displayscale": 1.0, "eye_separation": 6.4, "height": 500, "layout": "IPY_MODEL_3ba63313ec8a40368a6d5009b68f818e", "matrix_projection": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "matrix_world": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "meshes": ["IPY_MODEL_f4a6932d2b474e3f915ad8d9d6574661"], "mouse_mode": "normal", "panorama_mode": "no", "pixel_ratio": null, "render_continuous": false, "scales": {"x": "IPY_MODEL_c1b8c308a64a4b22bd48cbe52948476d", "y": "IPY_MODEL_0025e854fc1e4b10b6a2c54fd50c3b69", "z": "IPY_MODEL_e7b6e912b5e8492ea5788a0baed5030a"}, "scatters": [], "scene": "IPY_MODEL_b0b3555627b64613983d6ebd05cfc452", "selection_mode": "replace", "selector": "lasso", "show": "Volume", "specular_coefficient": 0.5, "specular_exponent": 5.0, "stereo": false, "style": {"axes": {"visible": true, "label": {"color": "black"}, "ticklabel": {"color": "black"}, "color": "black"}, "box": {"visible": true}, "background-color": "white"}, "volumes": [], "width": 400, "xlabel": "x", "ylabel": "y", "zlabel": "z"}}, "efadcc55e22d4ed19262f79397a9933e": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "36b297f8b8704795822c2204584159a1": {"model_name": "VBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "VBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "VBoxView", "box_style": "", "children": ["IPY_MODEL_7a0bf7c79cd44b1e9cec148da478e7d4"], "layout": "IPY_MODEL_efadcc55e22d4ed19262f79397a9933e"}}, "3f606a8d55004f97ba574a010cd07492": {"model_name": "ShaderMaterialModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "ShaderMaterialModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "alphaTest": 0.0, "blendDst": "OneMinusSrcAlphaFactor", "blendDstAlpha": 0.0, "blendEquation": "AddEquation", "blendEquationAlpha": 0.0, "blendSrc": "SrcAlphaFactor", "blendSrcAlpha": 0.0, "blending": "NormalBlending", "clipIntersection": false, "clipShadows": false, "clipping": false, "clippingPlanes": [], "colorWrite": true, "defines": null, "depthFunc": "LessEqualDepth", "depthTest": true, "depthWrite": true, "dithering": false, "extensions": {}, "flatShading": false, "fog": false, "fragmentShader": "", "lights": false, "linewidth": 1.0, "morphNormals": false, "morphTargets": false, "name": "", "opacity": 1.0, "overdraw": 0.0, "polygonOffset": false, "polygonOffsetFactor": 0.0, "polygonOffsetUnits": 0.0, "precision": null, "premultipliedAlpha": false, "shadowSide": null, "side": "FrontSide", "skinning": false, "transparent": false, "type": "ShaderMaterial", "uniforms": {}, "uniformsNeedUpdate": false, "vertexColors": "NoColors", "vertexShader": "", "visible": true, "wireframe": false, "wireframeLinewidth": 1.0}}, "daa5e38c47ba49058c85f489fa917ee7": {"model_name": "ShaderMaterialModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "ShaderMaterialModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "alphaTest": 0.0, "blendDst": "OneMinusSrcAlphaFactor", "blendDstAlpha": 0.0, "blendEquation": "AddEquation", "blendEquationAlpha": 0.0, "blendSrc": "SrcAlphaFactor", "blendSrcAlpha": 0.0, "blending": "NormalBlending", "clipIntersection": false, "clipShadows": false, "clipping": false, "clippingPlanes": [], "colorWrite": true, "defines": null, "depthFunc": "LessEqualDepth", "depthTest": true, "depthWrite": true, "dithering": false, "extensions": {}, "flatShading": false, "fog": false, "fragmentShader": "", "lights": false, "linewidth": 1.0, "morphNormals": false, "morphTargets": false, "name": "", "opacity": 1.0, "overdraw": 0.0, "polygonOffset": false, "polygonOffsetFactor": 0.0, "polygonOffsetUnits": 0.0, "precision": null, "premultipliedAlpha": false, "shadowSide": null, "side": "DoubleSide", "skinning": false, "transparent": false, "type": "ShaderMaterial", "uniforms": {}, "uniformsNeedUpdate": false, "vertexColors": "NoColors", "vertexShader": "", "visible": true, "wireframe": false, "wireframeLinewidth": 1.0}}, "f4a6932d2b474e3f915ad8d9d6574661": {"model_name": "MeshModel", "model_module": "ipyvolume", "model_module_version": "~0.6.0-alpha.5", "state": {"_model_module": "ipyvolume", "_model_module_version": "~0.6.0-alpha.5", "_model_name": "MeshModel", "_view_count": null, "_view_module": "ipyvolume", "_view_module_version": "~0.6.0-alpha.5", "_view_name": "MeshView", "color": [{"dtype": "float32", "shape": [78, 4]}], "color_scale": null, "line_material": "IPY_MODEL_3f606a8d55004f97ba574a010cd07492", "lines": [{"dtype": "uint32", "shape": [218, 2]}], "material": "IPY_MODEL_daa5e38c47ba49058c85f489fa917ee7", "sequence_index": 0, "texture": null, "triangles": null, "u": null, "v": null, "visible": true, "x": [{"dtype": "float32", "shape": [78]}], "y": [{"dtype": "float32", "shape": [78]}], "z": [{"dtype": "float32", "shape": [78]}]}, "buffers": [{"data": "fxJPPhEcNz9IwfM+AACAP1GhOj7KNNo+a58OPwAAgD/GNEM+TWrQPtlbDj8AAIA/KA0FPsRADz/2Rg0/AACAP9EFVT7K/Dc/aRzyPgAAgD8oDQU+xEAPP/ZGDT8AAIA/MGhhPvW6OT8tte4+AACAP0KZBj+rX1U/YoWTPgAAgD95W/k+A+1SP4ronz4AAIA/ho9IPjJ2yj6RJg4/AACAP4aPSD4ydso+kSYOPwAAgD8woQI+kiMRPz3xDD8AAIA/MGhhPvW6OT8tte4+AACAP+V8AT4BFRI/YcIMPwAAgD/RIls+d9w4P9dt8D4AAIA/UkT+PmGNUz9y3Zw+AACAP3anCz+5iVY/2h6NPgAAgD9kAj4+z07WPl2HDj8AAIA/UaE6Pso02j5rnw4/AACAP38STz4RHDc/SMHzPgAAgD91sS0/Mh5dPxMNQj4AAIA/2zNLPx10YT8uxfU9AACAPwezXT9kzmM/AoPEPQAAgD+ARX4/6PlnP/VjEz4AAIA/SBVtP2u3ZT8tI9U9AACAP0HUVT/M0mI/ETjSPQAAgD+Lazg/Qs9eP2eBJj4AAIA/DohQPwsmYj+c/eE9AACAP6jiYj+fcmQ/clPDPQAAgD91sS0/Mh5dPxMNQj4AAIA/dbEtPzIeXT8TDUI+AACAPw6IUD8LJmI/nP3hPQAAgD9B1FU/zNJiPxE40j0AAIA/dbEtPzIeXT8TDUI+AACAP1WHSD/SGGE/K2oAPgAAgD+iXjA/AI5dP0McOz4AAIA/kBPmPhpTUD90t6s+AACAP6Wk7z7PpFE/EeOlPgAAgD91sS0/Mh5dPxMNQj4AAIA/fxJPPhEcNz9IwfM+AACAPzBoYT71ujk/LbXuPgAAgD/idDI+z9zjPnXLDj8AAIA/ZJYdPskhLj9rEQE/AACAPxr9OD4VjzM/6fP5PgAAgD+NfA4+56cIPwIoDj8AAIA/SiYXPu8AAz/Dmg4/AACAP38STz4RHDc/SMHzPgAAgD9RoTo+yjTaPmufDj8AAIA/mRFOPmVwxD425g0/AACAP9UGdz7izJc+XioKPwAAgD+xGZA+96+sPZGY0D4AAIA/9rOQPuhOED6rP+o+AACAP/M7bT7K3qI+PnoLPwAAgD8nwkY+EHTMPoI5Dj8AAIA/bouKPuc0Wz4pzgE/AACAP1Mkjz6BsS4+K8L1PgAAgD9RoTo+yjTaPmufDj8AAIA/guSNPmmsPT7p0/o+AACAP5TZkD5J2Nc95pLaPgAAgD/AtIg+E7afOxWpqD4AAIA/JXqJPkpeHTwWvas+AACAP7K9jj7Bi349Y+/FPgAAgD996Io+aF2jPD7NsT4AAIA/LNaQPp0uCz6VJ+g+AACAP7EZkD73r6w9kZjQPgAAgD9xkYs+f2nRPJvItD4AAIA/guSNPmmsPT7p0/o+AACAP4LkjT5prD0+6dP6PgAAgD/Q7pA+VwkGPusC5j4AAIA/sRmQPvevrD2RmNA+AACAPyx9iD6EvWk+YKwDPwAAgD+QaYU+H9l8Pg7YBT8AAIA/WFiQPs+itz0PKNM+AACAP35TkD6NgBo+kEnuPgAAgD/FA4I+X8+HPvesBz8AAIA/1v6GPopVcz6WzQQ/AACAP4LkjT5prD0+6dP6PgAAgD9JMAU+GsEmPxqIBT8AAIA/", "encoding": "base64", "path": ["color", 0, "data"]}, {"data": "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", "encoding": "base64", "path": ["lines", 0, "data"]}, {"data": "7fZMwe32TMElG/bA3d3EwOzm98BIYlfAzVKwvxdpWsDjl8zAHA6kv8ltgT9dp0NAYEZ9PxpEvkBzOu1ADgG8QDIXOUCXke9A7fZMQe32TEHt9kzB/EP+wOFmyr/qhWPAxoHcwHLYRz9ZIuVAuymvQF84GEDt9kxB7fZMwYV1+8CtRQrALyi2wC3UD78JqNZAHm+hQEIAgz/t9kxB7fZMwa5WysDl5q3AlRV/vyLZ1UC3y6lAO5byP+32TEHt9kzBWADnwBnFrb/T1kPA9rXRwJY/3z4SHORAx+27QFg/P0Dt9kxB7fZMwWPS9cDhCae/U99QwENfycDM7JM/4brtQK0cwUClYURA7fZMQe32TMH6jvbAYAepv1C0VsDIZsTA81OHP6dZ70CU+b5Ah4lEQO32TEECu5DA", "encoding": "base64", "path": ["x", 0, "data"]}, {"data": "h6HuQIeh7kDQIgJBOSASQW8GCEGdWRpBQ64WQYui/UA4me9ANWwPQVY3D0HL7BhBjL0UQX4SD0ExnAFB7ynUQC3t6UBMegFBh6HuQIeh7kA5sEVA15KQQGthq0Bj1DJAulEyQBzcoEDscWVA48wyP2O2ij85sEVAObBFwFPiAsDM2v2/MNhfwByiEsBG+SrABb2mwOhPpcA5sEXAh6HuwFtKzsA8yfTAkFrjwKWb48DWRvvAHl0BwYeh7sCHoe7A/ujqwHgr9cBVG6fABQeZwN8b88B7XenAyC6owGf9r8CHoe7AObBFwHwCP8AsexvA0ZVqPysbPz9DDBjAVMI0wL6WTT9SlWo/ObBFwDmwRUDEqF5A8AiIQD0K20BOeM5AmwKIQI0oZ0B4wdBAi9XeQDmwRUDtF+PA", "encoding": "base64", "path": ["y", 0, "data"]}, {"data": "ObBFQDmwRcD1P17A17WNvqgRTUCRbpS+WnBUQJzvyEBAXL1AZepuwA+ObMCHso29QVhWQGu0sbxsF1FAnPy/QOxJzUAVm1DAObBFwDmwRUCHoe5AGhwFQYwSDUG3PB5BZDIVQRPGCUEnW/dAAIcGQYVvEEGHoe5Ah6HuQCkpB0G/9wlBVJXtQMzgA0HF3e5A1xWzQDvTt0CHoe5AObBFQBQuVUAQUSvA5IAXQFQ+M0ATk0u/fpievzmwRUA5sEXAE4t6wP7gs8Dc7BDBMmwCwQvdpcC6RGrA4pDgwAJ698A5sEXAh6HuwAnkC8HipiLBrBIhwVXOFcFzbx7BKf4DwcSyEMGozhzBh6HuwIeh7sC5oATBz04QwcZW2MD/+szAexwPwUeFAMFU7MTALwHSwIeh7sA1tdU/", "encoding": "base64", "path": ["z", 0, "data"]}]}, "68493582563d4c1985baae3b0c3de8b9": {"model_name": "PerspectiveCameraModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "PerspectiveCameraModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "aspect": 1.0, "castShadow": false, "children": [], "far": 2000.0, "focus": 10.0, "fov": 45.0, "frustumCulled": true, "matrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixAutoUpdate": true, "matrixWorld": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixWorldInverse": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixWorldNeedsUpdate": false, "modelViewMatrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "name": "", "near": 0.1, "normalMatrix": [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0], "position": [0.0, 0.0, 2.0], "projectionMatrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "quaternion": [0.0, 0.0, 0.0, 1.0], "receiveShadow": false, "renderOrder": 0, "rotation": [0.0, 0.0, 0.0, "XYZ"], "scale": [1.0, 1.0, 1.0], "type": "PerspectiveCamera", "up": [0.0, 1.0, 0.0], "visible": true, "zoom": 1.0}}, "6098c157671e413290101e046967c8cd": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "ced4bf6b52c341748205dca2592fb430": {"model_name": "LinearScaleModel", "model_module": "bqplot", "model_module_version": "^0.5.23", "state": {"_model_module": "bqplot", "_model_module_version": "^0.5.23", "_model_name": "LinearScaleModel", "_view_count": null, "_view_module": "bqplot", "_view_module_version": "^0.5.23", "_view_name": "LinearScale", "allow_padding": true, "max": 12.810284347345132, "mid_range": 0.8, "min": -12.810284347345132, "min_range": 0.6, "reverse": false, "stabilized": false}}, "cd0fe1170ac74acebf9f379199715182": {"model_name": "LinearScaleModel", "model_module": "bqplot", "model_module_version": "^0.5.23", "state": {"_model_module": "bqplot", "_model_module_version": "^0.5.23", "_model_name": "LinearScaleModel", "_view_count": null, "_view_module": "bqplot", "_view_module_version": "^0.5.23", "_view_name": "LinearScale", "allow_padding": true, "max": 12.810284347345132, "mid_range": 0.8, "min": -12.810284347345132, "min_range": 0.6, "reverse": false, "stabilized": false}}, "13d1073a6fad4c40afcbbb4b97584722": {"model_name": "LinearScaleModel", "model_module": "bqplot", "model_module_version": "^0.5.23", "state": {"_model_module": "bqplot", "_model_module_version": "^0.5.23", "_model_name": "LinearScaleModel", "_view_count": null, "_view_module": "bqplot", "_view_module_version": "^0.5.23", "_view_name": "LinearScale", "allow_padding": true, "max": 12.810284347345132, "mid_range": 0.8, "min": -12.810284347345132, "min_range": 0.6, "reverse": false, "stabilized": false}}, "798bfbb6f2904a179628bff8fa6f4797": {"model_name": "SceneModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "SceneModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "autoUpdate": true, "background": null, "castShadow": false, "children": [], "fog": null, "frustumCulled": true, "matrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixAutoUpdate": true, "matrixWorld": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "matrixWorldNeedsUpdate": false, "modelViewMatrix": [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0], "name": "", "normalMatrix": [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0], "overrideMaterial": null, "position": [0.0, 0.0, 0.0], "quaternion": [0.0, 0.0, 0.0, 1.0], "receiveShadow": false, "renderOrder": 0, "rotation": [0.0, 0.0, 0.0, "XYZ"], "scale": [1.0, 1.0, 1.0], "type": "Scene", "up": [0.0, 1.0, 0.0], "visible": true}}, "8b64ecba3e6a434dbc3048d1ac63b667": {"model_name": "FigureModel", "model_module": "ipyvolume", "model_module_version": "~0.6.0-alpha.5", "state": {"_dom_classes": [], "_model_module": "ipyvolume", "_model_module_version": "~0.6.0-alpha.5", "_model_name": "FigureModel", "_view_count": null, "_view_module": "ipyvolume", "_view_module_version": "~0.6.0-alpha.5", "_view_name": "FigureView", "ambient_coefficient": 0.5, "animation": 0.0, "animation_exponent": 1.0, "camera": "IPY_MODEL_68493582563d4c1985baae3b0c3de8b9", "camera_center": [0.0, 0.0, 0.0], "camera_control": "trackball", "camera_fov": 45.0, "capture_fps": null, "controls": null, "cube_resolution": 512, "diffuse_coefficient": 0.8, "displayscale": 1.0, "eye_separation": 6.4, "height": 500, "layout": "IPY_MODEL_6098c157671e413290101e046967c8cd", "matrix_projection": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "matrix_world": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "meshes": ["IPY_MODEL_e6b98e0891c040b4912a6ca1f4e3e854"], "mouse_mode": "normal", "panorama_mode": "no", "pixel_ratio": null, "render_continuous": false, "scales": {"x": "IPY_MODEL_ced4bf6b52c341748205dca2592fb430", "y": "IPY_MODEL_cd0fe1170ac74acebf9f379199715182", "z": "IPY_MODEL_13d1073a6fad4c40afcbbb4b97584722"}, "scatters": [], "scene": "IPY_MODEL_798bfbb6f2904a179628bff8fa6f4797", "selection_mode": "replace", "selector": "lasso", "show": "Volume", "specular_coefficient": 0.5, "specular_exponent": 5.0, "stereo": false, "style": {"axes": {"visible": true, "label": {"color": "black"}, "ticklabel": {"color": "black"}, "color": "black"}, "box": {"visible": true}, "background-color": "white"}, "volumes": [], "width": 400, "xlabel": "x", "ylabel": "y", "zlabel": "z"}}, "21515111e70c4b9398f46d7475f18e2c": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "6602cd9c0ebb43c39f8021a8dce65059": {"model_name": "VBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "VBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "VBoxView", "box_style": "", "children": ["IPY_MODEL_8b64ecba3e6a434dbc3048d1ac63b667"], "layout": "IPY_MODEL_21515111e70c4b9398f46d7475f18e2c"}}, "acdbe2eccfdc470b92d9badf2c24b317": {"model_name": "ShaderMaterialModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "ShaderMaterialModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "alphaTest": 0.0, "blendDst": "OneMinusSrcAlphaFactor", "blendDstAlpha": 0.0, "blendEquation": "AddEquation", "blendEquationAlpha": 0.0, "blendSrc": "SrcAlphaFactor", "blendSrcAlpha": 0.0, "blending": "NormalBlending", "clipIntersection": false, "clipShadows": false, "clipping": false, "clippingPlanes": [], "colorWrite": true, "defines": null, "depthFunc": "LessEqualDepth", "depthTest": true, "depthWrite": true, "dithering": false, "extensions": {}, "flatShading": false, "fog": false, "fragmentShader": "", "lights": false, "linewidth": 1.0, "morphNormals": false, "morphTargets": false, "name": "", "opacity": 1.0, "overdraw": 0.0, "polygonOffset": false, "polygonOffsetFactor": 0.0, "polygonOffsetUnits": 0.0, "precision": null, "premultipliedAlpha": false, "shadowSide": null, "side": "FrontSide", "skinning": false, "transparent": false, "type": "ShaderMaterial", "uniforms": {}, "uniformsNeedUpdate": false, "vertexColors": "NoColors", "vertexShader": "", "visible": true, "wireframe": false, "wireframeLinewidth": 1.0}}, "200a7bd4a2204a1fb23f3a89111f152f": {"model_name": "ShaderMaterialModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "ShaderMaterialModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "alphaTest": 0.0, "blendDst": "OneMinusSrcAlphaFactor", "blendDstAlpha": 0.0, "blendEquation": "AddEquation", "blendEquationAlpha": 0.0, "blendSrc": "SrcAlphaFactor", "blendSrcAlpha": 0.0, "blending": "NormalBlending", "clipIntersection": false, "clipShadows": false, "clipping": false, "clippingPlanes": [], "colorWrite": true, "defines": null, "depthFunc": "LessEqualDepth", "depthTest": true, "depthWrite": true, "dithering": false, "extensions": {}, "flatShading": false, "fog": false, "fragmentShader": "", "lights": false, "linewidth": 1.0, "morphNormals": false, "morphTargets": false, "name": "", "opacity": 1.0, "overdraw": 0.0, "polygonOffset": false, "polygonOffsetFactor": 0.0, "polygonOffsetUnits": 0.0, "precision": null, "premultipliedAlpha": false, "shadowSide": null, "side": "DoubleSide", "skinning": false, "transparent": false, "type": "ShaderMaterial", "uniforms": {}, "uniformsNeedUpdate": false, "vertexColors": "NoColors", "vertexShader": "", "visible": true, "wireframe": false, "wireframeLinewidth": 1.0}}, "e6b98e0891c040b4912a6ca1f4e3e854": {"model_name": "MeshModel", "model_module": "ipyvolume", "model_module_version": "~0.6.0-alpha.5", "state": {"_model_module": "ipyvolume", "_model_module_version": "~0.6.0-alpha.5", "_model_name": "MeshModel", "_view_count": null, "_view_module": "ipyvolume", "_view_module_version": "~0.6.0-alpha.5", "_view_name": "MeshView", "color": [{"dtype": "float32", "shape": [80, 4]}], "color_scale": null, "line_material": "IPY_MODEL_acdbe2eccfdc470b92d9badf2c24b317", "lines": [{"dtype": "uint32", "shape": [224, 2]}], "material": "IPY_MODEL_200a7bd4a2204a1fb23f3a89111f152f", "sequence_index": 0, "texture": null, "triangles": null, "u": null, "v": null, "visible": true, "x": [{"dtype": "float32", "shape": [80]}], "y": [{"dtype": "float32", "shape": [80]}], "z": [{"dtype": "float32", "shape": [80]}]}, "buffers": [{"data": "gEV+P+j5Zz/1YxM+AACAP4BFfj/o+Wc/9WMTPgAAgD9RoTo+yjTaPmufDj8AAIA/wLSIPhO2nzsVqag+AACAP1GhOj7KNNo+a58OPwAAgD9xx4s+sW1RPspwAD8AAIA/V9GPPv6ZoT0R/s0+AACAP3HHiz6xbVE+ynAAPwAAgD/AtIg+E7afOxWpqD4AAIA/V9GPPv6ZoT0R/s0+AACAP1fRjz7+maE9Ef7NPgAAgD9xx4s+sW1RPspwAD8AAIA/V9GPPv6ZoT0R/s0+AACAP8C0iD4Ttp87FamoPgAAgD9RoTo+yjTaPmufDj8AAIA/wLSIPhO2nzsVqag+AACAP3HHiz6xbVE+ynAAPwAAgD9RoTo+yjTaPmufDj8AAIA/gEV+P+j5Zz/1YxM+AACAP4BFfj/o+Wc/9WMTPgAAgD+ARX4/6PlnP/VjEz4AAIA/UaE6Pso02j5rnw4/AACAP1fRjz7+maE9Ef7NPgAAgD9xx4s+sW1RPspwAD8AAIA/wLSIPhO2nzsVqag+AACAP1fRjz7+maE9Ef7NPgAAgD9RoTo+yjTaPmufDj8AAIA/wLSIPhO2nzsVqag+AACAP3HHiz6xbVE+ynAAPwAAgD+ARX4/6PlnP/VjEz4AAIA/gEV+P+j5Zz/1YxM+AACAP1GhOj7KNNo+a58OPwAAgD9X0Y8+/pmhPRH+zT4AAIA/cceLPrFtUT7KcAA/AACAP8C0iD4Ttp87FamoPgAAgD9X0Y8+/pmhPRH+zT4AAIA/UaE6Pso02j5rnw4/AACAP8C0iD4Ttp87FamoPgAAgD9xx4s+sW1RPspwAD8AAIA/gEV+P+j5Zz/1YxM+AACAP4BFfj/o+Wc/9WMTPgAAgD9RoTo+yjTaPmufDj8AAIA/V9GPPv6ZoT0R/s0+AACAP3HHiz6xbVE+ynAAPwAAgD/AtIg+E7afOxWpqD4AAIA/V9GPPv6ZoT0R/s0+AACAP1GhOj7KNNo+a58OPwAAgD/AtIg+E7afOxWpqD4AAIA/cceLPrFtUT7KcAA/AACAP4BFfj/o+Wc/9WMTPgAAgD+ARX4/6PlnP/VjEz4AAIA/UaE6Pso02j5rnw4/AACAP1fRjz7+maE9Ef7NPgAAgD9xx4s+sW1RPspwAD8AAIA/wLSIPhO2nzsVqag+AACAP1fRjz7+maE9Ef7NPgAAgD9RoTo+yjTaPmufDj8AAIA/wLSIPhO2nzsVqag+AACAP3HHiz6xbVE+ynAAPwAAgD+ARX4/6PlnP/VjEz4AAIA/gEV+P+j5Zz/1YxM+AACAP1GhOj7KNNo+a58OPwAAgD9X0Y8+/pmhPRH+zT4AAIA/cceLPrFtUT7KcAA/AACAP8C0iD4Ttp87FamoPgAAgD9X0Y8+/pmhPRH+zT4AAIA/UaE6Pso02j5rnw4/AACAP8C0iD4Ttp87FamoPgAAgD9xx4s+sW1RPspwAD8AAIA/gEV+P+j5Zz/1YxM+AACAP4BFfj/o+Wc/9WMTPgAAgD9RoTo+yjTaPmufDj8AAIA/V9GPPv6ZoT0R/s0+AACAP3HHiz6xbVE+ynAAPwAAgD/AtIg+E7afOxWpqD4AAIA/V9GPPv6ZoT0R/s0+AACAP1GhOj7KNNo+a58OPwAAgD/AtIg+E7afOxWpqD4AAIA/cceLPrFtUT7KcAA/AACAP4BFfj/o+Wc/9WMTPgAAgD8=", "encoding": "base64", "path": ["color", 0, "data"]}, {"data": "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", "encoding": "base64", "path": ["lines", 0, "data"]}, {"data": "h6HuQIeh7kCgZPtAtKgMQZ8q/UBxkxhBsfsNQQwJ2ECGU8hAJgAOQbH7DUFxkxhBJgAOQbSoDEGgZPtAeYTFQL6D10CfKv1Ah6HuQIeh7kA5sEVA3kZVQAMta0CLhTw8Xzl+PQdYa0DJtkxAXzl+vYuFPLw5sEVAObBFwMm2TMAHWGvAvoPXwHmExcADLWvA3kZVwIZTyMAMCdjAObBFwIeh7sCgZPvAJgAOwXGTGMG0qAzBsfsNwZ8q/cC0qAzBcZMYwYeh7sCHoe7Anyr9wLH7DcEMCdjAhlPIwCYADsGgZPvAeYTFwL6D18CHoe7AObBFwN5GVcADLWvAi4U8vF85fr0HWGvAybZMwF85fj2LhTw8ObBFwDmwRUDJtkxAB1hrQL6D10B5hMVAAy1rQN5GVUCGU8hADAnYQDmwRUA=", "encoding": "base64", "path": ["x", 0, "data"]}, {"data": "ObBFQDmwRcDeRlXAXzl+vcm2TECLhTy8B1hrQL6D10B5hMVAAy1rwAdYa8CLhTw8Ay1rQF85fj3eRlVAhlPIQAwJ2EDJtkzAObBFwDmwRUCHoe5AoGT7QCYADkFxkxhBtKgMQbH7DUGfKv1AtKgMQXGTGEGHoe5Ah6HuQJ8q/UCx+w1BDAnYQIZTyEAmAA5BoGT7QHmExUC+g9dAh6HuQDmwRUDeRlVAAy1rQIuFPDxfOX49B1hrQMm2TEBfOX69i4U8vDmwRUA5sEXAybZMwAdYa8C+g9fAeYTFwAMta8DeRlXAhlPIwAwJ2MA5sEXAh6HuwKBk+8AmAA7BcZMYwbSoDMGx+w3Bnyr9wLSoDMFxkxjBh6HuwIeh7sCfKv3AsfsNwQwJ2MCGU8jAJgAOwaBk+8B5hMXAvoPXwIeh7sA=", "encoding": "base64", "path": ["y", 0, "data"]}, {"data": "7fZMwe32TMH5GPPAHka+wPkY88BOBUzAxWyMv04FTMAeRr7AxWyMv8VsjD9OBUxAxWyMPx5GvkD5GPNAHka+QE4FTED5GPNA7fZMQe32TEHt9kzB+RjzwMVsjL9OBUzAHka+wMVsjD/5GPNAHka+QE4FTEDt9kxB7fZMwfkY88DFbIy/TgVMwB5GvsDFbIw/+RjzQB5GvkBOBUxA7fZMQe32TMH5GPPAxWyMv04FTMAeRr7AxWyMP/kY80AeRr5ATgVMQO32TEHt9kzB+RjzwMVsjL9OBUzAHka+wMVsjD/5GPNAHka+QE4FTEDt9kxB7fZMwfkY88DFbIy/TgVMwB5GvsDFbIw/+RjzQB5GvkBOBUxA7fZMQe32TMH5GPPAxWyMv04FTMAeRr7AxWyMP/kY80AeRr5ATgVMQO32TEE=", "encoding": "base64", "path": ["z", 0, "data"]}]}, "0957e7bf6e5b432494513f53e9106e39": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "47e509969c7a4b8bb2496f32260bb551": {"model_name": "VBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": ["widget-interact"], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "VBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "VBoxView", "box_style": "", "children": ["IPY_MODEL_0e091b7775d74057824b5cfb2372e660", "IPY_MODEL_82d847a9789949c7b962792e2982b5e3"], "layout": "IPY_MODEL_0957e7bf6e5b432494513f53e9106e39"}}, "2865e7f45e434ef08f763cbaca05eba6": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "3da2c8eb04584952b2935cf47f3d1fd9": {"model_name": "SliderStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "SliderStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": "", "handle_color": null}}, "0e091b7775d74057824b5cfb2372e660": {"model_name": "IntSliderModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "IntSliderModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "IntSliderView", "continuous_update": true, "description": "i", "description_tooltip": null, "disabled": false, "layout": "IPY_MODEL_2865e7f45e434ef08f763cbaca05eba6", "max": 17, "min": 0, "orientation": "horizontal", "readout": true, "readout_format": "d", "step": 1, "style": "IPY_MODEL_3da2c8eb04584952b2935cf47f3d1fd9", "value": 0}}, "5852803709314f37867210c32346764e": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "82d847a9789949c7b962792e2982b5e3": {"model_name": "OutputModel", "model_module": "@jupyter-widgets/output", "model_module_version": "1.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/output", "_model_module_version": "1.0.0", "_model_name": "OutputModel", "_view_count": null, "_view_module": "@jupyter-widgets/output", "_view_module_version": "1.0.0", "_view_name": "OutputView", "layout": "IPY_MODEL_5852803709314f37867210c32346764e", "msg_id": "", "outputs": []}}, "72d23c16935a40499b9be1dcf8115693": {"model_name": "ShaderMaterialModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "ShaderMaterialModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "alphaTest": 0.0, "blendDst": "OneMinusSrcAlphaFactor", "blendDstAlpha": 0.0, "blendEquation": "AddEquation", "blendEquationAlpha": 0.0, "blendSrc": "SrcAlphaFactor", "blendSrcAlpha": 0.0, "blending": "NormalBlending", "clipIntersection": false, "clipShadows": false, "clipping": false, "clippingPlanes": [], "colorWrite": true, "defines": null, "depthFunc": "LessEqualDepth", "depthTest": true, "depthWrite": true, "dithering": false, "extensions": {}, "flatShading": false, "fog": false, "fragmentShader": "", "lights": false, "linewidth": 1.0, "morphNormals": false, "morphTargets": false, "name": "", "opacity": 1.0, "overdraw": 0.0, "polygonOffset": false, "polygonOffsetFactor": 0.0, "polygonOffsetUnits": 0.0, "precision": null, "premultipliedAlpha": false, "shadowSide": null, "side": "FrontSide", "skinning": false, "transparent": false, "type": "ShaderMaterial", "uniforms": {}, "uniformsNeedUpdate": false, "vertexColors": "NoColors", "vertexShader": "", "visible": true, "wireframe": false, "wireframeLinewidth": 1.0}}, "ec72c9b94cb6497888a100482e48eb62": {"model_name": "ShaderMaterialModel", "model_module": "jupyter-threejs", "model_module_version": "^2.1.0", "state": {"_model_module": "jupyter-threejs", "_model_module_version": "^2.1.0", "_model_name": "ShaderMaterialModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "alphaTest": 0.0, "blendDst": "OneMinusSrcAlphaFactor", "blendDstAlpha": 0.0, "blendEquation": "AddEquation", "blendEquationAlpha": 0.0, "blendSrc": "SrcAlphaFactor", "blendSrcAlpha": 0.0, "blending": "NormalBlending", "clipIntersection": false, "clipShadows": false, "clipping": false, "clippingPlanes": [], "colorWrite": true, "defines": null, "depthFunc": "LessEqualDepth", "depthTest": true, "depthWrite": true, "dithering": false, "extensions": {}, "flatShading": false, "fog": false, "fragmentShader": "", "lights": false, "linewidth": 1.0, "morphNormals": false, "morphTargets": false, "name": "", "opacity": 1.0, "overdraw": 0.0, "polygonOffset": false, "polygonOffsetFactor": 0.0, "polygonOffsetUnits": 0.0, "precision": null, "premultipliedAlpha": false, "shadowSide": null, "side": "DoubleSide", "skinning": false, "transparent": false, "type": "ShaderMaterial", "uniforms": {}, "uniformsNeedUpdate": false, "vertexColors": "NoColors", "vertexShader": "", "visible": true, "wireframe": false, "wireframeLinewidth": 1.0}}, "2c79ca21b9df4524ae7a8415dc296420": {"model_name": "MeshModel", "model_module": "ipyvolume", "model_module_version": "~0.6.0-alpha.5", "state": {"_model_module": "ipyvolume", "_model_module_version": "~0.6.0-alpha.5", "_model_name": "MeshModel", "_view_count": null, "_view_module": "ipyvolume", "_view_module_version": "~0.6.0-alpha.5", "_view_name": "MeshView", "color": [{"dtype": "float32", "shape": [80, 4]}], "color_scale": null, "line_material": "IPY_MODEL_72d23c16935a40499b9be1dcf8115693", "lines": [{"dtype": "uint32", "shape": [224, 2]}], "material": "IPY_MODEL_ec72c9b94cb6497888a100482e48eb62", "sequence_index": 0, "texture": null, "triangles": null, "u": null, "v": null, "visible": true, "x": [{"dtype": "float32", "shape": [80]}], "y": [{"dtype": "float32", "shape": [80]}], "z": [{"dtype": "float32", "shape": [80]}]}, "buffers": [{"data": "gEV+P+j5Zz/1YxM+AACAP4BFfj/o+Wc/9WMTPgAAgD9RoTo+yjTaPmufDj8AAIA/wLSIPhO2nzsVqag+AACAP1GhOj7KNNo+a58OPwAAgD9xx4s+sW1RPspwAD8AAIA/V9GPPv6ZoT0R/s0+AACAP3HHiz6xbVE+ynAAPwAAgD/AtIg+E7afOxWpqD4AAIA/V9GPPv6ZoT0R/s0+AACAP1fRjz7+maE9Ef7NPgAAgD9xx4s+sW1RPspwAD8AAIA/V9GPPv6ZoT0R/s0+AACAP8C0iD4Ttp87FamoPgAAgD9RoTo+yjTaPmufDj8AAIA/wLSIPhO2nzsVqag+AACAP3HHiz6xbVE+ynAAPwAAgD9RoTo+yjTaPmufDj8AAIA/gEV+P+j5Zz/1YxM+AACAP4BFfj/o+Wc/9WMTPgAAgD+ARX4/6PlnP/VjEz4AAIA/UaE6Pso02j5rnw4/AACAP1fRjz7+maE9Ef7NPgAAgD9xx4s+sW1RPspwAD8AAIA/wLSIPhO2nzsVqag+AACAP1fRjz7+maE9Ef7NPgAAgD9RoTo+yjTaPmufDj8AAIA/wLSIPhO2nzsVqag+AACAP3HHiz6xbVE+ynAAPwAAgD+ARX4/6PlnP/VjEz4AAIA/gEV+P+j5Zz/1YxM+AACAP1GhOj7KNNo+a58OPwAAgD9X0Y8+/pmhPRH+zT4AAIA/cceLPrFtUT7KcAA/AACAP8C0iD4Ttp87FamoPgAAgD9X0Y8+/pmhPRH+zT4AAIA/UaE6Pso02j5rnw4/AACAP8C0iD4Ttp87FamoPgAAgD9xx4s+sW1RPspwAD8AAIA/gEV+P+j5Zz/1YxM+AACAP4BFfj/o+Wc/9WMTPgAAgD9RoTo+yjTaPmufDj8AAIA/V9GPPv6ZoT0R/s0+AACAP3HHiz6xbVE+ynAAPwAAgD/AtIg+E7afOxWpqD4AAIA/V9GPPv6ZoT0R/s0+AACAP1GhOj7KNNo+a58OPwAAgD/AtIg+E7afOxWpqD4AAIA/cceLPrFtUT7KcAA/AACAP4BFfj/o+Wc/9WMTPgAAgD+ARX4/6PlnP/VjEz4AAIA/UaE6Pso02j5rnw4/AACAP1fRjz7+maE9Ef7NPgAAgD9xx4s+sW1RPspwAD8AAIA/wLSIPhO2nzsVqag+AACAP1fRjz7+maE9Ef7NPgAAgD9RoTo+yjTaPmufDj8AAIA/wLSIPhO2nzsVqag+AACAP3HHiz6xbVE+ynAAPwAAgD+ARX4/6PlnP/VjEz4AAIA/gEV+P+j5Zz/1YxM+AACAP1GhOj7KNNo+a58OPwAAgD9X0Y8+/pmhPRH+zT4AAIA/cceLPrFtUT7KcAA/AACAP8C0iD4Ttp87FamoPgAAgD9X0Y8+/pmhPRH+zT4AAIA/UaE6Pso02j5rnw4/AACAP8C0iD4Ttp87FamoPgAAgD9xx4s+sW1RPspwAD8AAIA/gEV+P+j5Zz/1YxM+AACAP4BFfj/o+Wc/9WMTPgAAgD9RoTo+yjTaPmufDj8AAIA/V9GPPv6ZoT0R/s0+AACAP3HHiz6xbVE+ynAAPwAAgD/AtIg+E7afOxWpqD4AAIA/V9GPPv6ZoT0R/s0+AACAP1GhOj7KNNo+a58OPwAAgD/AtIg+E7afOxWpqD4AAIA/cceLPrFtUT7KcAA/AACAP4BFfj/o+Wc/9WMTPgAAgD8=", "encoding": "base64", "path": ["color", 0, "data"]}, {"data": "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", "encoding": "base64", "path": ["lines", 0, "data"]}, {"data": "h6HuQIeh7kCgZPtAtKgMQZ8q/UBxkxhBsfsNQQwJ2ECGU8hAJgAOQbH7DUFxkxhBJgAOQbSoDEGgZPtAeYTFQL6D10CfKv1Ah6HuQIeh7kA5sEVA3kZVQAMta0CLhTw8Xzl+PQdYa0DJtkxAXzl+vYuFPLw5sEVAObBFwMm2TMAHWGvAvoPXwHmExcADLWvA3kZVwIZTyMAMCdjAObBFwIeh7sCgZPvAJgAOwXGTGMG0qAzBsfsNwZ8q/cC0qAzBcZMYwYeh7sCHoe7Anyr9wLH7DcEMCdjAhlPIwCYADsGgZPvAeYTFwL6D18CHoe7AObBFwN5GVcADLWvAi4U8vF85fr0HWGvAybZMwF85fj2LhTw8ObBFwDmwRUDJtkxAB1hrQL6D10B5hMVAAy1rQN5GVUCGU8hADAnYQDmwRUA=", "encoding": "base64", "path": ["x", 0, "data"]}, {"data": "ObBFQDmwRcDeRlXAXzl+vcm2TECLhTy8B1hrQL6D10B5hMVAAy1rwAdYa8CLhTw8Ay1rQF85fj3eRlVAhlPIQAwJ2EDJtkzAObBFwDmwRUCHoe5AoGT7QCYADkFxkxhBtKgMQbH7DUGfKv1AtKgMQXGTGEGHoe5Ah6HuQJ8q/UCx+w1BDAnYQIZTyEAmAA5BoGT7QHmExUC+g9dAh6HuQDmwRUDeRlVAAy1rQIuFPDxfOX49B1hrQMm2TEBfOX69i4U8vDmwRUA5sEXAybZMwAdYa8C+g9fAeYTFwAMta8DeRlXAhlPIwAwJ2MA5sEXAh6HuwKBk+8AmAA7BcZMYwbSoDMGx+w3Bnyr9wLSoDMFxkxjBh6HuwIeh7sCfKv3AsfsNwQwJ2MCGU8jAJgAOwaBk+8B5hMXAvoPXwIeh7sA=", "encoding": "base64", "path": ["y", 0, "data"]}, {"data": "7fZMwe32TMH5GPPAHka+wPkY88BOBUzAxWyMv04FTMAeRr7AxWyMv8VsjD9OBUxAxWyMPx5GvkD5GPNAHka+QE4FTED5GPNA7fZMQe32TEHt9kzB+RjzwMVsjL9OBUzAHka+wMVsjD/5GPNAHka+QE4FTEDt9kxB7fZMwfkY88DFbIy/TgVMwB5GvsDFbIw/+RjzQB5GvkBOBUxA7fZMQe32TMH5GPPAxWyMv04FTMAeRr7AxWyMP/kY80AeRr5ATgVMQO32TEHt9kzB+RjzwMVsjL9OBUzAHka+wMVsjD/5GPNAHka+QE4FTEDt9kxB7fZMwfkY88DFbIy/TgVMwB5GvsDFbIw/+RjzQB5GvkBOBUxA7fZMQe32TMH5GPPAxWyMv04FTMAeRr7AxWyMP/kY80AeRr5ATgVMQO32TEE=", "encoding": "base64", "path": ["z", 0, "data"]}]}}, "version_major": 2, "version_minor": 0}
+</script>
+
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="A-ReversibleNetworkReconnection.html" title="previous page">Reversible Network Reconnection Model</a>
+    <a class='right-next' id="next-link" href="C-2DMigration.html" title="next page">Packing and influence on cell motility</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

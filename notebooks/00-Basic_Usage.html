@@ -1,0 +1,1139 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Basic Usage of the tyssue library &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Geometry classes" href="01-Geometry.html" />
+    <link rel="prev" title="Welcome to Tyssue’s documentation!" href="../index.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/notebooks/00-Basic_Usage.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/notebooks/00-Basic_Usage.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#easy-creation-of-a-2d-epithelial-sheet">
+   Easy creation of a 2D epithelial sheet
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-remark-on-the-half-edge-data-structure">
+     A remark on the half-edge data structure
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#datasets">
+   Datasets
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#specifications">
+   Specifications
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#input-and-output">
+   Input and Output
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#writing">
+     Writing
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#reading">
+     Reading
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#upcasting-and-downcasting-data">
+   Upcasting and downcasting data
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#upcasting">
+     Upcasting
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#downcasting">
+     Downcasting
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="basic-usage-of-the-tyssue-library">
+<h1>Basic Usage of the <code class="docutils literal notranslate"><span class="pre">tyssue</span></code> library<a class="headerlink" href="#basic-usage-of-the-tyssue-library" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="easy-creation-of-a-2d-epithelial-sheet">
+<h2>Easy creation of a 2D epithelial sheet<a class="headerlink" href="#easy-creation-of-a-2d-epithelial-sheet" title="Permalink to this headline">¶</a></h2>
+<p>In tyssue, an apical junction network is represented as a mesh. The structure of this mesh is stored in three tables (<code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> objects) corresponding to vertices, faces and edges. The structure and data associated with these meshes are detailed bellow.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="c1"># Core object</span>
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">Sheet</span>
+<span class="c1"># Simple 2D geometry</span>
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">PlanarGeometry</span> <span class="k">as</span> <span class="n">geom</span>
+<span class="c1"># Visualisation</span>
+<span class="kn">from</span> <span class="nn">tyssue.draw</span> <span class="kn">import</span> <span class="n">sheet_view</span>
+
+<span class="n">sheet</span> <span class="o">=</span> <span class="n">Sheet</span><span class="o">.</span><span class="n">planar_sheet_2d</span><span class="p">(</span>
+    <span class="s1">&#39;basic2D&#39;</span><span class="p">,</span> <span class="c1"># a name or identifier for this sheet</span>
+    <span class="n">nx</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="c1"># approximate number of cells on the x axis</span>
+    <span class="n">ny</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="c1"># approximate number of cells along the y axis</span>
+    <span class="n">distx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># distance between 2 cells along x</span>
+    <span class="n">disty</span><span class="o">=</span><span class="mi">1</span> <span class="c1"># distance between 2 cells along y</span>
+<span class="p">)</span>
+<span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">sheet_view</span></code> function displays the created object in a matplotlib figure:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/00-Basic_Usage_4_0.png" src="../_images/00-Basic_Usage_4_0.png" />
+</div>
+</div>
+<p>We can have a cleaner, better ordered <code class="docutils literal notranslate"><span class="pre">sheet</span></code> with the <code class="docutils literal notranslate"><span class="pre">sanitize</span></code> method:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Give the tissue a nice hear cut ;)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">sanitize</span><span class="p">(</span><span class="n">trim_borders</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here we pass an option to display the edge directions
+see the visualization tutorial for details</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span>
+    <span class="n">sheet</span><span class="p">,</span> 
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;2D&quot;</span><span class="p">,</span>
+    <span class="n">edge</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;head_width&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/00-Basic_Usage_8_0.png" src="../_images/00-Basic_Usage_8_0.png" />
+</div>
+</div>
+<blockquote>
+<div><p>You can look at the <code class="docutils literal notranslate"><span class="pre">tyssue.generation</span></code> module for more sheet creation utilities.</p>
+</div></blockquote>
+<div class="section" id="a-remark-on-the-half-edge-data-structure">
+<h3>A remark on the half-edge data structure<a class="headerlink" href="#a-remark-on-the-half-edge-data-structure" title="Permalink to this headline">¶</a></h3>
+<p>As is represented in the above graph, each edge between two cells is composed of two half-edges (only one half-edge is present in the border ones). This makes it easier to compute many cell-specific quantities, as well as keeping a well oriented mesh. This is inspired by CGAL <a class="reference external" href="https://doc.cgal.org/4.2/CGAL.CGAL.3D-Polyhedral-Surface/html/index.html">polyhedral surfaces</a>.</p>
+</div>
+</div>
+<div class="section" id="datasets">
+<h2>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<p>The data associated with the mesh displayed above, i.e. the points positions,
+the connectivity information, etc. is stored in pandas <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/dsintro.html#dataframe">DataFrame</a> objects, hold together in the <code class="docutils literal notranslate"><span class="pre">datasets</span></code> dictionnary.</p>
+<p>Depending on the geometry, the following dataframes are populated:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets[&quot;edge&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">sheet.edge_df</span></code>: The edge related dataframe contains  the connectivity information:
+source and target vertices, associated face and (for thick tissues)
+the associated cell body, geometry data associated with the edge, such as its length
+and any suplemental data, such as a color or a dynamical parameter (an elasticity for example)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets[&quot;vert&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">sheet.vert_df</span></code>: The vertices related dataframe. In the apical junction mesh above,
+those are  the vertices at the cells junctions. It usually holds the coordinates of the points,
+and geometry or dynamical data.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets[&quot;face&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">sheet.face_df</span></code>: The faces related dataframe. For a thin, 2D tissue, this corresponds to
+a cell of the epithelium, delimited by its edges. In thick, 3D models, one cell has several faces
+(the apical, sagittal and basal ones for a 3D monolayer, for example).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets[&quot;cell&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">sheet.cell_df</span></code>: The cells related dataframe, only for 3D, thick, epithelium.
+Each cell have several faces.</p>
+<p><img alt="datastructures in " src="../_images/tyssue_data_management.png" /></p>
+</li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">element</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">sheet</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">element</span><span class="si">}</span><span class="s2"> table has shape </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>vert table has shape (48, 3)
+edge table has shape (128, 20)
+face table has shape (25, 7)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>trgt</th>
+      <th>nz</th>
+      <th>length</th>
+      <th>face</th>
+      <th>srce</th>
+      <th>dx</th>
+      <th>dy</th>
+      <th>sx</th>
+      <th>sy</th>
+      <th>tx</th>
+      <th>ty</th>
+      <th>fx</th>
+      <th>fy</th>
+      <th>ux</th>
+      <th>uy</th>
+      <th>rx</th>
+      <th>ry</th>
+      <th>sub_area</th>
+      <th>is_valid</th>
+      <th>phi</th>
+    </tr>
+    <tr>
+      <th>edge</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>30</td>
+      <td>0.28125</td>
+      <td>0.750000</td>
+      <td>0</td>
+      <td>28</td>
+      <td>0.0</td>
+      <td>0.75</td>
+      <td>1.5</td>
+      <td>0.625</td>
+      <td>1.5</td>
+      <td>1.375</td>
+      <td>1.125</td>
+      <td>1.250</td>
+      <td>0.000000</td>
+      <td>1.000000</td>
+      <td>0.375</td>
+      <td>-0.625</td>
+      <td>0.140625</td>
+      <td>True</td>
+      <td>-0.643501</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>9</td>
+      <td>0.15625</td>
+      <td>0.559017</td>
+      <td>0</td>
+      <td>30</td>
+      <td>-0.5</td>
+      <td>0.25</td>
+      <td>1.5</td>
+      <td>1.375</td>
+      <td>1.0</td>
+      <td>1.625</td>
+      <td>1.125</td>
+      <td>1.250</td>
+      <td>-0.894427</td>
+      <td>0.447214</td>
+      <td>0.375</td>
+      <td>0.125</td>
+      <td>0.078125</td>
+      <td>True</td>
+      <td>0.643501</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>5</td>
+      <td>0.21875</td>
+      <td>0.559017</td>
+      <td>0</td>
+      <td>9</td>
+      <td>-0.5</td>
+      <td>-0.25</td>
+      <td>1.0</td>
+      <td>1.625</td>
+      <td>0.5</td>
+      <td>1.375</td>
+      <td>1.125</td>
+      <td>1.250</td>
+      <td>-0.894427</td>
+      <td>-0.447214</td>
+      <td>-0.125</td>
+      <td>0.375</td>
+      <td>0.109375</td>
+      <td>True</td>
+      <td>1.570796</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>28</td>
+      <td>0.34375</td>
+      <td>1.250000</td>
+      <td>0</td>
+      <td>5</td>
+      <td>1.0</td>
+      <td>-0.75</td>
+      <td>0.5</td>
+      <td>1.375</td>
+      <td>1.5</td>
+      <td>0.625</td>
+      <td>1.125</td>
+      <td>1.250</td>
+      <td>1.788854</td>
+      <td>-1.341641</td>
+      <td>-0.625</td>
+      <td>0.125</td>
+      <td>0.171875</td>
+      <td>True</td>
+      <td>1.570796</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>43</td>
+      <td>0.37500</td>
+      <td>0.750000</td>
+      <td>1</td>
+      <td>29</td>
+      <td>0.0</td>
+      <td>0.75</td>
+      <td>2.5</td>
+      <td>0.625</td>
+      <td>2.5</td>
+      <td>1.375</td>
+      <td>2.000</td>
+      <td>1.125</td>
+      <td>0.000000</td>
+      <td>1.000000</td>
+      <td>0.500</td>
+      <td>-0.500</td>
+      <td>0.187500</td>
+      <td>True</td>
+      <td>-0.643501</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">edge_df</span></code> dataframe contains most of the information. In particular, each time the geometry is updated with the <code class="docutils literal notranslate"><span class="pre">geom.update_all(sheet)</span></code> function, the positions of the source and target vertices of each edge are copied to the <code class="docutils literal notranslate"><span class="pre">&quot;sx&quot;,</span> <span class="pre">&quot;sy&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;tx&quot;,</span> <span class="pre">&quot;ty&quot;</span></code> columns, respectively.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>y</th>
+      <th>is_alive</th>
+      <th>perimeter</th>
+      <th>area</th>
+      <th>x</th>
+      <th>num_sides</th>
+      <th>id</th>
+    </tr>
+    <tr>
+      <th>face</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.250000</td>
+      <td>1</td>
+      <td>3.118034</td>
+      <td>0.5000</td>
+      <td>1.125000</td>
+      <td>4</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.125000</td>
+      <td>1</td>
+      <td>3.618034</td>
+      <td>0.8750</td>
+      <td>2.000000</td>
+      <td>5</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.125000</td>
+      <td>1</td>
+      <td>3.618034</td>
+      <td>0.8750</td>
+      <td>3.000000</td>
+      <td>5</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.125000</td>
+      <td>1</td>
+      <td>3.618034</td>
+      <td>0.8750</td>
+      <td>4.000000</td>
+      <td>5</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.208333</td>
+      <td>1</td>
+      <td>2.427051</td>
+      <td>0.1875</td>
+      <td>4.666667</td>
+      <td>3</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We can use all the goodies from pandas DataFrames objects. For example, it is possible to
+compute the average edge length for each face like so:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;face&#39;</span><span class="p">)[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>face
+0    0.779508
+1    0.723607
+2    0.723607
+3    0.723607
+4    0.809017
+Name: length, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="specifications">
+<h2>Specifications<a class="headerlink" href="#specifications" title="Permalink to this headline">¶</a></h2>
+<p><strong>Specifications</strong> are defined as a nested dictionnary, <code class="docutils literal notranslate"><span class="pre">sheet.specs</span></code>. For each element <code class="docutils literal notranslate"><span class="pre">(&quot;vert&quot;,</span> <span class="pre">&quot;edge&quot;,</span> <span class="pre">face&quot;,</span> <span class="pre">&quot;cell&quot;)</span></code>, the specification defines the columns of the corresponding DataFrame and their default values. An extra key at the root of the specification is called <code class="docutils literal notranslate"><span class="pre">&quot;settings&quot;</span></code>, and can hold specific parameters, for example the arguments for an energy minimization procedure. For exemple, consider the following <code class="docutils literal notranslate"><span class="pre">spec</span></code> dictionnary</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;vert&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;active&quot;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;edge&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;tension&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;face&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;area&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;alive&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This defines e.g an  <code class="docutils literal notranslate"><span class="pre">&quot;area&quot;</span></code> column for <code class="docutils literal notranslate"><span class="pre">sheet.face_df</span></code>.</p>
+<p>By calling <code class="docutils literal notranslate"><span class="pre">sheet.update_specs(specs)</span></code> method, those columns will be added to the respective dataframes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">update_specs</span><span class="p">({</span><span class="s2">&quot;edge&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;tension&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}})</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;tension&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>edge
+0    0.0
+1    0.0
+2    0.0
+3    0.0
+4    0.0
+Name: tension, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>Optionaly, you can pass <code class="docutils literal notranslate"><span class="pre">reset=True</span></code> to <code class="docutils literal notranslate"><span class="pre">update_spec</span></code> (a warning is emitted):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">update_specs</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;edge&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;tension&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}},</span>
+    <span class="n">reset</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;tension&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column tension of the edge dataset with new specs
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>edge
+0    1.0
+1    1.0
+2    1.0
+3    1.0
+4    1.0
+Name: tension, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="input-and-output">
+<h2>Input and Output<a class="headerlink" href="#input-and-output" title="Permalink to this headline">¶</a></h2>
+<p>The ‘native’ format is to save the datasets to hdf5 via <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/cookbook.html#hdfstore"><code class="docutils literal notranslate"><span class="pre">pandas.HDFStore</span></code></a>. The <code class="docutils literal notranslate"><span class="pre">io.obj</span></code> also provides functions to export the junction mesh or triangulations to the wavefront <code class="docutils literal notranslate"><span class="pre">OBJ</span></code> format (requires <code class="docutils literal notranslate"><span class="pre">vispy</span></code>), for easy import in 3D software such as Blender.</p>
+<p>Here is the code to save the data in wavefront <code class="docutils literal notranslate"><span class="pre">OBJ</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obj</span><span class="o">.</span><span class="n">save_junction_mesh</span><span class="p">(</span><span class="s1">&#39;junctions.obj&#39;</span><span class="p">,</span> <span class="n">sheet</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The standard data format for the datasets is HDF:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tyssue.io</span> <span class="kn">import</span> <span class="n">hdf5</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="writing">
+<h3>Writing<a class="headerlink" href="#writing" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hdf5</span><span class="o">.</span><span class="n">save_datasets</span><span class="p">(</span><span class="s1">&#39;tmp_data.hdf5&#39;</span><span class="p">,</span> <span class="n">sheet</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="reading">
+<h3>Reading<a class="headerlink" href="#reading" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dsets</span> <span class="o">=</span> <span class="n">hdf5</span><span class="o">.</span><span class="n">load_datasets</span><span class="p">(</span><span class="s1">&#39;tmp_data.hdf5&#39;</span><span class="p">)</span>
+<span class="n">sheet2</span> <span class="o">=</span> <span class="n">Sheet</span><span class="p">(</span><span class="s1">&#39;reloaded&#39;</span><span class="p">,</span> <span class="n">dsets</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>rm tmp_data.hdf5
+</pre></div>
+</div>
+</div>
+</div>
+<p>Specs can be saved as json files:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;tmp_specs.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">jh</span><span class="p">:</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">specs</span><span class="p">,</span> <span class="n">jh</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And reloaded accordingly</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;tmp_specs.json&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">jh</span><span class="p">:</span>
+    <span class="n">specs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">jh</span><span class="p">)</span>
+
+<span class="n">sheet2</span><span class="o">.</span><span class="n">update_specs</span><span class="p">(</span><span class="n">specs</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>rm tmp_specs.json
+</pre></div>
+</div>
+</div>
+</div>
+<blockquote>
+<div><p>This should evolve in the future to have a “single shop stop” for all the data, surely as a <a class="reference external" href="https://zarr.readthedocs.io/en/latest/">zarr</a> data store.
+Also we plan on using <a class="reference external" href="https://github.com/nschloe/meshio">meshio</a> as an I/O interface.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="upcasting-and-downcasting-data">
+<h2>Upcasting and downcasting data<a class="headerlink" href="#upcasting-and-downcasting-data" title="Permalink to this headline">¶</a></h2>
+<p>It is often necessary to use a vertex-associated data on a computation involving faces, are other combinations of elements. Tyssue offers the upcast and downcast mechanisms to do that.</p>
+<blockquote>
+<div><p>This part is less important for an immediate use of tyssue, you can skip it at first.</p>
+</div></blockquote>
+<div class="section" id="upcasting">
+<h3>Upcasting<a class="headerlink" href="#upcasting" title="Permalink to this headline">¶</a></h3>
+<p>Geometry or physics computations often require to access for example
+the cell related data on each of the cell’s edges. The <code class="docutils literal notranslate"><span class="pre">Epithelium</span></code>
+class and its derivatives defines utilities to make this,
+i.e copying the area of each face to each of its edges:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Faces associated with the first edges:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;face&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># First edge associated face</span>
+<span class="n">face</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;face&#39;</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Area of cell # </span><span class="si">{}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">face</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">face</span><span class="p">,</span> <span class="s1">&#39;area&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Upcasted areas over the edges:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">upcast_face</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Faces associated with the first edges:
+edge
+0    0
+1    0
+2    0
+3    0
+4    1
+Name: face, dtype: int64
+
+
+Area of cell # 0:
+0.5
+
+
+Upcasted areas over the edges:
+edge
+0    0.500
+1    0.500
+2    0.500
+3    0.500
+4    0.875
+Name: area, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>The values have indeed been upcasted. This can also be done with the source and target vertices
+(<code class="docutils literal notranslate"><span class="pre">sheet.upcast_srce</span></code>, <code class="docutils literal notranslate"><span class="pre">sheet.upcast_trgt</span></code>) and cells in the 3D case (<code class="docutils literal notranslate"><span class="pre">sheet.upcast_cell</span></code>).</p>
+</div>
+<div class="section" id="downcasting">
+<h3>Downcasting<a class="headerlink" href="#downcasting" title="Permalink to this headline">¶</a></h3>
+<p>This is usually done by <code class="docutils literal notranslate"><span class="pre">groupby</span></code> operations as shown above.
+Syntactic sugar is available for summation, e.g. over every edges with a given source:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">sum_srce</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;line_tension&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyError</span><span class="g g-Whitespace">                                  </span>Traceback (most recent call last)
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/indexes/base.py</span> in <span class="ni">get_loc</span><span class="nt">(self, key, method, tolerance)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3079</span>             <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">3080</span>                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">casted_key</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3081</span>             <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+
+<span class="nn">pandas/_libs/index.pyx</span> in <span class="ni">pandas._libs.index.IndexEngine.get_loc</span><span class="nt">()</span>
+
+<span class="nn">pandas/_libs/index.pyx</span> in <span class="ni">pandas._libs.index.IndexEngine.get_loc</span><span class="nt">()</span>
+
+<span class="nn">pandas/_libs/hashtable_class_helper.pxi</span> in <span class="ni">pandas._libs.hashtable.PyObjectHashTable.get_item</span><span class="nt">()</span>
+
+<span class="nn">pandas/_libs/hashtable_class_helper.pxi</span> in <span class="ni">pandas._libs.hashtable.PyObjectHashTable.get_item</span><span class="nt">()</span>
+
+<span class="ne">KeyError</span>: &#39;line_tension&#39;
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">KeyError</span><span class="g g-Whitespace">                                  </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">19</span><span class="o">-</span><span class="mi">63845</span><span class="n">d2edfe8</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">sheet</span><span class="o">.</span><span class="n">sum_srce</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;line_tension&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/frame.py</span> in <span class="ni">__getitem__</span><span class="nt">(self, key)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3022</span>             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">3023</span>                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getitem_multilevel</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">3024</span>             <span class="n">indexer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3025</span>             <span class="k">if</span> <span class="n">is_integer</span><span class="p">(</span><span class="n">indexer</span><span class="p">):</span>
+<span class="g g-Whitespace">   </span><span class="mi">3026</span>                 <span class="n">indexer</span> <span class="o">=</span> <span class="p">[</span><span class="n">indexer</span><span class="p">]</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/indexes/base.py</span> in <span class="ni">get_loc</span><span class="nt">(self, key, method, tolerance)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3080</span>                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">casted_key</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3081</span>             <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">3082</span>                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+<span class="g g-Whitespace">   </span><span class="mi">3083</span> 
+<span class="g g-Whitespace">   </span><span class="mi">3084</span>         <span class="k">if</span> <span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="ne">KeyError</span>: &#39;line_tension&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="../index.html" title="previous page">Welcome to Tyssue’s documentation!</a>
+    <a class='right-next' id="next-link" href="01-Geometry.html" title="next page">Geometry classes</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

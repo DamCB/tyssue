@@ -1,0 +1,810 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tyssue.topology package &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/source/tyssue.topology.rst"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#submodules">
+   Submodules
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.topology.base_topology">
+   tyssue.topology.base_topology module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.topology.bulk_topology">
+   tyssue.topology.bulk_topology module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.topology.monolayer_topology">
+   tyssue.topology.monolayer_topology module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.topology.sheet_topology">
+   tyssue.topology.sheet_topology module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.topology">
+   Module contents
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="tyssue-topology-package">
+<h1>tyssue.topology package<a class="headerlink" href="#tyssue-topology-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tyssue.topology.base_topology">
+<span id="tyssue-topology-base-topology-module"></span><h2>tyssue.topology.base_topology module<a class="headerlink" href="#module-tyssue.topology.base_topology" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.add_vert">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">add_vert</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.add_vert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a vertex in the middle of the edge,</p>
+<p>which is split as is its opposite(s)</p>
+<p>eptm : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Epithelium</span></code> instance
+edge : int
+the index of one of the half-edges to split</p>
+<p>new_vert : int
+the index to the new vertex
+new_edges : int or list of ints
+index to the new edge(s). For a sheet, returns
+a single index, for a 3D epithelium, returns
+the list of all the new parallel edges
+new_opp_edges : int or list of ints
+index to the new opposite edge(s). For a sheet, returns
+a single index, for a 3D epithelium, returns
+the list of all the new parallel edges</p>
+<p>In the simple case whith two half-edge, returns
+indices to the new edges, with the following convention:</p>
+<dl class="simple">
+<dt>s    e    t</dt><dd><p>——&gt;</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p>&lt;—— *</p></li>
+</ul>
+<p>oe</p>
+<dl class="simple">
+<dt>s    e       ne   t</dt><dd><p>——   —–&gt;</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><dl class="simple">
+<dt>&lt;—– * —— *</dt><dd><p>oe   nv   noe</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>where “e” is the passed edge as argument, “s” its source “t” its
+target and “oe” its opposite. The returned edges are the ones
+between the new vertex and the input edge’s original target.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.close_face">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">close_face</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.close_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the face if a single edge is missing.</p>
+<p>This function <strong>does not</strong> close the adjacent and opposite
+faces.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.collapse_edge">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">collapse_edge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_two_sided</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.collapse_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collapses edge and merges it’s vertices, creating (or increasing the rank of)
+a rosette structure.</p>
+<p>If <cite>reindex</cite> is <cite>True</cite> (the default), resets indexes and topology data.
+The edge is collapsed on the smaller of the srce, trgt indexes (to minimize reindexing impact)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.condition_4i">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">condition_4i</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.condition_4i" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an index over the faces violating condition 4 i in Okuda et al 2013,
+that is edges (from the same face) sharing two vertices simultaneously.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.condition_4ii">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">condition_4ii</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.condition_4ii" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an array of face pairs sharing more than two half-edges, as defined
+in Okuda et al. 2013 condition 4 ii</p>
+<p>An indication way to solve this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">faces</span> <span class="o">=</span> <span class="n">condition_4ii</span><span class="p">(</span><span class="n">eptm</span><span class="p">)</span>
+
+<span class="n">pairs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">)</span>
+
+
+<span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;srce&#39;</span><span class="p">,</span> <span class="s1">&#39;trgt&#39;</span><span class="p">,</span> <span class="s1">&#39;face&#39;</span><span class="p">,</span> <span class="s1">&#39;cell&#39;</span><span class="p">,</span> <span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="s1">&#39;sub_area&#39;</span><span class="p">]</span>
+<span class="n">edges</span> <span class="o">=</span> <span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="mi">0</span><span class="p">])][</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;face&quot;</span><span class="p">)</span>
+<span class="n">all_edges</span> <span class="o">=</span> <span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">faces</span><span class="o">.</span><span class="n">ravel</span><span class="p">())),</span> <span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;face&quot;</span><span class="p">)</span>
+
+<span class="n">all_edges</span><span class="p">[</span><span class="s1">&#39;single&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_edges</span><span class="p">[[</span><span class="s2">&quot;srce&quot;</span><span class="p">,</span> <span class="s2">&quot;trgt&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ufaces</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">faces</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
+<span class="n">com_vs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_edges</span><span class="o">.</span><span class="n">srce</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="n">ufaces</span><span class="p">:</span>
+    <span class="n">com_vs</span> <span class="o">=</span> <span class="n">com_vs</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">all_edges</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">all_edges</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">face</span><span class="p">,</span> <span class="s2">&quot;srce&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.drop_two_sided_faces">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">drop_two_sided_faces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.drop_two_sided_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all the two (or one?) sided faces from the epithelium</p>
+<p>Note that they are not collapsed, but simply eliminated
+Does not reindex</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.get_neighbour_face_pairs">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">get_neighbour_face_pairs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.get_neighbour_face_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a pandas Series of neighboring face pairs (as forzen sets of 2 indexes)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.get_num_common_edges">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">get_num_common_edges</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.get_num_common_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of common edges between two neighboring faces
+this number is set to -1 if those faces are opposite and share the
+same edges.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.merge_border_edges">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">merge_border_edges</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_two_sided</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.merge_border_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge edges at the border of a sheet such that no vertex has only
+one incoming and one outgoing edge.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.merge_vertices">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">merge_vertices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vert0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vert1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.merge_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge the two vertices vert0 and vert1 iff they are linked by an edge</p>
+<p>If <cite>reindex</cite> is <cite>True</cite> (the default), resets indexes and topology data</p>
+<p>It is more efficient to call directly <cite>collapse_edge</cite></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.remove_face">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">remove_face</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.remove_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a face from the mesh.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.base_topology.split_vert">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.base_topology.</span></code><code class="sig-name descname"><span class="pre">split_vert</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_rewire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recenter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.base_topology.split_vert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new vertex and moves it towards the center of face.</p>
+<p>The edges in to_rewire will be connected to the new vertex.</p>
+<p>sheet : a <a class="reference internal" href="../API.html#tyssue.Sheet" title="tyssue.Sheet"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.Sheet</span></code></a> instance
+vert : int, the index of the vertex to split
+face : int, the index of the face where to move the vertex
+to_rewire : <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> a subset of <cite>sheet.edge_df</cite></p>
+<blockquote>
+<div><p>where all the edges pointing to (or from) the old vertex will point
+to (or from) the new.</p>
+</div></blockquote>
+<p>This will leave opened faces and cells</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.topology.bulk_topology">
+<span id="tyssue-topology-bulk-topology-module"></span><h2>tyssue.topology.bulk_topology module<a class="headerlink" href="#module-tyssue.topology.bulk_topology" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.HI_transition">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">HI_transition</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.HI_transition" title="Permalink to this definition">¶</a></dt>
+<dd><p>H → I transition as defined in Okuda et al. 2013
+(DOI 10.1007/s10237-012-0430-7).
+See tyssue/doc/illus/IH_transition.png for the algorithm</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.IH_transition">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">IH_transition</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.IH_transition" title="Permalink to this definition">¶</a></dt>
+<dd><p>I → H transition as defined in Okuda et al. 2013
+(DOI 10.1007/s10237-012-0430-7).
+See tyssue/doc/illus/IH_transition.png for the algorithm</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.cell_division">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">cell_division</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mother</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mother_verts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daughter_verts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.cell_division" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.close_cell">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">close_cell</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.close_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the cell by adding a face. Assumes a single face is missing</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.find_HIs">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">find_HIs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shorts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.find_HIs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.find_IHs">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">find_IHs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shorts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.find_IHs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.find_rearangements">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">find_rearangements</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.find_rearangements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the candidates for IH and HI transitions
+Returns
+——-
+edges_HI: set of indexes of short edges
+faces_IH: set of indexes of small triangular faces</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.fix_pinch">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">fix_pinch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.fix_pinch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Due to rearangements, some faces in an epithelium will have more than one opposite face.</p>
+<p>This method fixes the issue so we can have a valid epithelium back.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.get_division_edges">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">get_division_edges</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mother</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane_normal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane_center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_verts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.get_division_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an index of the mother cell edges crossed by the division plane, ordered
+clockwize around the division plane normal.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.get_division_vertices">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">get_division_vertices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">division_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mother</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane_normal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane_center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.get_division_vertices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.remove_cell">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">remove_cell</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.remove_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a tetrahedral cell from the epithelium.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.bulk_topology.split_vert">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.bulk_topology.</span></code><code class="sig-name descname"><span class="pre">split_vert</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.bulk_topology.split_vert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits a vertex towards a face.</p>
+<p>eptm : a <a class="reference internal" href="../API.html#tyssue.Epithelium" title="tyssue.Epithelium"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.Epithelium</span></code></a> instance
+vert : int the vertex to split
+face : int, optional, the face to split</p>
+<blockquote>
+<div><p>if face is None, one face will be chosen at random</p>
+</div></blockquote>
+<dl class="simple">
+<dt>multiplier: float, default 1.5</dt><dd><p>length of the new edge(s) in units of eptm.settings[“threshold_length”]</p>
+</dd>
+</dl>
+<p>For a given face, we look for the adjacent cell with the lowest number
+of faces converging on the vertex. If this number is higher than 4
+we raise a ValueError</p>
+<p>If it’s 3, we do a OI transition, resulting in a new edge but no new faces
+If it’s 4, we do a IH transition, resulting in a new face and 2 ne edges.</p>
+<p>see ../doc/illus/IH_transition.png</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.topology.monolayer_topology">
+<span id="tyssue-topology-monolayer-topology-module"></span><h2>tyssue.topology.monolayer_topology module<a class="headerlink" href="#module-tyssue.topology.monolayer_topology" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.topology.monolayer_topology.cell_division">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.monolayer_topology.</span></code><code class="sig-name descname"><span class="pre">cell_division</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monolayer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mother</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vertical'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.monolayer_topology.cell_division" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divides the cell mother in the monolayer.</p>
+<ul class="simple">
+<li><p>monolayer: a <code class="xref py py-class docutils literal notranslate"><span class="pre">Monolayer</span></code> instance</p></li>
+<li><p>mother: int, the index of the cell to devide</p></li>
+<li><p>orientation: str, {“vertical” | “horizontal” | “apical”}
+if “horizontal”, performs a division in the equatorial
+plane of the cell. If “vertical” (the default), performs
+a division along the basal-apical axis of the cell.
+If “apical”, performs a division cutting the apical face
+perpendicularly to its principal axis</p></li>
+<li><p>psi: float, default 0
+extra rotation angle of the division plane
+around the basal-apical plane</p></li>
+</ul>
+<ul class="simple">
+<li><p>daughter: int, the index of the daughter cell</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.monolayer_topology.find_basal_edge">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.monolayer_topology.</span></code><code class="sig-name descname"><span class="pre">find_basal_edge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monolayer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apical_edge</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.monolayer_topology.find_basal_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the basal edge parallel to the apical edge passed
+in argument.</p>
+<p>monolayer: a <code class="xref py py-class docutils literal notranslate"><span class="pre">Monolayer</span></code> instance</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.topology.sheet_topology">
+<span id="tyssue-topology-sheet-topology-module"></span><h2>tyssue.topology.sheet_topology module<a class="headerlink" href="#module-tyssue.topology.sheet_topology" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.topology.sheet_topology.cell_division">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.sheet_topology.</span></code><code class="sig-name descname"><span class="pre">cell_division</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mother</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.sheet_topology.cell_division" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes a cell to divide</p>
+<p>sheet : a ‘Sheet’ instance
+mother : face index of target dividing cell
+geom : a 2D geometry
+angle : division angle for newly formed edge</p>
+<p>daughter: face index of new cell</p>
+<ul class="simple">
+<li><p>Function checks for perodic boundaries if there are, it checks if dividing cell
+rests on an edge of the periodic boundaries if so, it displaces the boundaries
+by a half a period and moves the target cell in the bulk of the tissue. It then
+performs cell division normally and reverts the periodic boundaries to the original
+configuration</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.sheet_topology.face_division">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.sheet_topology.</span></code><code class="sig-name descname"><span class="pre">face_division</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mother</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vert_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vert_b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.sheet_topology.face_division" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divides the face associated with edges
+indexed by <cite>edge_a</cite> and <cite>edge_b</cite>, splitting it
+in the middle of those edes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.sheet_topology.get_division_edges">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.sheet_topology.</span></code><code class="sig-name descname"><span class="pre">get_division_edges</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mother</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.sheet_topology.get_division_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.sheet_topology.resolve_t1s">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.sheet_topology.</span></code><code class="sig-name descname"><span class="pre">resolve_t1s</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.sheet_topology.resolve_t1s" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.sheet_topology.split_vert">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.sheet_topology.</span></code><code class="sig-name descname"><span class="pre">split_vert</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recenter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.sheet_topology.split_vert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits a vertex towards the center of the face.</p>
+<p>This operation removes the  face <cite>face</cite> from the neighborhood of the vertex.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.sheet_topology.type1_transition">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.sheet_topology.</span></code><code class="sig-name descname"><span class="pre">type1_transition</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge01</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_tri_faces</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.sheet_topology.type1_transition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a type 1 transition around the edge edge01</p>
+<p>See ../../doc/illus/t1_transition.png for a sketch of the definition
+of the vertices and cells letterings
+See Finegan et al. for a description of the algotithm <a class="reference external" href="https://doi.org/10.1101/704932">https://doi.org/10.1101/704932</a></p>
+<p>sheet : a <cite>Sheet</cite> instance
+edge_01 : int</p>
+<blockquote>
+<div><p>index of the edge around which the transition takes place</p>
+</div></blockquote>
+<dl class="simple">
+<dt>epsilon<span class="classifier">float, optional, deprecated</span></dt><dd><p>default 0.1, the initial length of the new edge, in case “threshold_length”
+is not in the sheet.settings</p>
+</dd>
+<dt>remove_tri_faces<span class="classifier">bool, optional</span></dt><dd><p>if True (the default), will remove triangular cells
+after the T1 transition is performed</p>
+</dd>
+<dt>multiplier<span class="classifier">float, optional</span></dt><dd><p>default 1.5, the multiplier to the threshold length, so that the
+length of the new edge is set to multiplier * threshold_length</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.topology">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tyssue.topology" title="Permalink to this headline">¶</a></h2>
+<dl class="py exception">
+<dt id="tyssue.topology.TopologyChangeError">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.topology.</span></code><code class="sig-name descname"><span class="pre">TopologyChangeError</span></code><a class="headerlink" href="#tyssue.topology.TopologyChangeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when trying to assign values without
+the correct length to an epithelium dataset</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.all_rearangements">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.</span></code><code class="sig-name descname"><span class="pre">all_rearangements</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_t3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.all_rearangements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs rearangements (T3/HI first) until
+there are none left or MAX_ITER is reached.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.auto_t1">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.</span></code><code class="sig-name descname"><span class="pre">auto_t1</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.auto_t1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.auto_t3">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.</span></code><code class="sig-name descname"><span class="pre">auto_t3</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.auto_t3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.topology.single_rearangement">
+<code class="sig-prename descclassname"><span class="pre">tyssue.topology.</span></code><code class="sig-name descname"><span class="pre">single_rearangement</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_t3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.topology.single_rearangement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a single rearangement (if any) on epithelium <cite>eptm</cite>.</p>
+<p>If <cite>with_t3</cite> is True and there are removeable faces, will perform
+a type 3 or HI transition on one of those faces. If no such
+transition should occur, will perform a type 1 or IH transition on one
+of the edges.</p>
+</dd></dl>
+
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./source"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

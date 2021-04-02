@@ -1,0 +1,783 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tyssue.generation package &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/source/tyssue.generation.rst"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#submodules">
+   Submodules
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.generation.from_voronoi">
+   tyssue.generation.from_voronoi module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.generation.hexagonal_grids">
+   tyssue.generation.hexagonal_grids module
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#hexagonal-grids">
+     Hexagonal grids
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.generation.modifiers">
+   tyssue.generation.modifiers module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.generation.shapes">
+   tyssue.generation.shapes module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.generation.utils">
+   tyssue.generation.utils module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.generation">
+   Module contents
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="tyssue-generation-package">
+<h1>tyssue.generation package<a class="headerlink" href="#tyssue-generation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tyssue.generation.from_voronoi">
+<span id="tyssue-generation-from-voronoi-module"></span><h2>tyssue.generation.from_voronoi module<a class="headerlink" href="#module-tyssue.generation.from_voronoi" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.generation.from_voronoi.from_2d_voronoi">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.from_voronoi.</span></code><code class="sig-name descname"><span class="pre">from_2d_voronoi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voro</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.from_voronoi.from_2d_voronoi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates 2D (sheet geometry) datasets from a Voronoï  tessalation</p>
+<p>voro: a <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.spatial.Voronoi</span></code> object</p>
+<dl class="simple">
+<dt>datasets: dict</dt><dd><p>datasets suitable for <code class="xref py py-class docutils literal notranslate"><span class="pre">Epithelium</span></code> implementation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.from_voronoi.from_3d_voronoi">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.from_voronoi.</span></code><code class="sig-name descname"><span class="pre">from_3d_voronoi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voro</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.from_voronoi.from_3d_voronoi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates 3D (bulk geometry) datasets from a Voronoï  tessalation</p>
+<p>voro: a <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.spatial.Voronoi</span></code> object</p>
+<dl class="simple">
+<dt>datasets: dict</dt><dd><p>datasets suitable for <code class="xref py py-class docutils literal notranslate"><span class="pre">Epithelium</span></code> implementation</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.generation.hexagonal_grids">
+<span id="tyssue-generation-hexagonal-grids-module"></span><h2>tyssue.generation.hexagonal_grids module<a class="headerlink" href="#module-tyssue.generation.hexagonal_grids" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="hexagonal-grids">
+<h3>Hexagonal grids<a class="headerlink" href="#hexagonal-grids" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="tyssue.generation.hexagonal_grids.circle">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.hexagonal_grids.</span></code><code class="sig-name descname"><span class="pre">circle</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.hexagonal_grids.circle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns x and y positions of <cite>num_t</cite> points regularly placed around a circle
+of radius <cite>radius</cite>, shifted by <cite>phase</cite> radians.</p>
+<dl class="simple">
+<dt>num_t<span class="classifier">int</span></dt><dd><p>the number of points around the circle</p>
+</dd>
+<dt>radius<span class="classifier">float, default 1.</span></dt><dd><p>the radius of the circle</p>
+</dd>
+<dt>phase<span class="classifier">float, default 0.0</span></dt><dd><p>angle shift w/r to the x axis in radians</p>
+</dd>
+</dl>
+<p>points : np.Ndarray of shape (num_t, 2), the x, y positions of the points</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.hexagonal_grids.hexa_cylinder">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.hexagonal_grids.</span></code><code class="sig-name descname"><span class="pre">hexa_cylinder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capped</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'transverse'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.hexagonal_grids.hexa_cylinder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an arrays of x, y positions of points evenly spread on
+a cylinder with num_t points on the periphery and num_z points on its length.</p>
+<dl class="simple">
+<dt>num_t<span class="classifier">int,</span></dt><dd><p>The number of points on the periphery</p>
+</dd>
+<dt>num_z<span class="classifier">int,</span></dt><dd><p>The number of points along the z axis (the length of the cylinder)</p>
+</dd>
+<dt>radius<span class="classifier">float, default 1</span></dt><dd><p>The radius of the cylinder</p>
+</dd>
+<dt>capped<span class="classifier">bool, default False</span></dt><dd><p>If True, the tips of the cylinder are capped by a disk of point
+as generated by the <cite>hexa_disk</cite> function.</p>
+</dd>
+<dt>noise<span class="classifier">float, default 0</span></dt><dd><p>normaly distributed position noise around the cell points</p>
+</dd>
+<dt>orientation<span class="classifier">{‘transverse’ | ‘longitudinal’}, default ‘transverse’</span></dt><dd><p>the orientation of the cells (with the longueur axis
+perpendicular or along the length of the cylinder)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.hexagonal_grids.hexa_disk">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.hexagonal_grids.</span></code><code class="sig-name descname"><span class="pre">hexa_disk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.hexagonal_grids.hexa_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an arrays of x, y positions of points evenly spread on
+a disk with num_t points on the periphery.</p>
+<dl class="simple">
+<dt>num_t<span class="classifier">int</span></dt><dd><p>the number of poitns on the disk periphery, the rest of the disk is
+filled automaticaly</p>
+</dd>
+<dt>radius<span class="classifier">float, default 1.</span></dt><dd><p>the radius of the disk</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.hexagonal_grids.hexa_grid2d">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.hexagonal_grids.</span></code><code class="sig-name descname"><span class="pre">hexa_grid2d</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.hexagonal_grids.hexa_grid2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an hexagonal grid of points</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.hexagonal_grids.hexa_grid3d">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.hexagonal_grids.</span></code><code class="sig-name descname"><span class="pre">hexa_grid3d</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.hexagonal_grids.hexa_grid3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an hexagonal grid of points</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.hexagonal_grids.three_faces_sheet">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.hexagonal_grids.</span></code><code class="sig-name descname"><span class="pre">three_faces_sheet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zaxis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.hexagonal_grids.three_faces_sheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the apical junctions mesh of three packed hexagonal faces.
+If <cite>zaxis</cite> is <cite>True</cite> (defaults to False), adds a <cite>z</cite> coordinates,
+with <cite>z = 0</cite>.</p>
+<p>Faces have a side length of 1.0 +/- 1e-3.</p>
+<p>face_df: the faces <cite>DataFrame</cite> indexed from 0 to 2
+vert_df: the junction vertices <cite>DataFrame</cite>
+edge_df: the junction edges <cite>DataFrame</cite></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.hexagonal_grids.three_faces_sheet_array">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.hexagonal_grids.</span></code><code class="sig-name descname"><span class="pre">three_faces_sheet_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.hexagonal_grids.three_faces_sheet_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the apical junctions mesh of three packed hexagonal faces.
+If <cite>zaxis</cite> is <cite>True</cite> (defaults to False), adds a <cite>z</cite> coordinates,
+with <cite>z = 0</cite>.</p>
+<p>Faces have a side length of 1.0 +/- 1e-3.</p>
+<dl class="simple">
+<dt>points: (13, ndim) np.array of floats</dt><dd><p>the positions, where ndim is 2 or 3 depending on <cite>zaxis</cite></p>
+</dd>
+<dt>edges: (15, 2)  np.array of ints</dt><dd><p>indices of the edges</p>
+</dd>
+<dt>(Nc, Nv, Ne): triple of ints</dt><dd><p>number of faces, vertices and edges (3, 13, 15)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-tyssue.generation.modifiers">
+<span id="tyssue-generation-modifiers-module"></span><h2>tyssue.generation.modifiers module<a class="headerlink" href="#module-tyssue.generation.modifiers" title="Permalink to this headline">¶</a></h2>
+<p>This module provides utlities to modify an input tissue through extrusion or subdivision</p>
+<dl class="py function">
+<dt id="tyssue.generation.modifiers.create_anchors">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.modifiers.</span></code><code class="sig-name descname"><span class="pre">create_anchors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.modifiers.create_anchors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an edge linked to every vertices at the boundary
+and create anchor vertices</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.modifiers.extrude">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.modifiers.</span></code><code class="sig-name descname"><span class="pre">extrude</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">apical_datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'homotecy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">-</span> <span class="pre">1]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.modifiers.extrude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extrude a sheet to form a monlayer epithelium</p>
+<ul class="simple">
+<li><p>apical_datasets: dictionnary of three DataFrames,</p></li>
+</ul>
+<p>‘vert’, ‘edge’, ‘face’
+* method: str, optional {‘homotecy’|’translation’|’normals’}
+default ‘homotecy’
+* scale: float, optional
+the scale factor for homotetic scaling, default 0.3.
+* vector: sequence of three floats, optional,
+used for the translation</p>
+<p>default [0, 0, -1]</p>
+<p>if <cite>method == ‘homotecy’</cite>, the basal layer is scaled down from the
+apical one homoteticaly w/r to the center of the coordinate
+system, by a factor given by <cite>scale</cite></p>
+<p>if <cite>method == ‘translation’</cite>, the basal vertices are translated from
+the apical ones by the vector <cite>vect</cite></p>
+<p>if <cite>method == ‘normals’</cite>, basal vertices are translated from
+the apical ones along the normal of the surface at each vertex,
+by a vector whose size is given by <cite>scale</cite></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.modifiers.subdivide_faces">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.modifiers.</span></code><code class="sig-name descname"><span class="pre">subdivide_faces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">faces</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.modifiers.subdivide_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a vertex at the center of each face, and returns a
+new dataset</p>
+<p>eptm: a <code class="xref py py-class docutils literal notranslate"><span class="pre">Epithelium</span></code> instance
+faces: list,</p>
+<blockquote>
+<div><p>indices of the faces to be subdivided</p>
+</div></blockquote>
+<dl class="simple">
+<dt>new_dset: dict</dt><dd><p>a dataset with the new faces devided</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.generation.shapes">
+<span id="tyssue-generation-shapes-module"></span><h2>tyssue.generation.shapes module<a class="headerlink" href="#module-tyssue.generation.shapes" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tyssue.generation.shapes.AnnularSheet">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">AnnularSheet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.AnnularSheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tyssue.core.html#tyssue.core.sheet.Sheet" title="tyssue.core.sheet.Sheet"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.core.sheet.Sheet</span></code></a></p>
+<p>2D annular model of a cylinder-like monolayer.</p>
+<p>Provides syntactic sugar to access the apical, basal and
+lateral segments of the epithlium</p>
+<dl class="py method">
+<dt id="tyssue.generation.shapes.AnnularSheet.apical_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">apical_edges</span></code><a class="headerlink" href="#tyssue.generation.shapes.AnnularSheet.apical_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.generation.shapes.AnnularSheet.apical_verts">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">apical_verts</span></code><a class="headerlink" href="#tyssue.generation.shapes.AnnularSheet.apical_verts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.generation.shapes.AnnularSheet.basal_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">basal_edges</span></code><a class="headerlink" href="#tyssue.generation.shapes.AnnularSheet.basal_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.generation.shapes.AnnularSheet.basal_verts">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">basal_verts</span></code><a class="headerlink" href="#tyssue.generation.shapes.AnnularSheet.basal_verts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.generation.shapes.AnnularSheet.lateral_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">lateral_edges</span></code><a class="headerlink" href="#tyssue.generation.shapes.AnnularSheet.lateral_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.generation.shapes.AnnularSheet.reset_topo">
+<code class="sig-name descname"><span class="pre">reset_topo</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.AnnularSheet.reset_topo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recomputes the number of sides for the faces and the
+number of faces for the cells.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.generation.shapes.AnnularSheet.segment_index">
+<code class="sig-name descname"><span class="pre">segment_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.AnnularSheet.segment_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.shapes.Lloyd_relaxation">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">Lloyd_relaxation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.Lloyd_relaxation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs Lloyd relaxation on the sheet.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.shapes.ellipse_rho">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">ellipse_rho</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.ellipse_rho" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.shapes.ellipsoid_sheet">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">ellipsoid_sheet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_zs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.ellipsoid_sheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an ellipsoidal apical mesh.</p>
+<dl class="simple">
+<dt>a, b, c<span class="classifier">floats</span></dt><dd><p>Size of the ellipsoid half axes in
+the x, y, and z directions, respectively</p>
+</dd>
+<dt>n_zs<span class="classifier">int</span></dt><dd><p>The (approximate) number of faces along the z axis.</p>
+</dd>
+</dl>
+<p>kwargs are passed to <cite>get_ellipsoid_centers</cite></p>
+<p>eptm : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Epithelium</span></code> object</p>
+<p>The mesh returned is an <cite>Epithelium</cite> and not a simpler <cite>Sheet</cite>
+so that a unique cell data can hold information on the
+whole volume of the ellipsoid.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.shapes.generate_ring">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">generate_ring</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Nf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_vit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'in'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.generate_ring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a 2D tyssue object aranged in a ring of Nf tetragonal cells
+with inner diameter R_in and outer diameter R_out</p>
+<dl class="simple">
+<dt>Nf<span class="classifier">int</span></dt><dd><p>The number of cells in the tissue</p>
+</dd>
+<dt>R_in<span class="classifier">float</span></dt><dd><p>The inner ring diameter</p>
+</dd>
+<dt>R_out<span class="classifier">float</span></dt><dd><p>The outer ring diameter</p>
+</dd>
+<dt>R_vit<span class="classifier">float</span></dt><dd><p>The vitelline membrane diameter
+(a non strechable membrane around the annulus)</p>
+</dd>
+<dt>apical<span class="classifier">str {‘in’ | ‘out’}</span></dt><dd><p>The side of the apical surface
+if “in”, the apical surface is inside the annulus, facing
+the lumen as in an organoid; if ‘out’: the apical side is facing the
+exterior of the tissue, as in an embryo</p>
+</dd>
+</dl>
+<dl>
+<dt>eptm<span class="classifier"><a class="reference internal" href="#tyssue.generation.shapes.AnnularSheet" title="tyssue.generation.shapes.AnnularSheet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnnularSheet</span></code></a></span></dt><dd><p>2D annular tissue. The <cite>R_in</cite> and <cite>R_out</cite> parameters
+are stored in the class <cite>settings</cite> attribute.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.shapes.get_ellipsoid_centers">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">get_ellipsoid_centers</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_zs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.get_ellipsoid_centers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates hexagonaly organized points on the surface of an ellipsoid</p>
+<dl class="simple">
+<dt>a, b, c: float</dt><dd><p>ellipsoid radii along the x, y and z axes, respectively
+i.e the ellipsoid boounding box will be
+<cite>[[-a, a], [-b, b], [-c, c]]</cite></p>
+</dd>
+<dt>n_zs<span class="classifier">float</span></dt><dd><p>number of cells on the z axis, typical</p>
+</dd>
+<dt>pos_err<span class="classifier">float, default 0.</span></dt><dd><p>normaly distributed noise of std. dev. pos_err is added
+to the centers positions</p>
+</dd>
+<dt>phase_err<span class="classifier">float, default 0.</span></dt><dd><p>normaly distributed noise of std. dev. phase_err is added
+to the centers angle ϕ</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.shapes.sheet_from_cell_centers">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">sheet_from_cell_centers</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.sheet_from_cell_centers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Sheet object from the Voronoï tessalation
+of the cell centers.</p>
+<p>The strategy is to project the points on a sphere, get the Voronoï
+tessalation on this sphere and reproject the vertices on the
+original (implicit) surface through linear interpolation of the cell centers.</p>
+<p>Works for relatively smooth surfaces (at the very minimum star convex).</p>
+<dl class="simple">
+<dt>points<span class="classifier">np.ndarray of shape (Nf, 3)</span></dt><dd><p>the x, y, z coordinates of the cell centers</p>
+</dd>
+<dt>noise<span class="classifier">float, default 0.0</span></dt><dd><p>addiditve normal noise stdev</p>
+</dd>
+<dt>interp_s<span class="classifier">float, default 1e-4</span></dt><dd><p>interpolation smoothing factor (might need to set higher)</p>
+</dd>
+</dl>
+<p>sheet : a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object with Nf faces</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.shapes.spherical_monolayer">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">spherical_monolayer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lloyd_relax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.spherical_monolayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a spherical monolayer with the given inner and
+outer radii, and approximately the gieven number of cells.</p>
+<p>The <cite>apical</cite> argument can be ‘in’ out ‘out’ to specify wether
+the apical face of the cells faces inward or outward, reespectively.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.shapes.spherical_sheet">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">spherical_sheet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lloyd_relax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.spherical_sheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a spherical sheet with the given radius and (approximately)
+the given number of cells</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.generation.shapes.update_on_sphere">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.shapes.</span></code><code class="sig-name descname"><span class="pre">update_on_sphere</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.shapes.update_on_sphere" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.generation.utils">
+<span id="tyssue-generation-utils-module"></span><h2>tyssue.generation.utils module<a class="headerlink" href="#module-tyssue.generation.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.generation.utils.make_df">
+<code class="sig-prename descclassname"><span class="pre">tyssue.generation.utils.</span></code><code class="sig-name descname"><span class="pre">make_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.generation.utils.make_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.generation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tyssue.generation" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>generation</cite> module provides utilities to easily create <code class="xref py py-class docutils literal notranslate"><span class="pre">Epithelium</span></code> objects.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./source"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

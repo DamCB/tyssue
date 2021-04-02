@@ -1,0 +1,1415 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tyssue.dynamics package &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/source/tyssue.dynamics.rst"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#submodules">
+   Submodules
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.apoptosis_model">
+   tyssue.dynamics.apoptosis_model module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.base_gradients">
+   tyssue.dynamics.base_gradients module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.bulk_gradients">
+   tyssue.dynamics.bulk_gradients module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.bulk_model">
+   tyssue.dynamics.bulk_model module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.effectors">
+   tyssue.dynamics.effectors module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.factory">
+   tyssue.dynamics.factory module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.planar_gradients">
+   tyssue.dynamics.planar_gradients module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.planar_vertex_model">
+   tyssue.dynamics.planar_vertex_model module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.sheet_gradients">
+   tyssue.dynamics.sheet_gradients module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.sheet_vertex_model">
+   tyssue.dynamics.sheet_vertex_model module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics.units">
+   tyssue.dynamics.units module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.dynamics">
+   Module contents
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="tyssue-dynamics-package">
+<h1>tyssue.dynamics package<a class="headerlink" href="#tyssue-dynamics-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tyssue.dynamics.apoptosis_model">
+<span id="tyssue-dynamics-apoptosis-model-module"></span><h2>tyssue.dynamics.apoptosis_model module<a class="headerlink" href="#module-tyssue.dynamics.apoptosis_model" title="Permalink to this headline">¶</a></h2>
+<p>Specific functions for apoptosis vertex model</p>
+<dl class="py class">
+<dt id="tyssue.dynamics.apoptosis_model.ApicoBasalTension">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.apoptosis_model.</span></code><code class="sig-name descname"><span class="pre">ApicoBasalTension</span></code><a class="headerlink" href="#tyssue.dynamics.apoptosis_model.ApicoBasalTension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<p>Effector for the apical-basal tension.</p>
+<p>The energy is proportional to the heigth of the cell</p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.apoptosis_model.ApicoBasalTension.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**2</span></em><a class="headerlink" href="#tyssue.dynamics.apoptosis_model.ApicoBasalTension.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.apoptosis_model.ApicoBasalTension.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'vert'</span></em><a class="headerlink" href="#tyssue.dynamics.apoptosis_model.ApicoBasalTension.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.apoptosis_model.ApicoBasalTension.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.apoptosis_model.ApicoBasalTension.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.apoptosis_model.ApicoBasalTension.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.apoptosis_model.ApicoBasalTension.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.apoptosis_model.ApicoBasalTension.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Apical-basal</span> <span class="pre">tension'</span></em><a class="headerlink" href="#tyssue.dynamics.apoptosis_model.ApicoBasalTension.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.apoptosis_model.ApicoBasalTension.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'radial_tension'</span></em><a class="headerlink" href="#tyssue.dynamics.apoptosis_model.ApicoBasalTension.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.apoptosis_model.ApicoBasalTension.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'vert':</span> <span class="pre">{'height':</span> <span class="pre">1.0,</span> <span class="pre">'is_active':</span> <span class="pre">1,</span> <span class="pre">'radial_tension':</span> <span class="pre">0.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.apoptosis_model.ApicoBasalTension.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.dynamics.base_gradients">
+<span id="tyssue-dynamics-base-gradients-module"></span><h2>tyssue.dynamics.base_gradients module<a class="headerlink" href="#module-tyssue.dynamics.base_gradients" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.dynamics.base_gradients.length_grad">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.base_gradients.</span></code><code class="sig-name descname"><span class="pre">length_grad</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.base_gradients.length_grad" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns -(dx/l, dy/l, dz/l), ie grad_i(l_ij))</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.dynamics.bulk_gradients">
+<span id="tyssue-dynamics-bulk-gradients-module"></span><h2>tyssue.dynamics.bulk_gradients module<a class="headerlink" href="#module-tyssue.dynamics.bulk_gradients" title="Permalink to this headline">¶</a></h2>
+<p>Base gradients for bulk geometry</p>
+<dl class="py function">
+<dt id="tyssue.dynamics.bulk_gradients.lumen_volume_grad">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.bulk_gradients.</span></code><code class="sig-name descname"><span class="pre">lumen_volume_grad</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.bulk_gradients.lumen_volume_grad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the gradient for the volume enclosed by the epithelium.</p>
+<p>For a monolayer, it will by default compute the volume enclosed
+by the basal side (edges whose ‘segment’ column is “basal”).
+If the polarity is reversed and the apical side faces the lumen,
+this can be changed by setting eptm.settings[“lumen_side”] to ‘apical’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.dynamics.bulk_gradients.volume_grad">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.bulk_gradients.</span></code><code class="sig-name descname"><span class="pre">volume_grad</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.bulk_gradients.volume_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.dynamics.bulk_model">
+<span id="tyssue-dynamics-bulk-model-module"></span><h2>tyssue.dynamics.bulk_model module<a class="headerlink" href="#module-tyssue.dynamics.bulk_model" title="Permalink to this headline">¶</a></h2>
+<p>Dynamical models for monlayer and bulk epithelium.</p>
+<dl class="py class">
+<dt id="tyssue.dynamics.bulk_model.LaminaModel">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.bulk_model.</span></code><code class="sig-name descname"><span class="pre">LaminaModel</span></code><a class="headerlink" href="#tyssue.dynamics.bulk_model.LaminaModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.factory.model_factory.&lt;locals&gt;.NewModel</span></code></p>
+<p>Not implemented yet</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.dynamics.effectors">
+<span id="tyssue-dynamics-effectors-module"></span><h2>tyssue.dynamics.effectors module<a class="headerlink" href="#module-tyssue.dynamics.effectors" title="Permalink to this headline">¶</a></h2>
+<p>Generic forces and energies</p>
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.AbstractEffector">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">AbstractEffector</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The effector class is used by model factories
+to construct a model.</p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.get_nrj_norm">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_nrj_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.get_nrj_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Abstract</span> <span class="pre">effector'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">(None,</span> <span class="pre">None)</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'cell':</span> <span class="pre">{},</span> <span class="pre">'edge':</span> <span class="pre">{},</span> <span class="pre">'face':</span> <span class="pre">{},</span> <span class="pre">'vert':</span> <span class="pre">{}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.AbstractEffector.temporal_ref">
+<code class="sig-name descname"><span class="pre">temporal_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">(None,</span> <span class="pre">None)</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.AbstractEffector.temporal_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.BarrierElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">BarrierElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.BarrierElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<p>Barrier use to maintain the tissue integrity.</p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BarrierElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**2</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BarrierElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BarrierElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'vert'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BarrierElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.BarrierElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.BarrierElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.BarrierElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.BarrierElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BarrierElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Barrier</span> <span class="pre">elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BarrierElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BarrierElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'barrier_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BarrierElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BarrierElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'vert':</span> <span class="pre">{'barrier_elasticity':</span> <span class="pre">1.0,</span> <span class="pre">'delta_rho':</span> <span class="pre">0.0,</span> <span class="pre">'is_active':</span> <span class="pre">1}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BarrierElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.BorderElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">BorderElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BorderElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**2</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BorderElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'edge'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.BorderElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.BorderElasticity.get_nrj_norm">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_nrj_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity.get_nrj_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.BorderElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BorderElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Border</span> <span class="pre">edges</span> <span class="pre">elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BorderElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'border_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BorderElasticity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('prefered_length',</span> <span class="pre">UnitLength('micrometer',</span> <span class="pre">0.001</span> <span class="pre">*</span> <span class="pre">mm,</span> <span class="pre">'um'))</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.BorderElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'edge':</span> <span class="pre">{'border_elasticity':</span> <span class="pre">1.0,</span> <span class="pre">'is_active':</span> <span class="pre">1,</span> <span class="pre">'is_border':</span> <span class="pre">1.0,</span> <span class="pre">'length':</span> <span class="pre">1.0,</span> <span class="pre">'prefered_length':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.BorderElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">CellAreaElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**4</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'cell'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity.get_nrj_norm">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_nrj_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity.get_nrj_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Area</span> <span class="pre">elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'area_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('prefered_area',</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">um**2)</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellAreaElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'cell':</span> <span class="pre">{'area':</span> <span class="pre">1.0,</span> <span class="pre">'area_elasticity':</span> <span class="pre">1.0,</span> <span class="pre">'is_alive':</span> <span class="pre">1,</span> <span class="pre">'prefered_area':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellAreaElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">CellVolumeElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**6</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'cell'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity.get_nrj_norm">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_nrj_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity.get_nrj_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Volume</span> <span class="pre">elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'vol_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('prefered_vol',</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">um**3)</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.CellVolumeElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'cell':</span> <span class="pre">{'is_alive':</span> <span class="pre">1,</span> <span class="pre">'prefered_vol':</span> <span class="pre">1.0,</span> <span class="pre">'vol':</span> <span class="pre">1.0,</span> <span class="pre">'vol_elasticity':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.CellVolumeElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">FaceAreaElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.dimensionless">
+<code class="sig-name descname"><span class="pre">dimensionless</span></code><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.dimensionless" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**4</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'face'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.get_nrj_norm">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_nrj_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.get_nrj_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Area</span> <span class="pre">elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'area_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('prefered_area',</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">um**2)</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceAreaElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'edge':</span> <span class="pre">{'sub_area':</span> <span class="pre">0.16666666666666666},</span> <span class="pre">'face':</span> <span class="pre">{'area':</span> <span class="pre">1.0,</span> <span class="pre">'area_elasticity':</span> <span class="pre">1.0,</span> <span class="pre">'is_alive':</span> <span class="pre">1,</span> <span class="pre">'prefered_area':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceAreaElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.FaceContractility">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">FaceContractility</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.FaceContractility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceContractility.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**2</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceContractility.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceContractility.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'face'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceContractility.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.FaceContractility.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.FaceContractility.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.FaceContractility.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.FaceContractility.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceContractility.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Contractility'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceContractility.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceContractility.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'contractility'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceContractility.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceContractility.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('mean_perimeter',</span> <span class="pre">UnitLength('micrometer',</span> <span class="pre">0.001</span> <span class="pre">*</span> <span class="pre">mm,</span> <span class="pre">'um'))</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceContractility.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceContractility.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'face':</span> <span class="pre">{'contractility':</span> <span class="pre">1.0,</span> <span class="pre">'is_alive':</span> <span class="pre">1,</span> <span class="pre">'perimeter':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceContractility.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">FaceVolumeElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**6</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'face'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity.get_nrj_norm">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_nrj_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity.get_nrj_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Volume</span> <span class="pre">elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'vol_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('prefered_vol',</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">um**3)</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.FaceVolumeElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'edge':</span> <span class="pre">{'sub_area':</span> <span class="pre">0.16666666666666666},</span> <span class="pre">'face':</span> <span class="pre">{'is_alive':</span> <span class="pre">1,</span> <span class="pre">'prefered_vol':</span> <span class="pre">1.0,</span> <span class="pre">'vol':</span> <span class="pre">1.0,</span> <span class="pre">'vol_elasticity':</span> <span class="pre">1.0},</span> <span class="pre">'vert':</span> <span class="pre">{'height':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.FaceVolumeElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.LengthElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">LengthElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<p>Elastic half edge</p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LengthElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**2</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LengthElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'edge'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LengthElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LengthElasticity.get_nrj_norm">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_nrj_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity.get_nrj_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LengthElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LengthElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Length</span> <span class="pre">elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LengthElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'length_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LengthElasticity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('prefered_length',</span> <span class="pre">UnitLength('micrometer',</span> <span class="pre">0.001</span> <span class="pre">*</span> <span class="pre">mm,</span> <span class="pre">'um'))</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LengthElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'edge':</span> <span class="pre">{'is_active':</span> <span class="pre">1,</span> <span class="pre">'length':</span> <span class="pre">1.0,</span> <span class="pre">'length_elasticity':</span> <span class="pre">1.0,</span> <span class="pre">'prefered_length':</span> <span class="pre">1.0,</span> <span class="pre">'ux':</span> <span class="pre">0.5773502691896257,</span> <span class="pre">'uy':</span> <span class="pre">0.5773502691896257,</span> <span class="pre">'uz':</span> <span class="pre">0.5773502691896257}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LengthElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.LineTension">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">LineTension</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.LineTension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineTension.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineTension.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineTension.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'edge'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineTension.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LineTension.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LineTension.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LineTension.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LineTension.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineTension.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Line</span> <span class="pre">tension'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineTension.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineTension.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'line_tension'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineTension.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineTension.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('mean_length',</span> <span class="pre">UnitLength('micrometer',</span> <span class="pre">0.001</span> <span class="pre">*</span> <span class="pre">mm,</span> <span class="pre">'um'))</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineTension.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineTension.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'edge':</span> <span class="pre">{'is_active':</span> <span class="pre">1,</span> <span class="pre">'line_tension':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineTension.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.LineViscosity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">LineViscosity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.LineViscosity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineViscosity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">s*nN/um</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineViscosity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineViscosity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'edge'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineViscosity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LineViscosity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LineViscosity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineViscosity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Linear</span> <span class="pre">viscosity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineViscosity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineViscosity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'edge_viscosity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineViscosity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineViscosity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('mean_length',</span> <span class="pre">UnitLength('micrometer',</span> <span class="pre">0.001</span> <span class="pre">*</span> <span class="pre">mm,</span> <span class="pre">'um'))</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineViscosity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineViscosity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'edge':</span> <span class="pre">{'edge_viscosity':</span> <span class="pre">1.0,</span> <span class="pre">'is_active':</span> <span class="pre">1}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineViscosity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LineViscosity.temporal_ref">
+<code class="sig-name descname"><span class="pre">temporal_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('dt',</span> <span class="pre">UnitTime('second',</span> <span class="pre">'s'))</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LineViscosity.temporal_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.LumenAreaElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">LumenAreaElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.LumenAreaElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<blockquote>
+<div><p>..math:</p>
+</div></blockquote>
+<p>rac{K_Y}{2}(A_{mathrm{lumen}} - A_{0,mathrm{lumen}})^2</p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenAreaElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**4</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenAreaElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenAreaElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'settings'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenAreaElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LumenAreaElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LumenAreaElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LumenAreaElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LumenAreaElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenAreaElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Lumen</span> <span class="pre">volume</span> <span class="pre">constraint'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenAreaElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenAreaElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'lumen_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenAreaElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenAreaElasticity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('lumen_prefered_vol',</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">um**2)</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenAreaElasticity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenAreaElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'settings':</span> <span class="pre">{'lumen_elasticity':</span> <span class="pre">1.0,</span> <span class="pre">'lumen_prefered_vol':</span> <span class="pre">1.0,</span> <span class="pre">'lumen_vol':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenAreaElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">LumenVolumeElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<p>Global volume elasticity of the object.
+For example the volume of the yolk in the Drosophila embryo</p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**6</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'settings'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity.get_nrj_norm">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_nrj_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity.get_nrj_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Lumen</span> <span class="pre">volume</span> <span class="pre">elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'lumen_vol_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('lumen_prefered_vol',</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">um**3)</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.LumenVolumeElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'settings':</span> <span class="pre">{'lumen_prefered_vol':</span> <span class="pre">1.0,</span> <span class="pre">'lumen_vol':</span> <span class="pre">1.0,</span> <span class="pre">'lumen_vol_elasticity':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.LumenVolumeElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.PerimeterElasticity">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">PerimeterElasticity</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.PerimeterElasticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<p>From Mapeng Bi et al. <a class="reference external" href="https://doi.org/10.1038/nphys3471">https://doi.org/10.1038/nphys3471</a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.PerimeterElasticity.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**2</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.PerimeterElasticity.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.PerimeterElasticity.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'face'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.PerimeterElasticity.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.PerimeterElasticity.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.PerimeterElasticity.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.PerimeterElasticity.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.PerimeterElasticity.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.PerimeterElasticity.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Perimeter</span> <span class="pre">Elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.PerimeterElasticity.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.PerimeterElasticity.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'perimeter_elasticity'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.PerimeterElasticity.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.PerimeterElasticity.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('prefered_perimeter',</span> <span class="pre">UnitLength('micrometer',</span> <span class="pre">0.001</span> <span class="pre">*</span> <span class="pre">mm,</span> <span class="pre">'um'))</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.PerimeterElasticity.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.PerimeterElasticity.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'face':</span> <span class="pre">{'is_alive':</span> <span class="pre">1,</span> <span class="pre">'perimeter':</span> <span class="pre">1.0,</span> <span class="pre">'perimeter_elasticity':</span> <span class="pre">0.1,</span> <span class="pre">'prefered_perimeter':</span> <span class="pre">3.81}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.PerimeterElasticity.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.RadialTension">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">RadialTension</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.RadialTension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<p>Apply a tension perpendicular to a face.</p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.RadialTension.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.RadialTension.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.RadialTension.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'face'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.RadialTension.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.RadialTension.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.RadialTension.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.RadialTension.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.RadialTension.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.RadialTension.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Apical</span> <span class="pre">basal</span> <span class="pre">tension'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.RadialTension.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.RadialTension.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'radial_tension'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.RadialTension.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.RadialTension.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'face':</span> <span class="pre">{'height':</span> <span class="pre">1.0,</span> <span class="pre">'radial_tension':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.RadialTension.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.dynamics.effectors.SurfaceTension">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">SurfaceTension</span></code><a class="headerlink" href="#tyssue.dynamics.effectors.SurfaceTension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.dynamics.effectors.AbstractEffector" title="tyssue.dynamics.effectors.AbstractEffector"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.dynamics.effectors.AbstractEffector</span></code></a></p>
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.SurfaceTension.dimensions">
+<code class="sig-name descname"><span class="pre">dimensions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">fJ/um**2</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.SurfaceTension.dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.SurfaceTension.element">
+<code class="sig-name descname"><span class="pre">element</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'face'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.SurfaceTension.element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.SurfaceTension.energy">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.SurfaceTension.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.dynamics.effectors.SurfaceTension.gradient">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.SurfaceTension.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.SurfaceTension.label">
+<code class="sig-name descname"><span class="pre">label</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Surface</span> <span class="pre">tension'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.SurfaceTension.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.SurfaceTension.magnitude">
+<code class="sig-name descname"><span class="pre">magnitude</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'surface_tension'</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.SurfaceTension.magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.SurfaceTension.spatial_ref">
+<code class="sig-name descname"><span class="pre">spatial_ref</span></code><em class="property"> <span class="pre">=</span> <span class="pre">('prefered_area',</span> <span class="pre">array(1.)</span> <span class="pre">*</span> <span class="pre">um**2)</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.SurfaceTension.spatial_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="tyssue.dynamics.effectors.SurfaceTension.specs">
+<code class="sig-name descname"><span class="pre">specs</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'face':</span> <span class="pre">{'area':</span> <span class="pre">1.0,</span> <span class="pre">'is_active':</span> <span class="pre">1,</span> <span class="pre">'surface_tension':</span> <span class="pre">1.0}}</span></em><a class="headerlink" href="#tyssue.dynamics.effectors.SurfaceTension.specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.dynamics.effectors.dimensionalize">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">dimensionalize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nondim_specs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_specs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">effector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_effector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.dimensionalize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.dynamics.effectors.elastic_energy">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">elastic_energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elasticity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefered</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.elastic_energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.dynamics.effectors.elastic_force">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">elastic_force</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elasticity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefered</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.elastic_force" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.dynamics.effectors.normalize">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">normalize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim_specs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nondim_specs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">effector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_effector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.normalize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.dynamics.effectors.scaler">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.effectors.</span></code><code class="sig-name descname"><span class="pre">scaler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nondim_specs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_specs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">effector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_effector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.effectors.scaler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.dynamics.factory">
+<span id="tyssue-dynamics-factory-module"></span><h2>tyssue.dynamics.factory module<a class="headerlink" href="#module-tyssue.dynamics.factory" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.dynamics.factory.model_factory">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.factory.</span></code><code class="sig-name descname"><span class="pre">model_factory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">effectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_effector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.factory.model_factory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces a Model class with the provided effectors.</p>
+<p>effectors : list of <code class="xref py py-class docutils literal notranslate"><span class="pre">effectors.AbstractEffectors</span></code> classes.
+ref_effector : optional, default None</p>
+<blockquote>
+<div><p>if passed, will be used for normalization,
+by default, the last effector in the list is used</p>
+</div></blockquote>
+<dl class="simple">
+<dt>NewModel<span class="classifier">a Model derived class with compute_enregy and compute_gradient</span></dt><dd><p>methods</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.dynamics.planar_gradients">
+<span id="tyssue-dynamics-planar-gradients-module"></span><h2>tyssue.dynamics.planar_gradients module<a class="headerlink" href="#module-tyssue.dynamics.planar_gradients" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.dynamics.planar_gradients.area_grad">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.planar_gradients.</span></code><code class="sig-name descname"><span class="pre">area_grad</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.planar_gradients.area_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.dynamics.planar_gradients.lumen_area_grad">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.planar_gradients.</span></code><code class="sig-name descname"><span class="pre">lumen_area_grad</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.planar_gradients.lumen_area_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.dynamics.planar_vertex_model">
+<span id="tyssue-dynamics-planar-vertex-model-module"></span><h2>tyssue.dynamics.planar_vertex_model module<a class="headerlink" href="#module-tyssue.dynamics.planar_vertex_model" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tyssue.dynamics.sheet_gradients">
+<span id="tyssue-dynamics-sheet-gradients-module"></span><h2>tyssue.dynamics.sheet_gradients module<a class="headerlink" href="#module-tyssue.dynamics.sheet_gradients" title="Permalink to this headline">¶</a></h2>
+<p>Base gradients for sheet like geometries</p>
+<dl class="py function">
+<dt id="tyssue.dynamics.sheet_gradients.area_grad">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.sheet_gradients.</span></code><code class="sig-name descname"><span class="pre">area_grad</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.sheet_gradients.area_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.dynamics.sheet_gradients.height_grad">
+<code class="sig-prename descclassname"><span class="pre">tyssue.dynamics.sheet_gradients.</span></code><code class="sig-name descname"><span class="pre">height_grad</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.dynamics.sheet_gradients.height_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.dynamics.sheet_vertex_model">
+<span id="tyssue-dynamics-sheet-vertex-model-module"></span><h2>tyssue.dynamics.sheet_vertex_model module<a class="headerlink" href="#module-tyssue.dynamics.sheet_vertex_model" title="Permalink to this headline">¶</a></h2>
+<p>Vertex model for an Epithelial sheet (see definitions).</p>
+<p>Depends on the sheet vertex geometry functions.</p>
+</div>
+<div class="section" id="module-tyssue.dynamics.units">
+<span id="tyssue-dynamics-units-module"></span><h2>tyssue.dynamics.units module<a class="headerlink" href="#module-tyssue.dynamics.units" title="Permalink to this headline">¶</a></h2>
+<p>Small module to manage units and dimension analysis</p>
+</div>
+<div class="section" id="module-tyssue.dynamics">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tyssue.dynamics" title="Permalink to this headline">¶</a></h2>
+<p>dynamics</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./source"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

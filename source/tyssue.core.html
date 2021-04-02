@@ -1,0 +1,1373 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tyssue.core package &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/source/tyssue.core.rst"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#submodules">
+   Submodules
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.core.history">
+   tyssue.core.history module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.core.monolayer">
+   tyssue.core.monolayer module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.core.multisheet">
+   tyssue.core.multisheet module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.core.objects">
+   tyssue.core.objects module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.core.sheet">
+   tyssue.core.sheet module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.core">
+   Module contents
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="tyssue-core-package">
+<h1>tyssue.core package<a class="headerlink" href="#tyssue-core-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tyssue.core.history">
+<span id="tyssue-core-history-module"></span><h2>tyssue.core.history module<a class="headerlink" href="#module-tyssue.core.history" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tyssue.core.history.History">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.core.history.</span></code><code class="sig-name descname"><span class="pre">History</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.history.History" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class handles recording and retrieving time series
+of sheet objects.</p>
+<dl class="py method">
+<dt id="tyssue.core.history.History.cell_h">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">cell_h</span></code><a class="headerlink" href="#tyssue.core.history.History.cell_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.History.edge_h">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">edge_h</span></code><a class="headerlink" href="#tyssue.core.history.History.edge_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.History.face_h">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">face_h</span></code><a class="headerlink" href="#tyssue.core.history.History.face_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.History.record">
+<code class="sig-name descname"><span class="pre">record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_stamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.history.History.record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends a copy of the sheet datasets to the history instance.</p>
+<p>time_stamp : float, save specific timestamp</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.History.retrieve">
+<code class="sig-name descname"><span class="pre">retrieve</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.history.History.retrieve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return datasets at time <cite>time</cite>.</p>
+<p>If a specific dataset was not recorded at time time, the closest record before that
+time is used.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.History.time_stamps">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">time_stamps</span></code><a class="headerlink" href="#tyssue.core.history.History.time_stamps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.History.to_archive">
+<code class="sig-name descname"><span class="pre">to_archive</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf5file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.history.History.to_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the history to a HDF file</p>
+<p>This file can later be accessed again with the <cite>HistoryHdf5.from_archive</cite>
+class method</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.History.vert_h">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">vert_h</span></code><a class="headerlink" href="#tyssue.core.history.History.vert_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.core.history.HistoryHdf5">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.core.history.</span></code><code class="sig-name descname"><span class="pre">HistoryHdf5</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf5file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.history.HistoryHdf5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.core.history.History" title="tyssue.core.history.History"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.core.history.History</span></code></a></p>
+<p>This class handles recording and retrieving time series
+of sheet objects.</p>
+<dl class="py method">
+<dt id="tyssue.core.history.HistoryHdf5.from_archive">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_archive</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf5file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eptm_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.history.HistoryHdf5.from_archive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.HistoryHdf5.record">
+<code class="sig-name descname"><span class="pre">record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_stamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.history.HistoryHdf5.record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends a copy of the sheet datasets to the history HDF file.</p>
+<p>sheet: a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object which we want to record. This argument can
+be used if the sheet object is different at each time point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.HistoryHdf5.retrieve">
+<code class="sig-name descname"><span class="pre">retrieve</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.history.HistoryHdf5.retrieve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return datasets at time <cite>time</cite>.</p>
+<p>If a specific dataset was not recorded at time time, the closest record before that
+time is used.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.history.HistoryHdf5.time_stamps">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">time_stamps</span></code><a class="headerlink" href="#tyssue.core.history.HistoryHdf5.time_stamps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.core.monolayer">
+<span id="tyssue-core-monolayer-module"></span><h2>tyssue.core.monolayer module<a class="headerlink" href="#module-tyssue.core.monolayer" title="Permalink to this headline">¶</a></h2>
+<p>Monolayer epithelium objects</p>
+<dl class="py class">
+<dt id="tyssue.core.monolayer.Monolayer">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.core.monolayer.</span></code><code class="sig-name descname"><span class="pre">Monolayer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.monolayer.Monolayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.core.objects.Epithelium" title="tyssue.core.objects.Epithelium"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.core.objects.Epithelium</span></code></a></p>
+<p>3D monolayer epithelium</p>
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.apical_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">apical_edges</span></code><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.apical_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.apical_faces">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">apical_faces</span></code><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.apical_faces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.apical_verts">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">apical_verts</span></code><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.apical_verts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.basal_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">basal_edges</span></code><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.basal_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.basal_faces">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">basal_faces</span></code><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.basal_faces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.basal_verts">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">basal_verts</span></code><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.basal_verts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.from_flat_sheet">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_flat_sheet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apical_sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.from_flat_sheet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.get_sub_sheet">
+<code class="sig-name descname"><span class="pre">get_sub_sheet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.get_sub_sheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code> object of the corresponding
+segment</p>
+<p>segment: str, the corresponding segment, wether ‘apical’ or ‘basal’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.guess_face_segment">
+<code class="sig-name descname"><span class="pre">guess_face_segment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.guess_face_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infers the face segment.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.guess_vert_segment">
+<code class="sig-name descname"><span class="pre">guess_vert_segment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vert</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.guess_vert_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infers the vertex segment from its surrounding edges.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.lateral_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">lateral_edges</span></code><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.lateral_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.lateral_faces">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">lateral_faces</span></code><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.lateral_faces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.lateral_verts">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">lateral_verts</span></code><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.lateral_verts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.monolayer.Monolayer.segment_index">
+<code class="sig-name descname"><span class="pre">segment_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.monolayer.Monolayer.segment_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.core.monolayer.MonolayerWithLamina">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.core.monolayer.</span></code><code class="sig-name descname"><span class="pre">MonolayerWithLamina</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.monolayer.MonolayerWithLamina" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.core.monolayer.Monolayer" title="tyssue.core.monolayer.Monolayer"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.core.monolayer.Monolayer</span></code></a></p>
+<p>3D monolayer epithelium with a lamina meshing</p>
+<dl class="py method">
+<dt id="tyssue.core.monolayer.MonolayerWithLamina.lamina_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">lamina_edges</span></code><a class="headerlink" href="#tyssue.core.monolayer.MonolayerWithLamina.lamina_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.core.multisheet">
+<span id="tyssue-core-multisheet-module"></span><h2>tyssue.core.multisheet module<a class="headerlink" href="#module-tyssue.core.multisheet" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tyssue.core.multisheet.MultiSheet">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.core.multisheet.</span></code><code class="sig-name descname"><span class="pre">MultiSheet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.multisheet.MultiSheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="tyssue.core.multisheet.MultiSheet.Nes">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Nes</span></code><a class="headerlink" href="#tyssue.core.multisheet.MultiSheet.Nes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.multisheet.MultiSheet.Nfs">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Nfs</span></code><a class="headerlink" href="#tyssue.core.multisheet.MultiSheet.Nfs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.multisheet.MultiSheet.Nvs">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Nvs</span></code><a class="headerlink" href="#tyssue.core.multisheet.MultiSheet.Nvs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.multisheet.MultiSheet.concat_datasets">
+<code class="sig-name descname"><span class="pre">concat_datasets</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.multisheet.MultiSheet.concat_datasets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.multisheet.MultiSheet.e_idxs">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">e_idxs</span></code><a class="headerlink" href="#tyssue.core.multisheet.MultiSheet.e_idxs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.multisheet.MultiSheet.f_idxs">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">f_idxs</span></code><a class="headerlink" href="#tyssue.core.multisheet.MultiSheet.f_idxs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.multisheet.MultiSheet.update_interpolants">
+<code class="sig-name descname"><span class="pre">update_interpolants</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.multisheet.MultiSheet.update_interpolants" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.multisheet.MultiSheet.v_idxs">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">v_idxs</span></code><a class="headerlink" href="#tyssue.core.multisheet.MultiSheet.v_idxs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.core.objects">
+<span id="tyssue-core-objects-module"></span><h2>tyssue.core.objects module<a class="headerlink" href="#module-tyssue.core.objects" title="Permalink to this headline">¶</a></h2>
+<p>Core definitions</p>
+<dl class="py class">
+<dt id="tyssue.core.objects.Epithelium">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.core.objects.</span></code><code class="sig-name descname"><span class="pre">Epithelium</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxbackup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class defining a connective tissue in 2D or 3D.</p>
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.Nc">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Nc</span></code><a class="headerlink" href="#tyssue.core.objects.Epithelium.Nc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of cells in the epithelium.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.Ne">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Ne</span></code><a class="headerlink" href="#tyssue.core.objects.Epithelium.Ne" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of edges in the epithelium.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.Nf">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Nf</span></code><a class="headerlink" href="#tyssue.core.objects.Epithelium.Nf" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of faces in the epithelium.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.Nv">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Nv</span></code><a class="headerlink" href="#tyssue.core.objects.Epithelium.Nv" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of vertices in the epithelium.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.backup">
+<code class="sig-name descname"><span class="pre">backup</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.backup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a copy of self and keeps a reference to it
+in the self._backups deque.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.cell_df">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">cell_df</span></code><a class="headerlink" href="#tyssue.core.objects.Epithelium.cell_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cell <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> containing cell associated
+data e.g. the position of their center or their volume</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.copy">
+<code class="sig-name descname"><span class="pre">copy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of the epithelium</p>
+<dl class="simple">
+<dt>deep_copy<span class="classifier">bool, default True</span></dt><dd><p>if True, use a copy of the original object’s datasets
+to create the new object. If False, datasets are not copied</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.cut_out">
+<code class="sig-name descname"><span class="pre">cut_out</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.cut_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the index of edges with at least one vertex outside of the bounding box</p>
+<dl class="simple">
+<dt>bbox<span class="classifier">sequence of shape (dim, 2)</span></dt><dd><p>the bounding box as (min, max) pairs for each coordinates.</p>
+</dd>
+<dt>coords<span class="classifier">list of str of len dim, default None</span></dt><dd><p>the coords corresponding to the bbox.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.edge_df">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">edge_df</span></code><a class="headerlink" href="#tyssue.core.objects.Epithelium.edge_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>The edge <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> containing edge associated
+data e.g. their length.This dataframe also contains the whole
+connexion of the epithelium through the <cite>“srce”, “trgt”, “face”, “cell”</cite>
+indices. In 2D, a half-edge is associated with a single (face, srce, trgt)
+positively oriented triangle. In 3D, the (cell, face, srce, trgt)
+positively oriented terahedron is also unique.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.face_df">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">face_df</span></code><a class="headerlink" href="#tyssue.core.objects.Epithelium.face_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>The face <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> containing face associated
+data e.g. the position of their center or their area</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.face_polygons">
+<code class="sig-name descname"><span class="pre">face_polygons</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.face_polygons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a pd.Series of arrays with the coordinates the face polygons</p>
+<p>Each element of the Series is a (num_sides, num_dims) array of points
+ordered counterclockwise.</p>
+<p>Vertices are assumed to be ordered in a face. If you are not
+sure it is the case, you can run <cite>sheet.reset_index(order=True)</cite> before calling
+this function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.get_invalid">
+<code class="sig-name descname"><span class="pre">get_invalid</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.get_invalid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a mask over self.edge_df for invalid faces.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.get_neighborhood">
+<code class="sig-name descname"><span class="pre">get_neighborhood</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.get_neighborhood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <cite>elem_id</cite> neighborhood up to a degree of <cite>order</cite></p>
+<p>For example, if <cite>order</cite> is 2, it wil return the adjacent cells (or faces)
+and theses cells neighbors.</p>
+<dl class="simple">
+<dt>neighbors<span class="classifier">pd.DataFrame with two colums, the index</span></dt><dd><p>of the neighboring cell (face), and it’s neighboring order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.get_neighbors">
+<code class="sig-name descname"><span class="pre">get_neighbors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.get_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the indexes of the adjacent elements (cells or faces) of
+the element of index <cite>elem_id</cite>.</p>
+<dl class="simple">
+<dt>elem_id<span class="classifier">int</span></dt><dd><p>the index of the central element (a face or a cell)</p>
+</dd>
+</dl>
+<p>element : {‘cell’ | ‘face’}, default ‘cell’</p>
+<dl class="simple">
+<dt>neghbors<span class="classifier">set</span></dt><dd><p>the cells (or faces) sharing an edge with the central cell (face)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.get_opposite_faces">
+<code class="sig-name descname"><span class="pre">get_opposite_faces</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.get_opposite_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populates the ‘opposite’ column of self.face_df with the index of
+the opposite face or -1 if the face has no opposite.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.get_orbits">
+<code class="sig-name descname"><span class="pre">get_orbits</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.get_orbits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dataframe with a <cite>(center, edge)</cite> MultiIndex with <cite>periph</cite>
+elements.</p>
+<dl class="simple">
+<dt>center<span class="classifier">str,</span></dt><dd><p>the name of the center element for example ‘face’, ‘srce’</p>
+</dd>
+<dt>periph<span class="classifier">str,</span></dt><dd><p>the name of the periphery elements, for example ‘trgt’, ‘cell’</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cell_verts</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">get_orbits</span><span class="p">(</span><span class="s1">&#39;face&#39;</span><span class="p">,</span> <span class="s1">&#39;srce&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cell_verts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">45</span><span class="p">]</span>
+<span class="go">edge</span>
+<span class="go">218    75</span>
+<span class="go">219    78</span>
+<span class="go">220    76</span>
+<span class="go">221    81</span>
+<span class="go">222    90</span>
+<span class="go">223    87</span>
+<span class="go">Name: srce, dtype: int64</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.get_valid">
+<code class="sig-name descname"><span class="pre">get_valid</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.get_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the ‘is_valid’ column to true if the faces are all closed polygons,
+and the cells closed polyhedra.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.idx_lookup">
+<code class="sig-name descname"><span class="pre">idx_lookup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.idx_lookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the current index of the element with the <cite>“id”</cite> column equal to <cite>elem_id</cite></p>
+<dl class="simple">
+<dt>elem_id<span class="classifier">int</span></dt><dd><p>id of the element to retrieve</p>
+</dd>
+<dt>element<span class="classifier">{“vert”|”edge”|”face”|”cell”}</span></dt><dd><p>the corresponding dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.remove">
+<code class="sig-name descname"><span class="pre">remove</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trim_borders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the edges indexed by <cite>edge_out</cite> associated with all
+the cells and faces containing those edges</p>
+<p>If trim_borders is True (defaults to False), there will be a single
+border edge per border face.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.reset_index">
+<code class="sig-name descname"><span class="pre">reset_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.reset_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the datasets  to have continuous indices</p>
+<p>If order is True (the default), sorts the edges
+such that for each face, vertices are ordered clockwize</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.reset_topo">
+<code class="sig-name descname"><span class="pre">reset_topo</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.reset_topo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recomputes the number of sides for the faces and the
+number of faces for the cells.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.restore">
+<code class="sig-name descname"><span class="pre">restore</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the eptithelium data to its last backed up state</p>
+<p>A copy of the current state prior to restoring is kept in the
+<cite>_bad</cite> attribute for inspection.
+Calling this method multiple times (without calling backup) will
+go back in the epithelium backups.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.sanitize">
+<code class="sig-name descname"><span class="pre">sanitize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trim_borders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.sanitize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes invalid faces and associated vertices</p>
+<p>If trim_borders is True (defaults to False), there will be a single
+border edge per border face.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.set_bbox">
+<code class="sig-name descname"><span class="pre">set_bbox</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.set_bbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the attribute <cite>bbox</cite> with pairs of values bellow
+and above the min and max of the vert coords, with a margin.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.settings">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">settings</span></code><a class="headerlink" href="#tyssue.core.objects.Epithelium.settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accesses the <cite>specs[‘settings’]</cite> dictionnary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.sum_cell">
+<code class="sig-name descname"><span class="pre">sum_cell</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.sum_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sums the values of the edge-indexed dataframe <cite>df</cite> grouped by
+the values of <cite>self.edge_df[“cell”]</cite></p>
+<p>summed : <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> the summed data, indexed by the source vertices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.sum_face">
+<code class="sig-name descname"><span class="pre">sum_face</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.sum_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sums the values of the edge-indexed dataframe <cite>df</cite> grouped by
+the values of <cite>self.edge_df[“face”]</cite></p>
+<p>summed : <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> the summed data, indexed by the source vertices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.sum_srce">
+<code class="sig-name descname"><span class="pre">sum_srce</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.sum_srce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sums the values of the edge-indexed dataframe <cite>df</cite> grouped by
+the values of <cite>self.edge_df[“srce”]</cite></p>
+<p>summed : <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> the summed data, indexed by the source vertices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.sum_trgt">
+<code class="sig-name descname"><span class="pre">sum_trgt</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.sum_trgt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sums the values of the edge-indexed dataframe <cite>df</cite> grouped by
+the values of <cite>self.edge_df[“trgt”]</cite></p>
+<p>summed : <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> the summed data, indexed by the source vertices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.triangular_mesh">
+<code class="sig-name descname"><span class="pre">triangular_mesh</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.triangular_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a triangulation of an epithelial sheet (2D in a 3D space),
+with added edges between face barycenters and junction vertices.</p>
+<dl class="simple">
+<dt>coords<span class="classifier">list of str:</span></dt><dd><p>pair of coordinates corresponding to column names
+for self.face_df and self.vert_df</p>
+</dd>
+<dt>return_mask<span class="classifier">bool, optional, default True</span></dt><dd><p>if True, returns <cite>face_mask</cite></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>vertices<span class="classifier">(self.Nf+self.Nv, 3) ndarray</span></dt><dd><p>all the vertices’ coordinates</p>
+</dd>
+<dt>triangles<span class="classifier">(self.Ne, 3) ndarray of ints</span></dt><dd><p>triple of the vertices’ indexes forming
+the triangular elements. For each junction edge, this is simply
+the index (srce, trgt, face). This is correctly oriented.</p>
+</dd>
+<dt>face_mask: (self.Nf + self.Nv,) mask with 1 iff the vertex corresponds</dt><dd><p>to a face center</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.upcast_cell">
+<code class="sig-name descname"><span class="pre">upcast_cell</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.upcast_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reindexes input data to self.edge_df.index
+by repeating the values for each cell entry</p>
+<dl>
+<dt>df<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code> <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code> or string</span></dt><dd><p>The data to be upcasted. If array like, should have <cite>self.Nc</cite> elements.
+If a string is passed it should be a column of <cite>self.cell_df</cite></p>
+</dd>
+</dl>
+<dl>
+<dt>upcast_df<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code></span></dt><dd><p>The value repeated like the values of <cite>self.edge_df[“cell”]</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.upcast_cols">
+<code class="sig-name descname"><span class="pre">upcast_cols</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.upcast_cols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Syntactic sugar to upcast from the epithelium datasets.</p>
+<dl class="simple">
+<dt>element: {‘srce’|’trgt’|’face’|’cell’}</dt><dd><p>corresponding self.edge_df column over which to index
+if element is ‘srce’ or ‘trgt’, the upcast data will be
+taken form self.vert_df</p>
+</dd>
+<dt>columns: index</dt><dd><p>the column(s) to be taken from the input dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.upcast_face">
+<code class="sig-name descname"><span class="pre">upcast_face</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.upcast_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reindexes input data to self.edge_df.index
+by repeating the values for each face entry</p>
+<dl>
+<dt>df<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code> <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code> or string</span></dt><dd><p>The data to be upcasted. If array like, should have <cite>self.Nf</cite> elements.
+If a string is passed it should be a column of <cite>self.face_df</cite></p>
+</dd>
+</dl>
+<dl>
+<dt>upcast_df<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code></span></dt><dd><p>The value repeated like the values of <cite>self.edge_df[“face”]</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.upcast_srce">
+<code class="sig-name descname"><span class="pre">upcast_srce</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.upcast_srce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reindexes input data to self.edge_df.index
+by repeating the values for each source entry.</p>
+<dl>
+<dt>df<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code> <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code> or string</span></dt><dd><p>The data to be upcasted. If array like, should have <cite>self.Nv</cite> elements.
+If a string is passed it should be a column of <cite>self.vert_df</cite></p>
+</dd>
+</dl>
+<dl>
+<dt>upcast_df<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code></span></dt><dd><p>The value repeated like the values of <cite>self.edge_df[“srce”]</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.upcast_trgt">
+<code class="sig-name descname"><span class="pre">upcast_trgt</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.upcast_trgt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reindexes input data to self.edge_df.index
+by repeating the values for each target entry</p>
+<dl>
+<dt>df<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code> <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code> or string</span></dt><dd><p>The data to be upcasted. If array like, should have <cite>self.Nv</cite> elements.
+If a string is passed it should be a column of <cite>self.vert_df</cite></p>
+</dd>
+</dl>
+<dl>
+<dt>upcast_df<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code></span></dt><dd><p>The value repeated like the values of <cite>self.edge_df[“trgt”]</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.update_num_faces">
+<code class="sig-name descname"><span class="pre">update_num_faces</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.update_num_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the number of faces around the cells.
+The data is registered in the <cite>“num_faces”</cite> column of
+<cite>self.cell_df</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.update_num_sides">
+<code class="sig-name descname"><span class="pre">update_num_sides</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.update_num_sides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the number of half-edges around the faces.
+The data is registered in the <cite>“num_sides”</cite> column of
+<cite>self.face_df</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.update_rank">
+<code class="sig-name descname"><span class="pre">update_rank</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.update_rank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.update_specs">
+<code class="sig-name descname"><span class="pre">update_specs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.update_specs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively updates the <cite>self.specs</cite> nested dictionnary,
+and set the new values to the corresponding columns
+in the datasets. If reset is <cite>True</cite>, existing values
+will be overwritten.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.validate">
+<code class="sig-name descname"><span class="pre">validate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns True if the mesh is validated</p>
+<p>e.g. has only closed polygons and polyhedra</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.validate_closed_cells">
+<code class="sig-name descname"><span class="pre">validate_closed_cells</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.validate_closed_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if all cells of the epithelium are closed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.vert_df">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">vert_df</span></code><a class="headerlink" href="#tyssue.core.objects.Epithelium.vert_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>The face <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> containing vertex associated
+data e.g. the position of each vertex.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.objects.Epithelium.vertex_mesh">
+<code class="sig-name descname"><span class="pre">vertex_mesh</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_normals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.Epithelium.vertex_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the vertex coordinates and a list of vertex indices
+for each face of the tissue.
+If <cite>vertex_normals</cite> is True, also returns the normals of each vertex
+(set as the average of the vertex’ edges), suitable for .OBJ export</p>
+<p>Vertices are assumed to be ordered in a face. If you are not
+sure it is the case, you can run <cite>sheet.reset_index()</cite> before calling
+this function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.core.objects.euler_characteristic">
+<code class="sig-prename descclassname"><span class="pre">tyssue.core.objects.</span></code><code class="sig-name descname"><span class="pre">euler_characteristic</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge_df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.euler_characteristic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Euler characteristic of the (non oriented) mesh represented by edge_df.</p>
+<p>The Euler characteristic is
+the number of vertices minus the number of edges plus the number of faces</p>
+<p>It is equal to 2 for a closed-on-itself mesh (topologicaly eq. to a sphere),
+1 to a mesh with a border. It is not unique for monoloyers or bulk epithelia
+but provides a way to check wether a cell is closed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.core.objects.get_next_edges">
+<code class="sig-prename descclassname"><span class="pre">tyssue.core.objects.</span></code><code class="sig-name descname"><span class="pre">get_next_edges</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.get_next_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a pd.Series with the index of the next
+edge for each edge</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.core.objects.get_opposite_faces">
+<code class="sig-prename descclassname"><span class="pre">tyssue.core.objects.</span></code><code class="sig-name descname"><span class="pre">get_opposite_faces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.get_opposite_faces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.core.objects.get_prev_edges">
+<code class="sig-prename descclassname"><span class="pre">tyssue.core.objects.</span></code><code class="sig-name descname"><span class="pre">get_prev_edges</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.get_prev_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a pd.Series with the index of the next
+edge for each edge</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.core.objects.get_simple_index">
+<code class="sig-prename descclassname"><span class="pre">tyssue.core.objects.</span></code><code class="sig-name descname"><span class="pre">get_simple_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge_df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.objects.get_simple_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a subset of the edge_df index corresponding
+to the non oriented edges (aka full edges).</p>
+<p>This is faster than <cite>get_extra_indices</cite> and works also in 3D</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.core.sheet">
+<span id="tyssue-core-sheet-module"></span><h2>tyssue.core.sheet module<a class="headerlink" href="#module-tyssue.core.sheet" title="Permalink to this headline">¶</a></h2>
+<p>An epithelial sheet, i.e a 2D mesh in a 2D or 3D space,
+akin to a HalfEdge data structure in CGAL.</p>
+<dl class="simple">
+<dt>For purely 2D the geometric properties are defined in</dt><dd><p><cite>tyssue.geometry.planar_geometry</cite></p>
+</dd>
+</dl>
+<p>A dynamical model derived from Fahradifar et al. 2007 is provided in
+<cite>tyssue.dynamics.planar_vertex_model</cite></p>
+<dl class="simple">
+<dt>For 2D in 3D, the geometric properties are defined in</dt><dd><p><cite>tyssue.geometry.sheet_geometry</cite></p>
+</dd>
+</dl>
+<p>A dynamical model derived from Monier, Gettings et al. 2015 is provided in
+<cite>tyssue.dynamics.sheet_vertex_model</cite></p>
+<dl class="py class">
+<dt id="tyssue.core.sheet.Sheet">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.core.sheet.</span></code><code class="sig-name descname"><span class="pre">Sheet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.core.objects.Epithelium" title="tyssue.core.objects.Epithelium"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.core.objects.Epithelium</span></code></a></p>
+<p>An epithelial sheet, i.e a 2D mesh in a 2D or 3D space,
+akin to a HalfEdge data structure in CGAL.</p>
+<p>The geometric properties are defined in <cite>tyssue.geometry.sheet_geometry</cite>
+A dynamical model derived from Fahradifar et al. 2007 is provided in
+<cite>tyssue.dynamics.sheet_vertex_model</cite></p>
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.extract">
+<code class="sig-name descname"><span class="pre">extract</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y',</span> <span class="pre">'z']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.extract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a new sheet from the sheet
+that correspond to a key word that define a face.</p>
+<p>face_mask : column name in face composed by boolean value
+coords :</p>
+<dl class="simple">
+<dt>sheet_fold_patch_extract :</dt><dd><p>subsheet corresponding to the fold patch area.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.extract_bounding_box">
+<code class="sig-name descname"><span class="pre">extract_bounding_box</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y',</span> <span class="pre">'z']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.extract_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts a new sheet from the embryo sheet</p>
+<p>that correspond to boundary coordinate define by the user.</p>
+<p>x_boundary : pair of floats
+y_boundary : pair of floats
+z_boundary : pair of floats
+coords : list of strings, default [‘x’, ‘y’, ‘z’]</p>
+<blockquote>
+<div><p>coordinates over which to crop the sheet</p>
+</div></blockquote>
+<p>subsheet : a new <a class="reference internal" href="#tyssue.core.sheet.Sheet" title="tyssue.core.sheet.Sheet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code></a> object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.get_extra_indices">
+<code class="sig-name descname"><span class="pre">get_extra_indices</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.get_extra_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes extra indices:</p>
+<ul class="simple">
+<li><p><cite>self.free_edges</cite>: half-edges at the epithelium boundary</p></li>
+<li><p><cite>self.dble_edges</cite>: half-edges inside the epithelium,
+with an opposite</p></li>
+<li><p><cite>self.east_edges</cite>: half of the <cite>dble_edges</cite>, pointing east
+(figuratively)</p></li>
+<li><dl class="simple">
+<dt><cite>self.west_edges</cite>: half of the <cite>dble_edges</cite>, pointing west</dt><dd><p>(the order of the east and west edges is conserved, so that
+the ith west half-edge is the opposite of the ith east half-edge)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>self.sgle_edges</cite>: joint index over free and east edges, spanning</dt><dd><p>the entire graph without double edges</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>self.wrpd_edges</cite>: joint index over free edges followed by the</dt><dd><dl class="simple">
+<dt>east edges twice, such that a vector over the whole half-edge</dt><dd><p>dataframe is wrapped over the single edges</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>self.srtd_edges</cite>: index over the whole half-edge sorted such that</dt><dd><p>the free edges come first, then the east, then the west</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Also computes:
+- <cite>self.Ni</cite>: the number of inside full edges</p>
+<blockquote>
+<div><p>(i.e. <cite>len(self.east_edges)</cite>)</p>
+</div></blockquote>
+<ul class="simple">
+<li><p><cite>self.No</cite>: the number of outside full edges
+(i.e. <cite>len(self.free_edges)</cite>)</p></li>
+<li><p><cite>self.Nd</cite>: the number of double half edges
+(i.e. <cite>len(self.dble_edges)</cite>)</p></li>
+<li><p><cite>self.anti_sym</cite>: <cite>pd.Series</cite> with shape <cite>(self.Ne,)</cite>
+with 1 at the free and east half-edges and -1
+at the opposite half-edges.</p></li>
+</ul>
+<ul class="simple">
+<li><p>East and west is resepctive to some orientation at the
+moment the indices are computed the partition stays valid as
+long as there are no changes in the topology, so due to vertex
+displacement, ‘east’ and ‘west’ might not stay valid. This is
+just a practical naming convention.</p></li>
+<li><p>As the name suggest, this method is not working for edges in
+3D pointing <em>exactly</em> north or south, ie iff <cite>edge[‘dx’] ==
+edge[‘dy’] == 0</cite>. Until we need or find a better solution,
+we’ll just assert it worked.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.get_force_inference">
+<code class="sig-name descname"><span class="pre">get_force_inference</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_border_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.get_force_inference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measure force based on Brodland method.</p>
+<p>g_gamma_matrix*tension_vector = 0
+Equation is homogenous and to avoid tension_vectors = 0,
+Construction and solve the constrained least-squares equation system
+[[g_gamma_matrix.T g_gamma_matrix, C^T_1],</p>
+<blockquote>
+<div><p>[C_1, 0]]
+où C1 = {1….1}</p>
+</div></blockquote>
+<p>shape of g_gamma_matrix = (Ne/2, Nv*len(coords))</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Results might not be consistens for highly curved epithelium</p>
+</div>
+</div></blockquote>
+<p>coords: coordinates
+column: None, specify a column name in edge_df to put tension value
+free_border_edges: bool, default False, take into account edges in the
+border of the tissue if True</p>
+<p>edges_tensions: tension values array if <cite>column</cite> not define</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.get_neighborhood">
+<code class="sig-name descname"><span class="pre">get_neighborhood</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'face'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.get_neighborhood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <cite>face</cite> neighborhood up to a degree of <cite>order</cite>.</p>
+<p>For example, if <cite>order</cite> is 2, it wil return the adjacent, faces
+and theses faces neighbors.</p>
+<dl class="simple">
+<dt>neighbors<span class="classifier">pd.DataFrame with two colums, the index</span></dt><dd><p>of the neighboring face, and it’s neighboring order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.get_neighbors">
+<code class="sig-name descname"><span class="pre">get_neighbors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'face'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.get_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the faces adjacent to <cite>face</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.get_opposite">
+<code class="sig-name descname"><span class="pre">get_opposite</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.get_opposite" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.planar_sheet_2d">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">planar_sheet_2d</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.planar_sheet_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a planar sheet from an hexagonal grid of cells.</p>
+<p>identifier : string
+nx, ny : int</p>
+<blockquote>
+<div><p>number of cells in the x and y axes</p>
+</div></blockquote>
+<dl class="simple">
+<dt>distx, disty<span class="classifier">float,</span></dt><dd><p>the distances in x and y between the cells</p>
+</dd>
+<dt>noise<span class="classifier">float, default None</span></dt><dd><p>position noise on the hexagonal grid</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>planar_sheet: a 2D <a class="reference internal" href="#tyssue.core.sheet.Sheet" title="tyssue.core.sheet.Sheet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code></a> instance</dt><dd><p>in the (x, y) plane</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.planar_sheet_3d">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">planar_sheet_3d</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.planar_sheet_3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a planar sheet from an hexagonal grid of cells.</p>
+<p>identifier : string
+nx, ny : int</p>
+<blockquote>
+<div><p>number of cells in the x and y axes</p>
+</div></blockquote>
+<dl class="simple">
+<dt>distx, disty<span class="classifier">float,</span></dt><dd><p>the distances in x and y between the cells</p>
+</dd>
+<dt>noise<span class="classifier">float, default None</span></dt><dd><p>position noise on the hexagonal grid</p>
+</dd>
+</dl>
+<p>flat_sheet: a 2.5D <a class="reference internal" href="#tyssue.core.sheet.Sheet" title="tyssue.core.sheet.Sheet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sheet</span></code></a> instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.reset_topo">
+<code class="sig-name descname"><span class="pre">reset_topo</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.reset_topo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recomputes the number of sides for the faces and the
+number of faces for the cells.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.core.sheet.Sheet.sort_edges_eastwest">
+<code class="sig-name descname"><span class="pre">sort_edges_eastwest</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.Sheet.sort_edges_eastwest" title="Permalink to this definition">¶</a></dt>
+<dd><p>reorder edges such the free edges are first,
+then the first half of the double edges, then the other half of
+the double edges, this way, each subset of the edges dataframe
+are contiguous.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.core.sheet.get_opposite">
+<code class="sig-prename descclassname"><span class="pre">tyssue.core.sheet.</span></code><code class="sig-name descname"><span class="pre">get_opposite</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_if_invalid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.get_opposite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the indices opposite to the edges in <cite>edge_df</cite></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.core.sheet.get_outer_sheet">
+<code class="sig-prename descclassname"><span class="pre">tyssue.core.sheet.</span></code><code class="sig-name descname"><span class="pre">get_outer_sheet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.core.sheet.get_outer_sheet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a Sheet object formed by all the faces w/o an opposite
+face.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tyssue.core" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./source"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

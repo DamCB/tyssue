@@ -1,0 +1,905 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamics &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The history object" href="04-Solvers.html" />
+    <link rel="prev" title="Epithelium Visualization" href="02-Visualization.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/notebooks/03-Dynamics.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/notebooks/03-Dynamics.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#non-dimensionalization">
+   (Non)-Dimensionalization
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#effector-classes">
+   Effector classes
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#predefined-effectors">
+     Predefined effectors
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#edge-effectors">
+     Edge effectors
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#face-effectors">
+     Face effectors
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#cell-effectors">
+     Cell effectors
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#lumen-effectors-for-closed-geometries">
+     Lumen effectors (for closed geometries)
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-factory">
+   Model factory
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#compute-energy">
+     Compute Energy
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#computing-the-gradient">
+     Computing the gradient
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plotting-forces">
+   Plotting forces
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#fixing-vertices">
+     Fixing vertices
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="dynamics">
+<h1>Dynamics<a class="headerlink" href="#dynamics" title="Permalink to this headline">¶</a></h1>
+<p>One of the objectives of tyssue is to make it easy to define and change the expression of the epithelium’s energy.
+For this, we define two classes of objects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Effector</span></code> : those define a single energy term, evaluated on the mesh, and depending on the values in the dataframe. For example, line tension, for which the energy is proportional to the length of the half-edge, is defined as an <code class="docutils literal notranslate"><span class="pre">Effector</span></code> object (see bellow). For each effector, we define a way to compute the energy and its spatial derivative, the gradient.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Model</span></code> : a model is basically a collection of effectors, with the mechanisms to combine them to define the total dynamics of the system.</p></li>
+</ul>
+<p>In general, the parameters of the models are addressable at the single element level. For example, the line tension can be set for each individual edge.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">optimize</span>
+
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">Sheet</span><span class="p">,</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">SheetGeometry</span> <span class="k">as</span> <span class="n">geom</span>
+<span class="kn">from</span> <span class="nn">tyssue.dynamics</span> <span class="kn">import</span> <span class="n">effectors</span><span class="p">,</span> <span class="n">model_factory</span>
+<span class="kn">from</span> <span class="nn">tyssue.draw</span> <span class="kn">import</span> <span class="n">sheet_view</span>
+<span class="kn">from</span> <span class="nn">tyssue.draw.plt_draw</span> <span class="kn">import</span> <span class="n">plot_forces</span>
+<span class="kn">from</span> <span class="nn">tyssue.io</span> <span class="kn">import</span> <span class="n">hdf5</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h5store</span> <span class="o">=</span> <span class="s1">&#39;data/small_hexagonal.hf5&#39;</span>
+<span class="c1">#h5store = &#39;data/before_apoptosis.hf5&#39;</span>
+
+<span class="n">datasets</span> <span class="o">=</span> <span class="n">hdf5</span><span class="o">.</span><span class="n">load_datasets</span><span class="p">(</span><span class="n">h5store</span><span class="p">)</span>
+<span class="n">sheet</span> <span class="o">=</span> <span class="n">Sheet</span><span class="p">(</span><span class="s1">&#39;emin&#39;</span><span class="p">,</span> <span class="n">datasets</span><span class="p">)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">sanitize</span><span class="p">(</span><span class="n">trim_borders</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+
+<span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span><span class="o">**</span><span class="mf">0.5</span> <span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;quick&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="mi">14</span><span class="n">aef7b53bcf</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> 
+<span class="ne">---&gt; </span><span class="mi">10</span> <span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span><span class="o">**</span><span class="mf">0.5</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">11</span> 
+<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;quick&#39;</span><span class="p">)</span>
+
+<span class="ne">TypeError</span>: scale() missing 1 required positional argument: &#39;coords&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="non-dimensionalization">
+<h2>(Non)-Dimensionalization<a class="headerlink" href="#non-dimensionalization" title="Permalink to this headline">¶</a></h2>
+<p>If you read Farhadifar’s article or other modeling papers, you’ll see that the discussion on parameter values is done by  defining unit dimensions, e.g. the unit length is defined such that the preferred area is unity. This can be done by defining dimension-less parameters and scaling them to correspond to the geometry (for example, line tension, which as units of energy per unit length, has a factor of <span class="math notranslate nohighlight">\(\sqrt(A_0)\)</span> between its dimension-less and its dimentionalized values. But in general it is simpler, and more robust computationally to scale the epithelium so that the average area is around unity (it is not strictly equivalent, but usually good enough), and then working with dimension-less units.</p>
+<p>Comparison with the real tissue can then be done by homothetically scaling length to match e.g. average junction lengths between experiments and models.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">sheet</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+<span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="effector-classes">
+<h2>Effector classes<a class="headerlink" href="#effector-classes" title="Permalink to this headline">¶</a></h2>
+<p>An effector designates a dynamical term in the epithelium governing equation. For quasistatic models, we need to provide  a method to compute the energy associated with this effector, and the corresponding gradient.</p>
+<p>For example, we can consider a line tension effector. The energy is <span class="math notranslate nohighlight">\(E_t = \sum_{ij} \Lambda\ell_{ij}\)</span> where the sum is over all the edges. For each half-edge, the gradient of <span class="math notranslate nohighlight">\(E_t\)</span> is defined by two terms, one for the gradient term associated with the half-edge <span class="math notranslate nohighlight">\({ij}\)</span> source, the over for it’s target. For the <span class="math notranslate nohighlight">\(x\)</span> coordinate:
+$<span class="math notranslate nohighlight">\(
+\frac{\partial E_t}{\partial x_i}
+= \Lambda\left(\sum_k \frac{\partial \ell_{ik}}{\partial x_i} + \sum_m \frac{\partial \ell_{mi}}{\partial x_i}\right)
+= \Lambda\left(\sum_k \frac{x_i}{\ell_{ik}}  - \sum_m \frac{x_i}{\ell_{mi}}\right)
+\)</span>$</p>
+<p>Where <span class="math notranslate nohighlight">\(\sum_k\)</span> is are over all the edges which vertex <span class="math notranslate nohighlight">\(i\)</span> is a source, and <span class="math notranslate nohighlight">\(\sum_m\)</span> over all the edges of which vertex i is a target.</p>
+<p>Here is the definition of the line tension effector:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LineTension</span><span class="p">(</span><span class="n">AbstractEffector</span><span class="p">):</span>
+
+    <span class="n">dimensions</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">line_tension</span>
+    <span class="n">magnitude</span> <span class="o">=</span> <span class="s2">&quot;line_tension&quot;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Line tension&quot;</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="s2">&quot;edge&quot;</span>
+    <span class="n">specs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;edge&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;is_active&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;line_tension&quot;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">}}</span>
+
+    <span class="n">spatial_ref</span> <span class="o">=</span> <span class="s2">&quot;mean_length&quot;</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">length</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="n">eptm</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span>
+            <span class="s2">&quot;line_tension&quot;</span> <span class="s2">&quot;* is_active&quot;</span> <span class="s2">&quot;* length / 2&quot;</span>
+        <span class="p">)</span>  <span class="c1"># accounts for half edges</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="n">eptm</span><span class="p">):</span>
+        <span class="n">grad_srce</span> <span class="o">=</span> <span class="o">-</span><span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="n">eptm</span><span class="o">.</span><span class="n">ucoords</span><span class="p">]</span> <span class="o">*</span> <span class="n">to_nd</span><span class="p">(</span>
+            <span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="s2">&quot;line_tension * is_active/2&quot;</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">eptm</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">grad_srce</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;g&quot;</span> <span class="o">+</span> <span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">eptm</span><span class="o">.</span><span class="n">coords</span><span class="p">]</span>
+        <span class="n">grad_trgt</span> <span class="o">=</span> <span class="o">-</span><span class="n">grad_srce</span>
+        <span class="k">return</span> <span class="n">grad_srce</span><span class="p">,</span> <span class="n">grad_trgt</span>
+</pre></div>
+</div>
+<div class="section" id="predefined-effectors">
+<h3>Predefined effectors<a class="headerlink" href="#predefined-effectors" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">AbstractEffector</span></code> : The abstract base class for all effectors</p>
+</div>
+<div class="section" id="edge-effectors">
+<h3>Edge effectors<a class="headerlink" href="#edge-effectors" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">LineTension</span></code> : <span class="math notranslate nohighlight">\(\Lambda \ell_{ij}\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">LengthElasticity</span></code> : <span class="math notranslate nohighlight">\(\frac{K_\ell}{2} (\ell_{ij} - \ell_0)^2\)</span></p>
+</div>
+<div class="section" id="face-effectors">
+<h3>Face effectors<a class="headerlink" href="#face-effectors" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">SurfaceTension</span></code> : <span class="math notranslate nohighlight">\(S A_{\alpha}\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">PerimeterElasticity</span></code> : <span class="math notranslate nohighlight">\(\frac{K_P}{2} (P_{\alpha} - P_0)^2\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">FaceAreaElasticity</span></code> : <span class="math notranslate nohighlight">\(\frac{K_a}{2} (a_{\alpha} - a_0)^2\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">FaceVolumeElasticity</span></code> : <span class="math notranslate nohighlight">\(\frac{K_v}{2} (V_{\alpha} - V_0)^2\)</span> (Volume is computed with the “height” column of the face.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FaceContractility</span></code> : <span class="math notranslate nohighlight">\(\Gamma P_{\alpha}^2\)</span></p>
+</div>
+<div class="section" id="cell-effectors">
+<h3>Cell effectors<a class="headerlink" href="#cell-effectors" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">CellAreaElasticity</span></code> : <span class="math notranslate nohighlight">\(\frac{K_A}{2} (A_C - A_0)^2\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">CellVolumeElasticity</span></code> : <span class="math notranslate nohighlight">\(\frac{K_V}{2} (V_C - V_0)^2\)</span></p>
+</div>
+<div class="section" id="lumen-effectors-for-closed-geometries">
+<h3>Lumen effectors (for closed geometries)<a class="headerlink" href="#lumen-effectors-for-closed-geometries" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">LumenAreaElasticity</span></code> : <span class="math notranslate nohighlight">\(\frac{K_L}{2} (A_L - A_{L0})^2\)</span></p>
+<p><code class="docutils literal notranslate"><span class="pre">LumenVolumeElasticity</span></code> : <span class="math notranslate nohighlight">\(\frac{K_L}{2} (V_L - V_{L0})^2\)</span></p>
+<p>(There are some more in the <code class="docutils literal notranslate"><span class="pre">effectors</span></code> module but they are less generally useful)</p>
+</div>
+</div>
+<div class="section" id="model-factory">
+<h2>Model factory<a class="headerlink" href="#model-factory" title="Permalink to this headline">¶</a></h2>
+<p>These effectors are then aggregated with others to define a <code class="docutils literal notranslate"><span class="pre">model</span></code> object. This object will have two methods <code class="docutils literal notranslate"><span class="pre">compute_energy</span></code> and <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> that take an <code class="docutils literal notranslate"><span class="pre">Epithelium</span></code> object as single argument.</p>
+<p>Such a model will usually be built with the function <code class="docutils literal notranslate"><span class="pre">model_factory</span></code>, that takes a list of effectors as input and returns a <code class="docutils literal notranslate"><span class="pre">model</span></code> object. For example, we can define the model from Farhadifar et al; by:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">model_factory</span><span class="p">([</span>
+    <span class="n">effectors</span><span class="o">.</span><span class="n">LineTension</span><span class="p">,</span>
+    <span class="n">effectors</span><span class="o">.</span><span class="n">FaceContractility</span><span class="p">,</span>
+    <span class="n">effectors</span><span class="o">.</span><span class="n">FaceAreaElasticity</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>As for other aspects, the parameters are defined by a nested dictionary <code class="docutils literal notranslate"><span class="pre">spec</span></code>. Default values are gathered in the <code class="docutils literal notranslate"><span class="pre">model.spec</span></code> attribute:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">specs</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;cell&#39;: {},
+ &#39;face&#39;: {&#39;is_alive&#39;: 1,
+  &#39;perimeter&#39;: 1.0,
+  &#39;contractility&#39;: 1.0,
+  &#39;area&#39;: 1.0,
+  &#39;area_elasticity&#39;: 1.0,
+  &#39;prefered_area&#39;: 1.0},
+ &#39;edge&#39;: {&#39;is_active&#39;: 1,
+  &#39;line_tension&#39;: 1.0,
+  &#39;sub_area&#39;: 0.16666666666666666},
+ &#39;vert&#39;: {},
+ &#39;settings&#39;: {&#39;nrj_norm_factor&#39;: 1.0}}
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can use <code class="docutils literal notranslate"><span class="pre">sheet.update_spec</span></code> to set the correct columns in the sheet object.</p>
+<p>Once the columns are set, it is possible to sets parameters for a subsets of edges (here by indexing the edges with a boolean series):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;sx&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;line_tension&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span><span class="o">.</span><span class="n">update_specs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">specs</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column is_alive of the face dataset with new specs
+Reseting column perimeter of the face dataset with new specs
+Reseting column contractility of the face dataset with new specs
+Reseting column area of the face dataset with new specs
+Reseting column area_elasticity of the face dataset with new specs
+Reseting column prefered_area of the face dataset with new specs
+Reseting column is_active of the edge dataset with new specs
+Reseting column line_tension of the edge dataset with new specs
+Reseting column sub_area of the edge dataset with new specs
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="compute-energy">
+<h3>Compute Energy<a class="headerlink" href="#compute-energy" title="Permalink to this headline">¶</a></h3>
+<p>We now can compute the energy. By default, the <code class="docutils literal notranslate"><span class="pre">compute_energy</span></code> method returns a scalar, the total energy in the epithelium:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+<span class="n">energy</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total energy: </span><span class="si">{</span><span class="n">energy</span><span class="si">:</span><span class="s1"> .3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total energy:  364.185
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can compute all the energy terms with the <code class="docutils literal notranslate"><span class="pre">full_output=True</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Et</span><span class="p">,</span> <span class="n">Ec</span><span class="p">,</span> <span class="n">Ea</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Et</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>edge
+0    0.323769
+1    0.323769
+2    0.322213
+3    0.322213
+4    0.322213
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span>
+    <span class="n">sheet</span><span class="p">,</span>
+    <span class="n">coords</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="s1">&#39;zy&#39;</span><span class="p">),</span>
+    <span class="n">face</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">Ec</span><span class="p">,</span> <span class="s2">&quot;colormap&quot;</span><span class="p">:</span> <span class="s2">&quot;gray&quot;</span><span class="p">},</span>
+    <span class="n">edge</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">Et</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/03-Dynamics_17_0.png" src="../_images/03-Dynamics_17_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="computing-the-gradient">
+<h3>Computing the gradient<a class="headerlink" href="#computing-the-gradient" title="Permalink to this headline">¶</a></h3>
+<p>Similarly, by default, the gradient computes an array of shape (Nv, 3), with 3 coordinates (or 2 in 2D) for each vertex.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grad_E</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_gradient</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+
+<span class="n">grad_E</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gx</th>
+      <th>gy</th>
+      <th>gz</th>
+    </tr>
+    <tr>
+      <th>srce</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2.931605</td>
+      <td>1.214310e+00</td>
+      <td>-8.234192</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2.931605</td>
+      <td>-1.214310e+00</td>
+      <td>-8.234192</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2.640334</td>
+      <td>-1.093662e+00</td>
+      <td>-0.337580</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2.892299</td>
+      <td>-1.007527e-14</td>
+      <td>-0.254173</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2.640334</td>
+      <td>1.093662e+00</td>
+      <td>-0.337580</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">components=True</span></code> it returns a tuple of terms for each effector of the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gradients</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compute_gradient</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">gradients</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="p">(</span><span class="n">srce</span><span class="p">,</span> <span class="n">trgt</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="p">(</span><span class="n">srce</span><span class="p">,</span> <span class="n">trgt</span><span class="p">)</span>
+             <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="n">gradients</span><span class="p">)}</span>
+<span class="n">gradients</span><span class="p">[</span><span class="s1">&#39;Line tension&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gx</th>
+      <th>gy</th>
+      <th>gz</th>
+    </tr>
+    <tr>
+      <th>edge</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-0.00000</td>
+      <td>-0.000000</td>
+      <td>-0.500000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-0.00000</td>
+      <td>-0.000000</td>
+      <td>0.500000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.08434</td>
+      <td>0.424007</td>
+      <td>0.251207</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-0.08434</td>
+      <td>0.424007</td>
+      <td>-0.251207</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.08434</td>
+      <td>-0.424007</td>
+      <td>0.251207</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="plotting-forces">
+<h2>Plotting forces<a class="headerlink" href="#plotting-forces" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">tyssue.draw</span></code> defines a useful <code class="docutils literal notranslate"><span class="pre">plot_forces</span></code> function:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_forces</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">scaling</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/03-Dynamics_23_0.png" src="../_images/03-Dynamics_23_0.png" />
+</div>
+</div>
+<div class="section" id="fixing-vertices">
+<h3>Fixing vertices<a class="headerlink" href="#fixing-vertices" title="Permalink to this headline">¶</a></h3>
+<p>You may notice that the border vertices have no arrow. This is because they are not active, and do not participate in e.g. energy minimization, as we’ll see in the next section.</p>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="02-Visualization.html" title="previous page">Epithelium Visualization</a>
+    <a class='right-next' id="next-link" href="04-Solvers.html" title="next page">The  <code class="docutils literal notranslate"><span class="pre">history</span></code> object</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

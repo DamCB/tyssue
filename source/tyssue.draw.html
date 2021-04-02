@@ -1,0 +1,614 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tyssue.draw package &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/source/tyssue.draw.rst"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#submodules">
+   Submodules
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.draw.ipv_draw">
+   tyssue.draw.ipv_draw module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.draw.plt_draw">
+   tyssue.draw.plt_draw module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.draw">
+   Module contents
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="tyssue-draw-package">
+<h1>tyssue.draw package<a class="headerlink" href="#tyssue-draw-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tyssue.draw.ipv_draw">
+<span id="tyssue-draw-ipv-draw-module"></span><h2>tyssue.draw.ipv_draw module<a class="headerlink" href="#module-tyssue.draw.ipv_draw" title="Permalink to this headline">¶</a></h2>
+<p>3D visualisation inside the notebook.</p>
+<dl class="py function">
+<dt id="tyssue.draw.ipv_draw.browse_history">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.ipv_draw.</span></code><code class="sig-name descname"><span class="pre">browse_history</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">history</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y',</span> <span class="pre">'z']</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_specs_kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.ipv_draw.browse_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.ipv_draw.edge_mesh">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.ipv_draw.</span></code><code class="sig-name descname"><span class="pre">edge_mesh</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">edge_specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.ipv_draw.edge_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a ipyvolume Mesh of the edge lines to be displayed
+in Jupyter Notebooks</p>
+<p>mesh: a <code class="xref py py-class docutils literal notranslate"><span class="pre">ipyvolume.widgets.Mesh</span></code> mesh widget</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.ipv_draw.face_mesh">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.ipv_draw.</span></code><code class="sig-name descname"><span class="pre">face_mesh</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">face_draw_specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.ipv_draw.face_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a ipyvolume Mesh of the face polygons</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.ipv_draw.sheet_view">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.ipv_draw.</span></code><code class="sig-name descname"><span class="pre">sheet_view</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y',</span> <span class="pre">'z']</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_specs_kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.ipv_draw.sheet_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a javascript renderer of the edge lines to be displayed
+in Jupyter Notebooks</p>
+<p>fig: a <code class="xref py py-class docutils literal notranslate"><span class="pre">ipyvolume.widgets.Figure</span></code> widget
+mesh: a <code class="xref py py-class docutils literal notranslate"><span class="pre">ipyvolume.widgets.Mesh</span></code> mesh widget</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.ipv_draw.update_view">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.ipv_draw.</span></code><code class="sig-name descname"><span class="pre">update_view</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.ipv_draw.update_view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.ipv_draw.view_ipv">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.ipv_draw.</span></code><code class="sig-name descname"><span class="pre">view_ipv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y',</span> <span class="pre">'z']</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">edge_specs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.ipv_draw.view_ipv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a javascript renderer of the edge lines to be displayed
+in Jupyter Notebooks</p>
+<p>fig: a <code class="xref py py-class docutils literal notranslate"><span class="pre">ipyvolume.widgets.Figure</span></code> widget
+mesh: a <code class="xref py py-class docutils literal notranslate"><span class="pre">ipyvolume.widgets.Mesh</span></code> mesh widget</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.draw.plt_draw">
+<span id="tyssue-draw-plt-draw-module"></span><h2>tyssue.draw.plt_draw module<a class="headerlink" href="#module-tyssue.draw.plt_draw" title="Permalink to this headline">¶</a></h2>
+<p>Matplotlib based plotting</p>
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.create_gif">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">create_gif</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">history</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.create_gif" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an animated gif of the recorded history.</p>
+<p>You need imagemagick on your system for this function to work.</p>
+<p>history : a <code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.History</span></code> object
+output : path to the output gif file
+num_frames : int, the number of frames in the gif
+interval : tuples, define begin and end frame of the gif
+draw_func : a drawing function</p>
+<blockquote>
+<div><p>this function must take a <cite>sheet</cite> object as first argument
+and return a <cite>fig, ax</cite> pair. Defaults to quick_edge_draw
+(aka sheet_view with quick mode)</p>
+</div></blockquote>
+<dl class="simple">
+<dt>margin<span class="classifier">int, the graph margins in percents, default 5</span></dt><dd><p>if margin is -1, let the draw function decide</p>
+</dd>
+</dl>
+<p><a href="#id1"><span class="problematic" id="id2">**</span></a>draw_kwds are passed to the drawing function</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.curved_view">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">curved_view</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.curved_view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.draw_edge">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">draw_edge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_spec_kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.draw_edge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.draw_face">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">draw_face</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_spec_kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.draw_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws epithelial sheet polygonal faces in matplotlib
+Keyword values can be specified at the element
+level as columns of the sheet.face_df</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.draw_vert">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">draw_vert</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_spec_kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.draw_vert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw junction vertices in matplotlib.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.get_arc_data">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">get_arc_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.get_arc_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.parse_face_specs">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">parse_face_specs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_draw_specs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.parse_face_specs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.plot_forces">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">plot_forces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approx_grad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_specs_kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.plot_forces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the net forces at each vertex, with their amplitudes multiplied
+by <cite>scaling</cite>. To be clear, this is the oposite of the gradient - grad E.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.plot_junction">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">plot_junction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.plot_junction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots local graph around a junction, for debugging purposes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.plot_scaled_energies">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">plot_scaled_energies</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.plot_scaled_energies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot scaled energies</p>
+<p>sheet: a:class: Sheet object
+geom: a <code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code> class
+model: a :class:’Model’
+scales: np.linspace of float</p>
+<p>fig: a :class:matplotlib.figure.Figure instance
+ax: :class:matplotlib.Axes instance, default None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.quick_edge_draw">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">quick_edge_draw</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_spec_kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.quick_edge_draw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.plt_draw.sheet_view">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.plt_draw.</span></code><code class="sig-name descname"><span class="pre">sheet_view</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_specs_kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.plt_draw.sheet_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base view function, parametrizable
+through draw_secs</p>
+<p>The default sheet_spec specification is:</p>
+<dl>
+<dt>{‘edge’: {</dt><dd><blockquote>
+<div><p>‘visible’: True,
+‘width’: 0.5,
+‘head_width’: 0.2, # arrow head width for the edges
+‘length_includes_head’: True, # see matplotlib Arrow artist doc
+‘shape’: ‘right’,
+‘color’: ‘#2b5d0a’, # can be an array
+‘alpha’: 0.8,
+‘zorder’: 1,
+‘colormap’: ‘viridis’},</p>
+</div></blockquote>
+<dl class="simple">
+<dt>‘vert’: {</dt><dd><p>‘visible’: True,
+‘s’: 100,
+‘color’: ‘#000a4b’,
+‘alpha’: 0.3,
+‘zorder’: 2},</p>
+</dd>
+<dt>‘face’: {</dt><dd><p>‘visible’: False,
+‘color’: ‘#8aa678’,
+‘alpha’: 1.0,
+‘zorder’: -1}
+}</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.draw">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tyssue.draw" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.draw.highlight_cells">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.</span></code><code class="sig-name descname"><span class="pre">highlight_cells</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cells</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_visible</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.highlight_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a column ‘visible’ to True for all the faces of the
+cells passed as argument (for a 3D tyssue).</p>
+<p>If no such column exists in eptm.face_df, creates it.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.highlight_faces">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.</span></code><code class="sig-name descname"><span class="pre">highlight_faces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">faces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_visible</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.highlight_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the faces visibility to 1</p>
+<p>If <cite>reset_visible</cite> is <cite>True</cite>, sets all the other faces
+to <cite>visible = False</cite></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.draw.sheet_view">
+<code class="sig-prename descclassname"><span class="pre">tyssue.draw.</span></code><code class="sig-name descname"><span class="pre">sheet_view</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y',</span> <span class="pre">'z']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2D'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">draw_specs_kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.draw.sheet_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main plotting function in 2D or 3D.</p>
+<p>sheet: <code class="xref py py-class docutils literal notranslate"><span class="pre">Epithelium</span></code> instance
+coords: list of strings,</p>
+<blockquote>
+<div><p>the coordinates over which to do the plot</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ax: :class:matplotlib.Axes instance, default None</dt><dd><p>axis over which to plot the sheet, for quick and</p>
+</dd>
+<dt>mode: str, {‘2D’|’quick’|’3D’|’vispy’}, default ‘2D’</dt><dd><p>the type of graph to plot (see bellow)</p>
+</dd>
+</dl>
+<p>fig, {ax|meshes}:</p>
+</dd></dl>
+
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./source"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

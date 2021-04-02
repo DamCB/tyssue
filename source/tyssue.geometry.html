@@ -1,0 +1,1147 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tyssue.geometry package &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../notebooks/D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/source/tyssue.geometry.rst"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#submodules">
+   Submodules
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.geometry.base_geometry">
+   tyssue.geometry.base_geometry module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.geometry.bulk_geometry">
+   tyssue.geometry.bulk_geometry module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.geometry.multisheetgeometry">
+   tyssue.geometry.multisheetgeometry module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.geometry.planar_geometry">
+   tyssue.geometry.planar_geometry module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.geometry.sheet_geometry">
+   tyssue.geometry.sheet_geometry module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.geometry.utils">
+   tyssue.geometry.utils module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-tyssue.geometry">
+   Module contents
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="tyssue-geometry-package">
+<h1>tyssue.geometry package<a class="headerlink" href="#tyssue-geometry-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tyssue.geometry.base_geometry">
+<span id="tyssue-geometry-base-geometry-module"></span><h2>tyssue.geometry.base_geometry module<a class="headerlink" href="#module-tyssue.geometry.base_geometry" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.base_geometry.</span></code><code class="sig-name descname"><span class="pre">BaseGeometry</span></code><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry.center">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">center</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry.center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transates the epithelium vertices so that the center
+of mass is at the center of the coordinate system,
+and updates the geometry</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry.dist_to_point">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">dist_to_point</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vert_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry.dist_to_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the distance of all vertices from point over the
+coordinates</p>
+<dl class="simple">
+<dt>vert_df: a <code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> with the points coordinates</dt><dd><p>in the columns given by the <cite>coords</cite> argument</p>
+</dd>
+<dt>point: a doublet (in 2D) or triplet (in 3D) giving the reference point</dt><dd><p>coordinates</p>
+</dd>
+</dl>
+<p>coords: list of 2 or 3 strings giving the column names</p>
+<dl class="simple">
+<dt>distance: a <code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.Series</span></code> with the same length</dt><dd><p>as the input <cite>vert_df</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry.scale">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">scale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scales the coordinates <cite>coords</cite>
+by a factor <cite>delta</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry.update_all">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry.update_centroid">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_centroid</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry.update_centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the face_df <cite>coords</cite> columns as the face’s vertices
+center of mass. Also updates the edge_df fx, fy, fz columns
+with their upcasted values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry.update_dcoords">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_dcoords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry.update_dcoords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the edge vector coordinates  on the
+<cite>coords</cite> basis (<cite>default_coords</cite> by default).
+Modifies the corresponding
+columns (i.e <cite>[‘dx’, ‘dy’, ‘dz’]</cite>) in sheet.edge_df.</p>
+<p>Also updates the upcasted coordinates of the source and target
+vertices</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry.update_length">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_length</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry.update_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the edge_df <cite>length</cite> column on the <cite>coords</cite> basis</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry.update_perimeters">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_perimeters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry.update_perimeters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the perimeter of each face.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.base_geometry.BaseGeometry.update_ucoords">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_ucoords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.BaseGeometry.update_ucoords" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.geometry.base_geometry.update_periodic_dcoords">
+<code class="sig-prename descclassname"><span class="pre">tyssue.geometry.base_geometry.</span></code><code class="sig-name descname"><span class="pre">update_periodic_dcoords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.base_geometry.update_periodic_dcoords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the coordinates for periodic boundary conditions.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.geometry.bulk_geometry">
+<span id="tyssue-geometry-bulk-geometry-module"></span><h2>tyssue.geometry.bulk_geometry module<a class="headerlink" href="#module-tyssue.geometry.bulk_geometry" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tyssue.geometry.bulk_geometry.BulkGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.bulk_geometry.</span></code><code class="sig-name descname"><span class="pre">BulkGeometry</span></code><a class="headerlink" href="#tyssue.geometry.bulk_geometry.BulkGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.sheet_geometry.SheetGeometry" title="tyssue.geometry.sheet_geometry.SheetGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.sheet_geometry.SheetGeometry</span></code></a></p>
+<p>Geometry functions for 3D cell arangements</p>
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.BulkGeometry.update_all">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.BulkGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the eptm geometry by updating:
+* the edge vector coordinates
+* the edge lengths
+* the face centroids
+* the normals to each edge associated face
+* the face areas
+* the cell areas
+* the vertices heights (depends on geometry)
+* the face volumes (depends on geometry)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.BulkGeometry.update_areas">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_areas</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.BulkGeometry.update_areas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the normal coordniate of each (srce, trgt, face) face.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.BulkGeometry.update_centroid">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_centroid</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.BulkGeometry.update_centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the face_df <cite>coords</cite> columns as the face’s vertices
+center of mass. Also updates the edge_df fx, fy, fz columns
+with their upcasted values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.BulkGeometry.update_dcoords">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_dcoords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.BulkGeometry.update_dcoords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the edge vector coordinates  on the
+<cite>coords</cite> basis (<cite>default_coords</cite> by default).
+Modifies the corresponding
+columns (i.e <cite>[‘dx’, ‘dy’, ‘dz’]</cite>) in sheet.edge_df.</p>
+<p>Also updates the upcasted coordinates of the source and target
+vertices</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.BulkGeometry.update_ucoords">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_ucoords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.BulkGeometry.update_ucoords" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.BulkGeometry.update_vol">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_vol</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.BulkGeometry.update_vol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.BulkGeometry.validate_face_norms">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">validate_face_norms</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.BulkGeometry.validate_face_norms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.bulk_geometry.</span></code><code class="sig-name descname"><span class="pre">ClosedMonolayerGeometry</span></code><a class="headerlink" href="#tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.bulk_geometry.MonolayerGeometry" title="tyssue.geometry.bulk_geometry.MonolayerGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.bulk_geometry.MonolayerGeometry</span></code></a></p>
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry.update_all">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the eptm geometry by updating:
+* the edge vector coordinates
+* the edge lengths
+* the face centroids
+* the normals to each edge associated face
+* the face areas
+* the cell areas
+* the vertices heights (depends on geometry)
+* the face volumes (depends on geometry)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry.update_lumen_vol">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_lumen_vol</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry.update_lumen_vol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.geometry.bulk_geometry.MonoLayerGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.bulk_geometry.</span></code><code class="sig-name descname"><span class="pre">MonoLayerGeometry</span></code><a class="headerlink" href="#tyssue.geometry.bulk_geometry.MonoLayerGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.bulk_geometry.MonolayerGeometry" title="tyssue.geometry.bulk_geometry.MonolayerGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.bulk_geometry.MonolayerGeometry</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.geometry.bulk_geometry.MonolayerGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.bulk_geometry.</span></code><code class="sig-name descname"><span class="pre">MonolayerGeometry</span></code><a class="headerlink" href="#tyssue.geometry.bulk_geometry.MonolayerGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.bulk_geometry.RNRGeometry" title="tyssue.geometry.bulk_geometry.RNRGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.bulk_geometry.RNRGeometry</span></code></a></p>
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.MonolayerGeometry.basal_apical_axis">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">basal_apical_axis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.MonolayerGeometry.basal_apical_axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a unit vector allong the apical-basal axis of the cell</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.MonolayerGeometry.cell_projected_pos">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">cell_projected_pos</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.MonolayerGeometry.cell_projected_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the positions of the cell vertices
+transformed such that the cell center sits at the
+coordinate system’s origin and the basal-apical axis
+is the new <cite>z</cite> axis.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.geometry.bulk_geometry.RNRGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.bulk_geometry.</span></code><code class="sig-name descname"><span class="pre">RNRGeometry</span></code><a class="headerlink" href="#tyssue.geometry.bulk_geometry.RNRGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.bulk_geometry.BulkGeometry" title="tyssue.geometry.bulk_geometry.BulkGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.bulk_geometry.BulkGeometry</span></code></a></p>
+<dl class="py method">
+<dt id="tyssue.geometry.bulk_geometry.RNRGeometry.update_centroid">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_centroid</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.bulk_geometry.RNRGeometry.update_centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the face_df <cite>coords</cite> columns as the face’s vertices
+center of mass. Also updates the edge_df fx, fy, fz columns
+with their upcasted values</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.geometry.multisheetgeometry">
+<span id="tyssue-geometry-multisheetgeometry-module"></span><h2>tyssue.geometry.multisheetgeometry module<a class="headerlink" href="#module-tyssue.geometry.multisheetgeometry" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tyssue.geometry.multisheetgeometry.MultiSheetGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.multisheetgeometry.</span></code><code class="sig-name descname"><span class="pre">MultiSheetGeometry</span></code><a class="headerlink" href="#tyssue.geometry.multisheetgeometry.MultiSheetGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Geometry class for stacked 2D sheets</p>
+<dl class="py method">
+<dt id="tyssue.geometry.multisheetgeometry.MultiSheetGeometry.update_all">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.multisheetgeometry.MultiSheetGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.multisheetgeometry.MultiSheetGeometry.update_heights">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_heights</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.multisheetgeometry.MultiSheetGeometry.update_heights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.geometry.planar_geometry">
+<span id="tyssue-geometry-planar-geometry-module"></span><h2>tyssue.geometry.planar_geometry module<a class="headerlink" href="#module-tyssue.geometry.planar_geometry" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tyssue.geometry.planar_geometry.AnnularGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.planar_geometry.</span></code><code class="sig-name descname"><span class="pre">AnnularGeometry</span></code><a class="headerlink" href="#tyssue.geometry.planar_geometry.AnnularGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.planar_geometry.PlanarGeometry" title="tyssue.geometry.planar_geometry.PlanarGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.planar_geometry.PlanarGeometry</span></code></a></p>
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.AnnularGeometry.update_all">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.AnnularGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the sheet geometry by updating:
+* the edge vector coordinates
+* the edge lengths
+* the face centroids
+* the normals to each edge associated face
+* the face areas</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.AnnularGeometry.update_lumen_volume">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_lumen_volume</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.AnnularGeometry.update_lumen_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.geometry.planar_geometry.PlanarGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.planar_geometry.</span></code><code class="sig-name descname"><span class="pre">PlanarGeometry</span></code><a class="headerlink" href="#tyssue.geometry.planar_geometry.PlanarGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.base_geometry.BaseGeometry" title="tyssue.geometry.base_geometry.BaseGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.base_geometry.BaseGeometry</span></code></a></p>
+<p>Geomtetry methods for 2D planar cell arangements</p>
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.PlanarGeometry.face_projected_pos">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">face_projected_pos</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.PlanarGeometry.face_projected_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the sheet vertices position translated to center the face
+<cite>face</cite> at (0, 0) and rotated in the (x, y) plane
+by and angle <cite>psi</cite> radians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.PlanarGeometry.get_phis">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">get_phis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.PlanarGeometry.get_phis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.PlanarGeometry.update_all">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.PlanarGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the sheet geometry by updating:
+* the edge vector coordinates
+* the edge lengths
+* the face centroids
+* the normals to each edge associated face
+* the face areas</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.PlanarGeometry.update_areas">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_areas</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.PlanarGeometry.update_areas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the normal coordinate of each (srce, trgt, face) face.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.PlanarGeometry.update_normals">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_normals</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.PlanarGeometry.update_normals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.planar_geometry.</span></code><code class="sig-name descname"><span class="pre">WeightedPerimeterPlanarGeometry</span></code><a class="headerlink" href="#tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.planar_geometry.PlanarGeometry" title="tyssue.geometry.planar_geometry.PlanarGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.planar_geometry.PlanarGeometry</span></code></a></p>
+<p>Geometry methods for 2D planar cell arangements with a calculation
+of perimeter is based on weight of each junction.</p>
+<p>Meaning if all junction of a cell have the same weight, perimeter is
+calculated as a usual perimeter calculation (p = l_ij + l_jk + l_km + l_mn + l_ni)
+Otherwise, weight parameter allowed more or less importance of a junction in the
+perimeter calculation (p = w_ij*l_ij + w_jk*l_jk + w_km*l_km + w_mn*l_mn + w_ni*l_ni)</p>
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry.normalize_weights">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">normalize_weights</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry.normalize_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize weight of each cell.
+Sum of all weights of one cell equals to one.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry.update_all">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the sheet geometry by updating:
+* the edge vector coordinates
+* the edge lengths
+* the face centroids
+* the normals to each edge associated face
+* the face areas</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry.update_perimeters">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_perimeters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry.update_perimeters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the perimeter of each face according to the weight of each junction.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.geometry.sheet_geometry">
+<span id="tyssue-geometry-sheet-geometry-module"></span><h2>tyssue.geometry.sheet_geometry module<a class="headerlink" href="#module-tyssue.geometry.sheet_geometry" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tyssue.geometry.sheet_geometry.ClosedSheetGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.sheet_geometry.</span></code><code class="sig-name descname"><span class="pre">ClosedSheetGeometry</span></code><a class="headerlink" href="#tyssue.geometry.sheet_geometry.ClosedSheetGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.sheet_geometry.SheetGeometry" title="tyssue.geometry.sheet_geometry.SheetGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.sheet_geometry.SheetGeometry</span></code></a></p>
+<p>Geometry for a closed 2.5D sheet.</p>
+<p>Apart from the geometry update from a normal sheet, the enclosed
+volume is also computed. The value is stored in <cite>sheet.settings[“lumen_vol”]</cite></p>
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.ClosedSheetGeometry.update_all">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.ClosedSheetGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the sheet geometry by updating:
+* the edge vector coordinates
+* the edge lengths
+* the face centroids
+* the normals to each edge associated face
+* the face areas
+* the vertices heights (depends on geometry)
+* the face volumes (depends on geometry)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.ClosedSheetGeometry.update_lumen_vol">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_lumen_vol</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.ClosedSheetGeometry.update_lumen_vol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.geometry.sheet_geometry.EllipsoidGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.sheet_geometry.</span></code><code class="sig-name descname"><span class="pre">EllipsoidGeometry</span></code><a class="headerlink" href="#tyssue.geometry.sheet_geometry.EllipsoidGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.sheet_geometry.ClosedSheetGeometry" title="tyssue.geometry.sheet_geometry.ClosedSheetGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.sheet_geometry.ClosedSheetGeometry</span></code></a></p>
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.EllipsoidGeometry.scale">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">scale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.EllipsoidGeometry.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scales the coordinates <cite>coords</cite>
+by a factor <cite>delta</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.EllipsoidGeometry.update_height">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_height</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.EllipsoidGeometry.update_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the height of the sheet vertices, based on the geometry
+specified in the sheet settings:</p>
+<p><cite>sheet.settings[‘geometry’]</cite> can be set to</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>cylindrical</cite>: the vertex height is</dt><dd><p>measured with respect to the distance to the the axis
+specified in sheet.settings[‘height_axis’] (e.g <cite>z</cite>)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>flat</cite>: the vertex height is</dt><dd><p>measured with respect to the position on the axis
+specified in sheet.settings[‘height_axis’]</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘spherical’: the vertex height is measured with respect to its</dt><dd><p>distance to the coordinate system centers</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘rod’: the vertex height is measured with respect to its</dt><dd><p>distance to the coordinate height axis if between the focii, and
+from the closest focus otherwise. The focii positions are updated
+before the height update.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>In all the cases, this distance is shifted by an amount of
+<cite>sheet.vert_df[‘basal_shift’]</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.sheet_geometry.</span></code><code class="sig-name descname"><span class="pre">SheetGeometry</span></code><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.planar_geometry.PlanarGeometry" title="tyssue.geometry.planar_geometry.PlanarGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.planar_geometry.PlanarGeometry</span></code></a></p>
+<p>Geometry definitions for 2D sheets in 3D</p>
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.face_projected_pos">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">face_projected_pos</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.face_projected_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the position of a face vertices projected on a plane
+perpendicular to the face normal, and translated so that the face
+center is at the center of the coordinate system</p>
+<p>sheet: a :class:Sheet object
+face: int,</p>
+<blockquote>
+<div><p>the index of the face on which to rotate the sheet</p>
+</div></blockquote>
+<dl class="simple">
+<dt>psi: float,</dt><dd><p>Optional angle giving the rotation along the <cite>z</cite> axis</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>rot_pos: pd.DataFrame</dt><dd><p>The rotated, relative positions of the face’s vertices</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.face_rotation">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">face_rotation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.face_rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a 3D rotation matrix such that the face normal points
+in the z axis</p>
+<p>sheet: a :class:Sheet object
+face: int,</p>
+<blockquote>
+<div><p>the index of the face on which to rotate the sheet</p>
+</div></blockquote>
+<dl class="simple">
+<dt>psi: float,</dt><dd><p>Optional angle giving the rotation along the new <cite>z</cite> axis</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>rotation: (3, 3) np.ndarray</dt><dd><p>The rotation matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.face_rotations">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">face_rotations</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'edge'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.face_rotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the (sheet.Ne, 3, 3) array of rotation matrices
+such that each rotation returns a coordinate system (u, v, w) where the face
+vertices are mostly in the u, v plane.</p>
+<p>If method is ‘normal’, face is oriented with it’s normal along w
+if method is ‘svd’, the u, v, w is determined through singular value decompostion
+of the face vertices relative  positions.</p>
+<p>svd is slower but more effective at reducing face dimensionality.</p>
+<dl class="simple">
+<dt>output_as: string, default ‘edge’ Return the (sheet.Ne, 3, 3),</dt><dd><p>else ‘face’ Return the (sheet.Nf, 3, 3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.get_phis">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">get_phis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'normal'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.get_phis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the angle of the vertices in the plane perpendicular
+to each face normal. For not-too-deformed faces, sorting vertices by this
+gives clockwize orientation.</p>
+<p>I think not-too-deformed means starconvex here.</p>
+<p>The ‘method’ argument is passed to face_rotations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.normal_rotations">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">normal_rotations</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'edge'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.normal_rotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the (sheet.Ne, 3, 3) array of rotation matrices
+such that each rotation aligns the coordinate system along each face normals</p>
+<dl class="simple">
+<dt>output_as: string, default ‘edge’ Return the (sheet.Ne, 3, 3),</dt><dd><p>else ‘face’ Return the (sheet.Nf, 3, 3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.reset_scafold">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">reset_scafold</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.reset_scafold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Re-centers and (in the case of a rod sheet) resets the
+a-b parameters and tip masks</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.svd_rotations">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">svd_rotations</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'edge'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.svd_rotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the (sheet.Ne, 3, 3) array of rotation matrices
+such that each rotation aligns the coordinate system according
+to each face vertex SVD</p>
+<dl class="simple">
+<dt>output_as: string, default ‘edge’ Return the (sheet.Ne, 3, 3),</dt><dd><p>else ‘face’ Return the (sheet.Nf, 3, 3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.update_all">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the sheet geometry by updating:
+* the edge vector coordinates
+* the edge lengths
+* the face centroids
+* the normals to each edge associated face
+* the face areas
+* the vertices heights (depends on geometry)
+* the face volumes (depends on geometry)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.update_areas">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_areas</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.update_areas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the normal coordniate of each (srce, trgt, face) face.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.update_height">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_height</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.update_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the height of the sheet vertices, based on the geometry
+specified in the sheet settings:</p>
+<p><cite>sheet.settings[‘geometry’]</cite> can be set to</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>cylindrical</cite>: the vertex height is</dt><dd><p>measured with respect to the distance to the the axis
+specified in sheet.settings[‘height_axis’] (e.g <cite>z</cite>)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>flat</cite>: the vertex height is</dt><dd><p>measured with respect to the position on the axis
+specified in sheet.settings[‘height_axis’]</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘spherical’: the vertex height is measured with respect to its</dt><dd><p>distance to the coordinate system centers</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘rod’: the vertex height is measured with respect to its</dt><dd><p>distance to the coordinate height axis if between the focii, and
+from the closest focus otherwise. The focii positions are updated
+before the height update.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>In all the cases, this distance is shifted by an amount of
+<cite>sheet.vert_df[‘basal_shift’]</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.update_normals">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_normals</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.update_normals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the face_df <cite>coords</cite> columns as the face’s vertices
+center of mass.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.SheetGeometry.update_vol">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_vol</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.SheetGeometry.update_vol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note that this is an approximation of the sheet geometry
+module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tyssue.geometry.sheet_geometry.</span></code><code class="sig-name descname"><span class="pre">WeightedPerimeterEllipsoidLameGeometry</span></code><a class="headerlink" href="#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tyssue.geometry.sheet_geometry.ClosedSheetGeometry" title="tyssue.geometry.sheet_geometry.ClosedSheetGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">tyssue.geometry.sheet_geometry.ClosedSheetGeometry</span></code></a></p>
+<p>EllipsoidLameGeometry correspond to a super-egg geometry with a calculation
+of perimeter is based on weight of each junction.</p>
+<p>Meaning if all junction of a cell have the same weight, perimeter is
+calculated as a usual perimeter calculation (p = l_ij + l_jk + l_km + l_mn + l_ni)
+Otherwise, weight parameter allowed more or less importance of a junction in the
+perimeter calculation (p = w_ij*l_ij + w_jk*l_jk + w_km*l_km + w_mn*l_mn + w_ni*l_ni)</p>
+<p>In this geometry, a sphere surrounding the tissue, meaning a force is apply only at
+the extremity of the tissue; <cite>eptm.vert_df[‘delta_rho’]</cite> is computed as the
+difference between the vertex radius in a spherical frame of reference
+and <cite>eptm.settings[‘barrier_radius’]</cite></p>
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.normalize_weights">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">normalize_weights</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.normalize_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize weight of each cell.
+Sum of all weights of one cell equals to one.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.update_all">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">update_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.update_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the sheet geometry by updating:
+* the edge vector coordinates
+* the edge lengths
+* the face centroids
+* the normals to each edge associated face
+* the face areas
+* the vertices heights (depends on geometry)
+* the face volumes (depends on geometry)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.update_height">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_height</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.update_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the height of the sheet vertices, based on the geometry
+specified in the sheet settings:</p>
+<p><cite>sheet.settings[‘geometry’]</cite> can be set to</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>cylindrical</cite>: the vertex height is</dt><dd><p>measured with respect to the distance to the the axis
+specified in sheet.settings[‘height_axis’] (e.g <cite>z</cite>)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>flat</cite>: the vertex height is</dt><dd><p>measured with respect to the position on the axis
+specified in sheet.settings[‘height_axis’]</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘spherical’: the vertex height is measured with respect to its</dt><dd><p>distance to the coordinate system centers</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘rod’: the vertex height is measured with respect to its</dt><dd><p>distance to the coordinate height axis if between the focii, and
+from the closest focus otherwise. The focii positions are updated
+before the height update.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>In all the cases, this distance is shifted by an amount of
+<cite>sheet.vert_df[‘basal_shift’]</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.update_perimeters">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">update_perimeters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.update_perimeters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the perimeter of each face according to the weight of each junction.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.geometry.sheet_geometry.face_svd_">
+<code class="sig-prename descclassname"><span class="pre">tyssue.geometry.sheet_geometry.</span></code><code class="sig-name descname"><span class="pre">face_svd_</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">faces</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.sheet_geometry.face_svd_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.geometry.utils">
+<span id="tyssue-geometry-utils-module"></span><h2>tyssue.geometry.utils module<a class="headerlink" href="#module-tyssue.geometry.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tyssue.geometry.utils.rotation_matrices">
+<code class="sig-prename descclassname"><span class="pre">tyssue.geometry.utils.</span></code><code class="sig-name descname"><span class="pre">rotation_matrices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.utils.rotation_matrices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an (N, 3, 3) array of rotation matrices
+along N angles and N directions</p>
+<dl class="simple">
+<dt>angle<span class="classifier">np.ndarray of shape (N,)</span></dt><dd><p>array of rotation angles</p>
+</dd>
+<dt>directions<span class="classifier">np.ndarray of shape (N, 3)</span></dt><dd><p>array of rotation vectors</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>rots<span class="classifier">np.ndarray of shape (N, 3, 3)</span></dt><dd><p>the array of rotation matrices</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.geometry.utils.rotation_matrix">
+<code class="sig-prename descclassname"><span class="pre">tyssue.geometry.utils.</span></code><code class="sig-name descname"><span class="pre">rotation_matrix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.utils.rotation_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the 3X3 rotation matrix around <cite>direction</cite> by <cite>angle</cite></p>
+<p>adapted from <a class="reference external" href="http://www.lfd.uci.edu/~gohlke/code/transformations.py.html">http://www.lfd.uci.edu/~gohlke/code/transformations.py.html</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tyssue.geometry.utils.update_spherical">
+<code class="sig-prename descclassname"><span class="pre">tyssue.geometry.utils.</span></code><code class="sig-name descname"><span class="pre">update_spherical</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eptm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tyssue.geometry.utils.update_spherical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the spherical coordinates (rho, theta, phi)
+of an epithelium.</p>
+<p>rho is the distance to the coordinate system’s origin, theta
+is the co-latitude (0 ≤ θ &lt; π) and phi is the longitude (0 ≤ ϕ &lt; 2π).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tyssue.geometry">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tyssue.geometry" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./source"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

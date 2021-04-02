@@ -1,0 +1,2923 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/C-2DMigration.html">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="notebooks/D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.actions.ab_pull">ab_pull() (in module tyssue.behaviors.monolayer.actions)</a>
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.ab_pull">(in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.actions.ab_pull_edge">ab_pull_edge() (in module tyssue.behaviors.monolayer.actions)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector">AbstractEffector (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.base_topology.add_vert">add_vert() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.add_vert">[1]</a>
+</li>
+      <li><a href="source/tyssue.topology.html#tyssue.topology.all_rearangements">all_rearangements() (in module tyssue.topology)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.AnnularGeometry">AnnularGeometry (class in tyssue.geometry.planar_geometry)</a>
+</li>
+      <li><a href="API.html#tyssue.generation.shapes.AnnularSheet">AnnularSheet (class in tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.AnnularSheet">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.apical_edges">apical_edges() (tyssue.core.monolayer.Monolayer property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.generation.shapes.AnnularSheet.apical_edges">(tyssue.generation.shapes.AnnularSheet property)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.AnnularSheet.apical_edges">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.Monolayer.apical_edges">(tyssue.Monolayer property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.apical_faces">apical_faces() (tyssue.core.monolayer.Monolayer property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Monolayer.apical_faces">(tyssue.Monolayer property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.apical_verts">apical_verts() (tyssue.core.monolayer.Monolayer property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.generation.shapes.AnnularSheet.apical_verts">(tyssue.generation.shapes.AnnularSheet property)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.AnnularSheet.apical_verts">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.Monolayer.apical_verts">(tyssue.Monolayer property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension">ApicoBasalTension (class in tyssue.dynamics.apoptosis_model)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension">[1]</a>
+</li>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.apoptosis_events.apoptosis">apoptosis() (in module tyssue.behaviors.monolayer.apoptosis_events)</a>
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.apoptosis_events.apoptosis">(in module tyssue.behaviors.sheet.apoptosis_events)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.html#tyssue.behaviors.event_manager.EventManager.append">append() (tyssue.behaviors.event_manager.EventManager method)</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.quasistatic.QSSolver.approx_grad">approx_grad() (tyssue.solvers.quasistatic.QSSolver method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#tyssue.solvers.sheet_vertex_solver.Solver.approx_grad">(tyssue.solvers.sheet_vertex_solver.Solver class method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.utils.utils.ar_calculation">ar_calculation() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.ar_calculation">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.planar_gradients.area_grad">area_grad() (in module tyssue.dynamics.planar_gradients)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.planar_gradients.area_grad">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.sheet_gradients.area_grad">(in module tyssue.dynamics.sheet_gradients)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.sheet_gradients.area_grad">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.collisions.solvers.auto_collisions">auto_collisions() (in module tyssue.collisions.solvers)</a>, <a href="source/tyssue.collisions.html#tyssue.collisions.solvers.auto_collisions">[1]</a>
+</li>
+      <li><a href="source/tyssue.topology.html#tyssue.topology.auto_t1">auto_t1() (in module tyssue.topology)</a>
+</li>
+      <li><a href="source/tyssue.topology.html#tyssue.topology.auto_t3">auto_t3() (in module tyssue.topology)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.backup">backup() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.backup">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.dynamics.effectors.BarrierElasticity">BarrierElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BarrierElasticity">[1]</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.MonolayerGeometry.basal_apical_axis">basal_apical_axis() (tyssue.geometry.bulk_geometry.MonolayerGeometry static method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.MonolayerGeometry.basal_apical_axis">(tyssue.MonolayerGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.basal_edges">basal_edges() (tyssue.core.monolayer.Monolayer property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.generation.shapes.AnnularSheet.basal_edges">(tyssue.generation.shapes.AnnularSheet property)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.AnnularSheet.basal_edges">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.Monolayer.basal_edges">(tyssue.Monolayer property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.basal_faces">basal_faces() (tyssue.core.monolayer.Monolayer property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Monolayer.basal_faces">(tyssue.Monolayer property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.basal_verts">basal_verts() (tyssue.core.monolayer.Monolayer property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.generation.shapes.AnnularSheet.basal_verts">(tyssue.generation.shapes.AnnularSheet property)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.AnnularSheet.basal_verts">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.Monolayer.basal_verts">(tyssue.Monolayer property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry">BaseGeometry (class in tyssue.geometry.base_geometry)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity">BorderElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.draw.ipv_draw.browse_history">browse_history() (in module tyssue.draw.ipv_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.ipv_draw.browse_history">[1]</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.isotropic_solver.bruteforce_isotropic_relax">bruteforce_isotropic_relax() (in module tyssue.solvers.isotropic_solver)</a>
+</li>
+      <li><a href="source/tyssue.config.core.html#tyssue.config.core.bulk_spec">bulk_spec() (in module tyssue.config.core)</a>
+
+      <ul>
+        <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.bulk_spec">(in module tyssue.config.geometry)</a>
+</li>
+        <li><a href="source/tyssue.config.subdiv.html#tyssue.config.subdiv.bulk_spec">(in module tyssue.config.subdiv)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.BulkGeometry">BulkGeometry (class in tyssue)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.BulkGeometry">(class in tyssue.geometry.bulk_geometry)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.utils.utils.cell_centered_patch">cell_centered_patch() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.cell_centered_patch">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.cell_df">cell_df() (tyssue.core.objects.Epithelium property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.cell_df">(tyssue.Epithelium property)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.cell_division">cell_division() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.cell_division">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.topology.monolayer_topology.cell_division">(in module tyssue.topology.monolayer_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.monolayer_topology.cell_division">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.topology.sheet_topology.cell_division">(in module tyssue.topology.sheet_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.sheet_topology.cell_division">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.History.cell_h">cell_h() (tyssue.core.history.History property)</a>
+</li>
+      <li><a href="API.html#tyssue.utils.decorators.cell_lookup">cell_lookup() (in module tyssue.utils.decorators)</a>, <a href="source/tyssue.utils.html#tyssue.utils.decorators.cell_lookup">[1]</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.MonolayerGeometry.cell_projected_pos">cell_projected_pos() (tyssue.geometry.bulk_geometry.MonolayerGeometry class method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.MonolayerGeometry.cell_projected_pos">(tyssue.MonolayerGeometry class method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity">CellAreaElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity">CellVolumeElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity">[1]</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry.center">center() (tyssue.geometry.base_geometry.BaseGeometry static method)</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.quasistatic.QSSolver.check_grad">check_grad() (tyssue.solvers.quasistatic.QSSolver method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#tyssue.solvers.sheet_vertex_solver.Solver.check_grad">(tyssue.solvers.sheet_vertex_solver.Solver class method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.basic_events.check_tri_faces">check_tri_faces() (in module tyssue.behaviors.sheet.basic_events)</a>
+</li>
+      <li><a href="API.html#tyssue.generation.hexagonal_grids.circle">circle() (in module tyssue.generation.hexagonal_grids)</a>, <a href="source/tyssue.generation.html#tyssue.generation.hexagonal_grids.circle">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.close_cell">close_cell() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.close_cell">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.base_topology.close_face">close_face() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.close_face">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.ClosedMonolayerGeometry">ClosedMonolayerGeometry (class in tyssue)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry">(class in tyssue.geometry.bulk_geometry)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.ClosedSheetGeometry">ClosedSheetGeometry (class in tyssue)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.ClosedSheetGeometry">(class in tyssue.geometry.sheet_geometry)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.topology.base_topology.collapse_edge">collapse_edge() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.collapse_edge">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.collisions.solvers.CollidingBoxes">CollidingBoxes (class in tyssue.collisions.solvers)</a>, <a href="source/tyssue.collisions.html#tyssue.collisions.solvers.CollidingBoxes">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.utils.utils.combine_specs">combine_specs() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.combine_specs">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.multisheet.MultiSheet.concat_datasets">concat_datasets() (tyssue.core.multisheet.MultiSheet method)</a>
+</li>
+      <li><a href="API.html#tyssue.topology.base_topology.condition_4i">condition_4i() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.condition_4i">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.base_topology.condition_4ii">condition_4ii() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.condition_4ii">[1]</a>
+</li>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.delamination_events.constriction">constriction() (in module tyssue.behaviors.monolayer.delamination_events)</a>
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.delamination_events.constriction">(in module tyssue.behaviors.sheet.delamination_events)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.actions.contract">contract() (in module tyssue.behaviors.monolayer.actions)</a>
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.contract">(in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.actions.contract_apical_face">contract_apical_face() (in module tyssue.behaviors.monolayer.actions)</a>
+</li>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.basic_events.contraction">contraction() (in module tyssue.behaviors.monolayer.basic_events)</a>
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.basic_events.contraction">(in module tyssue.behaviors.sheet.basic_events)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.basic_events.contraction_line_tension">contraction_line_tension() (in module tyssue.behaviors.sheet.basic_events)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.copy">copy() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.copy">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.generation.modifiers.create_anchors">create_anchors() (in module tyssue.generation.modifiers)</a>, <a href="source/tyssue.generation.html#tyssue.generation.modifiers.create_anchors">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.create_gif">create_gif() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.create_gif">[1]</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.viscous.EulerSolver.current_pos">current_pos() (tyssue.solvers.viscous.EulerSolver property)</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.curved_view">curved_view() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.curved_view">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.cut_out">cut_out() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.cut_out">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.cylindrical_sheet">cylindrical_sheet() (in module tyssue.config.geometry)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.utils.utils.data_at_opposite">data_at_opposite() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.data_at_opposite">[1]</a>
+</li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.decrease">decrease() (in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.detach_vertices">detach_vertices() (in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.dimensionalize">dimensionalize() (in module tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.dimensionalize">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.dimensionless">dimensionless (tyssue.dynamics.effectors.FaceAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.dimensionless">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.dimensions">dimensions (tyssue.dynamics.apoptosis_model.ApicoBasalTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.dimensions">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.dimensions">(tyssue.dynamics.effectors.AbstractEffector attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BarrierElasticity.dimensions">(tyssue.dynamics.effectors.BarrierElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BarrierElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity.dimensions">(tyssue.dynamics.effectors.BorderElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity.dimensions">(tyssue.dynamics.effectors.CellAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity.dimensions">(tyssue.dynamics.effectors.CellVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.dimensions">(tyssue.dynamics.effectors.FaceAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceContractility.dimensions">(tyssue.dynamics.effectors.FaceContractility attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceContractility.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity.dimensions">(tyssue.dynamics.effectors.FaceVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity.dimensions">(tyssue.dynamics.effectors.LengthElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineTension.dimensions">(tyssue.dynamics.effectors.LineTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineTension.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineViscosity.dimensions">(tyssue.dynamics.effectors.LineViscosity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineViscosity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenAreaElasticity.dimensions">(tyssue.dynamics.effectors.LumenAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenAreaElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity.dimensions">(tyssue.dynamics.effectors.LumenVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.PerimeterElasticity.dimensions">(tyssue.dynamics.effectors.PerimeterElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.PerimeterElasticity.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.RadialTension.dimensions">(tyssue.dynamics.effectors.RadialTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.RadialTension.dimensions">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.SurfaceTension.dimensions">(tyssue.dynamics.effectors.SurfaceTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.SurfaceTension.dimensions">[1]</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry.dist_to_point">dist_to_point() (tyssue.geometry.base_geometry.BaseGeometry static method)</a>
+</li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.basic_events.division">division() (in module tyssue.behaviors.sheet.basic_events)</a>
+</li>
+      <li><a href="API.html#tyssue.utils.decorators.do_undo">do_undo() (in module tyssue.utils.decorators)</a>, <a href="source/tyssue.utils.html#tyssue.utils.decorators.do_undo">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.draw_edge">draw_edge() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.draw_edge">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.draw_face">draw_face() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.draw_face">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.draw_vert">draw_vert() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.draw_vert">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.base_topology.drop_two_sided_faces">drop_two_sided_faces() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.drop_two_sided_faces">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.multisheet.MultiSheet.e_idxs">e_idxs() (tyssue.core.multisheet.MultiSheet property)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.edge_df">edge_df() (tyssue.core.objects.Epithelium property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.edge_df">(tyssue.Epithelium property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.History.edge_h">edge_h() (tyssue.core.history.History property)</a>
+</li>
+      <li><a href="API.html#tyssue.draw.ipv_draw.edge_mesh">edge_mesh() (in module tyssue.draw.ipv_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.ipv_draw.edge_mesh">[1]</a>
+</li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv.edge_point_cloud">edge_point_cloud() (tyssue.particles.point_cloud.EdgeSubdiv method)</a>
+</li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv">EdgeSubdiv (class in tyssue.particles.point_cloud)</a>
+</li>
+      <li><a href="source/tyssue.utils.html#tyssue.utils.testing.effector_tester">effector_tester() (in module tyssue.utils.testing)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.elastic_energy">elastic_energy() (in module tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.elastic_energy">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.elastic_force">elastic_force() (in module tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.elastic_force">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.utils.utils.elem_centered_patch">elem_centered_patch() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.elem_centered_patch">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.element">element (tyssue.dynamics.apoptosis_model.ApicoBasalTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.element">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.element">(tyssue.dynamics.effectors.AbstractEffector attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BarrierElasticity.element">(tyssue.dynamics.effectors.BarrierElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BarrierElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity.element">(tyssue.dynamics.effectors.BorderElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity.element">(tyssue.dynamics.effectors.CellAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity.element">(tyssue.dynamics.effectors.CellVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.element">(tyssue.dynamics.effectors.FaceAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceContractility.element">(tyssue.dynamics.effectors.FaceContractility attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceContractility.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity.element">(tyssue.dynamics.effectors.FaceVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity.element">(tyssue.dynamics.effectors.LengthElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineTension.element">(tyssue.dynamics.effectors.LineTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineTension.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineViscosity.element">(tyssue.dynamics.effectors.LineViscosity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineViscosity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenAreaElasticity.element">(tyssue.dynamics.effectors.LumenAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenAreaElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity.element">(tyssue.dynamics.effectors.LumenVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.PerimeterElasticity.element">(tyssue.dynamics.effectors.PerimeterElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.PerimeterElasticity.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.RadialTension.element">(tyssue.dynamics.effectors.RadialTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.RadialTension.element">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.SurfaceTension.element">(tyssue.dynamics.effectors.SurfaceTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.SurfaceTension.element">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.generation.shapes.ellipse_rho">ellipse_rho() (in module tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.ellipse_rho">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.generation.shapes.ellipsoid_sheet">ellipsoid_sheet() (in module tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.ellipsoid_sheet">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.geometry.sheet_geometry.EllipsoidGeometry">EllipsoidGeometry (class in tyssue.geometry.sheet_geometry)</a>, <a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.EllipsoidGeometry">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.energy">energy() (tyssue.dynamics.apoptosis_model.ApicoBasalTension static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.energy">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.energy">(tyssue.dynamics.effectors.AbstractEffector static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BarrierElasticity.energy">(tyssue.dynamics.effectors.BarrierElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BarrierElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity.energy">(tyssue.dynamics.effectors.BorderElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity.energy">(tyssue.dynamics.effectors.CellAreaElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity.energy">(tyssue.dynamics.effectors.CellVolumeElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.energy">(tyssue.dynamics.effectors.FaceAreaElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceContractility.energy">(tyssue.dynamics.effectors.FaceContractility static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceContractility.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity.energy">(tyssue.dynamics.effectors.FaceVolumeElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity.energy">(tyssue.dynamics.effectors.LengthElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineTension.energy">(tyssue.dynamics.effectors.LineTension static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineTension.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenAreaElasticity.energy">(tyssue.dynamics.effectors.LumenAreaElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenAreaElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity.energy">(tyssue.dynamics.effectors.LumenVolumeElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.PerimeterElasticity.energy">(tyssue.dynamics.effectors.PerimeterElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.PerimeterElasticity.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.RadialTension.energy">(tyssue.dynamics.effectors.RadialTension static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.RadialTension.energy">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.SurfaceTension.energy">(tyssue.dynamics.effectors.SurfaceTension static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.SurfaceTension.energy">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.Epithelium">Epithelium (class in tyssue)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium">(class in tyssue.core.objects)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.euler_characteristic">euler_characteristic() (in module tyssue.core.objects)</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.viscous.EulerSolver">EulerSolver (class in tyssue.solvers.viscous)</a>
+</li>
+      <li><a href="source/tyssue.behaviors.html#tyssue.behaviors.event_manager.EventManager">EventManager (class in tyssue.behaviors.event_manager)</a>
+</li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.exchange">exchange() (in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      <li><a href="source/tyssue.behaviors.html#tyssue.behaviors.event_manager.EventManager.execute">execute() (tyssue.behaviors.event_manager.EventManager method)</a>
+</li>
+      <li><a href="source/tyssue.behaviors.html#tyssue.behaviors.event_manager.EventManager.extend">extend() (tyssue.behaviors.event_manager.EventManager method)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.extract">extract() (tyssue.core.sheet.Sheet method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Sheet.extract">(tyssue.Sheet method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.extract_bounding_box">extract_bounding_box() (tyssue.core.sheet.Sheet method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Sheet.extract_bounding_box">(tyssue.Sheet method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.generation.modifiers.extrude">extrude() (in module tyssue.generation.modifiers)</a>, <a href="source/tyssue.generation.html#tyssue.generation.modifiers.extrude">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.multisheet.MultiSheet.f_idxs">f_idxs() (tyssue.core.multisheet.MultiSheet property)</a>
+</li>
+      <li><a href="API.html#tyssue.utils.utils.face_centered_patch">face_centered_patch() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.face_centered_patch">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.face_df">face_df() (tyssue.core.objects.Epithelium property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.face_df">(tyssue.Epithelium property)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.sheet_topology.face_division">face_division() (in module tyssue.topology.sheet_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.sheet_topology.face_division">[1]</a>
+</li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.basic_events.face_elimination">face_elimination() (in module tyssue.behaviors.sheet.basic_events)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.History.face_h">face_h() (tyssue.core.history.History property)</a>
+</li>
+      <li><a href="API.html#tyssue.utils.decorators.face_lookup">face_lookup() (in module tyssue.utils.decorators)</a>, <a href="source/tyssue.utils.html#tyssue.utils.decorators.face_lookup">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.draw.ipv_draw.face_mesh">face_mesh() (in module tyssue.draw.ipv_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.ipv_draw.face_mesh">[1]</a>
+</li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.FaceGrid.face_point_cloud">face_point_cloud() (tyssue.particles.point_cloud.FaceGrid method)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.face_polygons">face_polygons() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.face_polygons">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.PlanarGeometry.face_projected_pos">face_projected_pos() (tyssue.geometry.planar_geometry.PlanarGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.face_projected_pos">(tyssue.geometry.sheet_geometry.SheetGeometry static method)</a>
+</li>
+        <li><a href="API.html#tyssue.PlanarGeometry.face_projected_pos">(tyssue.PlanarGeometry static method)</a>
+</li>
+        <li><a href="API.html#tyssue.SheetGeometry.face_projected_pos">(tyssue.SheetGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.face_rotation">face_rotation() (tyssue.geometry.sheet_geometry.SheetGeometry static method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.SheetGeometry.face_rotation">(tyssue.SheetGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.face_rotations">face_rotations() (tyssue.geometry.sheet_geometry.SheetGeometry class method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.SheetGeometry.face_rotations">(tyssue.SheetGeometry class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.face_svd_">face_svd_() (in module tyssue.geometry.sheet_geometry)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity">FaceAreaElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.FaceContractility">FaceContractility (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceContractility">[1]</a>
+</li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.FaceGrid">FaceGrid (class in tyssue.particles.point_cloud)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity">FaceVolumeElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.monolayer_topology.find_basal_edge">find_basal_edge() (in module tyssue.topology.monolayer_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.monolayer_topology.find_basal_edge">[1]</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.quasistatic.QSSolver.find_energy_min">find_energy_min() (tyssue.solvers.quasistatic.QSSolver method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#tyssue.solvers.sheet_vertex_solver.Solver.find_energy_min">(tyssue.solvers.sheet_vertex_solver.Solver class method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.find_HIs">find_HIs() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.find_HIs">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.find_IHs">find_IHs() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.find_IHs">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.find_rearangements">find_rearangements() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.find_rearangements">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.fix_pinch">fix_pinch() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.fix_pinch">[1]</a>
+</li>
+      <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.flat_sheet">flat_sheet() (in module tyssue.config.geometry)</a>
+</li>
+      <li><a href="API.html#tyssue.generation.from_voronoi.from_2d_voronoi">from_2d_voronoi() (in module tyssue.generation.from_voronoi)</a>, <a href="source/tyssue.generation.html#tyssue.generation.from_voronoi.from_2d_voronoi">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.generation.from_voronoi.from_3d_voronoi">from_3d_voronoi() (in module tyssue.generation.from_voronoi)</a>, <a href="source/tyssue.generation.html#tyssue.generation.from_voronoi.from_3d_voronoi">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.HistoryHdf5.from_archive">from_archive() (tyssue.core.history.HistoryHdf5 class method)</a>
+</li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv.from_eptm_edges">from_eptm_edges() (tyssue.particles.point_cloud.EdgeSubdiv static method)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.from_flat_sheet">from_flat_sheet() (tyssue.core.monolayer.Monolayer class method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Monolayer.from_flat_sheet">(tyssue.Monolayer class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.generation.shapes.generate_ring">generate_ring() (in module tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.generate_ring">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.get_arc_data">get_arc_data() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.get_arc_data">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.get_division_edges">get_division_edges() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.get_division_edges">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.topology.sheet_topology.get_division_edges">(in module tyssue.topology.sheet_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.sheet_topology.get_division_edges">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.get_division_vertices">get_division_vertices() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.get_division_vertices">[1]</a>
+</li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.get_edge_bases">get_edge_bases() (in module tyssue.particles.point_cloud)</a>
+</li>
+      <li><a href="API.html#tyssue.generation.shapes.get_ellipsoid_centers">get_ellipsoid_centers() (in module tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.get_ellipsoid_centers">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.get_extra_indices">get_extra_indices() (tyssue.core.sheet.Sheet method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Sheet.get_extra_indices">(tyssue.Sheet method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.get_force_inference">get_force_inference() (tyssue.core.sheet.Sheet method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Sheet.get_force_inference">(tyssue.Sheet method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.get_invalid">get_invalid() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.get_invalid">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.collisions.solvers.CollidingBoxes.get_limits">get_limits() (tyssue.collisions.solvers.CollidingBoxes method)</a>, <a href="source/tyssue.collisions.html#tyssue.collisions.solvers.CollidingBoxes.get_limits">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.get_neighborhood">get_neighborhood() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.get_neighborhood">(tyssue.core.sheet.Sheet method)</a>
+</li>
+        <li><a href="API.html#tyssue.Epithelium.get_neighborhood">(tyssue.Epithelium method)</a>
+</li>
+        <li><a href="API.html#tyssue.Sheet.get_neighborhood">(tyssue.Sheet method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.get_neighbors">get_neighbors() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.get_neighbors">(tyssue.core.sheet.Sheet method)</a>
+</li>
+        <li><a href="API.html#tyssue.Epithelium.get_neighbors">(tyssue.Epithelium method)</a>
+</li>
+        <li><a href="API.html#tyssue.Sheet.get_neighbors">(tyssue.Sheet method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.base_topology.get_neighbour_face_pairs">get_neighbour_face_pairs() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.get_neighbour_face_pairs">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.utils.utils.get_next">get_next() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.get_next">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.get_next_edges">get_next_edges() (in module tyssue.core.objects)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.get_nrj_norm">get_nrj_norm() (tyssue.dynamics.effectors.AbstractEffector static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.get_nrj_norm">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity.get_nrj_norm">(tyssue.dynamics.effectors.BorderElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity.get_nrj_norm">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity.get_nrj_norm">(tyssue.dynamics.effectors.CellAreaElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity.get_nrj_norm">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity.get_nrj_norm">(tyssue.dynamics.effectors.CellVolumeElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity.get_nrj_norm">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.get_nrj_norm">(tyssue.dynamics.effectors.FaceAreaElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.get_nrj_norm">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity.get_nrj_norm">(tyssue.dynamics.effectors.FaceVolumeElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity.get_nrj_norm">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity.get_nrj_norm">(tyssue.dynamics.effectors.LengthElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity.get_nrj_norm">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity.get_nrj_norm">(tyssue.dynamics.effectors.LumenVolumeElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity.get_nrj_norm">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.base_topology.get_num_common_edges">get_num_common_edges() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.get_num_common_edges">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.sheet.get_opposite">get_opposite() (in module tyssue.core.sheet)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.get_opposite">(tyssue.core.sheet.Sheet method)</a>
+</li>
+        <li><a href="API.html#tyssue.Sheet.get_opposite">(tyssue.Sheet method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.get_opposite_faces">get_opposite_faces() (in module tyssue.core.objects)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.get_opposite_faces">(tyssue.core.objects.Epithelium method)</a>
+</li>
+        <li><a href="API.html#tyssue.Epithelium.get_opposite_faces">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.get_orbits">get_orbits() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.get_orbits">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.sheet.get_outer_sheet">get_outer_sheet() (in module tyssue.core.sheet)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.PlanarGeometry.get_phis">get_phis() (tyssue.geometry.planar_geometry.PlanarGeometry class method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.get_phis">(tyssue.geometry.sheet_geometry.SheetGeometry class method)</a>
+</li>
+        <li><a href="API.html#tyssue.PlanarGeometry.get_phis">(tyssue.PlanarGeometry class method)</a>
+</li>
+        <li><a href="API.html#tyssue.SheetGeometry.get_phis">(tyssue.SheetGeometry class method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.get_prev_edges">get_prev_edges() (in module tyssue.core.objects)</a>
+</li>
+      <li><a href="source/tyssue.io.html#tyssue.io.get_sim_dir">get_sim_dir() (in module tyssue.io)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.get_simple_index">get_simple_index() (in module tyssue.core.objects)</a>
+</li>
+      <li><a href="API.html#tyssue.utils.utils.get_sub_eptm">get_sub_eptm() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.get_sub_eptm">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.get_sub_sheet">get_sub_sheet() (tyssue.core.monolayer.Monolayer method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Monolayer.get_sub_sheet">(tyssue.Monolayer method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.get_valid">get_valid() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.get_valid">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.gradient">gradient() (tyssue.dynamics.apoptosis_model.ApicoBasalTension static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.gradient">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.gradient">(tyssue.dynamics.effectors.AbstractEffector static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BarrierElasticity.gradient">(tyssue.dynamics.effectors.BarrierElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BarrierElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity.gradient">(tyssue.dynamics.effectors.BorderElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity.gradient">(tyssue.dynamics.effectors.CellAreaElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity.gradient">(tyssue.dynamics.effectors.CellVolumeElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.gradient">(tyssue.dynamics.effectors.FaceAreaElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceContractility.gradient">(tyssue.dynamics.effectors.FaceContractility static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceContractility.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity.gradient">(tyssue.dynamics.effectors.FaceVolumeElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity.gradient">(tyssue.dynamics.effectors.LengthElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineTension.gradient">(tyssue.dynamics.effectors.LineTension static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineTension.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineViscosity.gradient">(tyssue.dynamics.effectors.LineViscosity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineViscosity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenAreaElasticity.gradient">(tyssue.dynamics.effectors.LumenAreaElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenAreaElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity.gradient">(tyssue.dynamics.effectors.LumenVolumeElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.PerimeterElasticity.gradient">(tyssue.dynamics.effectors.PerimeterElasticity static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.PerimeterElasticity.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.RadialTension.gradient">(tyssue.dynamics.effectors.RadialTension static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.RadialTension.gradient">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.SurfaceTension.gradient">(tyssue.dynamics.effectors.SurfaceTension static method)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.SurfaceTension.gradient">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.actions.grow">grow() (in module tyssue.behaviors.monolayer.actions)</a>
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.grow">(in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.guess_face_segment">guess_face_segment() (tyssue.core.monolayer.Monolayer method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Monolayer.guess_face_segment">(tyssue.Monolayer method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.guess_vert_segment">guess_vert_segment() (tyssue.core.monolayer.Monolayer method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Monolayer.guess_vert_segment">(tyssue.Monolayer method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.dynamics.sheet_gradients.height_grad">height_grad() (in module tyssue.dynamics.sheet_gradients)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.sheet_gradients.height_grad">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.generation.hexagonal_grids.hexa_cylinder">hexa_cylinder() (in module tyssue.generation.hexagonal_grids)</a>, <a href="source/tyssue.generation.html#tyssue.generation.hexagonal_grids.hexa_cylinder">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.generation.hexagonal_grids.hexa_disk">hexa_disk() (in module tyssue.generation.hexagonal_grids)</a>, <a href="source/tyssue.generation.html#tyssue.generation.hexagonal_grids.hexa_disk">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.generation.hexagonal_grids.hexa_grid2d">hexa_grid2d() (in module tyssue.generation.hexagonal_grids)</a>, <a href="source/tyssue.generation.html#tyssue.generation.hexagonal_grids.hexa_grid2d">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.generation.hexagonal_grids.hexa_grid3d">hexa_grid3d() (in module tyssue.generation.hexagonal_grids)</a>, <a href="source/tyssue.generation.html#tyssue.generation.hexagonal_grids.hexa_grid3d">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.topology.bulk_topology.HI_transition">HI_transition() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.HI_transition">[1]</a>
+</li>
+      <li><a href="source/tyssue.draw.html#tyssue.draw.highlight_cells">highlight_cells() (in module tyssue.draw)</a>
+</li>
+      <li><a href="source/tyssue.draw.html#tyssue.draw.highlight_faces">highlight_faces() (in module tyssue.draw)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.History">History (class in tyssue.core.history)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.HistoryHdf5">HistoryHdf5 (class in tyssue.core.history)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.idx_lookup">idx_lookup() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.idx_lookup">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.IH_transition">IH_transition() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.IH_transition">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.increase">increase() (in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.increase_linear_tension">increase_linear_tension() (in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.viscous.IVPSolver">IVPSolver (class in tyssue.solvers.viscous)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.label">label (tyssue.dynamics.apoptosis_model.ApicoBasalTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.label">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.label">(tyssue.dynamics.effectors.AbstractEffector attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BarrierElasticity.label">(tyssue.dynamics.effectors.BarrierElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BarrierElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity.label">(tyssue.dynamics.effectors.BorderElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity.label">(tyssue.dynamics.effectors.CellAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity.label">(tyssue.dynamics.effectors.CellVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.label">(tyssue.dynamics.effectors.FaceAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceContractility.label">(tyssue.dynamics.effectors.FaceContractility attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceContractility.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity.label">(tyssue.dynamics.effectors.FaceVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity.label">(tyssue.dynamics.effectors.LengthElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineTension.label">(tyssue.dynamics.effectors.LineTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineTension.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineViscosity.label">(tyssue.dynamics.effectors.LineViscosity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineViscosity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenAreaElasticity.label">(tyssue.dynamics.effectors.LumenAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenAreaElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity.label">(tyssue.dynamics.effectors.LumenVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.PerimeterElasticity.label">(tyssue.dynamics.effectors.PerimeterElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.PerimeterElasticity.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.RadialTension.label">(tyssue.dynamics.effectors.RadialTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.RadialTension.label">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.SurfaceTension.label">(tyssue.dynamics.effectors.SurfaceTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.SurfaceTension.label">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.MonolayerWithLamina.lamina_edges">lamina_edges() (tyssue.core.monolayer.MonolayerWithLamina property)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.bulk_model.LaminaModel">LaminaModel (class in tyssue.dynamics.bulk_model)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.bulk_model.LaminaModel">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.lateral_edges">lateral_edges() (tyssue.core.monolayer.Monolayer property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.generation.shapes.AnnularSheet.lateral_edges">(tyssue.generation.shapes.AnnularSheet property)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.AnnularSheet.lateral_edges">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.Monolayer.lateral_edges">(tyssue.Monolayer property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.lateral_faces">lateral_faces() (tyssue.core.monolayer.Monolayer property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Monolayer.lateral_faces">(tyssue.Monolayer property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.lateral_verts">lateral_verts() (tyssue.core.monolayer.Monolayer property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Monolayer.lateral_verts">(tyssue.Monolayer property)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.dynamics.base_gradients.length_grad">length_grad() (in module tyssue.dynamics.base_gradients)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.base_gradients.length_grad">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity">LengthElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.LineTension">LineTension (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineTension">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.LineViscosity">LineViscosity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineViscosity">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.generation.shapes.Lloyd_relaxation">Lloyd_relaxation() (in module tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.Lloyd_relaxation">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.io.hdf5.load_datasets">load_datasets() (in module tyssue.io.hdf5)</a>, <a href="source/tyssue.io.html#tyssue.io.hdf5.load_datasets">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.stores.load_datasets">(in module tyssue.stores)</a>, <a href="source/tyssue.stores.html#tyssue.stores.load_datasets">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.config.html#tyssue.config.json_parser.load_spec">load_spec() (in module tyssue.config.json_parser)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.planar_gradients.lumen_area_grad">lumen_area_grad() (in module tyssue.dynamics.planar_gradients)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.planar_gradients.lumen_area_grad">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.bulk_gradients.lumen_volume_grad">lumen_volume_grad() (in module tyssue.dynamics.bulk_gradients)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.bulk_gradients.lumen_volume_grad">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.LumenAreaElasticity">LumenAreaElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenAreaElasticity">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity">LumenVolumeElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.magnitude">magnitude (tyssue.dynamics.apoptosis_model.ApicoBasalTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.magnitude">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.magnitude">(tyssue.dynamics.effectors.AbstractEffector attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BarrierElasticity.magnitude">(tyssue.dynamics.effectors.BarrierElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BarrierElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity.magnitude">(tyssue.dynamics.effectors.BorderElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity.magnitude">(tyssue.dynamics.effectors.CellAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity.magnitude">(tyssue.dynamics.effectors.CellVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.magnitude">(tyssue.dynamics.effectors.FaceAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceContractility.magnitude">(tyssue.dynamics.effectors.FaceContractility attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceContractility.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity.magnitude">(tyssue.dynamics.effectors.FaceVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity.magnitude">(tyssue.dynamics.effectors.LengthElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineTension.magnitude">(tyssue.dynamics.effectors.LineTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineTension.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineViscosity.magnitude">(tyssue.dynamics.effectors.LineViscosity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineViscosity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenAreaElasticity.magnitude">(tyssue.dynamics.effectors.LumenAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenAreaElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity.magnitude">(tyssue.dynamics.effectors.LumenVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.PerimeterElasticity.magnitude">(tyssue.dynamics.effectors.PerimeterElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.PerimeterElasticity.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.RadialTension.magnitude">(tyssue.dynamics.effectors.RadialTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.RadialTension.magnitude">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.SurfaceTension.magnitude">(tyssue.dynamics.effectors.SurfaceTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.SurfaceTension.magnitude">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.generation.html#tyssue.generation.utils.make_df">make_df() (in module tyssue.generation.utils)</a>
+</li>
+      <li><a href="API.html#tyssue.topology.base_topology.merge_border_edges">merge_border_edges() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.merge_border_edges">[1]</a>
+</li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.merge_vertices">merge_vertices() (in module tyssue.behaviors.sheet.actions)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.topology.base_topology.merge_vertices">(in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.merge_vertices">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.config.solvers.html#tyssue.config.solvers.minimize_spec">minimize_spec() (in module tyssue.config.solvers)</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.factory.model_factory">model_factory() (in module tyssue.dynamics.factory)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.factory.model_factory">[1]</a>
+</li>
+      <li><a href="source/tyssue.utils.html#tyssue.utils.testing.model_tester">model_tester() (in module tyssue.utils.testing)</a>
+</li>
+      <li><a href="API.html#tyssue.utils.utils.modify_segments">modify_segments() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.modify_segments">[1]</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="source/tests.html#module-tests">tests</a>
+</li>
+        <li><a href="source/tyssue.html#module-tyssue">tyssue</a>
+</li>
+        <li><a href="source/tyssue.behaviors.html#module-tyssue.behaviors">tyssue.behaviors</a>
+</li>
+        <li><a href="source/tyssue.behaviors.html#module-tyssue.behaviors.event_manager">tyssue.behaviors.event_manager</a>
+</li>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer">tyssue.behaviors.monolayer</a>
+</li>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer.actions">tyssue.behaviors.monolayer.actions</a>
+</li>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer.apoptosis_events">tyssue.behaviors.monolayer.apoptosis_events</a>
+</li>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer.basic_events">tyssue.behaviors.monolayer.basic_events</a>
+</li>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer.delamination_events">tyssue.behaviors.monolayer.delamination_events</a>
+</li>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet">tyssue.behaviors.sheet</a>
+</li>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet.actions">tyssue.behaviors.sheet.actions</a>
+</li>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet.apoptosis_events">tyssue.behaviors.sheet.apoptosis_events</a>
+</li>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet.basic_events">tyssue.behaviors.sheet.basic_events</a>
+</li>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet.delamination_events">tyssue.behaviors.sheet.delamination_events</a>
+</li>
+        <li><a href="source/tyssue.collisions.html#module-tyssue.collisions">tyssue.collisions</a>
+</li>
+        <li><a href="source/tyssue.collisions.cpp.html#module-tyssue.collisions.cpp">tyssue.collisions.cpp</a>
+</li>
+        <li><a href="API.html#module-tyssue.collisions.intersection">tyssue.collisions.intersection</a>, <a href="source/tyssue.collisions.html#module-tyssue.collisions.intersection">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.collisions.solvers">tyssue.collisions.solvers</a>, <a href="source/tyssue.collisions.html#module-tyssue.collisions.solvers">[1]</a>
+</li>
+        <li><a href="source/tyssue.config.html#module-tyssue.config">tyssue.config</a>
+</li>
+        <li><a href="source/tyssue.config.core.html#module-tyssue.config.core">tyssue.config.core</a>
+</li>
+        <li><a href="source/tyssue.config.draw.html#module-tyssue.config.draw">tyssue.config.draw</a>
+</li>
+        <li><a href="source/tyssue.config.dynamics.html#module-tyssue.config.dynamics">tyssue.config.dynamics</a>
+</li>
+        <li><a href="source/tyssue.config.geometry.html#module-tyssue.config.geometry">tyssue.config.geometry</a>
+</li>
+        <li><a href="source/tyssue.config.html#module-tyssue.config.json_parser">tyssue.config.json_parser</a>
+</li>
+        <li><a href="source/tyssue.config.solvers.html#module-tyssue.config.solvers">tyssue.config.solvers</a>
+</li>
+        <li><a href="source/tyssue.config.stores.html#module-tyssue.config.stores">tyssue.config.stores</a>
+</li>
+        <li><a href="source/tyssue.config.subdiv.html#module-tyssue.config.subdiv">tyssue.config.subdiv</a>
+</li>
+        <li><a href="source/tyssue.core.html#module-tyssue.core">tyssue.core</a>
+</li>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.history">tyssue.core.history</a>
+</li>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.monolayer">tyssue.core.monolayer</a>
+</li>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.multisheet">tyssue.core.multisheet</a>
+</li>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.objects">tyssue.core.objects</a>
+</li>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.sheet">tyssue.core.sheet</a>
+</li>
+        <li><a href="source/tyssue.draw.html#module-tyssue.draw">tyssue.draw</a>
+</li>
+        <li><a href="API.html#module-tyssue.draw.ipv_draw">tyssue.draw.ipv_draw</a>, <a href="source/tyssue.draw.html#module-tyssue.draw.ipv_draw">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.draw.plt_draw">tyssue.draw.plt_draw</a>, <a href="source/tyssue.draw.html#module-tyssue.draw.plt_draw">[1]</a>
+</li>
+        <li><a href="source/tyssue.dynamics.html#module-tyssue.dynamics">tyssue.dynamics</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.apoptosis_model">tyssue.dynamics.apoptosis_model</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.apoptosis_model">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.base_gradients">tyssue.dynamics.base_gradients</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.base_gradients">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.bulk_gradients">tyssue.dynamics.bulk_gradients</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.bulk_gradients">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.bulk_model">tyssue.dynamics.bulk_model</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.bulk_model">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.effectors">tyssue.dynamics.effectors</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.effectors">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.factory">tyssue.dynamics.factory</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.factory">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.planar_gradients">tyssue.dynamics.planar_gradients</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.planar_gradients">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.planar_vertex_model">tyssue.dynamics.planar_vertex_model</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.planar_vertex_model">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.sheet_gradients">tyssue.dynamics.sheet_gradients</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.sheet_gradients">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.dynamics.sheet_vertex_model">tyssue.dynamics.sheet_vertex_model</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.sheet_vertex_model">[1]</a>
+</li>
+        <li><a href="source/tyssue.dynamics.html#module-tyssue.dynamics.units">tyssue.dynamics.units</a>
+</li>
+        <li><a href="API.html#module-tyssue.generation">tyssue.generation</a>, <a href="source/tyssue.generation.html#module-tyssue.generation">[1]</a>
+</li>
+        <li><a href="source/tyssue.generation.cpp.html#module-tyssue.generation.cpp">tyssue.generation.cpp</a>
+</li>
+        <li><a href="API.html#module-tyssue.generation.from_voronoi">tyssue.generation.from_voronoi</a>, <a href="source/tyssue.generation.html#module-tyssue.generation.from_voronoi">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.generation.hexagonal_grids">tyssue.generation.hexagonal_grids</a>, <a href="source/tyssue.generation.html#module-tyssue.generation.hexagonal_grids">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.generation.modifiers">tyssue.generation.modifiers</a>, <a href="source/tyssue.generation.html#module-tyssue.generation.modifiers">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.generation.shapes">tyssue.generation.shapes</a>, <a href="source/tyssue.generation.html#module-tyssue.generation.shapes">[1]</a>
+</li>
+        <li><a href="source/tyssue.generation.html#module-tyssue.generation.utils">tyssue.generation.utils</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry">tyssue.geometry</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.base_geometry">tyssue.geometry.base_geometry</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.bulk_geometry">tyssue.geometry.bulk_geometry</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.multisheetgeometry">tyssue.geometry.multisheetgeometry</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.planar_geometry">tyssue.geometry.planar_geometry</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.sheet_geometry">tyssue.geometry.sheet_geometry</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.utils">tyssue.geometry.utils</a>
+</li>
+        <li><a href="source/tyssue.io.html#module-tyssue.io">tyssue.io</a>
+</li>
+        <li><a href="API.html#module-tyssue.io.csv">tyssue.io.csv</a>, <a href="source/tyssue.io.html#module-tyssue.io.csv">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.io.hdf5">tyssue.io.hdf5</a>, <a href="source/tyssue.io.html#module-tyssue.io.hdf5">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.io.obj">tyssue.io.obj</a>, <a href="source/tyssue.io.html#module-tyssue.io.obj">[1]</a>
+</li>
+        <li><a href="source/tyssue.particles.html#module-tyssue.particles">tyssue.particles</a>
+</li>
+        <li><a href="source/tyssue.particles.html#module-tyssue.particles.point_cloud">tyssue.particles.point_cloud</a>
+</li>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers">tyssue.solvers</a>
+</li>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.base">tyssue.solvers.base</a>
+</li>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.isotropic_solver">tyssue.solvers.isotropic_solver</a>
+</li>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.quasistatic">tyssue.solvers.quasistatic</a>
+</li>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.sheet_vertex_solver">tyssue.solvers.sheet_vertex_solver</a>
+</li>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.viscous">tyssue.solvers.viscous</a>
+</li>
+        <li><a href="API.html#module-tyssue.stores">tyssue.stores</a>, <a href="source/tyssue.stores.html#module-tyssue.stores">[1]</a>
+</li>
+        <li><a href="source/tyssue.topology.html#module-tyssue.topology">tyssue.topology</a>
+</li>
+        <li><a href="API.html#module-tyssue.topology.base_topology">tyssue.topology.base_topology</a>, <a href="source/tyssue.topology.html#module-tyssue.topology.base_topology">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.topology.bulk_topology">tyssue.topology.bulk_topology</a>, <a href="source/tyssue.topology.html#module-tyssue.topology.bulk_topology">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.topology.monolayer_topology">tyssue.topology.monolayer_topology</a>, <a href="source/tyssue.topology.html#module-tyssue.topology.monolayer_topology">[1]</a>
+</li>
+        <li><a href="API.html#module-tyssue.topology.sheet_topology">tyssue.topology.sheet_topology</a>, <a href="source/tyssue.topology.html#module-tyssue.topology.sheet_topology">[1]</a>
+</li>
+        <li><a href="source/tyssue.utils.html#module-tyssue.utils">tyssue.utils</a>
+</li>
+        <li><a href="API.html#module-tyssue.utils.decorators">tyssue.utils.decorators</a>, <a href="source/tyssue.utils.html#module-tyssue.utils.decorators">[1]</a>
+</li>
+        <li><a href="source/tyssue.utils.html#module-tyssue.utils.testing">tyssue.utils.testing</a>
+</li>
+        <li><a href="API.html#module-tyssue.utils.utils">tyssue.utils.utils</a>, <a href="source/tyssue.utils.html#module-tyssue.utils.utils">[1]</a>
+</li>
+        <li><a href="source/tyssue.utils.html#module-tyssue.utils.widgets">tyssue.utils.widgets</a>
+</li>
+        <li><a href="source/tyssue.html#module-tyssue.version">tyssue.version</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.Monolayer">Monolayer (class in tyssue)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer">(class in tyssue.core.monolayer)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.MonolayerGeometry">MonolayerGeometry (class in tyssue)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.MonoLayerGeometry">MonoLayerGeometry (class in tyssue.geometry.bulk_geometry)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.MonolayerGeometry">MonolayerGeometry (class in tyssue.geometry.bulk_geometry)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.MonolayerWithLamina">MonolayerWithLamina (class in tyssue.core.monolayer)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.multisheet.MultiSheet">MultiSheet (class in tyssue.core.multisheet)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.multisheetgeometry.MultiSheetGeometry">MultiSheetGeometry (class in tyssue.geometry.multisheetgeometry)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.Nc">Nc() (tyssue.core.objects.Epithelium property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.Nc">(tyssue.Epithelium property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.Ne">Ne() (tyssue.core.objects.Epithelium property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.Ne">(tyssue.Epithelium property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.multisheet.MultiSheet.Nes">Nes() (tyssue.core.multisheet.MultiSheet property)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.Nf">Nf() (tyssue.core.objects.Epithelium property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.Nf">(tyssue.Epithelium property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.multisheet.MultiSheet.Nfs">Nfs() (tyssue.core.multisheet.MultiSheet property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.normal_rotations">normal_rotations() (tyssue.geometry.sheet_geometry.SheetGeometry static method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.SheetGeometry.normal_rotations">(tyssue.SheetGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.dynamics.effectors.normalize">normalize() (in module tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.normalize">[1]</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry.normalize_weights">normalize_weights() (tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.normalize_weights">(tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.Nv">Nv() (tyssue.core.objects.Epithelium property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.Nv">(tyssue.Epithelium property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.multisheet.MultiSheet.Nvs">Nvs() (tyssue.core.multisheet.MultiSheet property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.viscous.EulerSolver.ode_func">ode_func() (tyssue.solvers.viscous.EulerSolver method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.sheet_vertex_solver.Solver.opt_energy">opt_energy() (tyssue.solvers.sheet_vertex_solver.Solver class method)</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.sheet_vertex_solver.Solver.opt_grad">opt_grad() (tyssue.solvers.sheet_vertex_solver.Solver static method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.utils.html#tyssue.utils.widgets.parameter_settings">parameter_settings() (in module tyssue.utils.widgets)</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.parse_face_specs">parse_face_specs() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.parse_face_specs">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.PerimeterElasticity">PerimeterElasticity (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.PerimeterElasticity">[1]</a>
+</li>
+      <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.periodic_sheet">periodic_sheet() (in module tyssue.config.geometry)</a>
+</li>
+      <li><a href="source/tyssue.config.stores.html#tyssue.config.stores.planar_periodic8x8">planar_periodic8x8() (in module tyssue.config.stores)</a>
+</li>
+      <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.planar_periodic_sheet">planar_periodic_sheet() (in module tyssue.config.geometry)</a>
+</li>
+      <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.planar_sheet">planar_sheet() (in module tyssue.config.geometry)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.planar_sheet_2d">planar_sheet_2d() (tyssue.core.sheet.Sheet class method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Sheet.planar_sheet_2d">(tyssue.Sheet class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.planar_sheet_3d">planar_sheet_3d() (tyssue.core.sheet.Sheet class method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Sheet.planar_sheet_3d">(tyssue.Sheet class method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.planar_spec">planar_spec() (in module tyssue.config.geometry)</a>
+</li>
+      <li><a href="API.html#tyssue.PlanarGeometry">PlanarGeometry (class in tyssue)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.PlanarGeometry">(class in tyssue.geometry.planar_geometry)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.draw.plt_draw.plot_forces">plot_forces() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.plot_forces">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.plot_junction">plot_junction() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.plot_junction">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.plot_scaled_energies">plot_scaled_energies() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.plot_scaled_energies">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.quasistatic.QSSolver">QSSolver (class in tyssue.solvers.quasistatic)</a>
+</li>
+      <li><a href="source/tyssue.config.solvers.html#tyssue.config.solvers.quasistatic">quasistatic() (in module tyssue.config.solvers)</a>
+</li>
+      <li><a href="source/tyssue.config.dynamics.html#tyssue.config.dynamics.quasistatic_bulk_spec">quasistatic_bulk_spec() (in module tyssue.config.dynamics)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.config.dynamics.html#tyssue.config.dynamics.quasistatic_plane_spec">quasistatic_plane_spec() (in module tyssue.config.dynamics)</a>
+</li>
+      <li><a href="source/tyssue.config.dynamics.html#tyssue.config.dynamics.quasistatic_sheet_spec">quasistatic_sheet_spec() (in module tyssue.config.dynamics)</a>
+</li>
+      <li><a href="source/tyssue.config.dynamics.html#tyssue.config.dynamics.quasistatic_sheet_spec_anchors">quasistatic_sheet_spec_anchors() (in module tyssue.config.dynamics)</a>
+</li>
+      <li><a href="API.html#tyssue.draw.plt_draw.quick_edge_draw">quick_edge_draw() (in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.quick_edge_draw">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.dynamics.effectors.RadialTension">RadialTension (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.RadialTension">[1]</a>
+</li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.basic_events.reconnect">reconnect() (in module tyssue.behaviors.sheet.basic_events)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.History.record">record() (tyssue.core.history.History method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.history.HistoryHdf5.record">(tyssue.core.history.HistoryHdf5 method)</a>
+</li>
+        <li><a href="source/tyssue.solvers.html#tyssue.solvers.viscous.EulerSolver.record">(tyssue.solvers.viscous.EulerSolver method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.actions.relax">relax() (in module tyssue.behaviors.monolayer.actions)</a>
+</li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.remove">remove() (in module tyssue.behaviors.sheet.actions)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.remove">(tyssue.core.objects.Epithelium method)</a>
+</li>
+        <li><a href="API.html#tyssue.Epithelium.remove">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.bulk_topology.remove_cell">remove_cell() (in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.remove_cell">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.topology.base_topology.remove_face">remove_face() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.remove_face">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.reset_index">reset_index() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.reset_index">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.reset_scafold">reset_scafold() (tyssue.geometry.sheet_geometry.SheetGeometry class method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.SheetGeometry.reset_scafold">(tyssue.SheetGeometry class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.reset_topo">reset_topo() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.reset_topo">(tyssue.core.sheet.Sheet method)</a>
+</li>
+        <li><a href="API.html#tyssue.Epithelium.reset_topo">(tyssue.Epithelium method)</a>
+</li>
+        <li><a href="API.html#tyssue.generation.shapes.AnnularSheet.reset_topo">(tyssue.generation.shapes.AnnularSheet method)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.AnnularSheet.reset_topo">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.Sheet.reset_topo">(tyssue.Sheet method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.sheet_topology.resolve_t1s">resolve_t1s() (in module tyssue.topology.sheet_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.sheet_topology.resolve_t1s">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.restore">restore() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.restore">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.History.retrieve">retrieve() (tyssue.core.history.History method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.history.HistoryHdf5.retrieve">(tyssue.core.history.HistoryHdf5 method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.collisions.solvers.revert_positions">revert_positions() (in module tyssue.collisions.solvers)</a>, <a href="source/tyssue.collisions.html#tyssue.collisions.solvers.revert_positions">[1]</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.RNRGeometry">RNRGeometry (class in tyssue.geometry.bulk_geometry)</a>
+</li>
+      <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.rod_sheet">rod_sheet() (in module tyssue.config.geometry)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.utils.rotation_matrices">rotation_matrices() (in module tyssue.geometry.utils)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.utils.rotation_matrix">rotation_matrix() (in module tyssue.geometry.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.sanitize">sanitize() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.sanitize">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.io.hdf5.save_datasets">save_datasets() (in module tyssue.io.hdf5)</a>, <a href="source/tyssue.io.html#tyssue.io.hdf5.save_datasets">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.io.obj.save_junction_mesh">save_junction_mesh() (in module tyssue.io.obj)</a>, <a href="source/tyssue.io.html#tyssue.io.obj.save_junction_mesh">[1]</a>
+</li>
+      <li><a href="source/tyssue.config.html#tyssue.config.json_parser.save_spec">save_spec() (in module tyssue.config.json_parser)</a>
+</li>
+      <li><a href="API.html#tyssue.io.obj.save_splitted_cells">save_splitted_cells() (in module tyssue.io.obj)</a>, <a href="source/tyssue.io.html#tyssue.io.obj.save_splitted_cells">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.io.obj.save_triangulated">save_triangulated() (in module tyssue.io.obj)</a>, <a href="source/tyssue.io.html#tyssue.io.obj.save_triangulated">[1]</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry.scale">scale() (tyssue.geometry.base_geometry.BaseGeometry static method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.geometry.sheet_geometry.EllipsoidGeometry.scale">(tyssue.geometry.sheet_geometry.EllipsoidGeometry static method)</a>, <a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.EllipsoidGeometry.scale">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.utils.utils.scaled_unscaled">scaled_unscaled() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.scaled_unscaled">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.effectors.scaler">scaler() (in module tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.scaler">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.monolayer.Monolayer.segment_index">segment_index() (tyssue.core.monolayer.Monolayer method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.generation.shapes.AnnularSheet.segment_index">(tyssue.generation.shapes.AnnularSheet method)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.AnnularSheet.segment_index">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.Monolayer.segment_index">(tyssue.Monolayer method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.collisions.intersection.self_intersections">self_intersections() (in module tyssue.collisions.intersection)</a>, <a href="source/tyssue.collisions.html#tyssue.collisions.intersection.self_intersections">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.set_bbox">set_bbox() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.set_bbox">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.utils.utils.set_data_columns">set_data_columns() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.set_data_columns">[1]</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.base.set_pos">set_pos() (in module tyssue.solvers.base)</a>
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#tyssue.solvers.viscous.set_pos">(in module tyssue.solvers.viscous)</a>
+</li>
+        <li><a href="source/tyssue.solvers.html#tyssue.solvers.sheet_vertex_solver.Solver.set_pos">(tyssue.solvers.sheet_vertex_solver.Solver static method)</a>
+</li>
+        <li><a href="source/tyssue.solvers.html#tyssue.solvers.viscous.EulerSolver.set_pos">(tyssue.solvers.viscous.EulerSolver method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.set_value">set_value() (in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.settings">settings() (tyssue.core.objects.Epithelium property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.settings">(tyssue.Epithelium property)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.Sheet">Sheet (class in tyssue)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet">(class in tyssue.core.sheet)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.generation.shapes.sheet_from_cell_centers">sheet_from_cell_centers() (in module tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.sheet_from_cell_centers">[1]</a>
+</li>
+      <li><a href="source/tyssue.config.draw.html#tyssue.config.draw.sheet_spec">sheet_spec() (in module tyssue.config.draw)</a>
+
+      <ul>
+        <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.sheet_spec">(in module tyssue.config.geometry)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.draw.html#tyssue.draw.sheet_view">sheet_view() (in module tyssue.draw)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.draw.ipv_draw.sheet_view">(in module tyssue.draw.ipv_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.ipv_draw.sheet_view">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.draw.plt_draw.sheet_view">(in module tyssue.draw.plt_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.plt_draw.sheet_view">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.SheetGeometry">SheetGeometry (class in tyssue)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry">(class in tyssue.geometry.sheet_geometry)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.monolayer.html#tyssue.behaviors.monolayer.actions.shrink">shrink() (in module tyssue.behaviors.monolayer.actions)</a>
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.actions.shrink">(in module tyssue.behaviors.sheet.actions)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.utils.utils.single_cell">single_cell() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.single_cell">[1]</a>
+</li>
+      <li><a href="source/tyssue.topology.html#tyssue.topology.single_rearangement">single_rearangement() (in module tyssue.topology)</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.viscous.EulerSolver.solve">solve() (tyssue.solvers.viscous.EulerSolver method)</a>
+</li>
+      <li><a href="API.html#tyssue.collisions.solvers.solve_bulk_collisions">solve_bulk_collisions() (in module tyssue.collisions.solvers)</a>, <a href="source/tyssue.collisions.html#tyssue.collisions.solvers.solve_bulk_collisions">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.collisions.solvers.CollidingBoxes.solve_collisions">solve_collisions() (tyssue.collisions.solvers.CollidingBoxes method)</a>, <a href="source/tyssue.collisions.html#tyssue.collisions.solvers.CollidingBoxes.solve_collisions">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.collisions.solvers.solve_sheet_collisions">solve_sheet_collisions() (in module tyssue.collisions.solvers)</a>, <a href="source/tyssue.collisions.html#tyssue.collisions.solvers.solve_sheet_collisions">[1]</a>
+</li>
+      <li><a href="source/tyssue.solvers.html#tyssue.solvers.sheet_vertex_solver.Solver">Solver (class in tyssue.solvers.sheet_vertex_solver)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.sheet.Sheet.sort_edges_eastwest">sort_edges_eastwest() (tyssue.core.sheet.Sheet method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Sheet.sort_edges_eastwest">(tyssue.Sheet method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.spatial_ref">spatial_ref (tyssue.dynamics.effectors.AbstractEffector attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.spatial_ref">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity.spatial_ref">(tyssue.dynamics.effectors.BorderElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity.spatial_ref">(tyssue.dynamics.effectors.CellAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity.spatial_ref">(tyssue.dynamics.effectors.CellVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.spatial_ref">(tyssue.dynamics.effectors.FaceAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceContractility.spatial_ref">(tyssue.dynamics.effectors.FaceContractility attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceContractility.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity.spatial_ref">(tyssue.dynamics.effectors.FaceVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity.spatial_ref">(tyssue.dynamics.effectors.LengthElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineTension.spatial_ref">(tyssue.dynamics.effectors.LineTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineTension.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineViscosity.spatial_ref">(tyssue.dynamics.effectors.LineViscosity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineViscosity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenAreaElasticity.spatial_ref">(tyssue.dynamics.effectors.LumenAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenAreaElasticity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity.spatial_ref">(tyssue.dynamics.effectors.LumenVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.PerimeterElasticity.spatial_ref">(tyssue.dynamics.effectors.PerimeterElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.PerimeterElasticity.spatial_ref">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.SurfaceTension.spatial_ref">(tyssue.dynamics.effectors.SurfaceTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.SurfaceTension.spatial_ref">[1]</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.utils.utils.spec_updater">spec_updater() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.spec_updater">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.specs">specs (tyssue.dynamics.apoptosis_model.ApicoBasalTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.apoptosis_model.ApicoBasalTension.specs">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.specs">(tyssue.dynamics.effectors.AbstractEffector attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BarrierElasticity.specs">(tyssue.dynamics.effectors.BarrierElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BarrierElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.BorderElasticity.specs">(tyssue.dynamics.effectors.BorderElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.BorderElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellAreaElasticity.specs">(tyssue.dynamics.effectors.CellAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellAreaElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.CellVolumeElasticity.specs">(tyssue.dynamics.effectors.CellVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.CellVolumeElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceAreaElasticity.specs">(tyssue.dynamics.effectors.FaceAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceAreaElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceContractility.specs">(tyssue.dynamics.effectors.FaceContractility attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceContractility.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.FaceVolumeElasticity.specs">(tyssue.dynamics.effectors.FaceVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.FaceVolumeElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LengthElasticity.specs">(tyssue.dynamics.effectors.LengthElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LengthElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineTension.specs">(tyssue.dynamics.effectors.LineTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineTension.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineViscosity.specs">(tyssue.dynamics.effectors.LineViscosity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineViscosity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenAreaElasticity.specs">(tyssue.dynamics.effectors.LumenAreaElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenAreaElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.LumenVolumeElasticity.specs">(tyssue.dynamics.effectors.LumenVolumeElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LumenVolumeElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.PerimeterElasticity.specs">(tyssue.dynamics.effectors.PerimeterElasticity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.PerimeterElasticity.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.RadialTension.specs">(tyssue.dynamics.effectors.RadialTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.RadialTension.specs">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.dynamics.effectors.SurfaceTension.specs">(tyssue.dynamics.effectors.SurfaceTension attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.SurfaceTension.specs">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.generation.shapes.spherical_monolayer">spherical_monolayer() (in module tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.spherical_monolayer">[1]</a>
+</li>
+      <li><a href="source/tyssue.config.geometry.html#tyssue.config.geometry.spherical_sheet">spherical_sheet() (in module tyssue.config.geometry)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.generation.shapes.spherical_sheet">(in module tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.spherical_sheet">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.topology.base_topology.split_vert">split_vert() (in module tyssue.topology.base_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.base_topology.split_vert">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.topology.bulk_topology.split_vert">(in module tyssue.topology.bulk_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.bulk_topology.split_vert">[1]</a>
+</li>
+        <li><a href="API.html#tyssue.topology.sheet_topology.split_vert">(in module tyssue.topology.sheet_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.sheet_topology.split_vert">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.generation.modifiers.subdivide_faces">subdivide_faces() (in module tyssue.generation.modifiers)</a>, <a href="source/tyssue.generation.html#tyssue.generation.modifiers.subdivide_faces">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.sum_cell">sum_cell() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.sum_cell">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.sum_face">sum_face() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.sum_face">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.sum_srce">sum_srce() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.sum_srce">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.sum_trgt">sum_trgt() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.sum_trgt">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.dynamics.effectors.SurfaceTension">SurfaceTension (class in tyssue.dynamics.effectors)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.SurfaceTension">[1]</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.svd_rotations">svd_rotations() (tyssue.geometry.sheet_geometry.SheetGeometry static method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.SheetGeometry.svd_rotations">(tyssue.SheetGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.utils.utils.swap_apico_basal">swap_apico_basal() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.swap_apico_basal">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.dynamics.effectors.AbstractEffector.temporal_ref">temporal_ref (tyssue.dynamics.effectors.AbstractEffector attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.AbstractEffector.temporal_ref">[1]</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.dynamics.effectors.LineViscosity.temporal_ref">(tyssue.dynamics.effectors.LineViscosity attribute)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.effectors.LineViscosity.temporal_ref">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tests
+
+      <ul>
+        <li><a href="source/tests.html#module-tests">module</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.generation.hexagonal_grids.three_faces_sheet">three_faces_sheet() (in module tyssue.generation.hexagonal_grids)</a>, <a href="source/tyssue.generation.html#tyssue.generation.hexagonal_grids.three_faces_sheet">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.generation.hexagonal_grids.three_faces_sheet_array">three_faces_sheet_array() (in module tyssue.generation.hexagonal_grids)</a>, <a href="source/tyssue.generation.html#tyssue.generation.hexagonal_grids.three_faces_sheet_array">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.utils.decorators.time_exe">time_exe() (in module tyssue.utils.decorators)</a>, <a href="source/tyssue.utils.html#tyssue.utils.decorators.time_exe">[1]</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.History.time_stamps">time_stamps() (tyssue.core.history.History property)</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.history.HistoryHdf5.time_stamps">(tyssue.core.history.HistoryHdf5 property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.History.to_archive">to_archive() (tyssue.core.history.History method)</a>
+</li>
+      <li><a href="API.html#tyssue.utils.utils.to_nd">to_nd() (in module tyssue.utils.utils)</a>, <a href="source/tyssue.utils.html#tyssue.utils.utils.to_nd">[1]</a>
+</li>
+      <li><a href="source/tyssue.topology.html#tyssue.topology.TopologyChangeError">TopologyChangeError</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.triangular_mesh">triangular_mesh() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.triangular_mesh">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.sheet.html#tyssue.behaviors.sheet.basic_events.type1_transition">type1_transition() (in module tyssue.behaviors.sheet.basic_events)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.topology.sheet_topology.type1_transition">(in module tyssue.topology.sheet_topology)</a>, <a href="source/tyssue.topology.html#tyssue.topology.sheet_topology.type1_transition">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue
+
+      <ul>
+        <li><a href="source/tyssue.html#module-tyssue">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.html#module-tyssue.behaviors">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.event_manager
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.html#module-tyssue.behaviors.event_manager">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.monolayer
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.monolayer.actions
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer.actions">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.monolayer.apoptosis_events
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer.apoptosis_events">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.monolayer.basic_events
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer.basic_events">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.monolayer.delamination_events
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.monolayer.html#module-tyssue.behaviors.monolayer.delamination_events">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.sheet
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.sheet.actions
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet.actions">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.sheet.apoptosis_events
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet.apoptosis_events">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.sheet.basic_events
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet.basic_events">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.behaviors.sheet.delamination_events
+
+      <ul>
+        <li><a href="source/tyssue.behaviors.sheet.html#module-tyssue.behaviors.sheet.delamination_events">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.collisions
+
+      <ul>
+        <li><a href="source/tyssue.collisions.html#module-tyssue.collisions">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.collisions.cpp
+
+      <ul>
+        <li><a href="source/tyssue.collisions.cpp.html#module-tyssue.collisions.cpp">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.collisions.intersection
+
+      <ul>
+        <li><a href="API.html#module-tyssue.collisions.intersection">module</a>, <a href="source/tyssue.collisions.html#module-tyssue.collisions.intersection">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.collisions.solvers
+
+      <ul>
+        <li><a href="API.html#module-tyssue.collisions.solvers">module</a>, <a href="source/tyssue.collisions.html#module-tyssue.collisions.solvers">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.config
+
+      <ul>
+        <li><a href="source/tyssue.config.html#module-tyssue.config">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.config.core
+
+      <ul>
+        <li><a href="source/tyssue.config.core.html#module-tyssue.config.core">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.config.draw
+
+      <ul>
+        <li><a href="source/tyssue.config.draw.html#module-tyssue.config.draw">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.config.dynamics
+
+      <ul>
+        <li><a href="source/tyssue.config.dynamics.html#module-tyssue.config.dynamics">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.config.geometry
+
+      <ul>
+        <li><a href="source/tyssue.config.geometry.html#module-tyssue.config.geometry">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.config.json_parser
+
+      <ul>
+        <li><a href="source/tyssue.config.html#module-tyssue.config.json_parser">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.config.solvers
+
+      <ul>
+        <li><a href="source/tyssue.config.solvers.html#module-tyssue.config.solvers">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.config.stores
+
+      <ul>
+        <li><a href="source/tyssue.config.stores.html#module-tyssue.config.stores">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.config.subdiv
+
+      <ul>
+        <li><a href="source/tyssue.config.subdiv.html#module-tyssue.config.subdiv">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.core
+
+      <ul>
+        <li><a href="source/tyssue.core.html#module-tyssue.core">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.core.history
+
+      <ul>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.history">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.core.monolayer
+
+      <ul>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.monolayer">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.core.multisheet
+
+      <ul>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.multisheet">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.core.objects
+
+      <ul>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.objects">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.core.sheet
+
+      <ul>
+        <li><a href="source/tyssue.core.html#module-tyssue.core.sheet">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.draw
+
+      <ul>
+        <li><a href="source/tyssue.draw.html#module-tyssue.draw">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.draw.ipv_draw
+
+      <ul>
+        <li><a href="API.html#module-tyssue.draw.ipv_draw">module</a>, <a href="source/tyssue.draw.html#module-tyssue.draw.ipv_draw">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.draw.plt_draw
+
+      <ul>
+        <li><a href="API.html#module-tyssue.draw.plt_draw">module</a>, <a href="source/tyssue.draw.html#module-tyssue.draw.plt_draw">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics
+
+      <ul>
+        <li><a href="source/tyssue.dynamics.html#module-tyssue.dynamics">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.apoptosis_model
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.apoptosis_model">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.apoptosis_model">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.base_gradients
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.base_gradients">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.base_gradients">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.bulk_gradients
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.bulk_gradients">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.bulk_gradients">[1]</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    tyssue.dynamics.bulk_model
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.bulk_model">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.bulk_model">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.effectors
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.effectors">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.effectors">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.factory
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.factory">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.factory">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.planar_gradients
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.planar_gradients">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.planar_gradients">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.planar_vertex_model
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.planar_vertex_model">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.planar_vertex_model">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.sheet_gradients
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.sheet_gradients">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.sheet_gradients">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.sheet_vertex_model
+
+      <ul>
+        <li><a href="API.html#module-tyssue.dynamics.sheet_vertex_model">module</a>, <a href="source/tyssue.dynamics.html#module-tyssue.dynamics.sheet_vertex_model">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.dynamics.units
+
+      <ul>
+        <li><a href="source/tyssue.dynamics.html#module-tyssue.dynamics.units">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.generation
+
+      <ul>
+        <li><a href="API.html#module-tyssue.generation">module</a>, <a href="source/tyssue.generation.html#module-tyssue.generation">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.generation.cpp
+
+      <ul>
+        <li><a href="source/tyssue.generation.cpp.html#module-tyssue.generation.cpp">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.generation.from_voronoi
+
+      <ul>
+        <li><a href="API.html#module-tyssue.generation.from_voronoi">module</a>, <a href="source/tyssue.generation.html#module-tyssue.generation.from_voronoi">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.generation.hexagonal_grids
+
+      <ul>
+        <li><a href="API.html#module-tyssue.generation.hexagonal_grids">module</a>, <a href="source/tyssue.generation.html#module-tyssue.generation.hexagonal_grids">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.generation.modifiers
+
+      <ul>
+        <li><a href="API.html#module-tyssue.generation.modifiers">module</a>, <a href="source/tyssue.generation.html#module-tyssue.generation.modifiers">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.generation.shapes
+
+      <ul>
+        <li><a href="API.html#module-tyssue.generation.shapes">module</a>, <a href="source/tyssue.generation.html#module-tyssue.generation.shapes">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.generation.utils
+
+      <ul>
+        <li><a href="source/tyssue.generation.html#module-tyssue.generation.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.geometry
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.geometry.base_geometry
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.base_geometry">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.geometry.bulk_geometry
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.bulk_geometry">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.geometry.multisheetgeometry
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.multisheetgeometry">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.geometry.planar_geometry
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.planar_geometry">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.geometry.sheet_geometry
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.sheet_geometry">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.geometry.utils
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#module-tyssue.geometry.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.io
+
+      <ul>
+        <li><a href="source/tyssue.io.html#module-tyssue.io">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.io.csv
+
+      <ul>
+        <li><a href="API.html#module-tyssue.io.csv">module</a>, <a href="source/tyssue.io.html#module-tyssue.io.csv">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.io.hdf5
+
+      <ul>
+        <li><a href="API.html#module-tyssue.io.hdf5">module</a>, <a href="source/tyssue.io.html#module-tyssue.io.hdf5">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.io.obj
+
+      <ul>
+        <li><a href="API.html#module-tyssue.io.obj">module</a>, <a href="source/tyssue.io.html#module-tyssue.io.obj">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.particles
+
+      <ul>
+        <li><a href="source/tyssue.particles.html#module-tyssue.particles">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.particles.point_cloud
+
+      <ul>
+        <li><a href="source/tyssue.particles.html#module-tyssue.particles.point_cloud">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.solvers
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.solvers.base
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.base">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.solvers.isotropic_solver
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.isotropic_solver">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.solvers.quasistatic
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.quasistatic">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.solvers.sheet_vertex_solver
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.sheet_vertex_solver">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.solvers.viscous
+
+      <ul>
+        <li><a href="source/tyssue.solvers.html#module-tyssue.solvers.viscous">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.stores
+
+      <ul>
+        <li><a href="API.html#module-tyssue.stores">module</a>, <a href="source/tyssue.stores.html#module-tyssue.stores">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.topology
+
+      <ul>
+        <li><a href="source/tyssue.topology.html#module-tyssue.topology">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.topology.base_topology
+
+      <ul>
+        <li><a href="API.html#module-tyssue.topology.base_topology">module</a>, <a href="source/tyssue.topology.html#module-tyssue.topology.base_topology">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.topology.bulk_topology
+
+      <ul>
+        <li><a href="API.html#module-tyssue.topology.bulk_topology">module</a>, <a href="source/tyssue.topology.html#module-tyssue.topology.bulk_topology">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.topology.monolayer_topology
+
+      <ul>
+        <li><a href="API.html#module-tyssue.topology.monolayer_topology">module</a>, <a href="source/tyssue.topology.html#module-tyssue.topology.monolayer_topology">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.topology.sheet_topology
+
+      <ul>
+        <li><a href="API.html#module-tyssue.topology.sheet_topology">module</a>, <a href="source/tyssue.topology.html#module-tyssue.topology.sheet_topology">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.utils
+
+      <ul>
+        <li><a href="source/tyssue.utils.html#module-tyssue.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.utils.decorators
+
+      <ul>
+        <li><a href="API.html#module-tyssue.utils.decorators">module</a>, <a href="source/tyssue.utils.html#module-tyssue.utils.decorators">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.utils.testing
+
+      <ul>
+        <li><a href="source/tyssue.utils.html#module-tyssue.utils.testing">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.utils.utils
+
+      <ul>
+        <li><a href="API.html#module-tyssue.utils.utils">module</a>, <a href="source/tyssue.utils.html#module-tyssue.utils.utils">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.utils.widgets
+
+      <ul>
+        <li><a href="source/tyssue.utils.html#module-tyssue.utils.widgets">module</a>
+</li>
+      </ul></li>
+      <li>
+    tyssue.version
+
+      <ul>
+        <li><a href="source/tyssue.html#module-tyssue.version">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv.upcast">upcast() (tyssue.particles.point_cloud.EdgeSubdiv method)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.upcast_cell">upcast_cell() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.upcast_cell">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.upcast_cols">upcast_cols() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.upcast_cols">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.upcast_face">upcast_face() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.upcast_face">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.upcast_srce">upcast_srce() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.upcast_srce">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.upcast_trgt">upcast_trgt() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.upcast_trgt">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.behaviors.html#tyssue.behaviors.event_manager.EventManager.update">update() (tyssue.behaviors.event_manager.EventManager method)</a>
+</li>
+      <li><a href="API.html#tyssue.BulkGeometry.update_all">update_all() (tyssue.BulkGeometry class method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.ClosedMonolayerGeometry.update_all">(tyssue.ClosedMonolayerGeometry class method)</a>
+</li>
+        <li><a href="API.html#tyssue.ClosedSheetGeometry.update_all">(tyssue.ClosedSheetGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry.update_all">(tyssue.geometry.base_geometry.BaseGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.BulkGeometry.update_all">(tyssue.geometry.bulk_geometry.BulkGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry.update_all">(tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.multisheetgeometry.MultiSheetGeometry.update_all">(tyssue.geometry.multisheetgeometry.MultiSheetGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.AnnularGeometry.update_all">(tyssue.geometry.planar_geometry.AnnularGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.PlanarGeometry.update_all">(tyssue.geometry.planar_geometry.PlanarGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry.update_all">(tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.ClosedSheetGeometry.update_all">(tyssue.geometry.sheet_geometry.ClosedSheetGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.update_all">(tyssue.geometry.sheet_geometry.SheetGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.update_all">(tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv.update_all">(tyssue.particles.point_cloud.EdgeSubdiv method)</a>
+</li>
+        <li><a href="API.html#tyssue.PlanarGeometry.update_all">(tyssue.PlanarGeometry class method)</a>
+</li>
+        <li><a href="API.html#tyssue.SheetGeometry.update_all">(tyssue.SheetGeometry class method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.BulkGeometry.update_areas">update_areas() (tyssue.BulkGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.BulkGeometry.update_areas">(tyssue.geometry.bulk_geometry.BulkGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.PlanarGeometry.update_areas">(tyssue.geometry.planar_geometry.PlanarGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.update_areas">(tyssue.geometry.sheet_geometry.SheetGeometry static method)</a>
+</li>
+        <li><a href="API.html#tyssue.PlanarGeometry.update_areas">(tyssue.PlanarGeometry static method)</a>
+</li>
+        <li><a href="API.html#tyssue.SheetGeometry.update_areas">(tyssue.SheetGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.BulkGeometry.update_centroid">update_centroid() (tyssue.BulkGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry.update_centroid">(tyssue.geometry.base_geometry.BaseGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.BulkGeometry.update_centroid">(tyssue.geometry.bulk_geometry.BulkGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.RNRGeometry.update_centroid">(tyssue.geometry.bulk_geometry.RNRGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.BulkGeometry.update_dcoords">update_dcoords() (tyssue.BulkGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry.update_dcoords">(tyssue.geometry.base_geometry.BaseGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.BulkGeometry.update_dcoords">(tyssue.geometry.bulk_geometry.BulkGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.FaceGrid.update_grid">update_grid() (tyssue.particles.point_cloud.FaceGrid method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#tyssue.geometry.sheet_geometry.EllipsoidGeometry.update_height">update_height() (tyssue.geometry.sheet_geometry.EllipsoidGeometry static method)</a>, <a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.EllipsoidGeometry.update_height">[1]</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.update_height">(tyssue.geometry.sheet_geometry.SheetGeometry class method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.update_height">(tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry static method)</a>
+</li>
+        <li><a href="API.html#tyssue.SheetGeometry.update_height">(tyssue.SheetGeometry class method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.multisheetgeometry.MultiSheetGeometry.update_heights">update_heights() (tyssue.geometry.multisheetgeometry.MultiSheetGeometry static method)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.multisheet.MultiSheet.update_interpolants">update_interpolants() (tyssue.core.multisheet.MultiSheet method)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry.update_length">update_length() (tyssue.geometry.base_geometry.BaseGeometry static method)</a>
+</li>
+      <li><a href="API.html#tyssue.ClosedMonolayerGeometry.update_lumen_vol">update_lumen_vol() (tyssue.ClosedMonolayerGeometry static method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.ClosedSheetGeometry.update_lumen_vol">(tyssue.ClosedSheetGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry.update_lumen_vol">(tyssue.geometry.bulk_geometry.ClosedMonolayerGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.ClosedSheetGeometry.update_lumen_vol">(tyssue.geometry.sheet_geometry.ClosedSheetGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.AnnularGeometry.update_lumen_volume">update_lumen_volume() (tyssue.geometry.planar_geometry.AnnularGeometry static method)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.PlanarGeometry.update_normals">update_normals() (tyssue.geometry.planar_geometry.PlanarGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.update_normals">(tyssue.geometry.sheet_geometry.SheetGeometry static method)</a>
+</li>
+        <li><a href="API.html#tyssue.PlanarGeometry.update_normals">(tyssue.PlanarGeometry static method)</a>
+</li>
+        <li><a href="API.html#tyssue.SheetGeometry.update_normals">(tyssue.SheetGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.update_num_faces">update_num_faces() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.update_num_faces">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.update_num_sides">update_num_sides() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.update_num_sides">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv.update_offset">update_offset() (tyssue.particles.point_cloud.EdgeSubdiv method)</a>
+</li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv.update_offset_lut">update_offset_lut() (tyssue.particles.point_cloud.EdgeSubdiv method)</a>
+</li>
+      <li><a href="API.html#tyssue.generation.shapes.update_on_sphere">update_on_sphere() (in module tyssue.generation.shapes)</a>, <a href="source/tyssue.generation.html#tyssue.generation.shapes.update_on_sphere">[1]</a>
+</li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv.update_particles">update_particles() (tyssue.particles.point_cloud.EdgeSubdiv method)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry.update_perimeters">update_perimeters() (tyssue.geometry.base_geometry.BaseGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry.update_perimeters">(tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry.update_perimeters">(tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.update_periodic_dcoords">update_periodic_dcoords() (in module tyssue.geometry.base_geometry)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.update_rank">update_rank() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.update_rank">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.update_specs">update_specs() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.update_specs">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.utils.update_spherical">update_spherical() (in module tyssue.geometry.utils)</a>
+</li>
+      <li><a href="API.html#tyssue.BulkGeometry.update_ucoords">update_ucoords() (tyssue.BulkGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.base_geometry.BaseGeometry.update_ucoords">(tyssue.geometry.base_geometry.BaseGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.BulkGeometry.update_ucoords">(tyssue.geometry.bulk_geometry.BulkGeometry static method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv.update_upcaster">update_upcaster() (tyssue.particles.point_cloud.EdgeSubdiv method)</a>
+</li>
+      <li><a href="API.html#tyssue.draw.ipv_draw.update_view">update_view() (in module tyssue.draw.ipv_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.ipv_draw.update_view">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.BulkGeometry.update_vol">update_vol() (tyssue.BulkGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.BulkGeometry.update_vol">(tyssue.geometry.bulk_geometry.BulkGeometry static method)</a>
+</li>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.SheetGeometry.update_vol">(tyssue.geometry.sheet_geometry.SheetGeometry static method)</a>
+</li>
+        <li><a href="API.html#tyssue.SheetGeometry.update_vol">(tyssue.SheetGeometry static method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.multisheet.MultiSheet.v_idxs">v_idxs() (tyssue.core.multisheet.MultiSheet property)</a>
+</li>
+      <li><a href="API.html#tyssue.utils.decorators.validate">validate() (in module tyssue.utils.decorators)</a>, <a href="source/tyssue.utils.html#tyssue.utils.decorators.validate">[1]</a>
+
+      <ul>
+        <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.validate">(tyssue.core.objects.Epithelium method)</a>
+</li>
+        <li><a href="API.html#tyssue.Epithelium.validate">(tyssue.Epithelium method)</a>
+</li>
+        <li><a href="source/tyssue.particles.html#tyssue.particles.point_cloud.EdgeSubdiv.validate">(tyssue.particles.point_cloud.EdgeSubdiv method)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.validate_closed_cells">validate_closed_cells() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.validate_closed_cells">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.BulkGeometry.validate_face_norms">validate_face_norms() (tyssue.BulkGeometry static method)</a>
+
+      <ul>
+        <li><a href="source/tyssue.geometry.html#tyssue.geometry.bulk_geometry.BulkGeometry.validate_face_norms">(tyssue.geometry.bulk_geometry.BulkGeometry static method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.vert_df">vert_df() (tyssue.core.objects.Epithelium property)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.vert_df">(tyssue.Epithelium property)</a>
+</li>
+      </ul></li>
+      <li><a href="source/tyssue.core.html#tyssue.core.history.History.vert_h">vert_h() (tyssue.core.history.History property)</a>
+</li>
+      <li><a href="source/tyssue.core.html#tyssue.core.objects.Epithelium.vertex_mesh">vertex_mesh() (tyssue.core.objects.Epithelium method)</a>
+
+      <ul>
+        <li><a href="API.html#tyssue.Epithelium.vertex_mesh">(tyssue.Epithelium method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#tyssue.draw.ipv_draw.view_ipv">view_ipv() (in module tyssue.draw.ipv_draw)</a>, <a href="source/tyssue.draw.html#tyssue.draw.ipv_draw.view_ipv">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.dynamics.bulk_gradients.volume_grad">volume_grad() (in module tyssue.dynamics.bulk_gradients)</a>, <a href="source/tyssue.dynamics.html#tyssue.dynamics.bulk_gradients.volume_grad">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.behaviors.html#tyssue.behaviors.event_manager.wait">wait() (in module tyssue.behaviors.event_manager)</a>
+</li>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.sheet_geometry.WeightedPerimeterEllipsoidLameGeometry">WeightedPerimeterEllipsoidLameGeometry (class in tyssue.geometry.sheet_geometry)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/tyssue.geometry.html#tyssue.geometry.planar_geometry.WeightedPerimeterPlanarGeometry">WeightedPerimeterPlanarGeometry (class in tyssue.geometry.planar_geometry)</a>
+</li>
+      <li><a href="API.html#tyssue.io.obj.write_splitted_cells">write_splitted_cells() (in module tyssue.io.obj)</a>, <a href="source/tyssue.io.html#tyssue.io.obj.write_splitted_cells">[1]</a>
+</li>
+      <li><a href="API.html#tyssue.io.csv.write_storm_csv">write_storm_csv() (in module tyssue.io.csv)</a>, <a href="source/tyssue.io.html#tyssue.io.csv.write_storm_csv">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

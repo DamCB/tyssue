@@ -1,0 +1,1030 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Packing and influence on cell motility &#8212; Tyssue, an epithelium simulation library</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Energy minimization for a 2.5D sheet in 3D" href="D-FarhadifarModel.html" />
+    <link rel="prev" title="Single Cell apoptosis" href="B-Apoptosis.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Tyssue, an epithelium simulation library</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Welcome to Tyssue’s documentation!
+  </a>
+ </li>
+</ul>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="00-Basic_Usage.html">
+   Basic Usage of the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     tyssue
+    </span>
+   </code>
+   library
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="01-Geometry.html">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="02-Visualization.html">
+   Epithelium Visualization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="03-Dynamics.html">
+   Dynamics
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     history
+    </span>
+   </code>
+   object
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#quasistatic-solver">
+   Quasistatic solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04-Solvers.html#euler-solver">
+   Euler solver
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html">
+   Type 1 transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#rosette">
+   Rosette
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05-Rearangments.html#how-about-in-3d">
+   How about in 3D?
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="06-Cell_Division.html">
+   Cell Division
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="07-EventManager.html">
+   Event manager
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html">
+   Reversible Network Reconnection Model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="A-ReversibleNetworkReconnection.html#h-i-transition">
+   H → I transition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="B-Apoptosis.html">
+   Single Cell apoptosis
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Packing and influence on cell motility
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="D-FarhadifarModel.html">
+   Energy minimization for a 2.5D sheet in 3D
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="D-FarhadifarModel.html#non-dimensionalisation-and-isotropic-model">
+   Non dimensionalisation and isotropic model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html">
+   Core objects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#drawing-functions">
+   Drawing functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#geometry-classes">
+   Geometry classes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#topology-functions">
+   Topology functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#dynamic-models-definitions">
+   Dynamic models definitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.generation">
+   Epithelium generation utilities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.io.hdf5">
+   Input/output
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#collision-detection-and-correction">
+   Collision detection and correction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../API.html#module-tyssue.utils.utils">
+   Miscellanous utils
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/notebooks/C-2DMigration.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/notebooks/C-2DMigration.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#create-a-2d-patch-of-cells">
+   Create a 2D patch of cells
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#define-the-relevant-mechanical-components">
+   Define the relevant mechanical components
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#quasistatic-gradient-descent">
+   Quasistatic gradient descent
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pulling-on-a-face">
+   Pulling on a face
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#simple-visualisation">
+     Simple visualisation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#model-with-all-the-components">
+     Model with all the components
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#setup-the-event-manager-and-the-solver">
+     Setup the event manager and the solver
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#run-the-solver">
+     Run the solver
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-a-simple-drawing-function">
+     Define a simple drawing function
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-a-gif-of-the-resulting-simulation">
+     Create a gif of the resulting simulation
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="packing-and-influence-on-cell-motility">
+<h1>Packing and influence on cell motility<a class="headerlink" href="#packing-and-influence-on-cell-motility" title="Permalink to this headline">¶</a></h1>
+<p>Some time ago Hadrien Mary <a class="reference external" href="https://twitter.com/Hadim_">&#64;Hadim_</a> asked me if tyssue could reproduce this work:</p>
+<blockquote class="twitter-tweet" data-lang="fr"><p lang="en" dir="ltr">The subtle mechanics of densely packed cells may help explain why some cancerous tumors stay put while others spread <a href="https://t.co/G6lbhLhQxQ">https://t.co/G6lbhLhQxQ</a> <a href="https://t.co/AK9SzzUazU">pic.twitter.com/AK9SzzUazU</a></p>&mdash; Quanta Magazine (@QuantaMagazine) <a href="https://twitter.com/QuantaMagazine/status/907371443025039361?ref_src=twsrc%5Etfw">11 septembre 2017</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p><img alt="Cellular traffic jam" src="../_images/cellular_traffic_jam.gif" /></p>
+<p>Illustration is from <a class="reference external" href="https://www.lucyreading.co.uk/">Lucy Reading</a> <a class="reference external" href="https://twitter.com/LucyIkkanda">&#64;LucyIkkanda</a></p>
+<p>The relevant model is described in <a class="reference external" href="https://arxiv.org/abs/1409.0593v4">Mapeng Bi et al.</a> (<a class="reference external" href="https://www.nature.com/articles/nphys3471">nature physics version ($$)</a>)</p>
+<p>The master equation is the following:</p>
+<div class="math notranslate nohighlight">
+\[\epsilon = \sum_\alpha \left[ (a_\alpha - 1)^2 + \frac{(p_\alpha - p_0)^2}{r}\right]\]</div>
+<p>With a unit prefered area and <span class="math notranslate nohighlight">\(p_\alpha\)</span> the cell perimeter.</p>
+<div class="section" id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">tyssue</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">Sheet</span><span class="p">,</span> <span class="n">PlanarGeometry</span>
+<span class="kn">from</span> <span class="nn">tyssue.solvers</span> <span class="kn">import</span> <span class="n">QSSolver</span>
+
+<span class="kn">from</span> <span class="nn">tyssue.solvers.viscous</span> <span class="kn">import</span> <span class="n">EulerSolver</span>
+<span class="kn">from</span> <span class="nn">tyssue.draw</span> <span class="kn">import</span> <span class="n">sheet_view</span>
+
+<span class="kn">from</span> <span class="nn">tyssue.dynamics.factory</span> <span class="kn">import</span> <span class="n">model_factory</span>
+<span class="kn">from</span> <span class="nn">tyssue.dynamics</span> <span class="kn">import</span> <span class="n">effectors</span><span class="p">,</span> <span class="n">units</span>
+
+<span class="kn">from</span> <span class="nn">tyssue.utils</span> <span class="kn">import</span> <span class="n">to_nd</span>
+<span class="kn">from</span> <span class="nn">tyssue.utils.testing</span> <span class="kn">import</span> <span class="n">effector_tester</span><span class="p">,</span> <span class="n">model_tester</span>
+<span class="kn">from</span> <span class="nn">tyssue.behaviors</span> <span class="kn">import</span> <span class="n">EventManager</span>
+<span class="kn">from</span> <span class="nn">tyssue.behaviors.sheet</span> <span class="kn">import</span> <span class="n">basic_events</span>
+
+<span class="kn">from</span> <span class="nn">tyssue.draw</span> <span class="kn">import</span> <span class="n">highlight_faces</span><span class="p">,</span> <span class="n">create_gif</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="create-a-2d-patch-of-cells">
+<h2>Create a 2D patch of cells<a class="headerlink" href="#create-a-2d-patch-of-cells" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geom</span> <span class="o">=</span> <span class="n">PlanarGeometry</span>
+
+<span class="n">sheet</span> <span class="o">=</span> <span class="n">Sheet</span><span class="o">.</span><span class="n">planar_sheet_2d</span><span class="p">(</span><span class="s1">&#39;jam&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+
+<span class="n">sheet</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">cut_out</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">]]),</span> <span class="n">trim_borders</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">sanitize</span><span class="p">()</span>
+<span class="n">geom</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">area</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">**-</span><span class="mf">0.5</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">])</span>
+<span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">sheet</span><span class="o">.</span><span class="n">reset_topo</span><span class="p">()</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;quick&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/C-2DMigration_5_0.png" src="../_images/C-2DMigration_5_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="define-the-relevant-mechanical-components">
+<h2>Define the relevant mechanical components<a class="headerlink" href="#define-the-relevant-mechanical-components" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>   
+<span class="c1"># Adding some gigling</span>
+<span class="k">class</span> <span class="nc">BrownianMotion</span><span class="p">(</span><span class="n">effectors</span><span class="o">.</span><span class="n">AbstractEffector</span><span class="p">):</span>
+    
+    <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Brownian Motion&#39;</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="s1">&#39;vert&#39;</span>
+    <span class="n">specs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;settings&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">1e-3</span><span class="p">}}</span>
+    
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="n">eptm</span><span class="p">):</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">eptm</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">eptm</span><span class="o">.</span><span class="n">Nv</span><span class="p">)</span> <span class="o">*</span> <span class="n">T</span> <span class="o">/</span> <span class="n">eptm</span><span class="o">.</span><span class="n">Nv</span>
+    
+    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="n">eptm</span><span class="p">):</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">eptm</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">]</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">T</span><span class="o">/</span><span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        
+        <span class="n">grad</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">eptm</span><span class="o">.</span><span class="n">Nv</span><span class="p">,</span> <span class="n">eptm</span><span class="o">.</span><span class="n">dim</span><span class="p">)),</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">eptm</span><span class="o">.</span><span class="n">vert_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="o">+</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">eptm</span><span class="o">.</span><span class="n">coords</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">grad</span><span class="p">,</span> <span class="kc">None</span>
+    
+    
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="quasistatic-gradient-descent">
+<h2>Quasistatic gradient descent<a class="headerlink" href="#quasistatic-gradient-descent" title="Permalink to this headline">¶</a></h2>
+<p>With only the conservative potential terms</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">model_factory</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">effectors</span><span class="o">.</span><span class="n">PerimeterElasticity</span><span class="p">,</span>
+     <span class="n">effectors</span><span class="o">.</span><span class="n">FaceAreaElasticity</span><span class="p">])</span>
+
+
+<span class="n">model_specs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;face&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;area_elasticity&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span>
+        <span class="s1">&#39;prefered_area&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span>
+        <span class="s1">&#39;perimeter_elasticity&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="c1"># 1/2r in the master equation</span>
+        <span class="s1">&#39;prefered_perimeter&#39;</span><span class="p">:</span> <span class="mf">3.81</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="s1">&#39;edge&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s1">&#39;uy&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s1">&#39;is_active&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;line_tension&#39;</span><span class="p">:</span> <span class="mf">0.0</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;settings&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;temperature&#39;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">}</span>
+<span class="p">}</span>
+    
+<span class="n">sheet</span><span class="o">.</span><span class="n">update_specs</span><span class="p">(</span><span class="n">model_specs</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">QSSolver</span><span class="p">()</span><span class="o">.</span><span class="n">find_energy_min</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">PlanarGeometry</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column ux of the edge dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column uy of the edge dataset with new specs
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH
+</pre></div>
+</div>
+</div>
+</div>
+<p>Backup so we can play with parameters</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bck</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="pulling-on-a-face">
+<h2>Pulling on a face<a class="headerlink" href="#pulling-on-a-face" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    
+<span class="k">def</span> <span class="nf">tract</span><span class="p">(</span><span class="n">eptm</span><span class="p">,</span> <span class="n">face</span><span class="p">,</span> <span class="n">pull_axis</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">pull_column</span><span class="o">=</span><span class="s1">&#39;line_tension&#39;</span><span class="p">,</span> <span class="n">face_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Modeling face traction as shrinking apical junctions on the neighouring cells,</span>
+<span class="sd">    </span>
+<span class="sd">    As if pseudopods where pulling between the cells</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    
+    <span class="n">pull_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pull_axis</span><span class="p">)</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;face == </span><span class="si">{</span><span class="n">face</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">verts</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span><span class="s1">&#39;srce&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">r_ai</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[[</span><span class="s2">&quot;r&quot;</span><span class="o">+</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">eptm</span><span class="o">.</span><span class="n">coords</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">proj</span> <span class="o">=</span> <span class="p">(</span><span class="n">r_ai</span> <span class="o">*</span> <span class="n">pull_axis</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="n">pulling_vert</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">proj</span><span class="p">)]</span>
+    
+    <span class="n">v_edges</span> <span class="o">=</span> <span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;(srce == </span><span class="si">{</span><span class="n">pulling_vert</span><span class="si">}</span><span class="s1">) &amp; (face != </span><span class="si">{</span><span class="n">face</span><span class="si">}</span><span class="s1">)&#39;</span>
+    <span class="p">)</span>
+    <span class="n">pulling_edges</span> <span class="o">=</span> <span class="n">v_edges</span><span class="p">[</span><span class="o">~</span><span class="n">v_edges</span><span class="p">[</span><span class="s1">&#39;trgt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">verts</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="n">pull_column</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">pulling_edges</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+        <span class="n">eptm</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">pulling_edges</span><span class="p">,</span> <span class="n">pull_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        
+        
+<span class="n">default_traction_spec</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;face&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;face_id&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;pull_axis&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span>
+    <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;pull_column&quot;</span><span class="p">:</span> <span class="s2">&quot;line_tension&quot;</span>
+<span class="p">}</span>
+
+
+<span class="kn">from</span> <span class="nn">tyssue.utils.decorators</span> <span class="kn">import</span> <span class="n">face_lookup</span>
+
+<span class="nd">@face_lookup</span>
+<span class="k">def</span> <span class="nf">traction</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">manager</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    
+    <span class="n">traction_spec</span> <span class="o">=</span> <span class="n">default_traction_spec</span>
+    <span class="n">traction_spec</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">pulling</span> <span class="o">=</span> <span class="n">tract</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="o">**</span><span class="n">traction_spec</span><span class="p">)</span>
+    
+    <span class="n">manager</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">traction</span><span class="p">,</span> <span class="o">**</span><span class="n">traction_spec</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pulled</span> <span class="o">=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="simple-visualisation">
+<h3>Simple visualisation<a class="headerlink" href="#simple-visualisation" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">highlight_faces</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">,</span> <span class="p">[</span><span class="n">pulled</span><span class="p">,],</span> <span class="n">reset_visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span>
+    <span class="n">sheet</span><span class="p">,</span> 
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;2D&quot;</span><span class="p">,</span> 
+    <span class="n">face</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="n">edge</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;head_width&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span> 
+    <span class="n">vert</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/C-2DMigration_16_0.png" src="../_images/C-2DMigration_16_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="model-with-all-the-components">
+<h3>Model with all the components<a class="headerlink" href="#model-with-all-the-components" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">model_factory</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">effectors</span><span class="o">.</span><span class="n">PerimeterElasticity</span><span class="p">,</span>
+     <span class="n">BrownianMotion</span><span class="p">,</span>
+     <span class="n">effectors</span><span class="o">.</span><span class="n">LineTension</span><span class="p">,</span>
+     <span class="n">effectors</span><span class="o">.</span><span class="n">FaceAreaElasticity</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="setup-the-event-manager-and-the-solver">
+<h3>Setup the event manager and the solver<a class="headerlink" href="#setup-the-event-manager-and-the-solver" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sheet</span> <span class="o">=</span> <span class="n">bck</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+
+<span class="c1"># setting up values for the whole epithelium</span>
+<span class="n">model_specs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;face&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;area_elasticity&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span>
+        <span class="s1">&#39;prefered_area&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span>
+        <span class="s1">&#39;perimeter_elasticity&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span> <span class="c1"># 1/2r in the master equation</span>
+        <span class="s1">&#39;prefered_perimeter&#39;</span><span class="p">:</span> <span class="mf">3.81</span><span class="p">,</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="o">.</span><span class="n">index</span>
+        <span class="p">},</span>
+    <span class="s1">&#39;vert&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;viscosity&quot;</span><span class="p">:</span> <span class="mf">1.0</span>
+        <span class="p">},</span>
+    <span class="s1">&#39;edge&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;uy&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+    <span class="s1">&#39;settings&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;temperature&#39;</span><span class="p">:</span> <span class="mf">2e-1</span><span class="p">,</span>
+        <span class="s2">&quot;p_4&quot;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
+        <span class="s2">&quot;p_5p&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;threshold_length&quot;</span><span class="p">:</span> <span class="mf">2e-2</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">sheet</span><span class="o">.</span><span class="n">update_specs</span><span class="p">(</span><span class="n">model_specs</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># This allows to auomaticaly solve topology changes</span>
+
+<span class="n">manager</span> <span class="o">=</span> <span class="n">EventManager</span><span class="p">(</span><span class="s2">&quot;face&quot;</span><span class="p">,</span> <span class="p">)</span>
+<span class="n">manager</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">basic_events</span><span class="o">.</span><span class="n">reconnect</span><span class="p">)</span>
+<span class="n">manager</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">traction</span><span class="p">,</span> <span class="n">face_id</span><span class="o">=</span><span class="n">pulled</span><span class="p">)</span>
+
+<span class="c1"># Implicit Euler solver</span>
+
+<span class="n">solver</span> <span class="o">=</span> <span class="n">EulerSolver</span><span class="p">(</span>
+    <span class="n">sheet</span><span class="p">,</span>
+    <span class="n">geom</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">manager</span><span class="o">=</span><span class="n">manager</span><span class="p">,</span>
+    <span class="n">bounds</span><span class="o">=</span><span class="p">(</span>
+        <span class="o">-</span><span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">/</span><span class="mi">10</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+<span class="n">manager</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+
+<span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">[</span><span class="s1">&#39;prefered_perimeter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.8</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column area_elasticity of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column prefered_area of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column perimeter_elasticity of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column prefered_perimeter of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column id of the face dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column ux of the edge dataset with new specs
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reseting column uy of the edge dataset with new specs
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="run-the-solver">
+<h3>Run the solver<a class="headerlink" href="#run-the-solver" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    
+<span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">tf</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">highlight_faces</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">,</span> <span class="p">[</span><span class="n">pulled</span><span class="p">,],</span> <span class="n">reset_visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span>
+    <span class="n">sheet</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;2D&quot;</span><span class="p">,</span>
+    <span class="n">face</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="n">edge</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;head_width&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s2">&quot;line_tension&quot;</span><span class="p">]},</span>
+    <span class="n">vert</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">44</span><span class="n">dcd6235ffd</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">tf</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> 
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">highlight_faces</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">,</span> <span class="p">[</span><span class="n">pulled</span><span class="p">,],</span> <span class="n">reset_visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> 
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/tyssue-0.8.1-py3.9-linux-x86_64.egg/tyssue/solvers/viscous.py</span> in <span class="ni">solve</span><span class="nt">(self, tf, dt, on_topo_change, topo_change_args)</span>
+<span class="g g-Whitespace">    </span><span class="mi">125</span>         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev_t</span><span class="p">,</span> <span class="n">tf</span> <span class="o">+</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">126</span>             <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_pos</span>
+<span class="ne">--&gt; </span><span class="mi">127</span>             <span class="n">dot_r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_func</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">128</span>             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">129</span>                 <span class="n">dot_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">dot_r</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/tyssue-0.8.1-py3.9-linux-x86_64.egg/tyssue/solvers/viscous.py</span> in <span class="ni">ode_func</span><span class="nt">(self, t, pos)</span>
+<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">157</span><span class="sd"> </span>
+<span class="ne">--&gt; </span><span class="mi">158</span><span class="sd">         grad_U = self.model.compute_gradient(self.eptm).loc[self.eptm.active_verts]</span>
+<span class="g g-Whitespace">    </span><span class="mi">159</span><span class="sd">         return (</span>
+<span class="g g-Whitespace">    </span><span class="mi">160</span><span class="sd">             -grad_U.values</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/tyssue-0.8.1-py3.9-linux-x86_64.egg/tyssue/dynamics/factory.py</span> in <span class="ni">compute_gradient</span><span class="nt">(eptm, components)</span>
+<span class="g g-Whitespace">    </span><span class="mi">103</span><span class="sd">         def compute_gradient(eptm, components=False):</span>
+<span class="g g-Whitespace">    </span><span class="mi">104</span><span class="sd">             norm_factor = eptm.specs[&quot;settings&quot;].get(&quot;nrj_norm_factor&quot;, 1)</span>
+<span class="ne">--&gt; </span><span class="mi">105</span><span class="sd">             grads = [f.gradient(eptm) for f in effectors]</span>
+<span class="g g-Whitespace">    </span><span class="mi">106</span><span class="sd">             if components:</span>
+<span class="g g-Whitespace">    </span><span class="mi">107</span><span class="sd">                 return grads</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/tyssue-0.8.1-py3.9-linux-x86_64.egg/tyssue/dynamics/factory.py</span> in <span class="ni">&lt;listcomp&gt;</span><span class="nt">(.0)</span>
+<span class="g g-Whitespace">    </span><span class="mi">103</span><span class="sd">         def compute_gradient(eptm, components=False):</span>
+<span class="g g-Whitespace">    </span><span class="mi">104</span><span class="sd">             norm_factor = eptm.specs[&quot;settings&quot;].get(&quot;nrj_norm_factor&quot;, 1)</span>
+<span class="ne">--&gt; </span><span class="mi">105</span><span class="sd">             grads = [f.gradient(eptm) for f in effectors]</span>
+<span class="g g-Whitespace">    </span><span class="mi">106</span><span class="sd">             if components:</span>
+<span class="g g-Whitespace">    </span><span class="mi">107</span><span class="sd">                 return grads</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/tyssue-0.8.1-py3.9-linux-x86_64.egg/tyssue/dynamics/effectors.py</span> in <span class="ni">gradient</span><span class="nt">(eptm)</span>
+<span class="g g-Whitespace">    </span><span class="mi">197</span><span class="sd"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">198</span><span class="sd">         if len(eptm.coords) == 2:</span>
+<span class="ne">--&gt; </span><span class="mi">199</span><span class="sd">             grad_a_srce, grad_a_trgt = area_grad2d(eptm)</span>
+<span class="g g-Whitespace">    </span><span class="mi">200</span><span class="sd">         elif len(eptm.coords) == 3:</span>
+<span class="g g-Whitespace">    </span><span class="mi">201</span><span class="sd">             grad_a_srce, grad_a_trgt = area_grad(eptm)</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/tyssue-0.8.1-py3.9-linux-x86_64.egg/tyssue/dynamics/planar_gradients.py</span> in <span class="ni">area_grad</span><span class="nt">(sheet)</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span><span class="sd"> </span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span><span class="sd">     coords = sheet.coords</span>
+<span class="ne">----&gt; </span><span class="mi">9</span><span class="sd">     inv_area = sheet.edge_df.eval(&quot;1 / (4 * sub_area)&quot;)</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span><span class="sd"> </span>
+<span class="g g-Whitespace">     </span><span class="mi">11</span><span class="sd">     face_pos = sheet.edge_df[[&quot;f&quot; + c for c in coords]]</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/frame.py</span> in <span class="ni">eval</span><span class="nt">(self, expr, inplace, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3597</span><span class="sd">         kwargs[&quot;resolvers&quot;] = kwargs.get(&quot;resolvers&quot;, ()) + tuple(resolvers)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3598</span><span class="sd"> </span>
+<span class="ne">-&gt; </span><span class="mi">3599</span><span class="sd">         return _eval(expr, inplace=inplace, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3600</span><span class="sd"> </span>
+<span class="g g-Whitespace">   </span><span class="mi">3601</span><span class="sd">     def select_dtypes(self, include=None, exclude=None) -&gt; DataFrame:</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/computation/eval.py</span> in <span class="ni">eval</span><span class="nt">(expr, parser, engine, truediv, local_dict, global_dict, resolvers, level, target, inplace)</span>
+<span class="g g-Whitespace">    </span><span class="mi">345</span><span class="sd">         eng = ENGINES[engine]</span>
+<span class="g g-Whitespace">    </span><span class="mi">346</span><span class="sd">         eng_inst = eng(parsed_expr)</span>
+<span class="ne">--&gt; </span><span class="mi">347</span><span class="sd">         ret = eng_inst.evaluate()</span>
+<span class="g g-Whitespace">    </span><span class="mi">348</span><span class="sd"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">349</span><span class="sd">         if parsed_expr.assigner is None:</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/computation/engines.py</span> in <span class="ni">evaluate</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">     </span><span class="mi">68</span><span class="sd">         &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">69</span>         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_aligned</span><span class="p">:</span>
+<span class="ne">---&gt; </span><span class="mi">70</span>             <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aligned_axes</span> <span class="o">=</span> <span class="n">align_terms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">terms</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">71</span> 
+<span class="g g-Whitespace">     </span><span class="mi">72</span>         <span class="c1"># make sure no names in resolvers and locals/globals clash</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/computation/align.py</span> in <span class="ni">align_terms</span><span class="nt">(terms)</span>
+<span class="g g-Whitespace">    </span><span class="mi">148</span> 
+<span class="g g-Whitespace">    </span><span class="mi">149</span>     <span class="c1"># perform the main alignment</span>
+<span class="ne">--&gt; </span><span class="mi">150</span>     <span class="n">typ</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">_align_core</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">151</span>     <span class="k">return</span> <span class="n">typ</span><span class="p">,</span> <span class="n">axes</span>
+<span class="g g-Whitespace">    </span><span class="mi">152</span> 
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/computation/align.py</span> in <span class="ni">wrapper</span><span class="nt">(terms)</span>
+<span class="g g-Whitespace">     </span><span class="mi">66</span>             <span class="k">return</span> <span class="n">result_type_many</span><span class="p">(</span><span class="o">*</span><span class="n">term_values</span><span class="p">),</span> <span class="kc">None</span>
+<span class="g g-Whitespace">     </span><span class="mi">67</span> 
+<span class="ne">---&gt; </span><span class="mi">68</span>         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">69</span> 
+<span class="g g-Whitespace">     </span><span class="mi">70</span>     <span class="k">return</span> <span class="n">wrapper</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/computation/align.py</span> in <span class="ni">_align_core</span><span class="nt">(terms)</span>
+<span class="g g-Whitespace">     </span><span class="mi">78</span>     <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span>
+<span class="g g-Whitespace">     </span><span class="mi">79</span> 
+<span class="ne">---&gt; </span><span class="mi">80</span>     <span class="n">ndims</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">term_index</span><span class="p">,</span> <span class="n">term_dims</span><span class="p">)))</span>
+<span class="g g-Whitespace">     </span><span class="mi">81</span> 
+<span class="g g-Whitespace">     </span><span class="mi">82</span>     <span class="c1"># initial axes are the axes of the largest-axis&#39;d term</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/series.py</span> in <span class="ni">__init__</span><span class="nt">(self, data, index, dtype, name, copy, fastpath)</span>
+<span class="g g-Whitespace">    </span><span class="mi">316</span>                 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">_mgr</span>
+<span class="g g-Whitespace">    </span><span class="mi">317</span>             <span class="k">elif</span> <span class="n">is_dict_like</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">318</span>                 <span class="n">data</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">319</span>                 <span class="n">dtype</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="g g-Whitespace">    </span><span class="mi">320</span>                 <span class="n">copy</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/series.py</span> in <span class="ni">_init_dict</span><span class="nt">(self, data, index, dtype)</span>
+<span class="g g-Whitespace">    </span><span class="mi">409</span> 
+<span class="g g-Whitespace">    </span><span class="mi">410</span>         <span class="c1"># TODO: passing np.float64 to not break anything yet. See GH-17261</span>
+<span class="ne">--&gt; </span><span class="mi">411</span>         <span class="n">s</span> <span class="o">=</span> <span class="n">create_series_with_explicit_dtype</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">412</span>             <span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">dtype_if_empty</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+<span class="g g-Whitespace">    </span><span class="mi">413</span>         <span class="p">)</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/construction.py</span> in <span class="ni">create_series_with_explicit_dtype</span><span class="nt">(data, index, dtype, name, copy, fastpath, dtype_if_empty)</span>
+<span class="g g-Whitespace">    </span><span class="mi">664</span>     <span class="k">if</span> <span class="n">is_empty_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">665</span>         <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype_if_empty</span>
+<span class="ne">--&gt; </span><span class="mi">666</span>     <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">667</span>         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">,</span> <span class="n">fastpath</span><span class="o">=</span><span class="n">fastpath</span>
+<span class="g g-Whitespace">    </span><span class="mi">668</span>     <span class="p">)</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/series.py</span> in <span class="ni">__init__</span><span class="nt">(self, data, index, dtype, name, copy, fastpath)</span>
+<span class="g g-Whitespace">    </span><span class="mi">364</span>                 <span class="n">data</span> <span class="o">=</span> <span class="n">sanitize_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">copy</span><span class="p">,</span> <span class="n">raise_cast_failure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">365</span> 
+<span class="ne">--&gt; </span><span class="mi">366</span>                 <span class="n">data</span> <span class="o">=</span> <span class="n">SingleBlockManager</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">367</span> 
+<span class="g g-Whitespace">    </span><span class="mi">368</span>         <span class="n">generic</span><span class="o">.</span><span class="n">NDFrame</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/internals/managers.py</span> in <span class="ni">from_array</span><span class="nt">(cls, array, index)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1580</span>         <span class="n">Constructor</span> <span class="k">for</span> <span class="k">if</span> <span class="n">we</span> <span class="n">have</span> <span class="n">an</span> <span class="n">array</span> <span class="n">that</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">yet</span> <span class="n">a</span> <span class="n">Block</span><span class="o">.</span>
+<span class="g g-Whitespace">   </span><span class="mi">1581</span>         <span class="s2">&quot;&quot;&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">1582</span><span class="s2">         block = make_block(array, placement=slice(0, len(index)), ndim=1)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1583</span><span class="s2">         return cls(block, index)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1584</span><span class="s2"> </span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/internals/blocks.py</span> in <span class="ni">make_block</span><span class="nt">(values, placement, klass, ndim, dtype)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2723</span><span class="s2">     if klass is None:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2724</span><span class="s2">         dtype = dtype or values.dtype</span>
+<span class="ne">-&gt; </span><span class="mi">2725</span><span class="s2">         klass = get_block_type(values, dtype)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2726</span><span class="s2"> </span>
+<span class="g g-Whitespace">   </span><span class="mi">2727</span><span class="s2">     elif klass is DatetimeTZBlock and not is_datetime64tz_dtype(values.dtype):</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/internals/blocks.py</span> in <span class="ni">get_block_type</span><span class="nt">(values, dtype)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2688</span><span class="s2">     elif is_datetime64tz_dtype(values.dtype):</span>
+<span class="g g-Whitespace">   </span><span class="mi">2689</span><span class="s2">         cls = DatetimeTZBlock</span>
+<span class="ne">-&gt; </span><span class="mi">2690</span><span class="s2">     elif is_interval_dtype(dtype) or is_period_dtype(dtype):</span>
+<span class="g g-Whitespace">   </span><span class="mi">2691</span><span class="s2">         cls = ObjectValuesExtensionBlock</span>
+<span class="g g-Whitespace">   </span><span class="mi">2692</span><span class="s2">     elif is_extension_array_dtype(values.dtype):</span>
+
+<span class="nn">~/miniconda3/envs/tyssue/lib/python3.9/site-packages/pandas/core/dtypes/common.py</span> in <span class="ni">is_period_dtype</span><span class="nt">(arr_or_dtype)</span>
+<span class="g g-Whitespace">    </span><span class="mi">494</span><span class="s2">     if arr_or_dtype is None:</span>
+<span class="g g-Whitespace">    </span><span class="mi">495</span><span class="s2">         return False</span>
+<span class="ne">--&gt; </span><span class="mi">496</span><span class="s2">     return PeriodDtype.is_dtype(arr_or_dtype)</span>
+<span class="g g-Whitespace">    </span><span class="mi">497</span><span class="s2"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">498</span><span class="s2"> </span>
+
+<span class="ne">KeyboardInterrupt</span>: 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="define-a-simple-drawing-function">
+<h3>Define a simple drawing function<a class="headerlink" href="#define-a-simple-drawing-function" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="n">sheet</span><span class="p">):</span>
+    <span class="n">highlight_faces</span><span class="p">(</span><span class="n">sheet</span><span class="o">.</span><span class="n">face_df</span><span class="p">,</span> <span class="p">[</span><span class="n">pulled</span><span class="p">],</span> <span class="n">reset_visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">geom</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;line_tension&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">():</span>
+        <span class="n">ecolor</span> <span class="o">=</span> <span class="n">sheet</span><span class="o">.</span><span class="n">edge_df</span><span class="p">[</span><span class="s1">&#39;line_tension&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ecolor</span> <span class="o">=</span> <span class="s2">&quot;#aaaaaa&quot;</span>
+        
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span>
+        <span class="n">sheet</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;2D&quot;</span><span class="p">,</span>
+        <span class="n">face</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="n">edge</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;head_width&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">ecolor</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="n">vert</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="create-a-gif-of-the-resulting-simulation">
+<h3>Create a gif of the resulting simulation<a class="headerlink" href="#create-a-gif-of-the-resulting-simulation" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">create_gif</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">history</span><span class="p">,</span> <span class="s2">&quot;demo.gif&quot;</span><span class="p">,</span> <span class="n">draw_func</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">num_frames</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">solver</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">time_stamps</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.000e+00, 1.000e-01, 2.000e-01, ..., 1.198e+02, 1.199e+02,
+       1.200e+02])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="n">Image</span><span class="p">(</span><span class="s2">&quot;demo.gif&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;IPython.core.display.Image object&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="" src="notebooks/test_rigid.gif" /></p>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="B-Apoptosis.html" title="previous page">Single Cell apoptosis</a>
+    <a class='right-next' id="next-link" href="D-FarhadifarModel.html" title="next page">Energy minimization for a 2.5D sheet in 3D</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By The Jupyter Book community<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>
