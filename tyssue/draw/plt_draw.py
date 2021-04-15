@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+import matplotlib as mpl
 from matplotlib import cm
 from matplotlib.path import Path
 from matplotlib.patches import FancyArrow, Arc, PathPatch
@@ -119,57 +119,162 @@ def create_gif(
         shutil.rmtree(graph_dir)
 
 
-def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
-    """Base view function, parametrizable
+# def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
+#    """Base view function, parametrizable
+#    through draw_secs
+#
+#    The default sheet_spec specification is:
+#
+#    {'edge': {
+#      'visible': True,
+#      'width': 0.5,
+#      'head_width': 0.2, # arrow head width for the edges
+#      'length_includes_head': True, # see matplotlib Arrow artist doc
+#      'shape': 'right',
+#      'color': '#2b5d0a', # can be an array
+#      'alpha': 0.8,
+#      'zorder': 1,
+#      'colormap': 'viridis'},
+#     'vert': {
+#      'visible': True,
+#      's': 100,
+#      'color': '#000a4b',
+#      'alpha': 0.3,
+#      'zorder': 2},
+#     'face': {
+#      'visible': False,
+#      'color': '#8aa678',
+#      'alpha': 1.0,
+#      'zorder': -1}
+#      }
+#    """
+#    draw_specs = sheet_spec()
+#    spec_updater(draw_specs, draw_specs_kw)
+#    if ax is None:
+#        fig, ax = plt.subplots()
+#    else:
+#        fig = ax.get_figure()
+#
+#    vert_spec = draw_specs["vert"]
+#    if vert_spec["visible"]:
+#        ax = draw_vert(sheet, coords, ax, **vert_spec)
+#
+#    edge_spec = draw_specs["edge"]
+#    if edge_spec["visible"]:
+#        ax = draw_edge(sheet, coords, ax, **edge_spec)
+#
+#    face_spec = draw_specs["face"]
+#    if face_spec["visible"]:
+#        ax = draw_face(sheet, coords, ax, **face_spec)
+#
+#    ax.autoscale()
+#    ax.set_aspect("equal")
+#    return fig, ax
+
+
+def sheet_view(sheet, coords=COORDS, ax1=None, ax2=None, **draw_specs_kw):
+    """ Base view function, parametrizable
     through draw_secs
-
     The default sheet_spec specification is:
-
-    {'edge': {
-      'visible': True,
-      'width': 0.5,
-      'head_width': 0.2, # arrow head width for the edges
-      'length_includes_head': True, # see matplotlib Arrow artist doc
-      'shape': 'right',
-      'color': '#2b5d0a', # can be an array
-      'alpha': 0.8,
-      'zorder': 1,
-      'colormap': 'viridis'},
-     'vert': {
-      'visible': True,
-      's': 100,
-      'color': '#000a4b',
-      'alpha': 0.3,
-      'zorder': 2},
-     'face': {
-      'visible': False,
-      'color': '#8aa678',
-      'alpha': 1.0,
-      'zorder': -1}
-      }
+    {"edge": {
+	"visible": true,
+    "width": 0.5,
+    "head_width": 0.0,
+    "length_includes_head": true,
+    "shape": "right",
+    "color": "#2b5d0a",
+    "alpha": 0.8,
+    "zorder": 1,
+	"colormap": "viridis"
+    },
+    "vert": {
+    "visible": false,
+    "s": 100,
+    "color": "#000a4b",
+    "alpha": 0.3,
+    "zorder": 2
+    },
+    "grad": {
+    "color":"#000a4b",
+    "alpha":0.5,
+    "width":0.04
+    },
+    "face": {
+    "visible": false,
+    "color":"#8aa678",
+    "alpha": 1.0,
+    "zorder": -1
+    },
+    "axis": {
+    "autoscale": true,
+    "color_bar_cmap":"viridis",
+    "color_bar_range":false, 
+    "color_bar_label":false, 
+    "color_bar_target":"face"}
+    }
+    Important note for quantitative colormap plots: make sure to normalize your values before getting
+    the colors using draw_specs["face"]["color"] = cmap(pandas_holding_quantity_of_interest).
+    For each plot normalize with respect to the current values (max and min) such that they lie between and including 0 to 1.
+    Note that if you want to keep a constant colorbar range you have to choose the normalization to match
+    the max and min of the color bar range you chose. 
     """
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
-    if ax is None:
-        fig, ax = plt.subplots()
+
+    if (ax1 is None) or (ax2 is None):
+        fig = plt.figure()
     else:
-        fig = ax.get_figure()
+        fig = plt.get_figure()
+
+    grid0 = plt.GridSpec(10, 10)
+    grid0.update(wspace=0.0)
+
+    ax1 = fig.add_subplot(grid0[:, :9])
 
     vert_spec = draw_specs["vert"]
     if vert_spec["visible"]:
-        ax = draw_vert(sheet, coords, ax, **vert_spec)
+        ax1 = draw_vert(sheet, coords, ax1, **vert_spec)
 
     edge_spec = draw_specs["edge"]
     if edge_spec["visible"]:
-        ax = draw_edge(sheet, coords, ax, **edge_spec)
+        ax1 = draw_edge(sheet, coords, ax1, **edge_spec)
 
     face_spec = draw_specs["face"]
     if face_spec["visible"]:
-        ax = draw_face(sheet, coords, ax, **face_spec)
+        ax1 = draw_face(sheet, coords, ax1, **face_spec)
 
-    ax.autoscale()
-    ax.set_aspect("equal")
-    return fig, ax
+    axis_spec = draw_specs.get("axis", {})
+    if axis_spec.get("autoscale") == True:
+        ax1.autoscale()
+        ax1.set_aspect("equal")
+    else:
+        ax1.set_xlim(axis_spec["x_min"], axis_spec["x_max"])
+        ax1.set_ylim(axis_spec["y_min"], axis_spec["y_max"])
+        ax1.set_aspect("equal")
+
+    ax2 = fig.add_subplot(grid0[:, 9])
+    cmap = cm.get_cmap(axis_spec.get("color_bar_cmap"))
+    if axis_spec.get("color_bar_range") == False:
+        if axis_spec.get("color_bar_target") == "face":
+            norm = mpl.colors.Normalize(
+                vmin=np.min(sheet.face_df["col"]), vmax=np.max(sheet.face_df["col"])
+            )
+        else:
+            print(
+                "automatic color bar range only works for the face dataframe use draw_specs dictionary under axis, color_bar_range entry to specify a range"
+            )
+    else:
+        norm = mpl.colors.Normalize(
+            vmin=axis_spec.get("color_bar_range")[0],
+            vmax=axis_spec.get("color_bar_range")[1],
+        )
+
+    cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, orientation="vertical")
+    if axis_spec.get("color_bar_label") == False:
+        cb1.set_label("a.u.")
+    else:
+        cb1.set_label(axis_spec.get("color_bar_label"))
+    return fig, [ax1, ax2]
 
 
 def draw_face(sheet, coords, ax, **draw_spec_kw):
@@ -402,17 +507,17 @@ def plot_forces(
     else:
         grad_i = model.compute_gradient(sheet, components=False) * scaling
         grad_i = grad_i.loc[sheet.vert_df["is_active"].astype(bool)]
-    sheet.vert_df[gcoords]=-grad_i[gcoords] # F = -grad E
+    sheet.vert_df[gcoords] = -grad_i[gcoords]  # F = -grad E
 
-    if 'extract' in draw_specs:
-        sheet = sheet.extract_bounding_box(**draw_specs['extract'])
+    if "extract" in draw_specs:
+        sheet = sheet.extract_bounding_box(**draw_specs["extract"])
 
     if ax is None:
         fig, ax = quick_edge_draw(sheet, coords)
     else:
         fig = ax.get_figure()
 
-    arrows = sheet.vert_df[coords+gcoords]
+    arrows = sheet.vert_df[coords + gcoords]
     for _, arrow in arrows.iterrows():
         ax.arrow(*arrow, **draw_specs["grad"])
     return fig, ax
