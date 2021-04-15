@@ -119,59 +119,6 @@ def create_gif(
         shutil.rmtree(graph_dir)
 
 
-# def sheet_view(sheet, coords=COORDS, ax=None, **draw_specs_kw):
-#    """Base view function, parametrizable
-#    through draw_secs
-#
-#    The default sheet_spec specification is:
-#
-#    {'edge': {
-#      'visible': True,
-#      'width': 0.5,
-#      'head_width': 0.2, # arrow head width for the edges
-#      'length_includes_head': True, # see matplotlib Arrow artist doc
-#      'shape': 'right',
-#      'color': '#2b5d0a', # can be an array
-#      'alpha': 0.8,
-#      'zorder': 1,
-#      'colormap': 'viridis'},
-#     'vert': {
-#      'visible': True,
-#      's': 100,
-#      'color': '#000a4b',
-#      'alpha': 0.3,
-#      'zorder': 2},
-#     'face': {
-#      'visible': False,
-#      'color': '#8aa678',
-#      'alpha': 1.0,
-#      'zorder': -1}
-#      }
-#    """
-#    draw_specs = sheet_spec()
-#    spec_updater(draw_specs, draw_specs_kw)
-#    if ax is None:
-#        fig, ax = plt.subplots()
-#    else:
-#        fig = ax.get_figure()
-#
-#    vert_spec = draw_specs["vert"]
-#    if vert_spec["visible"]:
-#        ax = draw_vert(sheet, coords, ax, **vert_spec)
-#
-#    edge_spec = draw_specs["edge"]
-#    if edge_spec["visible"]:
-#        ax = draw_edge(sheet, coords, ax, **edge_spec)
-#
-#    face_spec = draw_specs["face"]
-#    if face_spec["visible"]:
-#        ax = draw_face(sheet, coords, ax, **face_spec)
-#
-#    ax.autoscale()
-#    ax.set_aspect("equal")
-#    return fig, ax
-
-
 def sheet_view(sheet, coords=COORDS, ax1=None, ax2=None, **draw_specs_kw):
     """ Base view function, parametrizable
     through draw_secs
