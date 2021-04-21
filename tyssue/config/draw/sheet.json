@@ -27,5 +27,13 @@
         "color":"#8aa678",
         "alpha": 1.0,
         "zorder": -1
-    }
+        },
+    "axis": {
+        "autoscale": true,
+        "color_bar": false,
+        "color_bar_cmap": "viridis",
+        "color_bar_range": false,
+        "color_bar_label": false,
+        "color_bar_target": "face"
+        }
 }
