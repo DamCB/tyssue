@@ -154,6 +154,7 @@ def sheet_view(sheet, coords=COORDS, ax1=None, ax2=None, **draw_specs_kw):
     },
     "axis": {
     "autoscale": true,
+    "color_bar": false,
     "color_bar_cmap":"viridis",
     "color_bar_range":false, 
     "color_bar_label":false, 
@@ -199,29 +200,30 @@ def sheet_view(sheet, coords=COORDS, ax1=None, ax2=None, **draw_specs_kw):
         ax1.set_ylim(axis_spec["y_min"], axis_spec["y_max"])
         ax1.set_aspect("equal")
 
-    ax2 = fig.add_subplot(grid0[:, 9])
-    cmap = cm.get_cmap(axis_spec.get("color_bar_cmap"))
-    if axis_spec.get("color_bar_range") == False:
-        if axis_spec.get("color_bar_target") == "face":
-            norm = mpl.colors.Normalize(
-                vmin=np.min(sheet.face_df["col"]), vmax=np.max(sheet.face_df["col"])
-            )
-        else:
+    if axis_spec.get("color_bar") == False:
+        return fig, ax1
+    else:
+        ax2 = fig.add_subplot(grid0[:, 9])
+        cmap = cm.get_cmap(axis_spec.get("color_bar_cmap"))
+        if axis_spec.get("color_bar_range") == False:
             print(
-                "automatic color bar range only works for the face dataframe use draw_specs dictionary under axis, color_bar_range entry to specify a range"
+                "Warning: Since the quanity of interest should be normalized to pick face colours, color bar range should always be specified according to the normalization used. Default 0 to 1 range is used. "
             )
-    else:
-        norm = mpl.colors.Normalize(
-            vmin=axis_spec.get("color_bar_range")[0],
-            vmax=axis_spec.get("color_bar_range")[1],
-        )
+            norm = mpl.colors.Normalize(0.0, 1.0)
+        else:
+            norm = mpl.colors.Normalize(
+                vmin=axis_spec.get("color_bar_range")[0],
+                vmax=axis_spec.get("color_bar_range")[1],
+            )
 
-    cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, orientation="vertical")
-    if axis_spec.get("color_bar_label") == False:
-        cb1.set_label("a.u.")
-    else:
-        cb1.set_label(axis_spec.get("color_bar_label"))
-    return fig, [ax1, ax2]
+        cb1 = mpl.colorbar.ColorbarBase(
+            ax2, cmap=cmap, norm=norm, orientation="vertical"
+        )
+        if axis_spec.get("color_bar_label") == False:
+            cb1.set_label("a.u.")
+        else:
+            cb1.set_label(axis_spec.get("color_bar_label"))
+        return fig, [ax1, ax2]
 
 
 def draw_face(sheet, coords, ax, **draw_spec_kw):
