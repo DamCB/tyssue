@@ -41,8 +41,7 @@ def test_bulk_division():
     bulk.sanitize()
     bulk.reset_topo()
     bulk.reset_index()
-    with pytest.raises(ValueError):
-        cell_division(bulk, 4, BulkGeometry)
+    cell_division(bulk, 4, BulkGeometry)
 
     dsets = hdf5.load_datasets(Path(stores_dir) / "with_4sided_cell.hf5")
     bulk = Monolayer("4", dsets)

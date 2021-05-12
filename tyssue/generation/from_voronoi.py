@@ -12,7 +12,7 @@ Generate datasets and epithelia from Voronoi tessalations
 
 
 def from_3d_voronoi(voro):
-    """ Creates 3D (bulk geometry) datasets from a Voronoï  tessalation
+    """Creates 3D (bulk geometry) datasets from a Voronoï  tessalation
 
     Parameters
     ----------
@@ -23,10 +23,26 @@ def from_3d_voronoi(voro):
     datasets: dict
       datasets suitable for :class:`Epithelium` implementation
 
+    Notes
+    -----
+    It is important to reset the index of the created epithelium after creation
+
+    Example
+    -------
+
+        cells = hexa_grid3d(3, 3, 3)
+        datasets = from_3d_voronoi(Voronoi(cells))
+        bulk = Epithelium('bulk', datasets)
+        bulk.reset_topo()
+        bulk.reset_index(order=True)
+        bulk.sanitize()
+
     """
+
     specs3d = bulk_spec()
 
     el_idx = []
+    n_single_faces = len(voro.ridge_vertices)
 
     for f_idx, (rv, rp) in enumerate(zip(voro.ridge_vertices, voro.ridge_points)):
 
@@ -46,10 +62,10 @@ def from_3d_voronoi(voro):
             dotp = np.dot(ctof, normal)
             if np.sign(dotp) > 0:
                 el_idx.append([rv0, rv1, f_idx, rp[0]])
-                el_idx.append([rv1, rv0, f_idx, rp[1]])
+                el_idx.append([rv1, rv0, f_idx + n_single_faces, rp[1]])
             else:
                 el_idx.append([rv1, rv0, f_idx, rp[0]])
-                el_idx.append([rv0, rv1, f_idx, rp[1]])
+                el_idx.append([rv0, rv1, f_idx + n_single_faces, rp[1]])
 
     el_idx = np.array(el_idx)
 
@@ -72,12 +88,8 @@ def from_3d_voronoi(voro):
     included_cells = edge_df["cell"].unique()
     cell_df = cell_df.loc[included_cells].copy()
 
-    nfaces = len(voro.ridge_vertices)
-    face_idx = pd.Index(np.arange(nfaces), name="face")
-    face_df = make_df(face_idx, specs3d["face"])
     included_faces = edge_df["face"].unique()
-    face_df = face_df.loc[included_faces].copy()
-
+    face_df = make_df(included_faces, specs3d["face"])
     edge_df.sort_values(by="cell", inplace=True)
 
     datasets = {"vert": vert_df, "edge": edge_df, "face": face_df, "cell": cell_df}
@@ -85,7 +97,7 @@ def from_3d_voronoi(voro):
 
 
 def from_2d_voronoi(voro, specs=None):
-    """ Creates 2D (sheet geometry) datasets from a Voronoï  tessalation
+    """Creates 2D (sheet geometry) datasets from a Voronoï  tessalation
 
     Parameters
     ----------
