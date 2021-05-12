@@ -15,11 +15,11 @@ def hexa_grid2d(nx, ny, distx, disty, noise=None):
     """Creates an hexagonal grid of points
     """
     cy, cx = np.mgrid[0:ny, 0:nx]
-    cx = cx.astype(np.float)
-    cy = cy.astype(np.float)
+    cx = cx.astype(float)
+    cy = cy.astype(float)
     cx[::2, :] += 0.5
 
-    centers = np.vstack([cx.flatten(), cy.flatten()]).astype(np.float).T
+    centers = np.vstack([cx.flatten(), cy.flatten()]).astype(float).T
     centers[:, 0] *= distx
     centers[:, 1] *= disty
     if noise is not None:
@@ -32,9 +32,9 @@ def hexa_grid3d(nx, ny, nz, distx=1.0, disty=1.0, distz=1.0, noise=None):
     """Creates an hexagonal grid of points
     """
     cz, cy, cx = np.mgrid[0:nz, 0:ny, 0:nx]
-    cx = cx.astype(np.float)
-    cy = cy.astype(np.float)
-    cz = cz.astype(np.float)
+    cx = cx.astype(float)
+    cy = cy.astype(float)
+    cz = cz.astype(float)
     cx[:, ::2] += 0.5
     cy[::2, :] += 0.5
     cy *= np.sqrt(3) / 2

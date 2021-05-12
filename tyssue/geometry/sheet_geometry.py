@@ -205,7 +205,7 @@ class SheetGeometry(PlanarGeometry):
             - sheet.face_df.loc[face, sheet.coords].to_numpy()
         )
         _, _, rotation = np.linalg.svd(
-            rel_pos.astype(np.float), full_matrices=False)
+            rel_pos.astype(float), full_matrices=False)
         if psi:
             rotation = np.dot(rotation_matrix(psi, [0, 0, 1]), rotation)
         rot_pos = pd.DataFrame(
@@ -415,5 +415,5 @@ def face_svd_(faces):
 
     rel_pos = faces[["rx", "ry", "rz"]]
     _, _, rotation = np.linalg.svd(
-        rel_pos.astype(np.float), full_matrices=False)
+        rel_pos.astype(float), full_matrices=False)
     return rotation

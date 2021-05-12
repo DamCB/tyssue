@@ -97,8 +97,7 @@ def solve_sheet_collisions(sheet, position_buffer):
 
 
 class CollidingBoxes:
-    """Utility class to manage collisions
-    """
+    """Utility class to manage collisions"""
 
     def __init__(self, sheet, position_buffer, intersecting_edges):
         """Creates a CollidingBoxes instance
@@ -121,9 +120,7 @@ class CollidingBoxes:
         self.plane_not_found = False
 
     def _get_intersecting_faces(self):
-        """Returns unique pairs of intersecting faces
-
-        """
+        """Returns unique pairs of intersecting faces"""
         _face_pairs = self.sheet.edge_df.loc[
             self.edge_pairs.flatten(), "face"
         ].values.reshape((-1, 2))
@@ -132,7 +129,7 @@ class CollidingBoxes:
         return np.array([[*pair] for pair in unique_pairs if len(pair) == 2])
 
     def get_limits(self, shyness=1e-10):
-        """ Iterator over the position boundaries avoiding the
+        """Iterator over the position boundaries avoiding the
         collisions.
 
         Parameters
@@ -151,7 +148,7 @@ class CollidingBoxes:
             yield self._collision_plane(face_pair, shyness)
 
     def solve_collisions(self, shyness=1e-10):
-        """ Solves the collisions by finding the collision plane.
+        """Solves the collisions by finding the collision plane.
 
         Modifies the sheet vertex positions inplace such that they
         rest at a distance ``shyness`` apart on each side of the collision plane.
@@ -296,7 +293,7 @@ def _face_bbox(face_edges):
     lower = points.min(axis=0)
     upper = points.max(axis=0)
     return pd.DataFrame(
-        [lower, upper], index=list("lh"), columns=list("xyz"), dtype=np.float
+        [lower, upper], index=list("lh"), columns=list("xyz"), dtype=float
     ).T
 
 

@@ -140,7 +140,7 @@ class Sheet(Epithelium):
             (theta > 0) & (theta <= np.pi)
         ].index
         self.west_edges = pd.Index(
-            self.edge_df.loc[self.east_edges, "opposite"].astype(np.int), name="edge"
+            self.edge_df.loc[self.east_edges, "opposite"].astype(int), name="edge"
         )
 
         self.free_edges = self.edge_df[self.edge_df["opposite"] == -1].index
@@ -447,7 +447,7 @@ def get_opposite(edge_df, raise_if_invalid=False):
             raise e
 
     opposite[np.isnan(opposite)] = -1
-    return opposite.astype(np.int)
+    return opposite.astype(int)
 
 
 def get_outer_sheet(eptm):
