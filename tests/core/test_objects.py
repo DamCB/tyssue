@@ -361,6 +361,14 @@ def test_upcast():
     assert_array_equal(eptm.upcast_cell("test_data"), eptm.edge_df["cell"])
 
 
+def test_upcast_ndarray():
+    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets = extrude(datasets_2d)
+    eptm = Epithelium("3faces_3D", datasets, specs)
+    data = np.arange(eptm.Nv * 3).reshape((eptm.Nv, 3))
+    assert eptm.upcast_srce(data).shape == (eptm.Ne, 3)
+
+
 def test_summation():
     datasets_2d, specs = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)

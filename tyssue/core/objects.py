@@ -319,7 +319,7 @@ class Epithelium:
     def _upcast(self, idx, df):
 
         ## Assumes a flat index
-        upcast = df.take(idx)
+        upcast = df.take(idx, axis=0)
         try:
             upcast.index = self.edge_df.index
         except AttributeError:
