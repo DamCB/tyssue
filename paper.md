@@ -84,7 +84,7 @@ The `tyssue` library has already been used in several studies with different con
 <div align="justify">
 The work of this paper was supported by grants from the European Research Council (ERC) under the European Union Horizon 2020 research and innovation program (grant number EPAF: 648001), and from the Association Nationale de la recherche et de la Technologie (ANRT). `tyssue` has benefited from the contributions of [Hadrien Mary](https://github.com/hadim), [George Courcoubetis](https://github.com/gcourcou), [Bertrand Caré](https://github.com/bcare) and [Félix Quinton](https://github.com/felixquinton).
 
-We wish to thank Magali Suzanne and her team for their continuous support and for providing valuable insight on epithelium biology, Cyprien Gay for the discussions on the physics of epithelia, and the scientific python community for the core tools [@Virtanen:2020; Harris:2020; Hunter:2007; mckinney:2010] we use in this project.
+We wish to thank Magali Suzanne and her team for their continuous support and for providing valuable insight on epithelium biology, Cyprien Gay for the discussions on the physics of epithelia, and the scientific python community for the core tools [@Virtanen:2020; @Harris:2020; @Hunter:2007; @mckinney:2010] we use in this project.
 </div>
 
 # Correspondence
