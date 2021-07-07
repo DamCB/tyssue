@@ -123,7 +123,7 @@ class SheetGeometry(PlanarGeometry):
 
         edge_height = sheet.upcast_srce(sheet.vert_df[["height", "rho"]])
         edge_height.set_index(sheet.edge_df["face"], append=True, inplace=True)
-        sheet.face_df[["height", "rho"]] = edge_height.mean(level="face")
+        sheet.face_df[["height", "rho"]] = edge_height.groupby(level="face").mean()
 
     @classmethod
     def reset_scafold(cls, sheet):
