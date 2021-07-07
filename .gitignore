@@ -80,4 +80,4 @@ dist/
 *.blend[1-9]
 
 ## pytest
-.pytest_cache
+.pytest_cacheflycheck_*
