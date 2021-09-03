@@ -28,12 +28,20 @@ These non existent columns will not be saved."""
 
 
 class History:
-    """ This class handles recording and retrieving time series
+    """This class handles recording and retrieving time series
     of sheet objects.
 
     """
 
-    def __init__(self, sheet, save_every=None, dt=None, save_only=None, extra_cols=None, save_all=True):
+    def __init__(
+        self,
+        sheet,
+        save_every=None,
+        dt=None,
+        save_only=None,
+        extra_cols=None,
+        save_all=True,
+    ):
         """Creates a `SheetHistory` instance.
 
         Parameters
@@ -52,11 +60,10 @@ class History:
         """
         if extra_cols is not None:
             warnings.warn(
-                "extra_cols and save_all parameters are deprecated. Use save_only instead. ")
+                "extra_cols and save_all parameters are deprecated. Use save_only instead. "
+            )
 
-        extra_cols = {
-            k: list(sheet.datasets[k].columns) for k in sheet.datasets
-        }
+        extra_cols = {k: list(sheet.datasets[k].columns) for k in sheet.datasets}
 
         if save_only is not None:
             extra_cols = defaultdict(list, **extra_cols)
@@ -168,16 +175,13 @@ class History:
                 cols = self.columns[element]
                 df = self.sheet.datasets[element][cols].reset_index(drop=False)
                 if not "time" in cols:
-                    times = pd.Series(
-                        np.ones((df.shape[0],)) * self.time, name="time")
-                    df = pd.concat(
-                        [df, times], ignore_index=False, axis=1, sort=False)
+                    times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
+                    df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
                 if self.time in hist["time"]:
                     # erase previously recorded time point
                     hist = hist[hist["time"] != self.time]
 
-                hist = pd.concat(
-                    [hist, df], ignore_index=True, axis=0, sort=False)
+                hist = pd.concat([hist, df], ignore_index=True, axis=0, sort=False)
 
                 self.datasets[element] = hist
 
@@ -193,7 +197,7 @@ class History:
             warnings.warn(
                 """
 The time argument you requested is bigger than the maximum recorded time,
-are you sure you pass time in parameter and not an index ?
+are you sure you passed the time stamp as parameter, and not an index ?
 """
             )
         sheet_datasets = {}
@@ -209,14 +213,56 @@ are you sure you pass time in parameter and not an index ?
         )
 
     def __iter__(self):
-
+        """Iterates over all the time points of the history
+        """
         for t in self.time_stamps:
             sheet = self.retrieve(t)
             yield t, sheet
 
+    def slice(self, start=0, stop=None, size=None, endpoint=True):
+        """Returns a slice of the history's time_stamps array
+
+        The slice is over or under sampled to have exactly size point
+        between start and stop
+        """
+        if size is not None:
+            if stop is not None:
+                time_stamps = self.time_stamps[start : stop + int(endpoint)]
+            else:
+                time_stamps = self.time_stamps
+            indices = np.round(
+                np.linspace(0, time_stamps.size + 1, size, endpoint=True)
+            ).astype(int)
+            times = time_stamps.take(indices.clip(max=time_stamps.size - 1))
+        elif stop is not None:
+            times = self.time_stamps[start : stop + int(endpoint)]
+        else:
+            times = self.time_stamps
+        return times
+
+    def browse(self, start=0, stop=None, size=None, endpoint=True):
+        """Returns an iterator over part of the history
+
+        Parameters
+        ----------
+
+        start: int, index of the first time point
+        stop: int, index of the last time point
+        size: int, the number of time points to return
+        endpoint: bool, wether to include the stop time point (default True)
+
+        Returns
+        -------
+        iterator over (t, sheet(t)) for the retrieved time points
+
+
+        """
+        for t in self.slice(start=0, stop=None, size=None, endpoint=True):
+            yield t, self.retrieve(t)
+
 
 class HistoryHdf5(History):
-    """ This class handles recording and retrieving time series
+    """This class handles recording and retrieving time series
     of sheet objects.
 
     """
@@ -230,7 +276,7 @@ class HistoryHdf5(History):
         hf5file="",
         overwrite=False,
     ):
-        """Creates a `SheetHistory` instance.
+        """Creates a `HistoryHdf5` instance.
 
         Use the `from_archive` class method to re-open a saved history file
 
@@ -249,7 +295,8 @@ class HistoryHdf5(History):
 
         """
         logger.warning(
-            "extra_cols and save_all parameters are deprecated. Use save_only instead. ")
+            "extra_cols and save_all parameters are deprecated. Use save_only instead. "
+        )
 
         if not hf5file:
             warnings.warn(
@@ -288,8 +335,8 @@ class HistoryHdf5(History):
             last = self.time_stamps[-1]
             with pd.HDFStore(self.hf5file, "r") as file:
                 keys = file.keys()
-            if "\cell" in keys:
-                sheet = Epithelium
+            if r"\cell" in keys:
+                sheet = Epithelium(last)
 
         History.__init__(self, sheet, save_every, dt, save_only)
         self.dtypes = {
@@ -377,16 +424,20 @@ class HistoryHdf5(History):
             self.index % (int(self.save_every / self.dt)) == 0
         ):
             for element, df in self.sheet.datasets.items():
-                times = pd.Series(
-                    np.ones((df.shape[0],)) * self.time, name="time")
+                times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
                 df = df[self.columns[element]]
-                df = pd.concat([df, times], ignore_index=False,
-                               axis=1, sort=False)
+                df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
                 kwargs = {"data_columns": ["time"]}
                 if "segment" in df.columns:
                     kwargs["min_itemsize"] = {"segment": 8}
                 with pd.HDFStore(self.hf5file, "a") as store:
-                    if element in store and store.select(element, where=f"time == {self.time}")['time'].shape[0] > 0:
+                    if (
+                        element in store
+                        and store.select(element, where=f"time == {self.time}")[
+                            "time"
+                        ].shape[0]
+                        > 0
+                    ):
                         store.remove(key=element, where=f"time == {self.time}")
                     store.append(key=element, value=df, **kwargs)
 

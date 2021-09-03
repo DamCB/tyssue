@@ -1,13 +1,14 @@
-"""3D visualisation inside the notebook.
-"""
+"""3D visualisation inside the notebook."""
+
 import warnings
+
 import numpy as np
 import pandas as pd
-from matplotlib import cm
 from ipywidgets import interact
+from matplotlib import cm
 
-from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater, get_sub_eptm
+from ..config.draw import sheet_spec
 
 try:
     import ipyvolume as ipv
@@ -21,9 +22,10 @@ $ conda install -c conda-forge ipyvolume
     )
 
 
-def browse_history(history, coords=["x", "y", "z"], **draw_specs_kw):
-
-    times = history.time_stamps
+def browse_history(
+    history, coords=["x", "y", "z"], start=None, stop=None, size=None, **draw_specs_kw
+):
+    times = history.slice(start, stop, size)
     num_frames = times.size
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
