@@ -12,6 +12,7 @@ import pathlib
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from ipywidgets import interactive
 
 
 from matplotlib import cm
@@ -23,6 +24,50 @@ from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater, get_sub_eptm
 
 COORDS = ["x", "y"]
+
+
+def browse_history(
+    history,
+    coords=["x", "y"],
+    start=None,
+    stop=None,
+    size=None,
+    draw_func=None,
+    margin=5,
+    **draw_kwds,
+):
+    """Returns a browser widget with 2D plots of the epithelium
+    """
+    if draw_func is None:
+        if draw_kwds.get("mode") in ("quick", None):
+            draw_func = quick_edge_draw
+        else:
+            draw_func = sheet_view
+
+    times = history.slice(start, stop, size)
+    size = times.size
+    x, y = coords = draw_kwds.get("coords", history.sheet.coords[:2])
+
+    sheet0 = history.retrieve(0)
+    bounds = sheet0.vert_df[coords].describe().loc[["min", "max"]]
+    delta = (bounds.loc["max"] - bounds.loc["min"]).max()
+    margin = delta * margin / 100
+    xlim = bounds.loc["min", x] - margin, bounds.loc["max", x] + margin
+    ylim = bounds.loc["min", y] - margin, bounds.loc["max", y] + margin
+
+    def set_frame(i=0):
+        t = times[i]
+        sheet = history.retrieve(t)
+        fig = plt.figure(2)
+        ax = fig.subplots()
+        fig, ax = draw_func(sheet, ax=ax, **draw_kwds)
+        ax.set(xlim=xlim, ylim=ylim)
+        plt.show()
+
+    widget = interactive(set_frame, i=(0, size - 1))
+    output = widget.children[-1]
+    widget.layout.height = "500px"
+    return widget
 
 
 def create_gif(
@@ -56,17 +101,10 @@ def create_gif(
 
     """
     if draw_func is None:
-        draw_func = sheet_view
-        draw_kwds.update({"mode": "quick"})
-
-    time_stamps = history.time_stamps
-    if num_frames is not None:
-        times = np.linspace(time_stamps[0], time_stamps[-1], num_frames)
-    elif interval is not None:
-        times = time_stamps[interval[0] : interval[1] + 1]
-        num_frames = len(times)
-    else:
-        raise ValueError("Need to define `num_frames` or `interval` parameters.")
+        if draw_kwds.get("mode") in ("quick", None):
+            draw_func = quick_edge_draw
+        else:
+            draw_func = sheet_view
 
     graph_dir = pathlib.Path(tempfile.mkdtemp())
     x, y = coords = draw_kwds.get("coords", history.sheet.coords[:2])
@@ -77,33 +115,22 @@ def create_gif(
     xlim = bounds.loc["min", x] - margin, bounds.loc["max", x] + margin
     ylim = bounds.loc["min", y] - margin, bounds.loc["max", y] + margin
 
-    if len(history) < num_frames:
-        for i, (t_, sheet) in enumerate(history):
-            fig, ax = draw_func(sheet, **draw_kwds)
-            if isinstance(ax, plt.Axes) and margin >= 0:
-                ax.set(xlim=xlim, ylim=ylim)
-            fig.savefig(graph_dir / f"sheet_{i:03d}")
-            plt.close(fig)
-
-            figs = glob.glob((graph_dir / "sheet_*.png").as_posix())
-            figs.sort()
-
-        for i, t in enumerate(times):
-            index = np.where(time_stamps >= t)[0][0]
-            fig = figs[index]
-            shutil.copy(fig, graph_dir / f"movie_{i:04d}.png")
+    if interval is None:
+        start, stop = None, None
     else:
-        for i, t in enumerate(times):
-            sheet = history.retrieve(t)
-            try:
-                fig, ax = draw_func(sheet, **draw_kwds)
-            except Exception as e:
-                print("Droped frame {i}")
+        start, stop = interval[0], interval[1]
 
-            if isinstance(ax, plt.Axes) and margin >= 0:
-                ax.set(xlim=xlim, ylim=ylim)
-            fig.savefig(graph_dir / f"movie_{i:04d}.png")
-            plt.close(fig)
+    for i, t in enumerate(history.browse(start, stop, num_frames)):
+        sheet = history.retrieve(t)
+        try:
+            fig, ax = draw_func(sheet, **draw_kwds)
+        except Exception as e:
+            print("Droped frame {i}")
+
+        if isinstance(ax, plt.Axes) and margin >= 0:
+            ax.set(xlim=xlim, ylim=ylim)
+        fig.savefig(graph_dir / f"movie_{i:04d}.png")
+        plt.close(fig)
 
     try:
         proc = subprocess.run(
@@ -402,17 +429,17 @@ def plot_forces(
     else:
         grad_i = model.compute_gradient(sheet, components=False) * scaling
         grad_i = grad_i.loc[sheet.vert_df["is_active"].astype(bool)]
-    sheet.vert_df[gcoords]=-grad_i[gcoords] # F = -grad E
+    sheet.vert_df[gcoords] = -grad_i[gcoords]  # F = -grad E
 
-    if 'extract' in draw_specs:
-        sheet = sheet.extract_bounding_box(**draw_specs['extract'])
+    if "extract" in draw_specs:
+        sheet = sheet.extract_bounding_box(**draw_specs["extract"])
 
     if ax is None:
         fig, ax = quick_edge_draw(sheet, coords)
     else:
         fig = ax.get_figure()
 
-    arrows = sheet.vert_df[coords+gcoords]
+    arrows = sheet.vert_df[coords + gcoords]
     for _, arrow in arrows.iterrows():
         ax.arrow(*arrow, **draw_specs["grad"])
     return fig, ax

@@ -40,22 +40,31 @@ def load_datasets(store):
     return datasets, settings
 
 
-def save_datasets(store, eptm):
+def save_datasets(store, eptm, grp=None):
     """Saves the eptithelium data to a zarr store
 
     Parameters
     ----------
     store: path to a zarr store, or opened store / group
-    eptm: Epithelium object
+    eptm: an Epithelium object
+    grp: optional, str
+        name of a group within the store
 
     Returns
     -------
     the store object
     """
-    store_ = zarr.open(store, mode="w")
-    with store_:
+    if grp:
+        root = zarr.group(store)
+        group = root.create_group(grp, overwrite=True)
+
+    with zarr.open(store, mode="w") as store_:
         store_.attrs.update(filter_settings(eptm.settings))
+
     for key, dset in eptm.datasets.items():
+        if grp:
+            group.create_group(key)
+            key = f"{grp}/{key}"
         dset.to_xarray().to_zarr(store, group=key, mode="w")
 
     return store

@@ -1,7 +1,9 @@
-import pytest
 import os
+import pytest
+
 from pathlib import Path
 
+import numpy as np
 
 from tyssue import Sheet, History, Epithelium, RNRGeometry
 from tyssue.core.history import HistoryHdf5
@@ -61,6 +63,60 @@ def test_retrieve():
     assert sheet_.datasets["face"].loc[0, "area"] == 100.0
     sheet_ = history.retrieve(1)
     assert sheet_.datasets["face"].loc[0, "area"] == 100.0
+
+
+def test_browse():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = History(sheet)
+    for i in range(30):
+        history.record(i / 10)
+
+    times = [t for t, _ in history.browse()]
+    np.testing.assert_allclose(times, history.time_stamps)
+
+    times_areas = np.array(
+        [[t, s.face_df.loc[0, "area"]] for t, s in history.browse(2, 8, endpoint=True)]
+    )
+    assert times_areas.shape == (7, 2)
+    assert times_areas[0, 0] == history.time_stamps[2]
+    assert times_areas[-1, 0] == history.time_stamps[8]
+    assert set(times_areas[:, 0]).issubset(history.time_stamps)
+
+    times_areas = np.array(
+        [
+            [t, s.face_df.loc[0, "area"]]
+            for t, s in history.browse(2, 8, 4, endpoint=False)
+        ]
+    )
+    assert times_areas.shape == (4, 2)
+    assert times_areas[0, 0] == history.time_stamps[2]
+    assert times_areas[-1, 0] == history.time_stamps[7]
+    assert set(times_areas[:, 0]).issubset(history.time_stamps)
+
+    times_areas = np.array(
+        [
+            [t, s.face_df.loc[0, "area"]]
+            for t, s in history.browse(2, 8, 4, endpoint=True)
+        ]
+    )
+    assert times_areas.shape == (4, 2)
+    assert times_areas[0, 0] == history.time_stamps[2]
+    assert times_areas[-1, 0] == history.time_stamps[8]
+    assert set(times_areas[:, 0]).issubset(history.time_stamps)
+
+    times_areas = np.array(
+        [[t, s.face_df.loc[0, "area"]] for t, s in history.browse(2, 8, 10)]
+    )
+    assert times_areas.shape == (10, 2)
+    assert times_areas[0, 0] == history.time_stamps[2]
+    assert times_areas[-1, 0] == history.time_stamps[8]
+    assert set(times_areas[:, 0]).issubset(history.time_stamps)
+
+    times_areas = np.array(
+        [[t, s.edge_df.loc[0, "length"]] for t, s in history.browse(size=40)]
+    )
+    assert times_areas.shape == (40, 2)
+    assert set(times_areas[:, 0]) == set(history.time_stamps)
 
 
 def test_overwrite_time():
@@ -130,12 +186,7 @@ def test_historyHDF5_retrieve():
 def test_historyHDF5_save_every():
     sheet = Sheet("3", *three_faces_sheet())
 
-    history = HistoryHdf5(
-        sheet,
-        save_every=2,
-        dt=1,
-        hf5file="out.hf5",
-    )
+    history = HistoryHdf5(sheet, save_every=2, dt=1, hf5file="out.hf5",)
 
     for element in sheet.datasets:
         assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
@@ -163,10 +214,7 @@ def test_historyHDF5_save_every():
 def test_historyHDF5_itemsize():
     sheet = Sheet("3", *three_faces_sheet())
     sheet.vert_df["segment"] = "apical"
-    history = HistoryHdf5(
-        sheet,
-        hf5file="out.hf5",
-    )
+    history = HistoryHdf5(sheet, hf5file="out.hf5",)
 
     for element in sheet.datasets:
         assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
@@ -250,10 +298,7 @@ def test_to_and_from_archive():
 
 def test_unsaved_col():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(
-        sheet,
-        hf5file="test.hf5",
-    )
+    history = HistoryHdf5(sheet, hf5file="test.hf5",)
     history.record()
     history.record()
     sheet.face_df["new_col"] = 0
@@ -264,10 +309,7 @@ def test_unsaved_col():
 
 def test_change_col_types():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(
-        sheet,
-        hf5file="test.hf5",
-    )
+    history = HistoryHdf5(sheet, hf5file="test.hf5",)
     history.record()
     history.record()
     sheet.face_df["z"] = "abc"
