@@ -213,8 +213,7 @@ are you sure you passed the time stamp as parameter, and not an index ?
         )
 
     def __iter__(self):
-        """Iterates over all the time points of the history
-        """
+        """Iterates over all the time points of the history"""
         for t in self.time_stamps:
             sheet = self.retrieve(t)
             yield t, sheet
@@ -257,7 +256,7 @@ are you sure you passed the time stamp as parameter, and not an index ?
 
 
         """
-        for t in self.slice(start=0, stop=None, size=None, endpoint=True):
+        for t in self.slice(start=start, stop=stop, size=size, endpoint=endpoint):
             yield t, self.retrieve(t)
 
 
