@@ -463,6 +463,7 @@ class HistoryHdf5(History):
         sheet = type(self.sheet)(
             f"{self.sheet.identifier}_{time:04.3f}", sheet_datasets, self.sheet.specs
         )
+        sheet.coords = self.sheet.coords
         sheet.edge_df.index.rename("edge", inplace=True)
         return sheet
 
