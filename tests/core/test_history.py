@@ -186,7 +186,12 @@ def test_historyHDF5_retrieve():
 def test_historyHDF5_save_every():
     sheet = Sheet("3", *three_faces_sheet())
 
-    history = HistoryHdf5(sheet, save_every=2, dt=1, hf5file="out.hf5",)
+    history = HistoryHdf5(
+        sheet,
+        save_every=2,
+        dt=1,
+        hf5file="out.hf5",
+    )
 
     for element in sheet.datasets:
         assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
@@ -214,7 +219,10 @@ def test_historyHDF5_save_every():
 def test_historyHDF5_itemsize():
     sheet = Sheet("3", *three_faces_sheet())
     sheet.vert_df["segment"] = "apical"
-    history = HistoryHdf5(sheet, hf5file="out.hf5",)
+    history = HistoryHdf5(
+        sheet,
+        hf5file="out.hf5",
+    )
 
     for element in sheet.datasets:
         assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
@@ -280,6 +288,13 @@ def test_historyHDF5_from_archive():
         os.remove("test.hf5")
 
 
+def test_retrieve_coords():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = History(sheet)
+    history.record()
+    assert history.retrieve(0).coords == sheet.coords
+
+
 def test_to_and_from_archive():
 
     sheet = Sheet("3", *three_faces_sheet())
@@ -298,7 +313,10 @@ def test_to_and_from_archive():
 
 def test_unsaved_col():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet, hf5file="test.hf5",)
+    history = HistoryHdf5(
+        sheet,
+        hf5file="test.hf5",
+    )
     history.record()
     history.record()
     sheet.face_df["new_col"] = 0
@@ -309,7 +327,10 @@ def test_unsaved_col():
 
 def test_change_col_types():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet, hf5file="test.hf5",)
+    history = HistoryHdf5(
+        sheet,
+        hf5file="test.hf5",
+    )
     history.record()
     history.record()
     sheet.face_df["z"] = "abc"
