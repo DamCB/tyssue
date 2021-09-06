@@ -51,7 +51,7 @@ class TestsPlt:
             0.0, 1.0, num=self.sheet.edge_df.shape[0]
         )[::-1]
 
-        self.draw_specs["edge"]["visible"] = True 
+        self.draw_specs["edge"]["visible"] = True
         self.draw_specs["edge"]["color"] = self.sheet.edge_df["rand"]  # [0, 0, 0, 1]
         self.draw_specs["edge"]["alpha"] = 1.0
         self.draw_specs["edge"]["color_range"] = 0, 3
@@ -145,13 +145,11 @@ def test_create_gif():
     sheet.edge_df.loc[[1], "line_tension"] *= 8
     res = solver.solve(0.5, dt=0.05)
 
-    with pytest.raises(ValueError):
-        create_gif(history, "frames.gif")
     create_gif(history, "frames.gif", num_frames=5)
     create_gif(history, "interval.gif", interval=(2, 4))
 
-    assert os.path.isfile("frames.gif") == True
-    assert os.path.isfile("interval.gif") == True
+    assert os.path.isfile("frames.gif")
+    assert os.path.isfile("interval.gif")
 
     os.remove("frames.gif")
     os.remove("interval.gif")
@@ -161,13 +159,10 @@ def test_plot_forces():
     geom = SheetGeometry
     model = PlanarModel
     sheet = Sheet("3", *three_faces_sheet())
-    sheet.update_specs(model.specs) 
+    sheet.update_specs(model.specs)
     geom.update_all(sheet)
-    fig, ax = plot_forces(sheet,
-                         geom,
-                         model,
-                         list('xy'),
-                         0.05,
-                         **{'extract': {'x_boundary': (-10, 10)}})
+    fig, ax = plot_forces(
+        sheet, geom, model, list("xy"), 0.05, **{"extract": {"x_boundary": (-10, 10)}}
+    )
 
     assert ax.lines[0].get_xydata().shape == (54, 2)
