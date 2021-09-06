@@ -36,8 +36,7 @@ def browse_history(
     margin=5,
     **draw_kwds,
 ):
-    """Returns a browser widget with 2D plots of the epithelium
-    """
+    """Returns a browser widget with 2D plots of the epithelium"""
     if draw_func is None:
         if draw_kwds.get("mode") in ("quick", None):
             draw_func = quick_edge_draw
@@ -120,8 +119,7 @@ def create_gif(
     else:
         start, stop = interval[0], interval[1]
 
-    for i, t in enumerate(history.browse(start, stop, num_frames)):
-        sheet = history.retrieve(t)
+    for i, (t, sheet) in enumerate(history.browse(start, stop, num_frames)):
         try:
             fig, ax = draw_func(sheet, **draw_kwds)
         except Exception as e:
