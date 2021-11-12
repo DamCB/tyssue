@@ -130,7 +130,10 @@ def exchange_neighbour(sheet, manager, **kwargs):
     Executes neighbour exchanges for a face:
     1) if face_df[face, 'try_collapse_edge'] is True, collapse that face's shortest edge into a vert
     2) if face_df[face, 'try_expand_vert'] is True, expand that face's highest-order vert into an edge
-
+    
+    If either or both was successful:
+    1) Stores index of the new vert in face_df[face, 'edge_collapsed']
+    2) Stores index of the new edge in face_df[face, 'vert_expanded']
     
     Parameters
     ----------
