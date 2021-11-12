@@ -148,7 +148,7 @@ def close_face(eptm, face):
     """Closes the face if a single edge is missing.
 
     This function **does not** close the adjacent and opposite
-    faces.
+    faces. Returns the index of the new edge if created, otherwise None
     """
     logger.debug(f"closing face {face}")
     face_edges = eptm.edge_df[eptm.edge_df["face"] == face]
@@ -156,8 +156,8 @@ def close_face(eptm, face):
     trgts = set(face_edges["trgt"])
 
     if srces == trgts:
-        logger.info("Face {} already closed".format(face))
-        return
+        logger.debug("Face {} already closed".format(face))
+        return None
     try:
         (single_srce,) = srces.difference(trgts)
         (single_trgt,) = trgts.difference(srces)
@@ -169,6 +169,7 @@ def close_face(eptm, face):
     eptm.edge_df.index.name = "edge"
     new_edge = eptm.edge_df.index[-1]
     eptm.edge_df.loc[new_edge, ["srce", "trgt"]] = single_trgt, single_srce
+    return new_edge
 
 
 def drop_two_sided_faces(eptm):
@@ -190,7 +191,7 @@ def drop_two_sided_faces(eptm):
 
 
 def remove_face(sheet, face):
-    """Removes a face from the mesh."""
+    """Removes a face from the mesh. Returns the index of the new vert that replaces the face."""
     logger.debug(f"removing face {face}")
 
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
@@ -220,7 +221,7 @@ def remove_face(sheet, face):
     sheet.reset_index()
     sheet.reset_topo()
 
-    return 0
+    return new_vert
 
 
 def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
@@ -229,6 +230,8 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
 
     If `reindex` is `True` (the default), resets indexes and topology data.
     The edge is collapsed on the smaller of the srce, trgt indexes (to minimize reindexing impact)
+    
+    Returns the index of the collapsed edge's remaining vertex (its srce)
 
     """
     logger.debug(f"collapsing edge {edge}")
@@ -241,6 +244,9 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     ]
 
     has_3_sides = np.any(sheet.face_df.loc[edges["face"].astype(int), "num_sides"] < 4)
+    if has_3_sides and not allow_two_sided:
+        warnings.warn(f"Collapsing edge {edge} would result in a two sided face, aborting")
+        return -1
 
     sheet.vert_df.loc[srce, sheet.coords] = sheet.vert_df.loc[
         [srce, trgt], sheet.coords
@@ -258,7 +264,7 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     if reindex:
         sheet.reset_index()
         sheet.reset_topo()
-    return 0
+    return srce
 
 
 def merge_vertices(sheet, vert0, vert1, reindex=True):
