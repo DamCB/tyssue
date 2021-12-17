@@ -3,7 +3,9 @@ from ..utils.utils import to_nd
 
 
 class BaseGeometry:
-    """
+    """Abstract base class defining geometry methods
+
+    Each method MUST take a :class:`Epithelium` instance as first argument
     """
 
     @staticmethod
