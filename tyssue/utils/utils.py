@@ -65,7 +65,6 @@ def spec_updater(specs, new):
             specs[key] = new[key]
 
 
-
 def set_data_columns(datasets, specs, reset=False):
     """Sets the columns of the dataframes in the datasets dictionnary to
     the uniform values in the specs sub-dictionnaries.
@@ -161,10 +160,10 @@ def get_sub_eptm(eptm, edges, copy=False):
         warnings.warn("Sub epithelium appears to be empty")
         return None
     datasets["edge"] = edge_df
-    datasets["vert"] = eptm.vert_df.loc[set(edge_df["srce"])]
-    datasets["face"] = eptm.face_df.loc[set(edge_df["face"])]
+    datasets["vert"] = eptm.vert_df.loc[np.unique(edge_df["srce"])]
+    datasets["face"] = eptm.face_df.loc[np.unique(edge_df["face"])]
     if "cell" in eptm.datasets:
-        datasets["cell"] = eptm.cell_df.loc[set(edge_df["cell"])]
+        datasets["cell"] = eptm.cell_df.loc[np.unique(edge_df["cell"])]
 
     if copy:
         for elem, df in datasets.items():
@@ -178,10 +177,10 @@ def get_sub_eptm(eptm, edges, copy=False):
     if "cell" in eptm.datasets:
         sub_eptm.datasets["edge"]["cell_o"] = edge_df["cell"]
 
-    sub_eptm.datasets["vert"]["srce_o"] = set(edge_df["srce"])
-    sub_eptm.datasets["face"]["face_o"] = set(edge_df["face"])
+    sub_eptm.datasets["vert"]["srce_o"] = np.unique(edge_df["srce"])
+    sub_eptm.datasets["face"]["face_o"] = np.unique(edge_df["face"])
     if "cell" in eptm.datasets:
-        sub_eptm.datasets["cell"]["cell_o"] = set(edge_df["cell"])
+        sub_eptm.datasets["cell"]["cell_o"] = np.unique(edge_df["cell"])
 
     sub_eptm.reset_index()
     sub_eptm.reset_topo()
@@ -363,16 +362,16 @@ def elem_centered_patch(eptm, elem_idx, neighbour_order, elem):
     print(elems, elem)
     edges = eptm.edge_df[eptm.edge_df[elem].isin(elems)].copy()
 
-    vertices = eptm.vert_df.loc[set(edges["srce"])].copy()
+    vertices = eptm.vert_df.loc[np.unique(edges["srce"])].copy()
 
     if elem == "cell":
-        faces = eptm.face_df.loc[set(edges["face"])].copy()
+        faces = eptm.face_df.loc[np.unique(edges["face"])].copy()
         cells = eptm.cell_df.loc[elems].copy()
 
     elif "cell" in edges.columns:
 
         faces = eptm.face_df.loc[elems].copy()
-        cells = eptm.cell_df.loc[set(edges["cell"])].copy()
+        cells = eptm.cell_df.loc[np.unique(edges["cell"])].copy()
     else:
         faces = eptm.face_df.loc[elems].copy()
         cells = None

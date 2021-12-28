@@ -226,7 +226,7 @@ def get_ellipsoid_centers(a, b, c, n_zs, pos_err=0.0, phase_err=0.0):
     # np.linspace(-c, c, n_zs, endpoint=False)
     # thetas = np.arcsin(zs/c)
     av_rhos = (a + b) * np.cos(thetas) / 2
-    n_cells = np.ceil(av_rhos / dist).astype(np.int)
+    n_cells = np.ceil(av_rhos / dist).astype(int)
 
     phis = np.concatenate(
         [

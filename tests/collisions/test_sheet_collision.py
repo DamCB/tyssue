@@ -18,7 +18,7 @@ def test_detection():
     sheet.vert_df.x -= 35 * (sheet.vert_df.x / 2) ** 3
     SheetGeometry.update_all(sheet)
     colliding_edges = set(collisions.self_intersections(sheet).flatten())
-    expected = {32, 1, 34, 9, 35}
+    expected = {0, 32, 1, 34, 9, 35}
     assert colliding_edges == expected
 
 

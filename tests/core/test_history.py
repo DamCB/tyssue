@@ -1,7 +1,9 @@
-import pytest
 import os
+import pytest
+
 from pathlib import Path
 
+import numpy as np
 
 from tyssue import Sheet, History, Epithelium, RNRGeometry
 from tyssue.core.history import HistoryHdf5
@@ -61,6 +63,60 @@ def test_retrieve():
     assert sheet_.datasets["face"].loc[0, "area"] == 100.0
     sheet_ = history.retrieve(1)
     assert sheet_.datasets["face"].loc[0, "area"] == 100.0
+
+
+def test_browse():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = History(sheet)
+    for i in range(30):
+        history.record(i / 10)
+
+    times = [t for t, _ in history.browse()]
+    np.testing.assert_allclose(times, history.time_stamps)
+
+    times_areas = np.array(
+        [[t, s.face_df.loc[0, "area"]] for t, s in history.browse(2, 8, endpoint=True)]
+    )
+    assert times_areas.shape == (7, 2)
+    assert times_areas[0, 0] == history.time_stamps[2]
+    assert times_areas[-1, 0] == history.time_stamps[8]
+    assert set(times_areas[:, 0]).issubset(history.time_stamps)
+
+    times_areas = np.array(
+        [
+            [t, s.face_df.loc[0, "area"]]
+            for t, s in history.browse(2, 8, 4, endpoint=False)
+        ]
+    )
+    assert times_areas.shape == (4, 2)
+    assert times_areas[0, 0] == history.time_stamps[2]
+    assert times_areas[-1, 0] == history.time_stamps[7]
+    assert set(times_areas[:, 0]).issubset(history.time_stamps)
+
+    times_areas = np.array(
+        [
+            [t, s.face_df.loc[0, "area"]]
+            for t, s in history.browse(2, 8, 4, endpoint=True)
+        ]
+    )
+    assert times_areas.shape == (4, 2)
+    assert times_areas[0, 0] == history.time_stamps[2]
+    assert times_areas[-1, 0] == history.time_stamps[8]
+    assert set(times_areas[:, 0]).issubset(history.time_stamps)
+
+    times_areas = np.array(
+        [[t, s.face_df.loc[0, "area"]] for t, s in history.browse(2, 8, 10)]
+    )
+    assert times_areas.shape == (10, 2)
+    assert times_areas[0, 0] == history.time_stamps[2]
+    assert times_areas[-1, 0] == history.time_stamps[8]
+    assert set(times_areas[:, 0]).issubset(history.time_stamps)
+
+    times_areas = np.array(
+        [[t, s.edge_df.loc[0, "length"]] for t, s in history.browse(size=40)]
+    )
+    assert times_areas.shape == (40, 2)
+    assert set(times_areas[:, 0]) == set(history.time_stamps)
 
 
 def test_overwrite_time():
@@ -230,6 +286,13 @@ def test_historyHDF5_from_archive():
         assert isinstance(retrieved.sheet, type(sheet))
     finally:
         os.remove("test.hf5")
+
+
+def test_retrieve_coords():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = History(sheet)
+    history.record()
+    assert history.retrieve(0).coords == sheet.coords
 
 
 def test_to_and_from_archive():

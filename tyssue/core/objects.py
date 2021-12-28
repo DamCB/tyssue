@@ -319,7 +319,7 @@ class Epithelium:
     def _upcast(self, idx, df):
 
         ## Assumes a flat index
-        upcast = df.take(idx)
+        upcast = df.take(idx, axis=0)
         try:
             upcast.index = self.edge_df.index
         except AttributeError:
@@ -567,9 +567,9 @@ class Epithelium:
             for neigh in neighbors[neighbors["order"] == k - 1][elem]:
                 new_neighs = self.get_neighbors(neigh, elem)
                 new_neighs = set(new_neighs).difference(neighbors[elem])
-                orders = np.ones(len(new_neighs), dtype=np.int) * (k)
+                orders = np.ones(len(new_neighs), dtype=int) * (k)
                 new_neighs = pd.DataFrame.from_dict(
-                    {elem: list(new_neighs), "order": orders}, dtype=np.int
+                    {elem: list(new_neighs), "order": orders}, dtype=int
                 )
                 neighbors = pd.concat([neighbors, new_neighs])
         return neighbors.reset_index(drop=True).loc[1:]
@@ -702,7 +702,7 @@ class Epithelium:
             out_vert_ = (self.vert_df[c] < bounds[0]) | (self.vert_df[c] > bounds[1])
             outs[c] = self.upcast_srce(out_vert_) | self.upcast_trgt(out_vert_)
 
-        edge_out = outs.sum(axis=1).astype(np.bool)
+        edge_out = outs.sum(axis=1).astype(bool)
         return self.edge_df[edge_out].index
 
     def set_bbox(self, margin=0.0):
