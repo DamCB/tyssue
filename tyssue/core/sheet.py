@@ -277,6 +277,45 @@ class Sheet(Epithelium):
         subsheet.reset_topo()
         return subsheet
 
+    def extract_bounding_box_2dellipse(self, r_x, r_y, coords=["x", "y"]):
+        """Extracts a new sheet from the embryo sheet
+        that correspond to boundary coordinate defined by the user.
+        Parameters
+        ----------
+        r_x : size of major/minor axis in x-direction
+        r_y : size of major/minor axis in y-direction
+        coords : list of strings, default ['x', 'y', 'z']
+          coordinates over which to crop the sheet
+        Returns
+        -------
+        subsheet : a new :class:`Sheet` object
+        """
+        x, y = coords
+        datasets = {}
+        datasets["face"] = self.face_df.copy()
+
+        center_x = (self.face_df["x"].max() + self.face_df["x"].min()) / 2.0
+        center_y = (self.face_df["y"].max() + self.face_df["y"].min()) / 2.0
+
+        x = datasets["face"]["x"]
+        y = datasets["face"]["y"]
+
+        in_boundary = (
+            (x - center_x) ** 2 / (r_x ** 2) + (y - center_y) ** 2 / (r_y ** 2)
+        ) <= 1
+        datasets["face"] = datasets["face"].loc[in_boundary]
+
+        datasets["edge"] = self.edge_df[
+            self.edge_df["face"].isin(datasets["face"].index)
+        ].copy()
+
+        datasets["vert"] = self.vert_df.loc[self.edge_df["srce"].unique()].copy()
+
+        subsheet = Sheet("subsheet", datasets, self.specs)
+        subsheet.reset_index()
+        subsheet.reset_topo()
+        return subsheet
+
     def get_force_inference(self, coords=None, column=None, free_border_edges=False):
         """Measure force based on Brodland method.
 

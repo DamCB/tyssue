@@ -430,7 +430,7 @@ def find_rearangements(eptm):
     edges_HI: set of indexes of short edges
     faces_IH: set of indexes of small triangular faces
     """
-    l_th = eptm.settings.get("threshold_length", 1e-6)
+    l_th = eptm.settings.get("threshold_length", 1e-2)
     shorts = eptm.edge_df[eptm.edge_df["length"] < l_th]
     if not shorts.shape[0]:
         return np.array([]), np.array([])
@@ -441,7 +441,7 @@ def find_rearangements(eptm):
 
 def find_IHs(eptm, shorts=None):
 
-    l_th = eptm.settings.get("threshold_length", 1e-6)
+    l_th = eptm.settings.get("threshold_length", 1e-2)
     if shorts is None:
         shorts = eptm.edge_df[eptm.edge_df["length"] < l_th]
     if not shorts.shape[0]:
@@ -467,7 +467,7 @@ def find_IHs(eptm, shorts=None):
 
 
 def find_HIs(eptm, shorts=None):
-    l_th = eptm.settings.get("threshold_length", 1e-6)
+    l_th = eptm.settings.get("threshold_length", 1e-2)
     if shorts is None:
         shorts = eptm.edge_df[(eptm.edge_df["length"] < l_th)]
     if not shorts.shape[0]:
