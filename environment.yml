@@ -22,3 +22,5 @@ dependencies:
 - ipyvolume
 - vispy
 - meshio
+- zarr
+- xarray
