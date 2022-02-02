@@ -321,6 +321,37 @@ class ClosedSheetGeometry(SheetGeometry):
 
 
 class EllipsoidGeometry(ClosedSheetGeometry):
+    @classmethod
+    def update_all(cls,eptm):
+        midline_boudary_stiffness = eptm.settings.get(
+            "midline_boundary_stiffness", False)
+        if (midline_boudary_stiffness is not False):
+            if "leftright" not in eptm.vert_df.columns:
+                raise KeyError("The midline boundary effector requires "\
+                      "a column \"leftright\" in vert_df. The value should "\
+                      "be 1 if the initial x coordinate of a vert is "\
+                      "positive, -1 if negative. E.g. like `sheet.vert_df"\
+                      "[\"leftright\"] = sheet.vert_df.eval(\"x/abs(x)\")`")
+            # update boundary transgression
+            # leftright = 1|-1 depending on x position at start of sim
+            # x / abs(x) = 1|-1 depending on x position with given set of coords
+            # leftright - (x/abs(x)) = 0 if both are equal or x=0
+            #                        = 2 if both are unequal and x is negative
+            #                        = -2 if both are unequal and x is positive
+            # hence, take (0|2|-2)*-0.5x to get the distance from x axis as a positive number
+            eptm.vert_df["delta_boundary"] = eptm.vert_df.eval("((x / abs(x)) - leftright)*0.5*x")
+            #and update the diagnostic output in face_df as the sum of the vertex
+            #boundary transgressions
+            edge_transgr = eptm.upcast_srce(eptm.vert_df[["delta_boundary"]])
+            edge_transgr.set_index(eptm.edge_df["face"], append=True, inplace=True)
+            eptm.face_df["delta_boundary"] = edge_transgr.sum(level="face")
+
+            # I used vert_df["delta_boundary"] in a MidlineBoundary effector
+            # with an elastic energy term and a simple gradient term of 0.
+            # For sims I set midline_boundary_stiffness identical to the vitelline membrane
+
+        SheetGeometry.update_all(eptm)
+
     @staticmethod
     def update_height(eptm):
 
