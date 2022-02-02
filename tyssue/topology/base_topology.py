@@ -230,7 +230,7 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
 
     If `reindex` is `True` (the default), resets indexes and topology data.
     The edge is collapsed on the smaller of the srce, trgt indexes (to minimize reindexing impact)
-    
+
     Returns the index of the collapsed edge's remaining vertex (its srce)
 
     """

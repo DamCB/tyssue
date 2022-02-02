@@ -20,7 +20,7 @@ def split_vert(
     """Splits a vertex towards the center of the face.
 
     This operation removes the  face `face` from the neighborhood of the vertex.
-    
+
     Returns a list of the new edge's indices in edge_df. This should be two:
         the edge with vert as the srce and the newly created vertex as the trgt
         and the reverse edge with vert as the trgt and the new one as the srce
@@ -49,7 +49,7 @@ def split_vert(
     new_edges = []
     for face_ in connected["face"].unique():
         new_edge = close_face(sheet, face_)
-        if new_edge != None:
+        if new_edge is not None:
             new_edges.append(new_edge)
 
     if reindex:

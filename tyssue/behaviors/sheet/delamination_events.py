@@ -124,7 +124,7 @@ def constriction(sheet, manager, **kwargs):
                 constriction_spec.update({"current_traction": current_traction})
 
     manager.append(constriction, **constriction_spec)
-    
+
 def exchange_neighbour(sheet, manager, **kwargs):
     """
     Executes neighbour exchanges for a face:
@@ -174,12 +174,12 @@ def exchange_neighbour(sheet, manager, **kwargs):
               f"expand? {do_expand} ",end="\r")
     
     if (
-        do_collapse and 
+        do_collapse and
         sheet.face_df.loc[face].area > exchange_spec["critical_area"]
     ):
         #attempt to collapse the face's shortest edge
         e_collapsilling = sheet.edge_df[
-            sheet.edge_df["face"]==face 
+            sheet.edge_df["face"]==face
         ]["length"].idxmin()
         #check first: does this face, and the one opposite that edge have enough sides (>3)?
         if verbose:
@@ -197,8 +197,8 @@ def exchange_neighbour(sheet, manager, **kwargs):
                     print(f"collapsing edge {e_collapsilling} (face {face})  ",
                           end="\r")
                 remain_vert = collapse_edge(
-                    sheet, 
-                    e_collapsilling, 
+                    sheet,
+                    e_collapsilling,
                     reindex=True,
                     allow_two_sided=True
                 )
