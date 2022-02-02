@@ -167,7 +167,7 @@ def test_execute_apoptosis():
     manager.update()
     next_nbsides = sheet.face_df.loc[sheet.idx_lookup(face_id, "face"), "num_sides"]
     i = 1
-    while next_nbsides > 4:
+    while next_nbsides > 3:
         assert next_nbsides == initial_nbsides - i
         assert len(manager.current) > 0
         i = i + 1
