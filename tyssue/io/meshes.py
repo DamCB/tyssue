@@ -32,13 +32,13 @@ def save_triangular_mesh(filename, eptm):
 
 
 def import_triangular_mesh(filename):
-    if (filename[-3:] == 'ply') or (filename[-3:] == 'obj'):
+    if (filename.endswith('ply')) or (filename.endswith('obj')):
         mesh = meshio.read(filename)
         vert_ = pd.DataFrame(mesh.points, columns=list('xyz'))
         edge_ = pd.DataFrame(columns=['srce', 'trgt', 'face'])
         face_ = pd.DataFrame(columns=list('xyz'))
         cpt = 0
-        for c in mesh.cells[0][1]:
+        for c in mesh.cells[0].data:
             edge_.loc[cpt * 3] = [c[0], c[1], cpt]
             edge_.loc[cpt * 3 + 1] = [c[1], c[2], cpt]
             edge_.loc[cpt * 3 + 2] = [c[2], c[0], cpt]
