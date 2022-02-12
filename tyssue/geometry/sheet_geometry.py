@@ -350,7 +350,7 @@ class EllipsoidGeometry(ClosedSheetGeometry):
             # with an elastic energy term and a simple gradient term of 0.
             # For sims I set midline_boundary_stiffness identical to the vitelline membrane
 
-        SheetGeometry.update_all(eptm)
+        super().update_all(eptm)
 
     @staticmethod
     def update_height(eptm):
