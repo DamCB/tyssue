@@ -321,9 +321,12 @@ class ClosedSheetGeometry(SheetGeometry):
 
 class MidlineBoundaryGeometry(ClosedSheetGeometry):
     @classmethod
-    def update_all(cls,eptm):
+    def update_all(cls, eptm):
         super().update_all(eptm)
-        
+        cls.update_delta_boundary(eptm)
+
+    @staticmethod
+    def update_delta_boundary(eptm):
         midline_boudary_stiffness = eptm.settings.get(
             "midline_boundary_stiffness", False)
         if (midline_boudary_stiffness is not False):
@@ -344,7 +347,7 @@ class MidlineBoundaryGeometry(ClosedSheetGeometry):
             edge_transgr = eptm.upcast_srce(eptm.vert_df[["delta_boundary"]])
             edge_transgr.set_index(eptm.edge_df["face"], append=True, inplace=True)
             eptm.face_df["delta_boundary"] = edge_transgr.sum(level="face")
-    
+
 class EllipsoidGeometry(ClosedSheetGeometry):
 
     @staticmethod
