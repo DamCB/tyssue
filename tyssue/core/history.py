@@ -293,10 +293,6 @@ class HistoryHdf5(History):
 
 
         """
-        logger.warning(
-            "extra_cols and save_all parameters are deprecated. Use save_only instead. "
-        )
-
         if not hf5file:
             warnings.warn(
                 "No directory is given. The HDF5 file will be saved in the working directory as out.hf5."

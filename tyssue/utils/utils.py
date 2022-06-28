@@ -356,8 +356,11 @@ def elem_centered_patch(eptm, elem_idx, neighbour_order, elem):
     if elem not in ("face", "cell"):
         raise ValueError
 
-    elems = pd.Series(elem_idx).append(
-        eptm.get_neighborhood(elem_idx, neighbour_order, elem)[elem]
+    elems = pd.concat(
+        [
+            pd.Series(elem_idx),
+            eptm.get_neighborhood(elem_idx, neighbour_order, elem)[elem],
+        ]
     )
     print(elems, elem)
     edges = eptm.edge_df[eptm.edge_df[elem].isin(elems)].copy()

@@ -37,7 +37,7 @@ def split_vert(sheet, vert, face, to_rewire, epsilon, recenter=False):
 
     # Add a vertex
     this_vert = sheet.vert_df.loc[vert:vert]  # avoid type munching
-    sheet.vert_df = sheet.vert_df.append(this_vert, ignore_index=True)
+    sheet.vert_df = pd.concat([sheet.vert_df, this_vert], ignore_index=True)
     # reset datatypes
     new_vert = sheet.vert_df.index[-1]
     # Move it towards the face center
@@ -109,30 +109,23 @@ def add_vert(eptm, edge):
     ]
 
     new_vert = eptm.vert_df.loc[srce:srce]
-    eptm.vert_df = eptm.vert_df.append(new_vert, ignore_index=True)
+    eptm.vert_df = pd.concat([eptm.vert_df, new_vert], ignore_index=True)
     new_vert = eptm.vert_df.index[-1]
     eptm.vert_df.loc[new_vert, eptm.coords] = eptm.vert_df.loc[
         [srce, trgt], eptm.coords
     ].mean()
 
-    new_edges = []
+    eptm.edge_df.loc[parallels.index, "trgt"] = new_vert
+    eptm.edge_df = pd.concat([eptm.edge_df, parallels], ignore_index=True)
+    new_edges = eptm.edge_df.index[-parallels.index.size :]
+    eptm.edge_df.loc[new_edges, "srce"] = new_vert
+    eptm.edge_df.loc[new_edges, "trgt"] = trgt
 
-    for p, p_data in parallels.iterrows():
-        eptm.edge_df.loc[p, "trgt"] = new_vert
-        eptm.edge_df = eptm.edge_df.append(p_data, ignore_index=True)
-        new_edge = eptm.edge_df.index[-1]
-        eptm.edge_df.loc[new_edge, "srce"] = new_vert
-        eptm.edge_df.loc[new_edge, "trgt"] = trgt
-        new_edges.append(new_edge)
-
-    new_opp_edges = []
-    for o, o_data in opposites.iterrows():
-        eptm.edge_df.loc[o, "srce"] = new_vert
-        eptm.edge_df = eptm.edge_df.append(o_data, ignore_index=True)
-        new_opp_edge = eptm.edge_df.index[-1]
-        eptm.edge_df.loc[new_opp_edge, "trgt"] = new_vert
-        eptm.edge_df.loc[new_opp_edge, "srce"] = trgt
-        new_opp_edges.append(new_opp_edge)
+    eptm.edge_df.loc[opposites.index, "srce"] = new_vert
+    eptm.edge_df = pd.concat([eptm.edge_df, opposites], ignore_index=True)
+    new_opp_edges = eptm.edge_df.index[-opposites.index.size :]
+    eptm.edge_df.loc[new_opp_edges, "trgt"] = new_vert
+    eptm.edge_df.loc[new_opp_edges, "srce"] = trgt
 
     # ## Sheet special case
     if len(new_edges) == 1:
@@ -165,7 +158,7 @@ def close_face(eptm, face):
         print("Closing only possible with exactly two dangling vertices")
         raise err
 
-    eptm.edge_df = eptm.edge_df.append(face_edges.iloc[0:1], ignore_index=True)
+    eptm.edge_df = pd.concat([eptm.edge_df, face_edges.iloc[0:1]], ignore_index=True)
     eptm.edge_df.index.name = "edge"
     new_edge = eptm.edge_df.index[-1]
     eptm.edge_df.loc[new_edge, ["srce", "trgt"]] = single_trgt, single_srce
@@ -197,7 +190,7 @@ def remove_face(sheet, face):
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     verts = edges["srce"].unique()
     new_vert_data = sheet.vert_df.loc[verts].mean()
-    sheet.vert_df = sheet.vert_df.append(new_vert_data, ignore_index=True)
+    sheet.vert_df = pd.concat([sheet.vert_df, new_vert_data])
     new_vert = sheet.vert_df.index[-1]
 
     # collapse all edges connected to the face vertices
@@ -245,7 +238,9 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
 
     has_3_sides = np.any(sheet.face_df.loc[edges["face"].astype(int), "num_sides"] < 4)
     if has_3_sides and not allow_two_sided:
-        warnings.warn(f"Collapsing edge {edge} would result in a two sided face, aborting")
+        warnings.warn(
+            f"Collapsing edge {edge} would result in a two sided face, aborting"
+        )
         return -1
 
     sheet.vert_df.loc[srce, sheet.coords] = sheet.vert_df.loc[

@@ -1,10 +1,11 @@
 import logging
-import numpy as np
 from functools import wraps
+
 
 import warnings
 
-
+import numpy as np
+import pandas as pd
 from .base_topology import add_vert, collapse_edge, close_face, remove_face
 from .base_topology import split_vert as base_split_vert
 from tyssue.utils.decorators import do_undo, validate
@@ -206,17 +207,17 @@ def face_division(sheet, mother, vert_a, vert_b):
     # mother = sheet.edge_df.loc[edge_a, 'face']
 
     face_cols = sheet.face_df.loc[mother:mother]
-    sheet.face_df = sheet.face_df.append(face_cols, ignore_index=True)
+
+    sheet.face_df = pd.concat([sheet.face_df, face_cols], ignore_index=True)
     sheet.face_df.index.name = "face"
     daughter = int(sheet.face_df.index[-1])
 
     edge_cols = sheet.edge_df[sheet.edge_df["face"] == mother].iloc[0:1]
-    sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
-    new_edge_m = sheet.edge_df.index[-1]
+
+    sheet.edge_df = pd.concat([sheet.edge_df, edge_cols, edge_cols], ignore_index=True)
+    new_edge_m = sheet.edge_df.index[-2]
     sheet.edge_df.loc[new_edge_m, "srce"] = vert_b
     sheet.edge_df.loc[new_edge_m, "trgt"] = vert_a
-
-    sheet.edge_df = sheet.edge_df.append(edge_cols, ignore_index=True)
     new_edge_d = sheet.edge_df.index[-1]
     sheet.edge_df.loc[new_edge_d, "srce"] = vert_a
     sheet.edge_df.loc[new_edge_d, "trgt"] = vert_b

@@ -32,8 +32,9 @@ def remove_cell(eptm, cell):
     faces = eptm.face_df.loc[edges["face"].unique()]
     oppo = faces["opposite"][faces["opposite"] != -1]
     verts = eptm.vert_df.loc[edges["srce"].unique()].copy()
-
-    eptm.vert_df = eptm.vert_df.append(verts.mean(), ignore_index=True)
+    eptm.vert_df = pd.concat(
+        [eptm.vert_df, verts.mean(numeric_only=True)], ignore_index=True
+    )
     new_vert = eptm.vert_df.index[-1]
 
     eptm.vert_df.loc[new_vert, "segment"] = "basal"
@@ -67,7 +68,7 @@ def close_cell(eptm, cell):
     if euler_c != 1:
         raise ValueError("Cell has more than one hole")
 
-    eptm.face_df = eptm.face_df.append(eptm.face_df.loc[0:0], ignore_index=True)
+    eptm.face_df = pd.concat([eptm.face_df.loc[0:0]], ignore_index=True)
     new_face = eptm.face_df.index[-1]
 
     oppo = get_opposite(face_edges, raise_if_invalid=True)
@@ -76,7 +77,8 @@ def close_cell(eptm, cell):
     new_edges[["srce", "trgt"]] = new_edges[["trgt", "srce"]]
     new_edges["face"] = new_face
     new_edges.index = new_edges.index + eptm.edge_df.index.max()
-    eptm.edge_df = eptm.edge_df.append(new_edges, ignore_index=False)
+
+    eptm.edge_df = pd.concat([eptm.edge_df, new_edges], ignore_index=False)
 
     eptm.reset_index()
     eptm.reset_topo()
@@ -246,7 +248,7 @@ def get_division_edges(
         direction = [plane_normal[1], -plane_normal[0], 0]
         rot = rotation_matrix(theta, direction)
 
-    cell_verts = set(eptm.edge_df[eptm.edge_df["cell"] == mother]["srce"])
+    cell_verts = frozenset(eptm.edge_df[eptm.edge_df["cell"] == mother]["srce"])
     vert_pos = eptm.vert_df.loc[cell_verts, eptm.coords]
     for coord in eptm.coords:
         vert_pos[coord] -= plane_center[coord]
@@ -309,7 +311,8 @@ def cell_division(
             return_all=True,
         )
     cell_cols = eptm.cell_df.loc[mother:mother]
-    eptm.cell_df = eptm.cell_df.append(cell_cols, ignore_index=True)
+
+    eptm.cell_df = pd.concat([eptm.cell_df, cell_cols], ignore_index=True)
     eptm.cell_df.index.name = "cell"
     daughter = eptm.cell_df.index[-1]
     if "id" not in eptm.cell_df.columns:
@@ -344,7 +347,7 @@ identifier. Consider doing this at initialisation time
 
     # septum
     face_cols = eptm.face_df.iloc[-2:]
-    eptm.face_df = eptm.face_df.append(face_cols, ignore_index=True)
+    eptm.face_df = pd.concat([eptm.face_df, face_cols], ignore_index=True)
     eptm.face_df.index.name = "face"
     septum = eptm.face_df.index[-2:]
 
@@ -352,7 +355,8 @@ identifier. Consider doing this at initialisation time
     num_new_edges = num_v * 2
 
     edge_cols = eptm.edge_df.iloc[-num_new_edges:]
-    eptm.edge_df = eptm.edge_df.append(edge_cols, ignore_index=True)
+
+    eptm.edge_df = pd.concat([eptm.edge_df, edge_cols], ignore_index=True)
     eptm.edge_df.index.name = "edge"
     new_edges = eptm.edge_df.index[-num_new_edges:]
 

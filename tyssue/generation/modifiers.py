@@ -212,7 +212,7 @@ def subdivide_faces(eptm, faces):
     remaining = eptm.face_df.index.delete(faces)
     untouched_faces = eptm.face_df.loc[remaining]
     edge_df = pd.concat([eptm.edge_df[eptm.edge_df["face"] == face] for face in faces])
-    verts = set(edge_df["srce"])
+    verts = frozenset(edge_df["srce"])
     vert_df = eptm.vert_df.loc[verts]
 
     Nsf = face_df.shape[0]
