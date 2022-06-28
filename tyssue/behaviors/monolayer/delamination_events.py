@@ -146,9 +146,10 @@ def _constrict_apical(faces_in_cell, monolayer, constriction_spec):
         ].index
         if len(three_lateral):
             face_to_eliminate = three_lateral[0]
-        prev_Nf = monolayer.Nf
-        HI_transition(monolayer, face_to_eliminate)
-        monolayer.face_df.loc[prev_Nf:, "contractility"] = 0
+
+            prev_Nf = monolayer.Nf
+            HI_transition(monolayer, face_to_eliminate)
+            monolayer.face_df.loc[prev_Nf:, "contractility"] = 0
 
     elif len(faces_in_cell) == 4:
         if monolayer.cell_df.loc[cell, "vol"] > constriction_spec["critical_volume"]:

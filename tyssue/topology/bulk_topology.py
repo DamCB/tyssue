@@ -33,7 +33,7 @@ def remove_cell(eptm, cell):
     oppo = faces["opposite"][faces["opposite"] != -1]
     verts = eptm.vert_df.loc[edges["srce"].unique()].copy()
     eptm.vert_df = pd.concat(
-        [eptm.vert_df, verts.mean(numeric_only=True)], ignore_index=True
+        [eptm.vert_df, pd.DataFrame(verts.mean(numeric_only=True))], ignore_index=True
     )
     new_vert = eptm.vert_df.index[-1]
 
@@ -496,7 +496,7 @@ def IH_transition(eptm, edge):
 
     split_vert(eptm, vert, face)
 
-    logger.info(f"IH transition on edge {edge}")
+    logger.info("IH transition on edge %d", edge)
     return 0
 
 
@@ -518,7 +518,7 @@ def HI_transition(eptm, face):
     face = all_edges[all_edges["cell"] == cell]["face"].iloc[0]
     split_vert(eptm, vert, face)
 
-    logger.info(f"HI transition on edge {face}")
+    logger.info(f"HI transition on face %d", face)
     return 0
 
 

@@ -33,12 +33,12 @@ def split_vert(sheet, vert, face, to_rewire, epsilon, recenter=False):
     This will leave opened faces and cells
 
     """
-    logger.debug(f"splitting vertex {vert}")
+    logger.debug("splitting vertex %d", vert)
 
     # Add a vertex
     this_vert = sheet.vert_df.loc[vert:vert]  # avoid type munching
     sheet.vert_df = pd.concat([sheet.vert_df, this_vert], ignore_index=True)
-    # reset datatypes
+
     new_vert = sheet.vert_df.index[-1]
     # Move it towards the face center
     r_ia = sheet.face_df.loc[face, sheet.coords] - sheet.vert_df.loc[vert, sheet.coords]
@@ -113,7 +113,7 @@ def add_vert(eptm, edge):
     new_vert = eptm.vert_df.index[-1]
     eptm.vert_df.loc[new_vert, eptm.coords] = eptm.vert_df.loc[
         [srce, trgt], eptm.coords
-    ].mean()
+    ].mean(numeric_only=True)
 
     eptm.edge_df.loc[parallels.index, "trgt"] = new_vert
     eptm.edge_df = pd.concat([eptm.edge_df, parallels], ignore_index=True)
@@ -149,7 +149,7 @@ def close_face(eptm, face):
     trgts = set(face_edges["trgt"])
 
     if srces == trgts:
-        logger.debug("Face {} already closed".format(face))
+        logger.debug("Face %d already closed", face)
         return None
     try:
         (single_srce,) = srces.difference(trgts)
@@ -177,7 +177,7 @@ def drop_two_sided_faces(eptm):
         return
 
     two_sided = eptm.face_df[num_sides < 3].index
-    logger.debug(f"dropping {two_sided.shape} 2-sided faces")
+    logger.debug(f"dropping %d 2-sided faces", two_sided.size)
     edges = eptm.edge_df[eptm.edge_df["face"].isin(two_sided)].index
     eptm.edge_df.drop(edges, axis=0, inplace=True)
     eptm.face_df.drop(two_sided, axis=0, inplace=True)
@@ -189,8 +189,10 @@ def remove_face(sheet, face):
 
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     verts = edges["srce"].unique()
-    new_vert_data = sheet.vert_df.loc[verts].mean()
-    sheet.vert_df = pd.concat([sheet.vert_df, new_vert_data])
+    new_vert_data = sheet.vert_df.loc[verts].mean(numeric_only=True)
+    sheet.vert_df = pd.concat(
+        [sheet.vert_df, pd.DataFrame(new_vert_data)], ignore_index=True
+    )
     new_vert = sheet.vert_df.index[-1]
 
     # collapse all edges connected to the face vertices
@@ -227,8 +229,8 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     Returns the index of the collapsed edge's remaining vertex (its srce)
 
     """
-    logger.debug(f"collapsing edge {edge}")
 
+    logger.debug("collapsing edge %d", edge)
     srce, trgt = np.sort(sheet.edge_df.loc[edge, ["srce", "trgt"]]).astype(int)
 
     edges = sheet.edge_df[
