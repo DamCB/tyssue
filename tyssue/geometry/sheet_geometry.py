@@ -330,9 +330,8 @@ class MidlineBoundaryGeometry(ClosedSheetGeometry):
         midline_boudary_stiffness = eptm.settings.get(
             "midline_boundary_stiffness", False)
         if (midline_boudary_stiffness is not False):
-            if "leftright" not in eptm.vert_df.columns:
-                # x = 0 should practically never occur, but replace to safeguard
-                eptm.vert_df["leftright"] = eptm.vert_df.replace(0,1).eval("x/abs(x)")
+           if "leftright" not in eptm.vert_df.columns:
+            eptm.vert_df["leftright"] = np.sign(eptm.vert_df["x"])
             # update boundary transgression
             # leftright = 1|-1 depending on x position at start
             # x / abs(x) = 1|-1 depending on current x position
@@ -340,10 +339,13 @@ class MidlineBoundaryGeometry(ClosedSheetGeometry):
             #                        = -2 if both are unequal and current x is negative
             #                        = 2 if both are unequal and current x is positive
             # hence, take (0|2|-2)*0.5x to get the distance from x axis as a positive number
-            eptm.vert_df["delta_boundary"] = eptm.vert_df.replace(0,1).eval(
-                "((x / abs(x)) - leftright)*0.5*x")
-            #and update the diagnostic output in face_df as the sum of the vertex
-            #boundary transgressions
+            eptm.vert_df["delta_boundary"] = (
+                (np.sign(eptm.vert_df["x"]) - eptm.vert_df["leftright"])
+                * eptm.vert_df["x"]
+                / 2
+            )
+            # and update the diagnostic output in face_df as the sum of the vertex
+            # boundary transgressions
             edge_transgr = eptm.upcast_srce(eptm.vert_df[["delta_boundary"]])
             edge_transgr.set_index(eptm.edge_df["face"], append=True, inplace=True)
             eptm.face_df["delta_boundary"] = edge_transgr.sum(level="face")
