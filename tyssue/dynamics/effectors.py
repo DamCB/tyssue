@@ -653,6 +653,9 @@ class MidlineBoundary(AbstractEffector):
         grad = eptm.vert_df[eptm.coords] * to_nd(kl_l0, eptm.dim)
         grad.columns = ["g" + u for u in eptm.coords]
         grad["gy"] = 0
+        if "z" in eptm.coords:
+            grad["gz"] = 0
+
         return grad, grad
 
 def _exponants(dimensions, ref_dimensions, spatial_unit=None, temporal_unit=None):
