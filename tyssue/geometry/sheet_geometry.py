@@ -344,11 +344,6 @@ class MidlineBoundaryGeometry(ClosedSheetGeometry):
                 * eptm.vert_df["x"]
                 / 2
             )
-            # and update the diagnostic output in face_df as the sum of the vertex
-            # boundary transgressions
-            edge_transgr = eptm.upcast_srce(eptm.vert_df[["delta_boundary"]])
-            edge_transgr.set_index(eptm.edge_df["face"], append=True, inplace=True)
-            eptm.face_df["delta_boundary"] = edge_transgr.sum(level="face")
 
 class EllipsoidGeometry(ClosedSheetGeometry):
 
