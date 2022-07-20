@@ -319,8 +319,34 @@ class ClosedSheetGeometry(SheetGeometry):
         )
         sheet.settings["lumen_vol"] = sum(lumen_sub_vol)
 
+class MidlineBoundaryGeometry(ClosedSheetGeometry):
+    @classmethod
+    def update_all(cls, eptm):
+        super().update_all(eptm)
+        cls.update_delta_boundary(eptm)
+
+    @staticmethod
+    def update_delta_boundary(eptm):
+        midline_boudary_stiffness = eptm.settings.get(
+            "midline_boundary_stiffness", False)
+        if (midline_boudary_stiffness is not False):
+            if "leftright" not in eptm.vert_df.columns:
+                eptm.vert_df["leftright"] = np.sign(eptm.vert_df["x"])
+            # update boundary transgression
+            # leftright = 1|-1 depending on x position at start
+            # x / abs(x) = 1|-1 depending on current x position
+            # (x/abs(x)) - leftright = 0 if both are equal (vert has not crossed midline)
+            #                        = -2 if both are unequal and current x is negative
+            #                        = 2 if both are unequal and current x is positive
+            # hence, take (0|2|-2)*0.5x to get the distance from x axis as a positive number
+            eptm.vert_df["delta_boundary"] = (
+                (np.sign(eptm.vert_df["x"]) - eptm.vert_df["leftright"])
+                * eptm.vert_df["x"]
+                / 2
+            )
 
 class EllipsoidGeometry(ClosedSheetGeometry):
+
     @staticmethod
     def update_height(eptm):
 

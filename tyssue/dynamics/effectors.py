@@ -622,6 +622,41 @@ class BarrierElasticity(AbstractEffector):
         grad.columns = ["g" + c for c in eptm.coords]
         return grad, None
 
+class MidlineBoundary(AbstractEffector):
+    """
+    Elastic boundary at the x-axis, to be used with MidlineBoundaryGeometry.
+    Intended to use with a high midline_boundary_stiffness to prevent vertices
+    from crossing the midline.
+    """
+    dimensions = units.line_elasticity
+    magnitude = 'midline_boundary'
+    label = 'Midline boundary'
+    element = 'vert'
+    specs = {
+        'vert': {
+            'boundary_K':280,
+            'is_active':1,
+            'delta_boundary':0}
+    }
+
+    @staticmethod
+    def energy(eptm):
+        return eptm.vert_df.eval(
+            "0.5 * delta_boundary**2 * {}".format(
+                str(eptm.settings["midline_boundary_stiffness"]))
+        )
+
+    @staticmethod
+    def gradient(eptm):
+        #just a bunch of zeros
+        kl_l0 = elastic_force(eptm.vert_df, "delta_boundary","0","0")
+        grad = eptm.vert_df[eptm.coords] * to_nd(kl_l0, eptm.dim)
+        grad.columns = ["g" + u for u in eptm.coords]
+        grad["gy"] = 0
+        if "z" in eptm.coords:
+            grad["gz"] = 0
+
+        return grad, grad
 
 def _exponants(dimensions, ref_dimensions, spatial_unit=None, temporal_unit=None):
 
