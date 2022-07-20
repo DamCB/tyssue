@@ -330,8 +330,8 @@ class MidlineBoundaryGeometry(ClosedSheetGeometry):
         midline_boudary_stiffness = eptm.settings.get(
             "midline_boundary_stiffness", False)
         if (midline_boudary_stiffness is not False):
-           if "leftright" not in eptm.vert_df.columns:
-            eptm.vert_df["leftright"] = np.sign(eptm.vert_df["x"])
+            if "leftright" not in eptm.vert_df.columns:
+                eptm.vert_df["leftright"] = np.sign(eptm.vert_df["x"])
             # update boundary transgression
             # leftright = 1|-1 depending on x position at start
             # x / abs(x) = 1|-1 depending on current x position
