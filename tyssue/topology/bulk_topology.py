@@ -68,7 +68,7 @@ def close_cell(eptm, cell):
     if euler_c != 1:
         raise ValueError("Cell has more than one hole")
 
-    eptm.face_df = pd.concat([eptm.face_df.loc[0:0]], ignore_index=True)
+    eptm.face_df = pd.concat([eptm.face_df, eptm.face_df.loc[0:0]], ignore_index=True)
     new_face = eptm.face_df.index[-1]
 
     oppo = get_opposite(face_edges, raise_if_invalid=True)

@@ -64,8 +64,10 @@ def test_t1_transition():
     sheet = Sheet("emin", datasets, specs)
     geom.update_all(sheet)
     face = sheet.edge_df.loc[84, "face"]
+    srce = sheet.edge_df.loc[84, "srce"]
     type1_transition(sheet, 84)
     assert sheet.face_df.loc[face, "num_sides"] == 5
+    assert sheet.edge_df[(sheet.edge_df.srce == srce)].shape[0] == 3
 
 
 def test_t1_at_border():

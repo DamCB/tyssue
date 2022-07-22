@@ -173,7 +173,11 @@ def test_execute_apoptosis():
         i = i + 1
         manager.execute(sheet)
         manager.update()
-        next_nbsides = sheet.face_df.loc[sheet.idx_lookup(face_id, "face"), "num_sides"]
+        face = sheet.idx_lookup(face_id, "face")
+        if face is not None:
+            next_nbsides = sheet.face_df.loc[face, "num_sides"]
+        else:
+            break
         if i > 20:
             raise RecursionError
     manager.execute(sheet)

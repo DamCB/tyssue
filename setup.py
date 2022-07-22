@@ -1,11 +1,9 @@
 import os
-import re
 import sys
-import platform
 import subprocess
-import warnings
+import platform
 
-from distutils.version import LooseVersion
+
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
 
@@ -28,10 +26,10 @@ files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 # Version management copied form numpy
 # Thanks to them!
 MAJOR = 0
-MINOR = 8
-MICRO = 1
-ISRELEASED = True
-VERSION = "%d.%d.%s" % (MAJOR, MINOR, MICRO)
+MINOR = 9
+MICRO = 0
+ISRELEASED = False
+VERSION = f"{MAJOR}.{MINOR}.{MICRO}"
 
 
 def git_version():
@@ -51,44 +49,46 @@ def git_version():
 
     try:
         out = _minimal_ext_cmd(["git", "rev-parse", "HEAD"])
-        GIT_REVISION = out.strip().decode("ascii")
+        git_revision = out.strip().decode("ascii")
     except OSError:
-        GIT_REVISION = "Unknown"
+        git_revision = "Unknown"
 
-    return GIT_REVISION
+    return git_revision
 
 
 def get_version_info():
-    # Adding the git rev number needs to be done inside write_version_py(),
-    # otherwise the import of tyssue.version messes up the build under Python 3.
-    FULLVERSION = VERSION
+    """Adding the git rev number needs to be done inside write_version_py(),
+    otherwise the import of tyssue.version messes up the build under Python 3.
+    """
+    fullversion = VERSION
     if os.path.exists(".git"):
-        GIT_REVISION = git_version()
+        git_revision = git_version()
     elif os.path.exists("tyssue/version.py"):
         # must be a source distribution, use existing version file
         # read from it instead of importing to avoid importing
         # the whole package
-        with open("tyssue/version.py", "r") as fh:
-            for line in fh.readlines():
+        with open("tyssue/version.py", "r", encoding="utf-8") as version:
+            for line in version.readlines():
                 if line.startswith("git_revision"):
-                    GIT_REVISION = line.split("=")[-1][2:-2]
+                    git_revision = line.split("=")[-1][2:-2]
                     break
             else:
-                GIT_REVISION = "Unknown"
+                git_revision = "Unknown"
     else:
-        GIT_REVISION = "Unknown"
+        git_revision = "Unknown"
 
     if not ISRELEASED:
-        FULLVERSION += ".dev0+" + GIT_REVISION[:7]
+        fullversion += ".dev0+" + git_revision[:7]
 
-    return FULLVERSION, GIT_REVISION
+    return fullversion, git_revision
 
 
 def write_version_py(filename="tyssue/version.py"):
+    """Writes a version.py file with version info from setup.py and git"""
     fullversion, git_revision = get_version_info()
 
-    with open(filename, "w") as a:
-        a.write(
+    with open(filename, "w", encoding="utf-8") as version:
+        version.write(
             f"""
 # THIS FILE IS GENERATED FROM tyssue SETUP.PY
 #
@@ -115,19 +115,12 @@ class CMakeExtension(Extension):
 class CMakeBuild(build_ext):
     def run(self):
         try:
-            out = subprocess.check_output(["cmake", "--version"])
-        except OSError:
+            subprocess.check_output(["cmake", "--version"])
+        except OSError as exc:
             raise RuntimeError(
                 "CMake must be installed to build the following extensions: "
                 + ", ".join(e.name for e in self.extensions)
-            )
-
-        if platform.system() == "Windows":
-            cmake_version = LooseVersion(
-                re.search(r"version\s*([\d.]+)", out.decode()).group(1)
-            )
-            if cmake_version < "3.1.0":
-                raise RuntimeError("CMake >= 3.1.0 is required on Windows")
+            ) from exc
 
         for ext in self.extensions:
             self.build_extension(ext)
@@ -166,6 +159,12 @@ class CMakeBuild(build_ext):
         print(env["CXXFLAGS"], "\n")
 
 
+ext_modules = [
+    CMakeExtension("tyssue.collisions.cpp.c_collisions"),
+    CMakeExtension("tyssue.generation.cpp.mesh_generation"),
+]
+
+
 write_version_py()
 setup(
     name=DISTNAME,
@@ -193,10 +192,7 @@ setup(
     packages=find_packages(),
     package_data={"tyssue": files},
     include_package_data=True,
-    ext_modules=[
-        CMakeExtension("tyssue/collisions/cpp/c_collisions"),
-        CMakeExtension("tyssue/generation/cpp/mesh_generation"),
-    ],
-    cmdclass=dict(build_ext=CMakeBuild),
+    ext_modules=ext_modules,
+    cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
 )

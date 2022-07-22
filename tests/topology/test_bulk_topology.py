@@ -19,6 +19,7 @@ from tyssue.topology.bulk_topology import (
     find_rearangements,
     find_IHs,
     find_HIs,
+    split_vert,
 )
 
 from tyssue.topology.monolayer_topology import cell_division as monolayer_division
@@ -55,31 +56,33 @@ def test_bulk_division():
 
 
 def test_close_cell():
-    dsets = hdf5.load_datasets(Path(stores_dir) / "with_4sided_cell.hf5")
-    mono = Monolayer("4", dsets)
-    cell = mono.cell_df.query("num_faces != 4").index[0]
-    Nfi = mono.cell_df.loc[cell, "num_faces"]
-    Nei = mono.Ne
-    edges = mono.edge_df.query(f"cell == {cell}")
-    face = edges["face"].iloc[0]
-    face_edges = edges.query(f"face == {face}").index
-    Nsi = len(face_edges)
-    mono.face_df.drop(face, axis=0, inplace=True)
-    mono.edge_df.drop(face_edges, axis=0, inplace=True)
-    mono.reset_index()
-    mono.reset_topo()
 
-    assert mono.cell_df.loc[cell, "num_faces"] == Nfi - 1
-    assert mono.Ne == Nei - Nsi
+    sheet = Sheet.planar_sheet_3d("sheet", 5, 5, 1, 1)
+    sheet.sanitize()
+    datasets = extrude(sheet.datasets, method="translation")
 
-    res = close_cell(mono, cell)
-    MonolayerGeometry.update_all(mono)
-    mono.reset_index()
-    mono.reset_topo()
-    assert not res
-    assert mono.validate()
-    assert mono.cell_df.loc[cell, "num_faces"] == Nfi
-    assert mono.Ne == Nei
+    eptm = Monolayer("test_IHt", datasets, bulk_spec())
+    BulkGeometry.update_all(eptm)
+    Nf = eptm.Nf
+    cell = 5
+    cell_nf = eptm.cell_df.loc[cell, "num_faces"]
+
+    face = eptm.edge_df.loc[eptm.edge_df.cell == cell, "face"].iloc[0]
+
+    eptm.face_df.drop(face, axis=0, inplace=True)
+    edges = eptm.edge_df[eptm.edge_df.face == face].index
+
+    eptm.edge_df.drop(edges, axis=0, inplace=True)
+    eptm.reset_topo()
+    eptm.reset_index()
+
+    assert Nf == eptm.Nf + 1
+    assert cell_nf == eptm.cell_df.loc[cell, "num_faces"] + 1
+
+    close_cell(eptm, cell)
+    assert Nf == eptm.Nf
+    assert cell_nf == eptm.cell_df.loc[cell, "num_faces"]
+    assert np.all(np.isfinite(eptm.face_df.x))
 
 
 def test_close_already_closed(caplog):
@@ -147,6 +150,22 @@ def test_IH_transition():
     )
 
 
+def test_split_vert():
+    sheet = Sheet.planar_sheet_3d("sheet", 5, 5, 1, 1)
+    sheet.sanitize()
+    datasets = extrude(sheet.datasets, method="translation")
+
+    eptm = Monolayer("test_IHt", datasets, bulk_spec())
+    BulkGeometry.update_all(eptm)
+
+    split_vert(eptm, 32, face=None, multiplier=1.5)
+
+    BulkGeometry.update_all(eptm)
+
+    invalid = eptm.get_invalid()
+    assert np.alltrue(1 - invalid)
+
+
 def test_HI_transition():
 
     sheet = Sheet.planar_sheet_3d("sheet", 5, 5, 1, 1)
@@ -197,10 +216,8 @@ def test_find_transitions():
     eptm.settings["threshold_length"] = 2e-1
 
     ih, hi = find_rearangements(eptm)
-    assert len(ih) == 1
+    assert len(ih) == 0
     assert len(hi) == 0
-
-    assert len(find_IHs(eptm))
 
 
 def test_monolayer_division():
