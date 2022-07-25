@@ -1,15 +1,15 @@
-import os
-import warnings
-import traceback
 import logging
-import pandas as pd
-import numpy as np
-
+import os
+import traceback
+import warnings
+from collections import defaultdict
 from pathlib import Path
 
-from collections import defaultdict
-from .sheet import Sheet
+import numpy as np
+import pandas as pd
+
 from .objects import Epithelium
+from .sheet import Sheet
 
 logger = logging.getLogger(name=__name__)
 
@@ -60,7 +60,8 @@ class History:
         """
         if extra_cols is not None:
             warnings.warn(
-                "extra_cols and save_all parameters are deprecated. Use save_only instead. "
+                "extra_cols and save_all parameters are deprecated."
+                " Use save_only instead. "
             )
 
         extra_cols = {k: list(sheet.datasets[k].columns) for k in sheet.datasets}
@@ -84,7 +85,7 @@ class History:
         vcols = list(set(vcols))
         self.vcols = _filter_columns(vcols, sheet.vert_df.columns, "vertex")
         _vert_h = sheet.vert_df[self.vcols].reset_index(drop=False)
-        if not "time" in self.vcols:
+        if "time" not in self.vcols:
             _vert_h["time"] = 0
         self.datasets["vert"] = _vert_h
         self.columns["vert"] = self.vcols
@@ -92,7 +93,7 @@ class History:
         fcols = extra_cols["face"]
         self.fcols = _filter_columns(fcols, sheet.face_df.columns, "face")
         _face_h = sheet.face_df[self.fcols].reset_index(drop=False)
-        if not "time" in self.fcols:
+        if "time" not in self.fcols:
             _face_h["time"] = 0
         self.datasets["face"] = _face_h
         self.columns["face"] = self.fcols
@@ -101,7 +102,7 @@ class History:
             ccols = extra_cols["cell"]
             self.ccols = _filter_columns(ccols, sheet.cell_df.columns, "cell")
             _cell_h = sheet.cell_df[self.ccols].reset_index(drop=False)
-            if not "time" in self.ccols:
+            if "time" not in self.ccols:
                 _cell_h["time"] = 0
             self.datasets["cell"] = _cell_h
             self.columns["cell"] = self.ccols
@@ -111,7 +112,7 @@ class History:
         ecols = list(set(ecols))
         self.ecols = _filter_columns(ecols, sheet.edge_df.columns, "edge")
         _edge_h = sheet.edge_df[self.ecols].reset_index(drop=False)
-        if not "time" in self.ecols:
+        if "time" not in self.ecols:
             _edge_h["time"] = 0
         self.datasets["edge"] = _edge_h
         self.columns["edge"] = self.ecols
@@ -174,7 +175,7 @@ class History:
                 hist = self.datasets[element]
                 cols = self.columns[element]
                 df = self.sheet.datasets[element][cols].reset_index(drop=False)
-                if not "time" in cols:
+                if "time" not in cols:
                     times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
                     df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
                 if self.time in hist["time"]:
@@ -190,8 +191,8 @@ class History:
     def retrieve(self, time):
         """Return datasets at time `time`.
 
-        If a specific dataset was not recorded at time time, the closest record before that
-        time is used.
+        If a specific dataset was not recorded at time time,
+        the closest record before that time is used.
         """
         if time > self.datasets["vert"]["time"].values[-1]:
             warnings.warn(
@@ -287,15 +288,13 @@ class HistoryHdf5(History):
         save_only : dictionnary with sheet.datasets as keys and list of
             columns as values. Default None
         hf5file : string, define the path of the HDF5 file
-        overwrite : bool, Overwrite or not the file if it is already exist. Default False
-
-
-
-
+        overwrite : bool, Overwrite or not the file if it is already exist.
+            Default False
         """
         if not hf5file:
             warnings.warn(
-                "No directory is given. The HDF5 file will be saved in the working directory as out.hf5."
+                "No directory is given. The HDF5 file will be saved"
+                " in the working directory as out.hf5."
             )
             self.hf5file = Path(os.getcwd()) / "out.hf5"
         else:
@@ -304,7 +303,7 @@ class HistoryHdf5(History):
         if self.hf5file.exists():
             if overwrite:
                 tb = traceback.extract_stack(limit=2)
-                if not "from_archive" in tb[0].name:
+                if "from_archive" not in tb[0].name:
                     warnings.warn(
                         "The file already exist and will be overwritten."
                         " This is normal if you reopened an archive"
@@ -410,9 +409,8 @@ class HistoryHdf5(History):
                         if k in new_types and old_types[k] != new_types[k]
                     }
                     raise ValueError(
-                        "There is a change of datatype in {} table in {} columns".format(
-                            element, changed_type
-                        )
+                        f"There is a change of datatype in {element} table"
+                        f" in {changed_type} columns"
                     )
 
         if (self.save_every is None) or (
@@ -439,15 +437,16 @@ class HistoryHdf5(History):
         self.index += 1
 
     def retrieve(self, time):
-        """Return datasets at time `time`.
+        """Returns datasets at time `time`.
 
-        If a specific dataset was not recorded at time time, the closest record before that
-        time is used.
+        If a specific dataset was not recorded at time time,
+        the closest record before that time is used.
         """
         times = self.time_stamps
         if time > times[-1]:
             warnings.warn(
-                "The time argument you passed is bigger than the maximum recorded time, are you sure you pass time in parameter and not an index ? "
+                "The time argument you passed is bigger than the maximum recorded time,"
+                " are you sure you pass time in parameter and not an index ? "
             )
 
         time = times[np.argmin(np.abs(times - time))]

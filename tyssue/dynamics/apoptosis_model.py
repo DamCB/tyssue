@@ -3,15 +3,13 @@ Specific functions for apoptosis vertex model
 """
 
 from ..utils import to_nd
-from . import units
-
-from .sheet_gradients import height_grad
-from . import effectors
+from . import effectors, units
 from .factory import model_factory
+from .sheet_gradients import height_grad
 
 
 class ApicoBasalTension(effectors.AbstractEffector):
-    """ Effector for the apical-basal tension.
+    """Effector for the apical-basal tension.
 
     The energy is proportional to the heigth of the cell
     """
@@ -20,7 +18,7 @@ class ApicoBasalTension(effectors.AbstractEffector):
     label = "Apical-basal tension"
     magnitude = "radial_tension"
     element = "vert"
-    specs = {"vert": {"radial_tension":0.0, "height": 1.0, "is_active": 1}}
+    specs = {"vert": {"radial_tension": 0.0, "height": 1.0, "is_active": 1}}
 
     @staticmethod
     def energy(sheet):

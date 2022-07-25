@@ -1,25 +1,18 @@
-import os
-import tempfile
-import numpy as np
-import pandas as pd
-
-from tyssue import config
-from tyssue import Monolayer, Sheet
+from tyssue import Monolayer
 from tyssue import MonolayerGeometry as geom
-from tyssue.generation import three_faces_sheet, extrude
-
-
-from tyssue.behaviors.event_manager import EventManager, wait
+from tyssue import Sheet, config
+from tyssue.behaviors.event_manager import EventManager
 from tyssue.behaviors.monolayer.actions import (
-    grow,
-    shrink,
-    contract,
-    contract_apical_face,
     ab_pull,
     ab_pull_edge,
+    contract,
+    contract_apical_face,
+    grow,
+    shrink,
 )
 from tyssue.behaviors.monolayer.apoptosis_events import apoptosis
 from tyssue.behaviors.monolayer.delamination_events import constriction
+from tyssue.generation import extrude
 
 
 def test_grow():

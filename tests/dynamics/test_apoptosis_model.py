@@ -1,7 +1,7 @@
 from tyssue import Sheet
-from tyssue.generation import three_faces_sheet
-from tyssue.utils.testing import model_tester, effector_tester
 from tyssue.dynamics.apoptosis_model import ApicoBasalTension, SheetApoptosisModel
+from tyssue.generation import three_faces_sheet
+from tyssue.utils.testing import effector_tester, model_tester
 
 
 def test_effector():

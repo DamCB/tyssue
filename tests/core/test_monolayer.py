@@ -1,9 +1,9 @@
-from numpy.testing import assert_array_equal
 import numpy as np
+from numpy.testing import assert_array_equal
 
-from tyssue.generation import extrude, three_faces_sheet
-from tyssue import Monolayer, config, Sheet
+from tyssue import Monolayer, Sheet, config
 from tyssue.core.monolayer import MonolayerWithLamina
+from tyssue.generation import extrude, three_faces_sheet
 
 
 def test_monolayer():

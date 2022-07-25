@@ -1,12 +1,10 @@
 import os
-import sys
-import subprocess
 import platform
+import subprocess
+import sys
 
-
-from setuptools import setup, find_packages, Extension
+from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
-
 
 DISTNAME = "tyssue"
 DESCRIPTION = "tyssue is a living tissues, cell level, modeling library"
@@ -104,7 +102,7 @@ else:
         )
 
 
-## Extension management from pybind/cmake_example
+# Extension management from pybind/cmake_example
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=""):
         # Make build optionnal

@@ -1,5 +1,6 @@
 import os
 import warnings
+
 from ..io import hdf5
 
 stores_dir = os.path.abspath(os.path.dirname(__file__))

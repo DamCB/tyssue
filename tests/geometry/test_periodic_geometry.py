@@ -1,7 +1,6 @@
 import os
 
-from tyssue import Sheet, config
-from tyssue import PlanarGeometry, SheetGeometry
+from tyssue import PlanarGeometry, Sheet, SheetGeometry, config
 from tyssue.io import hdf5
 from tyssue.stores import stores_dir
 
@@ -14,7 +13,7 @@ def test_periodic_planar():
     assert sheet.edge_df.length.max() < 1.0
     fsx = sheet.edge_df["fx"] - sheet.edge_df["sx"]
     fsy = sheet.edge_df["fy"] - sheet.edge_df["sy"]
-    lai = (fsx ** 2 + fsy ** 2) ** 0.5
+    lai = (fsx**2 + fsy**2) ** 0.5
     assert lai.max() < 0.7
     assert sheet.face_df.area.max() < 1.2
     assert sheet.face_df.area.min() > 0.8
@@ -25,7 +24,7 @@ def test_periodic_planar():
     assert sheet.edge_df.length.max() < 1.0
     fsx = sheet.edge_df["fx"] - sheet.edge_df["sx"]
     fsy = sheet.edge_df["fy"] - sheet.edge_df["sy"]
-    lai = (fsx ** 2 + fsy ** 2) ** 0.5
+    lai = (fsx**2 + fsy**2) ** 0.5
     assert lai.max() < 0.7
     assert sheet.face_df.area.max() < 1.2
     assert sheet.face_df.area.min() > 0.8

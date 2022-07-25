@@ -1,15 +1,15 @@
 """Quasistatic solver for vertex models
 
 """
-import numpy as np
 import logging
 from itertools import count
 
+import numpy as np
 from scipy import optimize
+
 from .. import config
 from ..collisions import auto_collisions
 from ..topology import auto_t1, auto_t3
-
 from .base import TopologyChangeError, set_pos
 
 log = logging.getLogger(__name__)
@@ -82,7 +82,7 @@ class QSSolver:
         log.info("initial number of vertices: %i", eptm.Nv)
         settings = config.solvers.quasistatic()
         settings.update(**minimize_kw)
-        if periodic == False:
+        if not periodic:
             res = self._minimize(eptm, geom, model, **settings)
         else:
             res = self._minimize_pbc(eptm, geom, model, **settings)
@@ -190,7 +190,8 @@ class QSSolver:
         model : a model class
             model must provide `compute_energy` and `compute_gradient` methods
             that take `eptm` as first and unique positional argument.
-        box_increment: size of displacement of box size to approximate gradient of box size variable
+        box_increment: size of displacement of box size to approximate gradient
+            of box size variable
 
         """
         if self.rearange and eptm.topo_changed:

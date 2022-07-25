@@ -1,35 +1,30 @@
 import os
 import tempfile
+
 import numpy as np
 import pytest
 
-from tyssue.core.sheet import Sheet
-from tyssue.stores import stores_dir
-from tyssue.io.hdf5 import load_datasets
-from tyssue.generation import three_faces_sheet
 from tyssue import config
-from tyssue.geometry.sheet_geometry import SheetGeometry as geom
-
 from tyssue.behaviors.event_manager import EventManager, wait
-from tyssue.behaviors.sheet.basic_events import (
-    division,
-    contraction,
-    type1_transition,
-    face_elimination,
-    check_tri_faces,
-)
-from tyssue.behaviors.sheet.actions import (
-    ab_pull,
-    set_value,
-    increase,
-    decrease,
-    increase_linear_tension,
-    grow,
-)
-from tyssue.behaviors.sheet.actions import remove as type3
+from tyssue.behaviors.sheet.actions import ab_pull, decrease
 from tyssue.behaviors.sheet.actions import exchange as type1_at_shorter
+from tyssue.behaviors.sheet.actions import grow, increase, increase_linear_tension
+from tyssue.behaviors.sheet.actions import remove as type3
+from tyssue.behaviors.sheet.actions import set_value
 from tyssue.behaviors.sheet.apoptosis_events import apoptosis
+from tyssue.behaviors.sheet.basic_events import (
+    check_tri_faces,
+    contraction,
+    division,
+    face_elimination,
+    type1_transition,
+)
 from tyssue.behaviors.sheet.delamination_events import constriction
+from tyssue.core.sheet import Sheet
+from tyssue.generation import three_faces_sheet
+from tyssue.geometry.sheet_geometry import SheetGeometry as geom
+from tyssue.io.hdf5 import load_datasets
+from tyssue.stores import stores_dir
 
 
 def test_add_events():

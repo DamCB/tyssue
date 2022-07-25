@@ -2,8 +2,7 @@ import pandas as pd
 
 from tyssue import config
 from tyssue.core import Epithelium
-from tyssue.generation import three_faces_sheet, extrude
-
+from tyssue.generation import extrude, three_faces_sheet
 from tyssue.geometry.bulk_geometry import BulkGeometry
 
 
@@ -112,27 +111,14 @@ def test_bulk_update_vol():
         }
     ).set_index("face")
 
-    ## only update class methods in BulkGeometry : update_vol, update_centroids
+    # only update class methods in BulkGeometry : update_vol, update_centroids
     tolerance = 1e-16
 
-    ## check volumes
+    # check volumes
     assert all((expected_cell_df["vol"] - eptm.cell_df["vol"]) ** 2 < tolerance)
 
-    ## check centroids
+    # check centroids
     assert all(
         (expected_face_centroids - eptm.face_df.loc[:, ["x", "y", "z"]]) ** 2
         < tolerance
     )
-
-
-def test_mono_update_perimeters():
-    datasets_2d, _ = three_faces_sheet(zaxis=True)
-    datasets = extrude(datasets_2d, method="translation")
-    specs = config.geometry.bulk_spec()
-    eptm = Epithelium("test_volume", datasets, specs, coords=["x", "y", "z"])
-
-    # This method requires a column 'subdiv' in the edge_df.
-    # I'm not sure how to build it or what is expected
-    # to be found in this column by the method ?
-
-    # MonoLayerGeometry.update_all(eptm)

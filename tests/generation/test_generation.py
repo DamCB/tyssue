@@ -1,17 +1,18 @@
-from scipy.spatial import Voronoi
-from tyssue import generation
-from tyssue.core.sheet import Sheet
-from tyssue.generation import hexa_grid3d, from_3d_voronoi
-from tyssue.generation import hexa_grid2d, from_2d_voronoi
-from tyssue.generation import extrude, subdivide_faces
-from tyssue import Epithelium, BulkGeometry, config
-
-from tyssue.core.sheet import get_opposite
-
-from pytest import raises
-
 import numpy as np
 import pandas as pd
+from pytest import raises
+from scipy.spatial import Voronoi
+
+from tyssue import BulkGeometry, Epithelium, config, generation
+from tyssue.core.sheet import Sheet, get_opposite
+from tyssue.generation import (
+    extrude,
+    from_2d_voronoi,
+    from_3d_voronoi,
+    hexa_grid2d,
+    hexa_grid3d,
+    subdivide_faces,
+)
 
 
 def test_3faces():
@@ -83,9 +84,9 @@ def test_subdivide():
 
 
 def test_extrude_invalid_method():
-    datasets, specs = generation.three_faces_sheet()
+    datasets, _ = generation.three_faces_sheet()
     with raises(ValueError):
-        datasets_3d = extrude(datasets, method="invalid_method")
+        extrude(datasets, method="invalid_method")
 
 
 def test_hexagrid3d_noise():

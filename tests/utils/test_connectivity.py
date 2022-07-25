@@ -1,9 +1,9 @@
 import numpy as np
 
-from tyssue import Sheet, Monolayer
-from tyssue.generation import three_faces_sheet, extrude
-from tyssue.utils import connectivity
+from tyssue import Monolayer, Sheet
 from tyssue.config.geometry import bulk_spec
+from tyssue.generation import extrude, three_faces_sheet
+from tyssue.utils import connectivity
 
 
 def test_ef_connect():

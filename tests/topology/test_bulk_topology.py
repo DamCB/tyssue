@@ -1,34 +1,28 @@
-import pytest
-import numpy as np
-
 from pathlib import Path
 
-from tyssue import Sheet, Epithelium, Monolayer
+import numpy as np
+import pytest
+from scipy.spatial import Voronoi
 
-from tyssue.geometry.bulk_geometry import BulkGeometry, MonolayerGeometry
+from tyssue import Epithelium, Monolayer, Sheet
 from tyssue.config.geometry import bulk_spec
-
-from tyssue.generation import extrude, three_faces_sheet
+from tyssue.generation import extrude, from_3d_voronoi, hexa_grid3d, three_faces_sheet
+from tyssue.geometry.bulk_geometry import BulkGeometry, MonolayerGeometry
+from tyssue.io import hdf5
+from tyssue.stores import stores_dir
 from tyssue.topology.bulk_topology import (
-    IH_transition,
     HI_transition,
-    remove_cell,
-    close_cell,
-    fix_pinch,
+    IH_transition,
     cell_division,
-    find_rearangements,
-    find_IHs,
+    close_cell,
     find_HIs,
+    find_IHs,
+    find_rearangements,
+    fix_pinch,
+    remove_cell,
     split_vert,
 )
-
 from tyssue.topology.monolayer_topology import cell_division as monolayer_division
-
-from tyssue.stores import stores_dir
-from tyssue.io import hdf5
-
-from tyssue.generation import from_3d_voronoi, hexa_grid3d
-from scipy.spatial import Voronoi
 
 
 def test_bulk_division():
@@ -208,6 +202,7 @@ def test_find_transitions():
     assert len(ih) == 0
     assert len(hi) == 2
     assert len(find_HIs(eptm))
+    assert len(find_IHs(eptm)) == 0
 
     face = eptm.face_df.index[-1]
     HI_transition(eptm, face)

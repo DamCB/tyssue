@@ -1,8 +1,8 @@
-import meshio
 import logging
 
-import pandas as pd
+import meshio
 import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(name=__name__)
 
@@ -11,14 +11,16 @@ def save_triangular_mesh(filename, eptm):
     coords = eptm.coords
     eptm.reset_index(order=True)
 
-    if (filename[-3:] == 'ply') or (filename[-3:] == 'obj'):
-        points, faces = eptm.triangular_mesh(coords=coords, )
+    if (filename[-3:] == "ply") or (filename[-3:] == "obj"):
+        points, faces = eptm.triangular_mesh(
+            coords=coords,
+        )
         cells = []
         for f in faces:
             cells.append(("triangle", np.array([f])))
         mesh = meshio.Mesh(points, cells)
         mesh.write(filename)
-    elif (filename[-3:] == 'vtk'):
+    elif filename[-3:] == "vtk":
         points, faces = eptm.vertex_mesh(coords=coords, vertex_normals=False)
         cells = []
         for f in faces:
@@ -32,11 +34,11 @@ def save_triangular_mesh(filename, eptm):
 
 
 def import_triangular_mesh(filename):
-    if (filename.endswith('ply')) or (filename.endswith('obj')):
+    if (filename.endswith("ply")) or (filename.endswith("obj")):
         mesh = meshio.read(filename)
-        vert_ = pd.DataFrame(mesh.points, columns=list('xyz'))
-        edge_ = pd.DataFrame(columns=['srce', 'trgt', 'face'])
-        face_ = pd.DataFrame(columns=list('xyz'))
+        vert_ = pd.DataFrame(mesh.points, columns=list("xyz"))
+        edge_ = pd.DataFrame(columns=["srce", "trgt", "face"])
+        face_ = pd.DataFrame(columns=list("xyz"))
         cpt = 0
         for c in mesh.cells[0].data:
             edge_.loc[cpt * 3] = [c[0], c[1], cpt]
@@ -45,9 +47,7 @@ def import_triangular_mesh(filename):
 
             face_.loc[cpt] = [0, 0, 0]
             cpt += 1
-        data = {'vert': vert_,
-                'edge': edge_,
-                'face': face_}
+        data = {"vert": vert_, "edge": edge_, "face": face_}
 
         return data
     else:
@@ -68,9 +68,9 @@ def save_mesh(filename, eptm):
         cells.append(("triangle", np.array([f])))
     mesh = meshio.Mesh(points, cells)
 
-    if (filename[-3:] == 'ply'):
+    if filename[-3:] == "ply":
         meshio.ply.write(filename, mesh)
-    elif (filename[-3:] == 'vtk'):
+    elif filename[-3:] == "vtk":
         meshio.vtk.write(filename, mesh)
     else:
         print("This format %s is not taking in charge for now", filename[-3:])
@@ -82,11 +82,11 @@ def import_mesh(filename):
     """
     Can only import ply file as polygonal sheet.
     """
-    if (filename[-3:] == 'ply'):
+    if filename[-3:] == "ply":
         mesh = meshio.read(filename)
-        vert_ = pd.DataFrame(mesh.points, columns=list('xyz'))
-        edge_ = pd.DataFrame(columns=['srce', 'trgt', 'face'])
-        face_ = pd.DataFrame(columns=['x', 'y', 'z', 'num_sides'])
+        vert_ = pd.DataFrame(mesh.points, columns=list("xyz"))
+        edge_ = pd.DataFrame(columns=["srce", "trgt", "face"])
+        face_ = pd.DataFrame(columns=["x", "y", "z", "num_sides"])
         cpt_edge = 0
         cpt_face = 0
 
@@ -101,9 +101,7 @@ def import_mesh(filename):
                 face_.loc[cpt_face] = [0, 0, 0, poly]
                 cpt_face += 1
 
-        data = {'vert': vert_,
-                'edge': edge_,
-                'face': face_}
+        data = {"vert": vert_, "edge": edge_, "face": face_}
 
         return data
     else:

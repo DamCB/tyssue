@@ -1,13 +1,13 @@
 import os
+
 import numpy as np
 
+from tyssue import config
 from tyssue.core.sheet import Sheet
 from tyssue.generation import three_faces_sheet
-from tyssue.io.hdf5 import load_datasets
 from tyssue.geometry.sheet_geometry import SheetGeometry as sgeom
-
+from tyssue.io.hdf5 import load_datasets
 from tyssue.stores import stores_dir
-from tyssue import config
 
 
 def test_3faces():
@@ -70,7 +70,17 @@ def test_rotations():
     sheet.sanitize()
     sgeom.update_all(sheet)
     sgeom.center(sheet)
-    assert sgeom.face_rotations(sheet, method='normal', output_as='edge').shape[0] == sheet.Ne
-    assert sgeom.face_rotations(sheet, method='normal', output_as='face').shape[0] == sheet.Nf
-    assert sgeom.face_rotations(sheet, method='svd', output_as='edge').shape[0] == sheet.Ne
-    assert sgeom.face_rotations(sheet, method='svd', output_as='face').shape[0] == sheet.Nf
+    assert (
+        sgeom.face_rotations(sheet, method="normal", output_as="edge").shape[0]
+        == sheet.Ne
+    )
+    assert (
+        sgeom.face_rotations(sheet, method="normal", output_as="face").shape[0]
+        == sheet.Nf
+    )
+    assert (
+        sgeom.face_rotations(sheet, method="svd", output_as="edge").shape[0] == sheet.Ne
+    )
+    assert (
+        sgeom.face_rotations(sheet, method="svd", output_as="face").shape[0] == sheet.Nf
+    )

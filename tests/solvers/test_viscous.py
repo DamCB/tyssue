@@ -1,6 +1,6 @@
-from tyssue import config, Sheet, SheetGeometry, History
-from tyssue.generation import three_faces_sheet
+from tyssue import History, Sheet, SheetGeometry, config
 from tyssue.dynamics import PlanarModel
+from tyssue.generation import three_faces_sheet
 from tyssue.solvers.viscous import EulerSolver
 
 

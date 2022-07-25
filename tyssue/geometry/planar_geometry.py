@@ -1,10 +1,10 @@
 import numpy as np
+
 from .base_geometry import BaseGeometry
 
 
 class PlanarGeometry(BaseGeometry):
-    """Geomtetry methods for 2D planar cell arangements
-    """
+    """Geomtetry methods for 2D planar cell arangements"""
 
     @classmethod
     def update_all(cls, sheet):
@@ -63,17 +63,15 @@ class PlanarGeometry(BaseGeometry):
 
     @classmethod
     def get_phis(cls, sheet):
-        if not "rx" in sheet.edge_df:
+        if "rx" not in sheet.edge_df:
             cls.update_dcoords(sheet)
             cls.update_centroid(sheet)
 
         return np.arctan2(sheet.edge_df["ry"], sheet.edge_df["rx"])
 
 
-# The following classes will probably be included in tyssue at some point
 class AnnularGeometry(PlanarGeometry):
-    """
-    """
+    """ """
 
     @classmethod
     def update_all(cls, eptm):
@@ -82,10 +80,8 @@ class AnnularGeometry(PlanarGeometry):
 
     @staticmethod
     def update_lumen_volume(eptm):
-        srce_pos = eptm.upcast_srce(eptm.vert_df[["x", "y"]]).loc[
-            eptm.apical_edges]
-        trgt_pos = eptm.upcast_trgt(eptm.vert_df[["x", "y"]]).loc[
-            eptm.apical_edges]
+        srce_pos = eptm.upcast_srce(eptm.vert_df[["x", "y"]]).loc[eptm.apical_edges]
+        trgt_pos = eptm.upcast_trgt(eptm.vert_df[["x", "y"]]).loc[eptm.apical_edges]
         apical_edge_pos = (srce_pos + trgt_pos) / 2
         apical_edge_coords = eptm.edge_df.loc[eptm.apical_edges, ["dx", "dy"]]
         eptm.settings["lumen_volume"] = (
@@ -100,9 +96,14 @@ class WeightedPerimeterPlanarGeometry(PlanarGeometry):
     of perimeter is based on weight of each junction.
 
     Meaning if all junction of a cell have the same weight, perimeter is
-    calculated as a usual perimeter calculation (p = l_ij + l_jk + l_km + l_mn + l_ni)
+    calculated as a usual perimeter calculation:
+    .. math::
+        p = \\sum_{ij} l_{ij}
+
     Otherwise, weight parameter allowed more or less importance of a junction in the
-    perimeter calculation (p = w_ij*l_ij + w_jk*l_jk + w_km*l_km + w_mn*l_mn + w_ni*l_ni)
+    perimeter calculation
+    .. math::
+        p = \\sum_{ij} w_{ij} \\, l_{ij}
 
     """
 
@@ -117,10 +118,8 @@ class WeightedPerimeterPlanarGeometry(PlanarGeometry):
         """
         Updates the perimeter of each face according to the weight of each junction.
         """
-        eptm.edge_df["weighted_length"] = eptm.edge_df.weight * \
-            eptm.edge_df.length
-        eptm.face_df["perimeter"] = eptm.sum_face(
-            eptm.edge_df["weighted_length"])
+        eptm.edge_df["weighted_length"] = eptm.edge_df.weight * eptm.edge_df.length
+        eptm.face_df["perimeter"] = eptm.sum_face(eptm.edge_df["weighted_length"])
 
     @staticmethod
     def normalize_weights(sheet):

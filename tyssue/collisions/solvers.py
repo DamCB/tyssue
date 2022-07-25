@@ -1,11 +1,11 @@
 import logging
-import numpy as np
-import pandas as pd
-import warnings
 from functools import wraps
 
-from .intersection import self_intersections
+import numpy as np
+import pandas as pd
+
 from ..core.sheet import Sheet, get_outer_sheet
+from .intersection import self_intersections
 
 log = logging.getLogger(__name__)
 

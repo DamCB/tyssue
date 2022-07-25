@@ -1,9 +1,9 @@
 import numpy as np
+from pytest import warns
 
+from tyssue import Sheet
 from tyssue.dynamics import effectors, factory, units
 from tyssue.generation import three_faces_sheet
-from tyssue import Sheet
-from pytest import warns
 
 
 def test_old_style_warn():
@@ -31,7 +31,7 @@ def test_old_style_warn():
             return grad, None
 
     with warns(UserWarning):
-        model = factory.model_factory([BarrierElasticity, effectors.FaceAreaElasticity])
+        factory.model_factory([BarrierElasticity, effectors.FaceAreaElasticity])
 
 
 def test_update_specs():

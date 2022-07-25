@@ -1,30 +1,28 @@
 import os
 
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
 from numpy.testing import assert_array_equal
 from pytest import raises
 
+from tyssue import PlanarGeometry, config
 from tyssue.core import Epithelium
+from tyssue.core.objects import (
+    _ordered_edges,
+    _ordered_vert_idxs,
+    get_next_edges,
+    get_prev_edges,
+    get_simple_index,
+)
 from tyssue.core.sheet import Sheet, get_opposite
-from tyssue.stores import stores_dir
-from tyssue.io.hdf5 import load_datasets
-
-from tyssue.generation import three_faces_sheet
-from tyssue.core.objects import _ordered_edges, _ordered_vert_idxs
-from tyssue.core.objects import get_next_edges, get_prev_edges, get_simple_index
-from tyssue import config
-from tyssue.geometry.planar_geometry import PlanarGeometry
-from tyssue.geometry.sheet_geometry import SheetGeometry
-from tyssue.geometry.bulk_geometry import RNRGeometry
-from tyssue.generation import extrude, hexa_grid3d, hexa_grid2d
-from tyssue.config.dynamics import quasistatic_sheet_spec
-from tyssue.config.geometry import spherical_sheet
-from tyssue.generation import generate_ring
 from tyssue.dynamics import effectors, model_factory
+from tyssue.generation import extrude, three_faces_sheet
+from tyssue.geometry.bulk_geometry import RNRGeometry
+from tyssue.geometry.sheet_geometry import SheetGeometry
+from tyssue.io.hdf5 import load_datasets
 from tyssue.solvers.quasistatic import QSSolver
-from tyssue import PlanarGeometry
+from tyssue.stores import stores_dir
 
 
 def test_3faces():
@@ -109,7 +107,7 @@ def test_opposite():
 def test_extra_indices():
 
     datasets = {}
-    tri_verts = [[0, 0], [1, 0], [-0.5, 3 ** 0.5 / 2], [-0.5, -(3 ** 0.5) / 2]]
+    tri_verts = [[0, 0], [1, 0], [-0.5, 3**0.5 / 2], [-0.5, -(3**0.5) / 2]]
 
     tri_edges = [
         [0, 1, 0],
@@ -190,7 +188,7 @@ def test_extra_indices_hexabug():
 
 def test_sort_eastwest():
     datasets = {}
-    tri_verts = [[0, 0], [1, 0], [-0.5, 3 ** 0.5 / 2], [-0.5, -(3 ** 0.5) / 2]]
+    tri_verts = [[0, 0], [1, 0], [-0.5, 3**0.5 / 2], [-0.5, -(3**0.5) / 2]]
 
     tri_edges = [
         [0, 1, 0],
@@ -269,7 +267,7 @@ def test_update_rank():
     )
 
 
-#### BC ####
+# BC ####
 
 
 def test_wrong_datasets_keys():
@@ -277,11 +275,11 @@ def test_wrong_datasets_keys():
     datasets["edges"] = datasets["edge"]
     del datasets["edge"]
     with raises(ValueError):
-        eptm = Epithelium("3faces_2D", datasets, specs)
+        Epithelium("3faces_2D", datasets, specs)
 
 
 def test_optional_args_eptm():
-    datasets, specs = three_faces_sheet()
+    datasets, _ = three_faces_sheet()
     data_names = set(datasets.keys())
     eptm = Epithelium("3faces_2D", datasets)
     specs_names = set(eptm.specs.keys())
@@ -290,7 +288,7 @@ def test_optional_args_eptm():
 
 
 def test_3d_eptm_cell_getter_setter():
-    datasets_2d, specs = three_faces_sheet()
+    datasets_2d, _ = three_faces_sheet()
     datasets = extrude(datasets_2d)
     eptm = Epithelium("3faces_3D", datasets)
     assert eptm.cell_df is not None
@@ -302,7 +300,7 @@ def test_3d_eptm_cell_getter_setter():
 
 
 def test_eptm_copy():
-    datasets, specs = three_faces_sheet()
+    datasets, _ = three_faces_sheet()
     eptm = Epithelium("3faces_2D", datasets)
     eptm_copy = eptm.copy()
     assert eptm_copy.identifier == eptm.identifier + "_copy"
@@ -315,7 +313,7 @@ def test_eptm_copy():
 
 
 def test_settings_getter_setter():
-    datasets, specs = three_faces_sheet()
+    datasets, _ = three_faces_sheet()
     eptm = Epithelium("3faces_2D", datasets)
 
     eptm.settings["settings1"] = 154
@@ -489,7 +487,7 @@ def test_polygons():
     eptm = Epithelium("3faces_3D", datasets, specs)
     RNRGeometry.update_all(eptm)
     with raises(ValueError):
-        fp = eptm.face_polygons()
+        eptm.face_polygons()
 
     eptm.reset_index(order=True)
     res = eptm.face_polygons(["x", "y", "z"])
@@ -500,7 +498,7 @@ def test_polygons():
 def test_face_polygons_exception():
 
     datasets = {}
-    tri_verts = [[0, 0], [1, 0], [-0.5, 3 ** 0.5 / 2], [-0.5, -(3 ** 0.5) / 2]]
+    tri_verts = [[0, 0], [1, 0], [-0.5, 3**0.5 / 2], [-0.5, -(3**0.5) / 2]]
 
     tri_edges_valid = [
         [0, 1, 0],
@@ -513,18 +511,6 @@ def test_face_polygons_exception():
         [2, 3, 2],
         [3, 0, 2],
     ]
-
-    tri_edges_invalid = [
-        [0, 1, 0],
-        [1, 2, 0],
-        [2, 0, 0],
-        [0, 3, 1],
-        [3, 1, 1],
-        [1, 0, 1],
-        [0, 2, 2],
-        [2, 3, 2],
-        [3, 1, 2],
-    ]  # changed 0 to 1 to create an invalid face
 
     datasets["edge"] = pd.DataFrame(
         data=np.array(tri_edges_valid), columns=["srce", "trgt", "face"]
@@ -548,7 +534,7 @@ def test_invalid_valid_sanitize():
     # get_invalid and get_valid
 
     datasets = {}
-    tri_verts = [[0, 0], [1, 0], [-0.5, 3 ** 0.5 / 2], [-0.5, -(3 ** 0.5) / 2]]
+    tri_verts = [[0, 0], [1, 0], [-0.5, 3**0.5 / 2], [-0.5, -(3**0.5) / 2]]
 
     tri_edges_valid = [
         [0, 1, 0],

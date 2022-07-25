@@ -1,22 +1,20 @@
-from tyssue.generation import three_faces_sheet
-from tyssue import Monolayer, config, Sheet, MonolayerGeometry
-
-from tyssue.utils import testing
-
+from tyssue import Monolayer, MonolayerGeometry, Sheet, config
 from tyssue.dynamics.effectors import (
-    LineTension,
-    SurfaceTension,
-    LengthElasticity,
-    PerimeterElasticity,
-    FaceContractility,
-    FaceAreaElasticity,
-    FaceVolumeElasticity,
-    CellVolumeElasticity,
-    CellAreaElasticity,
-    BorderElasticity,
-    RadialTension,
     BarrierElasticity,
+    BorderElasticity,
+    CellAreaElasticity,
+    CellVolumeElasticity,
+    FaceAreaElasticity,
+    FaceContractility,
+    FaceVolumeElasticity,
+    LengthElasticity,
+    LineTension,
+    PerimeterElasticity,
+    RadialTension,
+    SurfaceTension,
 )
+from tyssue.generation import three_faces_sheet
+from tyssue.utils import testing
 
 sheet_effectors = [
     LengthElasticity,

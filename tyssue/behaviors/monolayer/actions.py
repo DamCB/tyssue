@@ -10,9 +10,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# noqa
-from ..sheet.actions import merge_vertices, detach_vertices
-
 
 def grow(monolayer, cell, grow_rate):
     """Multiplies the equilibrium volume of face by a factor (1+shrink_rate)."""

@@ -1,10 +1,10 @@
 import numpy as np
+
 from ..utils.utils import to_nd
 
 
 class BaseGeometry:
-    """
-    """
+    """ """
 
     @staticmethod
     def update_all(sheet):
@@ -12,7 +12,7 @@ class BaseGeometry:
 
     @staticmethod
     def scale(sheet, delta, coords):
-        """ Scales the coordinates `coords`
+        """Scales the coordinates `coords`
         by a factor `delta`
         """
         sheet.vert_df[coords] = sheet.vert_df[coords] * delta
@@ -111,9 +111,7 @@ class BaseGeometry:
 
 
 def update_periodic_dcoords(sheet):
-    """ Updates the coordinates for periodic boundary conditions.
-
-    """
+    """Updates the coordinates for periodic boundary conditions."""
     for u, boundary in sheet.settings["boundaries"].items():
         period = boundary[1] - boundary[0]
         shift = period * (

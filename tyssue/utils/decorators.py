@@ -1,5 +1,3 @@
-import time
-
 from functools import wraps
 
 
@@ -54,19 +52,6 @@ invalid epithelium as the `_bad` attribute of the restored one"""
         return result
 
     return with_validate
-
-
-def time_exe(func):
-    def with_time_exe(*args, **kwargs):
-        start = time.time()
-        result = func(*args, **kwargs)
-        end = time.time()
-
-        print("function : {} \ttime: {2:2f}sec".format(func.__name__, end - start))
-
-        return result
-
-    return with_time_exe
 
 
 def face_lookup(func):

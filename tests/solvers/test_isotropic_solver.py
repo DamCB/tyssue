@@ -1,14 +1,14 @@
 import os
-from tyssue import config
 
-from tyssue import Sheet, SheetGeometry as geom
-from tyssue.dynamics import SheetModel as model
-from tyssue.solvers.isotropic_solver import bruteforce_isotropic_relax
-from tyssue.stores import stores_dir
-
-from tyssue.io.hdf5 import load_datasets
 from numpy.testing import assert_almost_equal
 
+from tyssue import Sheet
+from tyssue import SheetGeometry as geom
+from tyssue import config
+from tyssue.dynamics import SheetModel as model
+from tyssue.io.hdf5 import load_datasets
+from tyssue.solvers.isotropic_solver import bruteforce_isotropic_relax
+from tyssue.stores import stores_dir
 
 TOLERANCE = 1e-8
 

@@ -1,12 +1,10 @@
 import logging
 import warnings
+from itertools import combinations
 
 import numpy as np
-
 import pandas as pd
 
-
-from itertools import combinations
 from ..utils.connectivity import face_face_connectivity
 
 logger = logging.getLogger(name=__name__)
@@ -177,15 +175,17 @@ def drop_two_sided_faces(eptm):
         return
 
     two_sided = eptm.face_df[num_sides < 3].index
-    logger.debug(f"dropping %d 2-sided faces", two_sided.size)
+    logger.debug("dropping %d 2-sided faces", two_sided.size)
     edges = eptm.edge_df[eptm.edge_df["face"].isin(two_sided)].index
     eptm.edge_df.drop(edges, axis=0, inplace=True)
     eptm.face_df.drop(two_sided, axis=0, inplace=True)
 
 
 def remove_face(sheet, face):
-    """Removes a face from the mesh. Returns the index of the new vert that replaces the face."""
-    logger.debug(f"removing face {face}")
+    """Removes a face from the mesh.
+
+    Returns the index of the new vert that replaces the face."""
+    logger.debug("removing face %d", face)
 
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     verts = edges["srce"].unique()
@@ -224,7 +224,8 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     a rosette structure.
 
     If `reindex` is `True` (the default), resets indexes and topology data.
-    The edge is collapsed on the smaller of the srce, trgt indexes (to minimize reindexing impact)
+    The edge is collapsed on the smaller of the srce, trgt indexes
+    (to minimize reindexing impact)
 
     Returns the index of the collapsed edge's remaining vertex (its srce)
 
@@ -345,10 +346,12 @@ def condition_4ii(eptm):
 
         pairs = set(frozenset(p) for p in faces)
 
-
         cols = ['srce', 'trgt', 'face', 'cell', 'length', 'sub_area']
-        edges = eptm.edge_df[eptm.edge_df["face"].isin(faces[0])][cols].sort_values("face")
-        all_edges = eptm.edge_df.loc[eptm.edge_df["face"].isin(set(faces.ravel())), cols].sort_values("face")
+        edges = eptm.edge_df[
+            eptm.edge_df["face"].isin(faces[0])
+        ][cols].sort_values("face")
+        all_edges = eptm.edge_df.loc[eptm.edge_df["face"].isin(
+            set(faces.ravel())), cols].sort_values("face")
 
         all_edges['single'] = all_edges[["srce", "trgt"]].apply(frozenset, axis=1)
 
@@ -356,7 +359,9 @@ def condition_4ii(eptm):
 
         com_vs = set(all_edges.srce)
         for face in ufaces:
-            com_vs = com_vs.intersection(all_edges.loc[all_edges["face"] == face, "srce"])
+            com_vs = com_vs.intersection(
+                all_edges.loc[all_edges["face"] == face, "srce"]
+            )
 
     """
     conmat = face_face_connectivity(eptm, exclude_opposites=True)

@@ -1,20 +1,18 @@
 import os
-import numpy as np
-
-from numpy.testing import assert_almost_equal
 from copy import deepcopy
 
-from tyssue.core.sheet import Sheet
-from tyssue.geometry.planar_geometry import PlanarGeometry
-from tyssue.geometry.sheet_geometry import SheetGeometry as geom
-from tyssue.dynamics.sheet_vertex_model import SheetModel as model
-from tyssue.dynamics.planar_vertex_model import PlanarModel
+import numpy as np
+from numpy.testing import assert_almost_equal
 
 from tyssue import config
-from tyssue.stores import stores_dir
+from tyssue.core.sheet import Sheet
+from tyssue.dynamics.planar_vertex_model import PlanarModel
+from tyssue.dynamics.sheet_vertex_model import SheetModel as model
+from tyssue.geometry.planar_geometry import PlanarGeometry
+from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 from tyssue.io.hdf5 import load_datasets
+from tyssue.stores import stores_dir
 from tyssue.utils.testing import model_tester
-
 
 TOL = 1e-5
 DECIMAL = 5

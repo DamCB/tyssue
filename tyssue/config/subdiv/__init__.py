@@ -1,6 +1,6 @@
 import os
-from ..json_parser import load_spec
 
+from ..json_parser import load_spec
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 

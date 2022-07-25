@@ -1,6 +1,7 @@
-import warnings
-import numpy as np
 import logging
+import warnings
+
+import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(name=__name__)
@@ -232,8 +233,6 @@ def scaled_unscaled(func, scale, eptm, geom, args=(), kwargs={}, coords=None):
     geom.update_all(eptm)
     try:
         res = func(*args, **kwargs)
-    except:
-        raise
     finally:
         geom.scale(eptm, 1 / scale, coords)
         geom.update_all(eptm)
@@ -326,7 +325,7 @@ def get_next(eptm):
     return next_
 
 
-## small utlity to swap apical and basal segments
+# small utlity to swap apical and basal segments
 def swap_apico_basal(organo):
     """Swap apical and basal segments of an organoid."""
     for elem in ["vert", "face", "edge"]:

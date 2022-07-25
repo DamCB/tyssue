@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
-from matplotlib import cm
-
 import vispy as vp
+from matplotlib import cm
 from vispy import app, scene
+
 from ..config.draw import sheet_spec
 from ..utils.utils import spec_updater
 
@@ -165,8 +165,7 @@ def edge_visual(sheet, coords=None, **draw_specs_kw):
 
 
 def sheet_view(sheet, coords=None, interactive=True, **draw_specs_kw):
-    """Uses VisPy to display an epithelium
-    """
+    """Uses VisPy to display an epithelium"""
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
 

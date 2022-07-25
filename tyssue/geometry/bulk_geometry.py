@@ -1,16 +1,12 @@
-import warnings
 import numpy as np
 
-from .sheet_geometry import SheetGeometry
-
-from .utils import rotation_matrix
 from ..utils import _to_3d
-from ..core.sheet import Sheet
+from .sheet_geometry import SheetGeometry
+from .utils import rotation_matrix
 
 
 class BulkGeometry(SheetGeometry):
-    """Geometry functions for 3D cell arangements
-    """
+    """Geometry functions for 3D cell arangements"""
 
     @classmethod
     def update_all(cls, eptm):
@@ -45,9 +41,7 @@ class BulkGeometry(SheetGeometry):
 
     @staticmethod
     def update_vol(eptm):
-        """
-
-        """
+        """ """
         face_pos = eptm.edge_df[["f" + c for c in eptm.coords]].values
         cell_pos = eptm.edge_df[["c" + c for c in eptm.coords]].values
 
@@ -187,9 +181,7 @@ class ClosedMonolayerGeometry(MonolayerGeometry):
 
     @staticmethod
     def update_lumen_vol(eptm):
-        """
-
-        """
+        """ """
         lumen_edges = eptm.edge_df[
             eptm.edge_df.segment == eptm.settings.get("lumen_side", "basal")
         ].copy()

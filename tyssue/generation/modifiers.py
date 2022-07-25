@@ -1,7 +1,9 @@
-"""This module provides utlities to modify an input tissue through extrusion or subdivision
+"""This module provides utlities to modify an input tissue through
+extrusion or subdivision
 """
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from ..config.geometry import bulk_spec
 
 
@@ -135,7 +137,7 @@ def extrude(apical_datasets, method="homotecy", scale=0.3, vector=[0, 0, -1]):
     for elem in ["vert", "edge", "face", "cell"]:
         datasets[elem].index.name = elem
         for col, value in specs[elem].items():
-            if not col in datasets[elem]:
+            if col not in datasets[elem]:
                 datasets[elem][col] = value
 
     datasets["face"]["id"] = np.arange(datasets["face"].shape[0])

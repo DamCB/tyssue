@@ -1,7 +1,8 @@
-import numpy as np
 from math import tau
 
-from tyssue.generation.hexagonal_grids import circle, hexa_disk, hexa_cylinder
+import numpy as np
+
+from tyssue.generation.hexagonal_grids import circle, hexa_cylinder, hexa_disk
 
 
 def test_circle():

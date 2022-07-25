@@ -1,21 +1,17 @@
-import matplotlib
-import pytest
 import os
 
-matplotlib.use("Agg")
-import numpy as np
-import pandas as pd
-
+import matplotlib
 import matplotlib.pyplot as plt
-from scipy import ndimage
-from tyssue import config, Sheet, SheetGeometry, History
+import numpy as np
+import pytest
+
+from tyssue import History, Sheet, SheetGeometry, config
+from tyssue.draw.plt_draw import create_gif, plot_forces, quick_edge_draw, sheet_view
 from tyssue.dynamics import PlanarModel
-from tyssue.solvers.viscous import EulerSolver
 from tyssue.generation import three_faces_sheet
-from tyssue import Sheet, config
-from tyssue.draw.plt_draw import quick_edge_draw, sheet_view
-from tyssue.draw.plt_draw import _face_color_from_sequence
-from tyssue.draw.plt_draw import create_gif, plot_forces
+from tyssue.solvers.viscous import EulerSolver
+
+matplotlib.use("Agg")
 
 
 class TestsPlt:
@@ -143,7 +139,7 @@ def test_create_gif():
 
     sheet.edge_df.loc[[0, 17], "line_tension"] *= 2
     sheet.edge_df.loc[[1], "line_tension"] *= 8
-    res = solver.solve(0.5, dt=0.05)
+    solver.solve(0.5, dt=0.05)
 
     create_gif(history, "frames.gif", num_frames=5)
     create_gif(history, "interval.gif", interval=(2, 4))

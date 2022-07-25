@@ -2,7 +2,7 @@ import numpy as np
 
 
 def update_spherical(eptm):
-    """ Computes the spherical coordinates (rho, theta, phi)
+    """Computes the spherical coordinates (rho, theta, phi)
     of an epithelium.
 
     rho is the distance to the coordinate system's origin, theta
@@ -77,7 +77,7 @@ def rotation_matrix(angle, direction):
 
 
 def rotation_matrices(angle, direction):
-    """ Return an (N, 3, 3) array of rotation matrices
+    """Return an (N, 3, 3) array of rotation matrices
     along N angles and N directions
 
 

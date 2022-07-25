@@ -1,14 +1,7 @@
 import os
-import re
-import sys
-import platform
 import subprocess
-import warnings
 
-from distutils.version import LooseVersion
-from setuptools import setup, find_packages, Extension
-from setuptools.command.build_ext import build_ext
-
+from setuptools import find_packages, setup
 
 DISTNAME = "tyssue"
 DESCRIPTION = "tyssue is a living tissues, cell level, modeling library"
@@ -25,8 +18,8 @@ DOWNLOAD_URL = "https://github.com/DamCB/tyssue.git"
 files = ["*.so*", "*.a*", "*.lib*", "config/*/*.json", "stores/*.*"]
 
 
-## Version management copied form numpy
-## Thanks to them!
+# Version management copied form numpy
+# Thanks to them!
 MAJOR = 0
 MINOR = 8
 MICRO = 1

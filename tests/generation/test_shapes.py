@@ -1,17 +1,16 @@
-import warnings
-import pytest
-
 from math import sin
 
 import numpy as np
+import pytest
 from numpy.testing import assert_almost_equal
-from tyssue.generation.shapes import (
-    generate_ring,
-    ellipsoid_sheet,
-    spherical_sheet,
-    spherical_monolayer,
-)
+
 from tyssue import PlanarGeometry
+from tyssue.generation.shapes import (
+    ellipsoid_sheet,
+    generate_ring,
+    spherical_monolayer,
+    spherical_sheet,
+)
 
 
 def test_annular():

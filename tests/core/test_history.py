@@ -1,13 +1,12 @@
 import os
-import pytest
-
 from pathlib import Path
 
 import numpy as np
+import pytest
 
-from tyssue import Sheet, History, Epithelium, RNRGeometry
+from tyssue import Epithelium, History, RNRGeometry, Sheet
 from tyssue.core.history import HistoryHdf5
-from tyssue.generation import three_faces_sheet, extrude
+from tyssue.generation import extrude, three_faces_sheet
 
 
 def test_simple_history():

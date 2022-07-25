@@ -1,17 +1,19 @@
 """
 Core definitions
 """
-import warnings
 import logging
+import warnings
 from collections import deque
+from copy import deepcopy
 from itertools import product
+
 import numpy as np
 import pandas as pd
-from copy import deepcopy
-from ..utils.utils import set_data_columns, spec_updater
-from ..utils import connectivity
+
 from ..geometry.planar_geometry import PlanarGeometry
 from ..geometry.sheet_geometry import SheetGeometry
+from ..utils import connectivity
+from ..utils.utils import set_data_columns, spec_updater
 
 log = logging.getLogger(name=__name__)
 
@@ -318,7 +320,7 @@ class Epithelium:
 
     def _upcast(self, idx, df):
 
-        ## Assumes a flat index
+        # Assumes a flat index
         upcast = df.take(idx, axis=0)
         try:
             upcast.index = self.edge_df.index
@@ -861,9 +863,8 @@ class Epithelium:
         cardinal = grouped.apply(len)
         if cardinal.max() > 2:
             raise ValueError(
-                "Invalid topology, the following faces have more than one neighbor: {}".format(
-                    face_v2[cardinal > 2].to_list()
-                )
+                "Invalid topology, the following faces have more than one neighbor: "
+                f"{face_v2[cardinal > 2].to_list()}"
             )
         self.face_df["opposite"] = -1
 

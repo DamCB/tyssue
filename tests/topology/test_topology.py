@@ -1,21 +1,18 @@
 import os
 
-from tyssue.generation import three_faces_sheet
+from tyssue.config.geometry import cylindrical_sheet
 from tyssue.core.sheet import Sheet
-
+from tyssue.generation import three_faces_sheet
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom
+from tyssue.io.hdf5 import load_datasets
+from tyssue.stores import stores_dir
 from tyssue.topology.base_topology import (
-    close_face,
     add_vert,
+    close_face,
     condition_4i,
     condition_4ii,
 )
-
-from tyssue.stores import stores_dir
-from tyssue.io.hdf5 import load_datasets
-from tyssue.topology.sheet_topology import cell_division, type1_transition, split_vert
-from tyssue.config.geometry import cylindrical_sheet
-from tyssue.draw import sheet_view
+from tyssue.topology.sheet_topology import cell_division, split_vert, type1_transition
 
 
 def test_condition4i():

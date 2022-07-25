@@ -17,13 +17,14 @@ A dynamical model derived from Monier, Gettings et al. 2015 is provided in
 """
 
 import warnings
+
 import numpy as np
 import pandas as pd
 import scipy.linalg as linalg
 from scipy.sparse import coo_matrix
 
-from .objects import Epithelium
 from ..config.geometry import flat_sheet
+from .objects import Epithelium
 
 
 class Sheet(Epithelium):
@@ -301,7 +302,7 @@ class Sheet(Epithelium):
         y = datasets["face"]["y"]
 
         in_boundary = (
-            (x - center_x) ** 2 / (r_x ** 2) + (y - center_y) ** 2 / (r_y ** 2)
+            (x - center_x) ** 2 / (r_x**2) + (y - center_y) ** 2 / (r_y**2)
         ) <= 1
         datasets["face"] = datasets["face"].loc[in_boundary]
 
@@ -426,8 +427,9 @@ class Sheet(Epithelium):
 
         """
         from scipy.spatial import Voronoi
+
         from ..config.geometry import planar_spec
-        from ..generation import hexa_grid2d, from_2d_voronoi
+        from ..generation import from_2d_voronoi, hexa_grid2d
 
         grid = hexa_grid2d(nx, ny, distx, disty, noise)
         datasets = from_2d_voronoi(Voronoi(grid))
@@ -453,8 +455,9 @@ class Sheet(Epithelium):
         """
 
         from scipy.spatial import Voronoi
+
         from ..config.geometry import flat_sheet
-        from ..generation import hexa_grid2d, from_2d_voronoi
+        from ..generation import from_2d_voronoi, hexa_grid2d
 
         grid = hexa_grid2d(nx, ny, distx, disty, noise)
         datasets = from_2d_voronoi(Voronoi(grid))

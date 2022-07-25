@@ -4,7 +4,6 @@
 import json
 import logging
 import os
-import warnings
 
 logger = logging.getLogger(__name__)
 

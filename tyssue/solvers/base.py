@@ -1,4 +1,5 @@
 import logging
+
 from ..topology import TopologyChangeError
 
 log = logging.getLogger(__name__)

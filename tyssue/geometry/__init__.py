@@ -1,1 +1,1 @@
-from . import sheet_geometry
+from . import sheet_geometry  # noqa

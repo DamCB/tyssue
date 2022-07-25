@@ -12,8 +12,7 @@ from .utils import make_df
 
 
 def hexa_grid2d(nx, ny, distx, disty, noise=None):
-    """Creates an hexagonal grid of points
-    """
+    """Creates an hexagonal grid of points"""
     cy, cx = np.mgrid[0:ny, 0:nx]
     cx = cx.astype(float)
     cy = cy.astype(float)
@@ -29,8 +28,7 @@ def hexa_grid2d(nx, ny, distx, disty, noise=None):
 
 
 def hexa_grid3d(nx, ny, nz, distx=1.0, disty=1.0, distz=1.0, noise=None):
-    """Creates an hexagonal grid of points
-    """
+    """Creates an hexagonal grid of points"""
     cz, cy, cx = np.mgrid[0:nz, 0:ny, 0:nx]
     cx = cx.astype(float)
     cy = cy.astype(float)
@@ -134,7 +132,8 @@ def hexa_cylinder(
         points_zt = np.vstack((points_tz[:, 1], points_tz[:, 0])).T
     else:
         raise ValueError(
-            f"Orientation should either be 'transverse' or 'longitudinal', not {orientation}"
+            f"Orientation should either be 'transverse' or 'longitudinal',"
+            f" not {orientation}"
         )
 
     points_zt[:, 0] = points_zt[:, 0] * radius

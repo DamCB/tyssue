@@ -1,11 +1,8 @@
 import warnings
-import numpy as np
 from copy import deepcopy
 
 from .effectors import dimensionalize as dimensionalize
 from .effectors import normalize as normalize
-
-from ..utils import to_nd
 
 
 def model_factory(effectors, ref_effector=None):

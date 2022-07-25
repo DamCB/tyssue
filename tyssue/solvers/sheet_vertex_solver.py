@@ -1,9 +1,10 @@
 """
 Energy minimization solvers for the sheet vertex model
 """
-from scipy import optimize
-from .. import config
 import numpy as np
+from scipy import optimize
+
+from .. import config
 
 
 class Solver:

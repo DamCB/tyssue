@@ -1,2 +1,2 @@
 """ solvers """
-from .quasistatic import QSSolver
+from .quasistatic import QSSolver  # noqa

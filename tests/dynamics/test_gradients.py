@@ -1,9 +1,9 @@
 import numpy as np
 
+from tyssue import Sheet, SheetGeometry, generation
 from tyssue.dynamics.base_gradients import length_grad
-from tyssue import generation, Sheet, SheetGeometry
-from tyssue.geometry.sheet_geometry import EllipsoidGeometry
 from tyssue.dynamics.sheet_gradients import height_grad
+from tyssue.geometry.sheet_geometry import EllipsoidGeometry
 
 
 def test_length_grad():

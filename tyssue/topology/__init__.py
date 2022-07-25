@@ -1,11 +1,23 @@
-import numpy as np
+import logging
 from functools import wraps
 from itertools import count
 
-from ..core.sheet import Sheet
+import numpy as np
 
-from .base_topology import *
-from .sheet_topology import type1_transition, remove_face
+from ..core.sheet import Sheet
+from .base_topology import (  # noqa: F401
+    add_vert,
+    close_face,
+    collapse_edge,
+    condition_4i,
+    condition_4ii,
+    drop_two_sided_faces,
+    get_neighbour_face_pairs,
+    get_num_common_edges,
+    merge_border_edges,
+    merge_vertices,
+    split_vert,
+)
 from .bulk_topology import (
     HI_transition,
     IH_transition,
@@ -13,13 +25,14 @@ from .bulk_topology import (
     find_IHs,
     find_rearangements,
 )
-
+from .sheet_topology import remove_face, type1_transition
 
 MAX_ITER = 10
+logger = logging.getLogger(name=__name__)
 
 
 class TopologyChangeError(ValueError):
-    """ Raised when trying to assign values without
+    """Raised when trying to assign values without
     the correct length to an epithelium dataset
     """
 

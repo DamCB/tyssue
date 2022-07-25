@@ -1,17 +1,21 @@
 import numpy as np
-import pandas as pd
 import pytest
+from numpy.testing import assert_allclose, assert_almost_equal, assert_array_equal
 from scipy.spatial import Voronoi
-from tyssue.utils import utils
-from tyssue import Sheet, SheetGeometry
-from tyssue.generation import three_faces_sheet, extrude
-from tyssue.generation import hexa_grid2d, from_2d_voronoi
-from tyssue.generation import hexa_grid3d, from_3d_voronoi
-from numpy.testing import assert_almost_equal, assert_allclose, assert_array_equal
-from tyssue import Monolayer, config
+
+from tyssue import Monolayer, Sheet
+from tyssue import SheetGeometry
 from tyssue import SheetGeometry as geom
-from tyssue.topology.base_topology import close_face
-from tyssue.core.sheet import get_opposite
+from tyssue import config
+from tyssue.generation import (
+    extrude,
+    from_2d_voronoi,
+    from_3d_voronoi,
+    hexa_grid2d,
+    hexa_grid3d,
+    three_faces_sheet,
+)
+from tyssue.utils import utils
 
 
 def test_get_next():
@@ -39,10 +43,10 @@ def test_spec_updater():
     print(specs)
     assert specs["face"]["geometry"] == new_specs["face"]["geometry"]
 
-    new_specs = {"extract":{"z_boundary":(-10,10)}}
+    new_specs = {"extract": {"z_boundary": (-10, 10)}}
     utils.spec_updater(specs, new_specs)
     assert "extract" in specs
-    assert specs["extract"]['z_boundary'] == new_specs["extract"]['z_boundary']
+    assert specs["extract"]["z_boundary"] == new_specs["extract"]["z_boundary"]
 
 
 def test_set_data_columns():

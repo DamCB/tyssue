@@ -1,22 +1,17 @@
+import itertools
 import logging
 import warnings
-import itertools
 
 import numpy as np
 import pandas as pd
 
-from .sheet_topology import face_division
-from .base_topology import (
-    add_vert,
-    close_face,
-    collapse_edge,
-    remove_face,
-)
-from .base_topology import split_vert as base_split_vert
-from ..geometry.utils import rotation_matrix
-from ..core.objects import euler_characteristic, _is_closed_cell
 from ..core.monolayer import Monolayer
+from ..core.objects import _is_closed_cell, euler_characteristic
 from ..core.sheet import get_opposite
+from ..geometry.utils import rotation_matrix
+from .base_topology import add_vert, close_face, collapse_edge, remove_face
+from .base_topology import split_vert as base_split_vert
+from .sheet_topology import face_division
 
 logger = logging.getLogger(name=__name__)
 MAX_ITER = 10
@@ -518,12 +513,13 @@ def HI_transition(eptm, face):
     face = all_edges[all_edges["cell"] == cell]["face"].iloc[0]
     split_vert(eptm, vert, face)
 
-    logger.info(f"HI transition on face %d", face)
+    logger.info("HI transition on face %d", face)
     return 0
 
 
 def fix_pinch(eptm):
-    """Due to rearangements, some faces in an epithelium will have more than one opposite face.
+    """Due to rearangements, some faces in an epithelium will have
+    more than one opposite face.
 
     This method fixes the issue so we can have a valid epithelium back.
     """

@@ -1,1 +1,1 @@
-from .objects import Epithelium
+from .objects import Epithelium  # noqa

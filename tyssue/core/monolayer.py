@@ -2,14 +2,13 @@
 """
 
 import logging
-import numpy as np
-import pandas as pd
 
+import pandas as pd
 from scipy.spatial import cKDTree
-from .objects import Epithelium
-from .sheet import Sheet
 
 from ..geometry.bulk_geometry import BulkGeometry
+from .objects import Epithelium
+from .sheet import Sheet
 
 logger = logging.getLogger(name=__name__)
 

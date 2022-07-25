@@ -1,15 +1,11 @@
 import logging
-from functools import wraps
-
-
 import warnings
 
 import numpy as np
 import pandas as pd
-from .base_topology import add_vert, collapse_edge, close_face, remove_face
-from .base_topology import split_vert as base_split_vert
-from tyssue.utils.decorators import do_undo, validate
 
+from .base_topology import add_vert, close_face, collapse_edge, remove_face
+from .base_topology import split_vert as base_split_vert
 
 logger = logging.getLogger(name=__name__)
 MAX_ITER = 100
@@ -31,7 +27,8 @@ def split_vert(
         epsilon = sheet.settings.get("threshold_length", 0.1) * multiplier
     else:
         warnings.warn(
-            "The epsilon argument is deprecated and will be removed in a future version. "
+            "The epsilon argument is deprecated and will be removed"
+            " in a future version. "
             "The length of the new edge should be set by "
             "`sheet.settings['threshold_length]*multiplier` "
         )
@@ -137,8 +134,8 @@ def cell_division(sheet, mother, geom, angle=None):
     - Function checks for perodic boundaries if there are, it checks if dividing cell
       rests on an edge of the periodic boundaries if so, it displaces the boundaries
       by a half a period and moves the target cell in the bulk of the tissue. It then
-      performs cell division normally and reverts the periodic boundaries to the original
-      configuration
+      performs cell division normally and reverts the periodic boundaries
+      to the original configuration
     """
 
     if sheet.settings.get("boundaries") is not None:
@@ -165,8 +162,8 @@ def cell_division(sheet, mother, geom, angle=None):
     if edge_a is None:
         return
 
-    vert_a, new_edge_a, new_opp_edge_a = add_vert(sheet, edge_a)
-    vert_b, new_edge_b, new_opp_edge_b = add_vert(sheet, edge_b)
+    vert_a, *_ = add_vert(sheet, edge_a)
+    vert_b, *_ = add_vert(sheet, edge_b)
     sheet.vert_df.index.name = "vert"
     daughter = face_division(sheet, mother, vert_a, vert_b)
 

@@ -1,9 +1,10 @@
 import os
 import tempfile
-from tyssue.config.json_parser import load_spec, save_spec
-from tyssue import config
+
 import pytest
 
+from tyssue import config
+from tyssue.config.json_parser import load_spec, save_spec
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 TESTCONFIG = os.path.join(CURRENT_DIR, "test_config.json")

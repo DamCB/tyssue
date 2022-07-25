@@ -1,9 +1,10 @@
 import tempfile
+
 import numpy as np
 import pandas as pd
 
-from tyssue.generation import three_faces_sheet
 from tyssue import Sheet
+from tyssue.generation import three_faces_sheet
 from tyssue.io import hdf5
 
 

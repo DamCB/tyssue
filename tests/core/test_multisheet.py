@@ -1,10 +1,9 @@
 import numpy as np
-
-from tyssue.core.multisheet import MultiSheet
-from tyssue.generation import hexa_grid2d, from_2d_voronoi
 from scipy.spatial import Voronoi
 
 import tyssue
+from tyssue.core.multisheet import MultiSheet
+from tyssue.generation import from_2d_voronoi, hexa_grid2d
 
 
 def test_multisheet():

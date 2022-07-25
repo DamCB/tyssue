@@ -1,12 +1,12 @@
-import pandas as pd
-import numpy as np
 import ipyvolume as ipv
+import numpy as np
+import pandas as pd
 
-from tyssue.generation import three_faces_sheet, extrude
-from tyssue import Sheet, config, Epithelium, SheetGeometry
-from tyssue.geometry.bulk_geometry import RNRGeometry
-from tyssue.draw.ipv_draw import sheet_view
+from tyssue import Epithelium, Sheet, SheetGeometry, config
 from tyssue.draw import highlight_cells
+from tyssue.draw.ipv_draw import sheet_view
+from tyssue.generation import extrude, three_faces_sheet
+from tyssue.geometry.bulk_geometry import RNRGeometry
 
 
 def test_sheet_view():

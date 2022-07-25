@@ -1,10 +1,10 @@
 import logging
 
+from ...topology.bulk_topology import HI_transition, IH_transition
 from ...utils.decorators import cell_lookup
-from ...topology.bulk_topology import IH_transition, HI_transition
-from .actions import shrink, contract, ab_pull_edge
 from ..sheet.basic_events import contraction as sheet_contraction
 from ..sheet.delamination_events import _neighbor_contractile_increase
+from .actions import ab_pull_edge, contract, shrink
 
 logger = logging.getLogger(__name__)
 

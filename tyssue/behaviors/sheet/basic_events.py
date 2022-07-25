@@ -4,25 +4,22 @@ Small event module
 
 
 """
-import numpy as np
 import logging
 
-logger = logging.getLogger(__name__)
-
-
-from ...utils.decorators import face_lookup
 from ...geometry.sheet_geometry import SheetGeometry
 from ...topology.sheet_topology import cell_division
-
+from ...utils.decorators import face_lookup
 from .actions import (
-    exchange,
-    remove,
-    merge_vertices,
-    detach_vertices,
-    increase,
     decrease,
+    detach_vertices,
+    exchange,
+    increase,
     increase_linear_tension,
+    merge_vertices,
+    remove,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def reconnect(sheet, manager, **kwargs):
@@ -34,7 +31,8 @@ def reconnect(sheet, manager, **kwargs):
     -----------------
     threshold_length : the threshold length at which vertex merging is performed
     p_4 : the probability per unit time to perform a detachement from a rank 4 vertex
-    p_5p : the probability per unit time to perform a detachement from a rank 5 or more vertex
+    p_5p : the probability per unit time to perform a detachement from a rank 5
+        or more vertex
 
 
     See Also

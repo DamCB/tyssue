@@ -1,6 +1,7 @@
 import logging
-from ...topology.bulk_topology import IH_transition, HI_transition
-from .actions import shrink, contract
+
+from ...topology.bulk_topology import HI_transition, IH_transition
+from .actions import contract, shrink
 
 logger = logging.getLogger(__name__)
 

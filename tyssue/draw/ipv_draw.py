@@ -7,8 +7,8 @@ import pandas as pd
 from ipywidgets import interact
 from matplotlib import cm
 
-from ..utils.utils import spec_updater, get_sub_eptm
 from ..config.draw import sheet_spec
+from ..utils.utils import get_sub_eptm, spec_updater
 
 try:
     import ipyvolume as ipv
@@ -191,8 +191,7 @@ def face_mesh(sheet, coords, **face_draw_specs):
 
 
 def _wire_color_from_sequence(edge_spec, sheet):
-    """
-    """
+    """ """
     color_ = edge_spec["color"]
     cmap = cm.get_cmap(edge_spec.get("colormap", "viridis"))
     if color_.shape in [(sheet.Nv, 3), (sheet.Nv, 4)]:

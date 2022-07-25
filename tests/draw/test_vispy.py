@@ -1,9 +1,9 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from tyssue.generation import three_faces_sheet, extrude
 from tyssue import Sheet, SheetGeometry
 from tyssue.draw.vispy_draw import sheet_view
+from tyssue.generation import three_faces_sheet
 
 
 def test_sheet_view():

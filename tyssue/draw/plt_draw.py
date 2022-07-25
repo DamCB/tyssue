@@ -1,27 +1,24 @@
 """
 Matplotlib based plotting
 """
-import shutil
-import glob
-import tempfile
-import subprocess
-import warnings
 import pathlib
-
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from ipywidgets import interactive
+import shutil
+import subprocess
+import tempfile
+import warnings
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from ipywidgets import interactive
 from matplotlib import cm
+from matplotlib.collections import LineCollection, PatchCollection, PolyCollection
+from matplotlib.patches import Arc, FancyArrow, PathPatch
 from matplotlib.path import Path
-from matplotlib.patches import FancyArrow, Arc, PathPatch
-from matplotlib.collections import PatchCollection, PolyCollection, LineCollection
 
 from ..config.draw import sheet_spec
-from ..utils.utils import spec_updater, get_sub_eptm
+from ..utils.utils import get_sub_eptm, spec_updater
 
 COORDS = ["x", "y"]
 
@@ -64,7 +61,6 @@ def browse_history(
         plt.show()
 
     widget = interactive(set_frame, i=(0, size - 1))
-    output = widget.children[-1]
     widget.layout.height = "500px"
     return widget
 
@@ -122,7 +118,7 @@ def create_gif(
     for i, (t, sheet) in enumerate(history.browse(start, stop, num_frames)):
         try:
             fig, ax = draw_func(sheet, **draw_kwds)
-        except Exception as e:
+        except Exception:
             print("Droped frame {i}")
 
         if isinstance(ax, plt.Axes) and margin >= 0:
@@ -131,9 +127,7 @@ def create_gif(
         plt.close(fig)
 
     try:
-        proc = subprocess.run(
-            ["convert", (graph_dir / "movie_*.png").as_posix(), output]
-        )
+        subprocess.run(["convert", (graph_dir / "movie_*.png").as_posix(), output])
     except Exception as e:
         print(
             "Converting didn't work, make sure imagemagick is available on your system"
@@ -191,11 +185,16 @@ def sheet_view(sheet, coords=COORDS, ax=None, cbar_axis=None, **draw_specs_kw):
     Note
     ----
 
-    Important note for quantitative colormap plots: make sure to normalize your values before getting
-    the colors using draw_specs["face"]["color"] = cmap(pandas_holding_quantity_of_interest).
-    For each plot normalize with respect to the current values (max and min) such that they lie between and including 0 to 1.
-    Note that if you want to keep a constant colorbar range you have to choose the normalization to match
-    the max and min of the color bar range you chose.
+    Important note for quantitative colormap plots: make sure to normalize your
+    values before getting the colors using
+
+         draw_specs["face"]["color"] = cmap(pandas_holding_quantity_of_interest)
+
+    For each plot normalize with respect to the current values
+    (max and min) such that they lie between and including 0 to 1.
+    Note that if you want to keep a constant colorbar range you have
+    to choose the normalization to match the max and min of the color
+    bar range you chose.
     """
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)

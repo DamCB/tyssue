@@ -4,5 +4,5 @@ Utilities
 """
 
 
-from .utils import *
-from .utils import _to_3d, _to_2d
+from .utils import *  # noqa
+from .utils import _to_2d, _to_3d  # noqa

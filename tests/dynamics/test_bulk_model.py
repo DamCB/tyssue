@@ -1,17 +1,16 @@
 from pathlib import Path
 
-from tyssue.generation import extrude, three_faces_sheet
-from tyssue import Monolayer, config, Sheet, MonolayerGeometry
-from tyssue.stores import stores_dir
-from tyssue.io.hdf5 import load_datasets
-from tyssue.utils import testing
+from tyssue import Monolayer, MonolayerGeometry, Sheet, config
 from tyssue.dynamics.bulk_model import (
     BulkModel,
     BulkModelwithFreeBorders,
     ClosedMonolayerModel,
 )
-
 from tyssue.dynamics.effectors import BorderElasticity
+from tyssue.generation import three_faces_sheet
+from tyssue.io.hdf5 import load_datasets
+from tyssue.stores import stores_dir
+from tyssue.utils import testing
 
 
 def test_effector():

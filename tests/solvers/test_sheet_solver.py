@@ -1,13 +1,13 @@
 import os
-from tyssue.core.sheet import Sheet
-from tyssue.geometry.sheet_geometry import SheetGeometry as geom
-from tyssue.dynamics.sheet_vertex_model import SheetModel as model
-from tyssue import config
-from tyssue.io.hdf5 import load_datasets
-from tyssue.stores import stores_dir
-from tyssue.solvers.sheet_vertex_solver import Solver as solver
-from tyssue.solvers import QSSolver
 
+from tyssue import config
+from tyssue.core.sheet import Sheet
+from tyssue.dynamics.sheet_vertex_model import SheetModel as model
+from tyssue.geometry.sheet_geometry import SheetGeometry as geom
+from tyssue.io.hdf5 import load_datasets
+from tyssue.solvers import QSSolver
+from tyssue.solvers.sheet_vertex_solver import Solver as solver
+from tyssue.stores import stores_dir
 
 TOL = 1e-5
 DECIMAL = 5

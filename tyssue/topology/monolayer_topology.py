@@ -1,16 +1,11 @@
 import logging
+
 import numpy as np
 
 from ..geometry.bulk_geometry import MonolayerGeometry
-from ..core.sheet import Sheet
-from ..geometry.sheet_geometry import SheetGeometry
 from ..geometry.utils import rotation_matrix
-
-from .bulk_topology import get_division_vertices
 from .bulk_topology import cell_division as bulk_division
-from .sheet_topology import type1_transition as sheet_t1
-from .sheet_topology import get_division_edges as sheet_division_edges
-
+from .bulk_topology import get_division_vertices
 
 logger = logging.getLogger(name=__name__)
 
@@ -45,11 +40,11 @@ def cell_division(monolayer, mother, orientation="vertical", psi=None):
     elif orientation == "vertical":
         plane_normal = _vertical_plane_normal(ab_axis, psi=psi)
     elif orientation == "apical":
-        rcoords = ['r'+c for c in monolayer.coords]
+        rcoords = ["r" + c for c in monolayer.coords]
         apical_pos = monolayer.edge_df.loc[
-            (monolayer.edge_df['cell'] == mother)
-            & (monolayer.edge_df['segment'] == "apical"),
-            rcoords
+            (monolayer.edge_df["cell"] == mother)
+            & (monolayer.edge_df["segment"] == "apical"),
+            rcoords,
         ]
         _, _, vh = np.linalg.svd(apical_pos)
         plane_normal = vh[0, :]
