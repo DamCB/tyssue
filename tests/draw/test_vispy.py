@@ -1,10 +1,14 @@
 import numpy as np
 import pandas as pd
+from vispy.testing import IS_CI
+import pytest
 
 from tyssue import Sheet, SheetGeometry
 from tyssue.draw.vispy_draw import sheet_view
 from tyssue.generation import three_faces_sheet
 
+if IS_CI:
+    pytest.skip("No qt in CI")
 
 def test_sheet_view():
 
