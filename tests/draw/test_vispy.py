@@ -8,7 +8,7 @@ from tyssue.draw.vispy_draw import sheet_view
 from tyssue.generation import three_faces_sheet
 
 if IS_CI:
-    pytest.skip("No qt in CI")
+    pytest.skip("No qt in CI", allow_module_level=True)
 
 
 def test_sheet_view():
