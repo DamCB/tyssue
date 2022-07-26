@@ -3,6 +3,7 @@ channels:
 - conda-forge
 
 dependencies:
+- cmake
 - pybind11
 - pip
 - boost-cpp
