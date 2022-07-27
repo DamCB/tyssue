@@ -1,4 +1,6 @@
-- file: index
+format: jb-article
+root: index
+sections:
 - file: notebooks/00-Basic_Usage.ipynb
 - file: notebooks/01-Geometry.ipynb
 - file: notebooks/02-Visualization.ipynb

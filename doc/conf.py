@@ -55,8 +55,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "Tyssue"
-copyright = "2016-2018, Morphogenie Logiciels"
-author = "Morphogenie Logiciels"
+copyright = "2016-2022, tyssue contributors"
+author = "Tyssue contributors"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

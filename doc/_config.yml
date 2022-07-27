@@ -7,3 +7,15 @@ execute:
 sphinx:
   extra_extensions:
     - sphinx.ext.autodoc
+    - sphinx.ext.coverage
+    - sphinx.ext.mathjax
+    - sphinx.ext.viewcode
+    - sphinx.ext.napoleon
+
+exclude_patterns :
+    - '_build'
+    - '**.ipynb_checkpoints'
+    - '**test**'
+    - 'setup.py'
+    - '**/tests'
+    - 'pybind11'
