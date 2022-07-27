@@ -8,7 +8,7 @@ build:
   jobs:
     pre_build:
       # Generate the Sphinx configuration for this Jupyter Book so it builds.
-      - "jupyter-book config sphinx docs/"
+      - "jupyter-book config sphinx doc/"
 
 conda:
   environment: docs_environment.yml
