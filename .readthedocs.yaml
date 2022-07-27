@@ -16,6 +16,7 @@ conda:
 submodules:
   include:
     - doc/notebooks
+    - pybind11
   recursive: true
 
 
