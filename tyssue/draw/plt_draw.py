@@ -96,10 +96,7 @@ def create_gif(
 
     """
     if draw_func is None:
-        if draw_kwds.get("mode") in ("quick", None):
-            draw_func = quick_edge_draw
-        else:
-            draw_func = sheet_view
+        draw_func = sheet_view
 
     graph_dir = pathlib.Path(tempfile.mkdtemp())
     x, y = coords = draw_kwds.get("coords", history.sheet.coords[:2])
@@ -118,8 +115,10 @@ def create_gif(
     for i, (t, sheet) in enumerate(history.browse(start, stop, num_frames)):
         try:
             fig, ax = draw_func(sheet, **draw_kwds)
-        except Exception:
-            print("Droped frame {i}")
+        except Exception as e:
+            print(f"Droped frame {i}")
+            print(e)
+            continue
 
         if isinstance(ax, plt.Axes) and margin >= 0:
             ax.set(xlim=xlim, ylim=ylim)
