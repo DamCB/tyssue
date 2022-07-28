@@ -178,6 +178,9 @@ class History:
                 if "time" not in cols:
                     times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
                     df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
+                else:
+                    df["time"] = self.time
+
                 if self.time in hist["time"]:
                     # erase previously recorded time point
                     hist = hist[hist["time"] != self.time]
@@ -461,6 +464,26 @@ class HistoryHdf5(History):
         sheet.coords = self.sheet.coords
         sheet.edge_df.index.rename("edge", inplace=True)
         return sheet
+
+    def retrieve_columns(self, element, columns):
+        """
+        Return a table with the selected columns from the given element
+
+        Parameters
+        ----------
+        element: str
+            either 'vert', 'edge', 'face' or 'cell'
+        columns: list of str
+            a list of columns to retrieve
+
+
+        """
+        with pd.HDFStore(self.hf5file, "r") as store:
+            data = store.select(
+                element,
+                columns=columns,
+            )
+        return data
 
 
 def _retrieve(dset, time):

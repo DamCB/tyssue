@@ -182,6 +182,20 @@ def test_historyHDF5_retrieve():
         p.unlink()
 
 
+def test_historyHDF5_retrieve_columns():
+    sheet = Sheet("3", *three_faces_sheet())
+    history = HistoryHdf5(sheet, hf5file="out.hf5")
+
+    history.record(time_stamp=0)
+    sheet.vert_df.loc[0, "x"] = 1000
+    history.record(time_stamp=1)
+    retrieved = history.retrieve_columns("vert", ["time", "x", "y"])
+    assert retrieved.shape == (2 * sheet.Nv, 3)
+    assert retrieved.iloc[sheet.Nv]["x"] == 1000
+    for p in Path(".").glob("out*.hf5"):
+        p.unlink()
+
+
 def test_historyHDF5_save_every():
     sheet = Sheet("3", *three_faces_sheet())
 
