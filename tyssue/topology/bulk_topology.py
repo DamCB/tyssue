@@ -80,7 +80,7 @@ def close_cell(eptm, cell):
     return 0
 
 
-def split_vert(eptm, vert, face=None, multiplier=1.5):
+def split_vert(eptm, vert, face=None, multiplier=1.5, recenter=False):
     """Splits a vertex towards a face.
 
     Parameters
@@ -139,11 +139,12 @@ def split_vert(eptm, vert, face=None, multiplier=1.5):
 
     if cells.loc[cell, "size"] == 3:
         logger.info(f"OI for face {face} of cell {cell}")
-        _OI_transition(eptm, all_edges, elements, multiplier)
+        _OI_transition(eptm, all_edges, elements, multiplier, recenter=recenter)
     elif cells.loc[cell, "size"] == 4:
         logger.info(f"OH for face {face} of cell {cell}")
-        _OH_transition(eptm, all_edges, elements, multiplier)
+        _OH_transition(eptm, all_edges, elements, multiplier, recenter=recenter)
     else:
+        logger.info("Nothing happened ")
         return 1
     # Tidy up
     for face in all_edges["face"].unique():
@@ -479,7 +480,7 @@ def find_HIs(eptm, shorts=None):
 
 
 # @check_condition4
-def IH_transition(eptm, edge):
+def IH_transition(eptm, edge, recenter=False):
     """
     I → H transition as defined in Okuda et al. 2013
     (DOI 10.1007/s10237-012-0430-7).
@@ -489,14 +490,14 @@ def IH_transition(eptm, edge):
     vert = min(srce, trgt)
     collapse_edge(eptm, edge)
 
-    split_vert(eptm, vert, face)
+    split_vert(eptm, vert, face, recenter=recenter)
 
     logger.info("IH transition on edge %d", edge)
     return 0
 
 
 # @check_condition4
-def HI_transition(eptm, face):
+def HI_transition(eptm, face, recenter=False):
     """
     H → I transition as defined in Okuda et al. 2013
     (DOI 10.1007/s10237-012-0430-7).
@@ -511,7 +512,7 @@ def HI_transition(eptm, face):
     cells = all_edges.groupby("cell").size()
     cell = cells.idxmin()
     face = all_edges[all_edges["cell"] == cell]["face"].iloc[0]
-    split_vert(eptm, vert, face)
+    split_vert(eptm, vert, face, recenter=recenter)
 
     logger.info("HI transition on face %d", face)
     return 0
