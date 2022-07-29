@@ -234,17 +234,19 @@ def collapse_edge(sheet, edge, reindex=True, allow_two_sided=False):
     logger.debug("collapsing edge %d", edge)
     srce, trgt = np.sort(sheet.edge_df.loc[edge, ["srce", "trgt"]]).astype(int)
 
-    edges = sheet.edge_df[
-        ((sheet.edge_df["srce"] == srce) & (sheet.edge_df["trgt"] == trgt))
-        | ((sheet.edge_df["srce"] == trgt) & (sheet.edge_df["trgt"] == srce))
-    ]
+    # edges = sheet.edge_df[
+    #     ((sheet.edge_df["srce"] == srce) & (sheet.edge_df["trgt"] == trgt))
+    #     | ((sheet.edge_df["srce"] == trgt) & (sheet.edge_df["trgt"] == srce))
+    # ]
 
-    has_3_sides = np.any(sheet.face_df.loc[edges["face"].astype(int), "num_sides"] < 4)
-    if has_3_sides and not allow_two_sided:
-        warnings.warn(
-            f"Collapsing edge {edge} would result in a two sided face, aborting"
-        )
-        return -1
+    # has_3_sides = np.any(
+    #     sheet.face_df.loc[edges["face"].astype(int), "num_sides"] < 4
+    # )
+    # if has_3_sides and not allow_two_sided:
+    #     warnings.warn(
+    #         f"Collapsing edge {edge} would result in a two sided face, aborting"
+    #     )
+    #     return -1
 
     sheet.vert_df.loc[srce, sheet.coords] = sheet.vert_df.loc[
         [srce, trgt], sheet.coords
