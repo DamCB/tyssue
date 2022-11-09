@@ -44,13 +44,13 @@ Mesh sheet_to_surface_mesh(py::array_t<double> vertices, py::array_t<double> fac
 
     // scan faces numpy array
     py::buffer_info info_faces = faces.request();
-    for (int i=0; i<info_faces.shape[0]; i=i+3)
+    for (int i=0; i<(info_faces.shape[0]*info_faces.shape[1]); i=i+3)
     {
-
-      vertex_descriptor u = vertex_descriptor(((double*)info_faces.ptr)[i]);
-      vertex_descriptor v = vertex_descriptor(((double*)info_faces.ptr)[i+1]);
-      vertex_descriptor w = vertex_descriptor(((double*)info_faces.ptr)[i+2]);
-      face_descriptor f = mesh.add_face(u,v,w);
+//        std::cout << i << std::endl;
+        vertex_descriptor u = vertex_descriptor(((double*)info_faces.ptr)[i]);
+        vertex_descriptor v = vertex_descriptor(((double*)info_faces.ptr)[i+1]);
+        vertex_descriptor w = vertex_descriptor(((double*)info_faces.ptr)[i+2]);
+        face_descriptor f = mesh.add_face(u,v,w);
 
     }
 
@@ -79,9 +79,16 @@ std::vector<std::tuple<int, int>> self_intersections(Mesh& mesh)
 
 }
 
+void write_polygon_mesh(Mesh& mesh, std::string filename)
+{
+    CGAL::IO::write_polygon_mesh(filename, mesh, CGAL::parameters::stream_precision(17));
+}
+
 
 PYBIND11_MODULE(c_collisions, m)
 {
+    m.def("write_polygon_mesh", &write_polygon_mesh);
+
     m.def("sheet_to_surface_mesh", &sheet_to_surface_mesh);
 
     m.def("does_self_intersect", &does_self_intersect);
@@ -101,6 +108,28 @@ PYBIND11_MODULE(c_collisions, m)
                      {
                         return m.number_of_faces();
                      })
+                    .def("get_vertices",
+                    [](Mesh& m)
+                    {
+                        std::vector<float> verts;
+                        for (Mesh::Vertex_index vi : m.vertices()) {
+                            K::Point_3 pt = m.point(vi);
+                            verts.push_back((float)pt.x());
+                            verts.push_back((float)pt.y());
+                            verts.push_back((float)pt.z());
+                        }
+                        return verts;
+                    })
+                    .def("get_faces",
+                    [](Mesh& m)
+                    {
+                        std::vector<uint32_t> indices;
+                        for (Mesh::Face_index face_index : m.faces()) {
+                            CGAL::Vertex_around_face_circulator<Mesh> vcirc(m.halfedge(face_index), m), done(vcirc);
+                            do indices.push_back(*vcirc++); while (vcirc != done);
+                        }
+                        return indices;
+                    })
     ;
 
 }

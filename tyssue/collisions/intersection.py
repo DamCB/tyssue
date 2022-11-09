@@ -25,8 +25,10 @@ def self_intersections(sheet):
          Array of shape (n_intersections, 2) with the indices of the
          pairs of intersecting edges
     """
-    faces, vertices = sheet.triangular_mesh(sheet.coords, return_mask=False)
-    mesh = c_collisions.sheet_to_surface_mesh(faces, vertices)
+    vertices, faces = sheet.triangular_mesh(sheet.coords, return_mask=False)
+    if vertices[0].shape[0] == 2:
+        vertices = np.array([list(np.append(vert, 0)) for vert in vertices])
+    mesh = c_collisions.sheet_to_surface_mesh(vertices, faces)
     if not c_collisions.does_self_intersect(mesh):
         return np.empty((0, 2), dtype=int)
     return np.array(c_collisions.self_intersections(mesh), dtype=int)

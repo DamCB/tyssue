@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from ..core.sheet import Sheet, get_outer_sheet
+from ..core.monolayer import Monolayer
 from .intersection import self_intersections
 
 log = logging.getLogger(__name__)
@@ -116,7 +117,7 @@ class CollidingBoxes:
         self.edge_pairs = intersecting_edges
         self.face_pairs = self._get_intersecting_faces()
         self.edge_buffer = sheet.upcast_srce(position_buffer).copy()
-        self.edge_buffer.columns = ["sx", "sy", "sz"]
+        self.edge_buffer.columns = ["s" + p for p in self.edge_buffer.columns]
         self.plane_not_found = False
 
     def _get_intersecting_faces(self):
@@ -261,12 +262,12 @@ class CollidingBoxes:
             log.info("""Plane Not Found""")
             self.plane_not_found = True
             lower_bound = pd.DataFrame(
-                index=set(fe0c.srce).union(fe1c.srce), columns=list("xyz")
+                index=set(fe0c.srce).union(fe1c.srce), columns=self.sheet.coords
             )
             upper_bound = pd.DataFrame(
-                index=set(fe0c.srce).union(fe1c.srce), columns=list("xyz")
+                index=set(fe0c.srce).union(fe1c.srce), columns=self.sheet.coords
             )
-            for c in list("xyz"):
+            for c in self.sheet.coords:
                 b0 = bb0c.loc[c]
                 b1 = bb1c.loc[c]
                 left, right = (fe0c, fe1c) if (b0.mean() < b1.mean()) else (fe1c, fe0c)
@@ -288,12 +289,14 @@ class CollidingBoxes:
 
 
 def _face_bbox(face_edges):
-
-    points = face_edges[["sx", "sy", "sz"]].values
+    if "sz" in face_edges.columns:
+        points = face_edges[["sx", "sy", "sz"]].values
+    else:
+        points = face_edges[["sx", "sy"]].values
     lower = points.min(axis=0)
     upper = points.max(axis=0)
     return pd.DataFrame(
-        [lower, upper], index=list("lh"), columns=list("xyz"), dtype=float
+        [lower, upper], index=list("lh"), columns=list("xyz")[:len(lower)], dtype=float
     ).T
 
 
