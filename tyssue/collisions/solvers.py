@@ -91,15 +91,16 @@ def solve_sheet_collisions(sheet, position_buffer):
     if intersecting_edges.shape[0]:
         log.info("%d intersections were detected", intersecting_edges.shape[0])
         shyness = sheet.settings.get("shyness", 1e-10)
-        boxes = CollidingBoxes(sheet, position_buffer, intersecting_edges)
+        if len(sheet.coords) == 2:
+            boxes = CollidingBoxes2D(sheet, position_buffer, intersecting_edges)
+        elif len(sheet.coords) == 3:
+            boxes = CollidingBoxes3D(sheet, position_buffer, intersecting_edges)
         changed = boxes.solve_collisions(shyness)
         return changed
     return False
 
 
 class CollidingBoxes:
-    """Utility class to manage collisions"""
-
     def __init__(self, sheet, position_buffer, intersecting_edges):
         """Creates a CollidingBoxes instance
 
@@ -120,6 +121,9 @@ class CollidingBoxes:
         self.edge_buffer.columns = ["s" + p for p in self.edge_buffer.columns]
         self.plane_not_found = False
 
+    def solve_collisions(self, shyness=1e-10):
+        return True
+
     def _get_intersecting_faces(self):
         """Returns unique pairs of intersecting faces"""
         _face_pairs = self.sheet.edge_df.loc[
@@ -128,6 +132,51 @@ class CollidingBoxes:
         unique_pairs = set(map(frozenset, _face_pairs))
 
         return np.array([[*pair] for pair in unique_pairs if len(pair) == 2])
+
+
+class CollidingBoxes2D(CollidingBoxes):
+    def __init__(self, sheet, position_buffer, intersecting_edges):
+        CollidingBoxes.__init__(self, sheet, position_buffer, intersecting_edges)
+
+    def _find_vert_inside(self, edge1, edge2):
+        triangle1 = [self.sheet.edge_df.loc[edge1][['sx', 'sy']].to_numpy(),
+                     self.sheet.edge_df.loc[edge1][['tx', 'ty']].to_numpy(),
+                     self.sheet.edge_df.loc[edge1][['fx', 'fy']].to_numpy()]
+        triangle2 = [self.sheet.edge_df.loc[edge2][['sx', 'sy']].to_numpy(),
+                     self.sheet.edge_df.loc[edge2][['tx', 'ty']].to_numpy(),
+                     self.sheet.edge_df.loc[edge2][['fx', 'fy']].to_numpy()]
+
+        if _point_in_triangle(self.sheet.edge_df.loc[edge1][['sx', 'sy']].to_numpy(), triangle2):
+            return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge2
+        if _point_in_triangle(self.sheet.edge_df.loc[edge1][['tx', 'ty']].to_numpy(), triangle2):
+            return self.sheet.edge_df.loc[edge1]['trgt'], self.sheet.edge_df.loc[edge1]['face'], edge2
+        if _point_in_triangle(self.sheet.edge_df.loc[edge2][['sx', 'sy']].to_numpy(), triangle1):
+            return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge1
+        if _point_in_triangle(self.sheet.edge_df.loc[edge2][['tx', 'ty']].to_numpy(), triangle1):
+            return self.sheet.edge_df.loc[edge2]['trgt'], self.sheet.edge_df.loc[edge2]['face'], edge1
+        return np.NaN, np.NaN, np.NaN
+
+    def solve_collisions(self, shyness=1e-10):
+        id_vert_change = []
+        for e1, e2 in self.edge_pairs:
+            if (e1 not in id_vert_change) and (e2 not in id_vert_change):
+                vert_inside, face, edge = self._find_vert_inside(e1, e2)
+                if not np.isnan(vert_inside):
+
+                    new_pos = _line_intersection(
+                        (self.sheet.vert_df.loc[vert_inside][['x', 'y']], self.sheet.face_df.loc[face][['x', 'y']]),
+                        (self.sheet.edge_df.loc[edge][['sx', 'sy']], self.sheet.edge_df.loc[edge][['tx', 'ty']]))
+                    if not np.isnan(new_pos[0]):
+                        self.sheet.vert_df.loc[vert_inside, self.sheet.coords] = new_pos
+                        id_vert_change.append(vert_inside)
+        return True
+
+
+class CollidingBoxes3D(CollidingBoxes):
+    """Utility class to manage collisions"""
+
+    def __init__(self, sheet, position_buffer, intersecting_edges):
+        CollidingBoxes.__init__(self, sheet, position_buffer, intersecting_edges)
 
     def get_limits(self, shyness=1e-10):
         """Iterator over the position boundaries avoiding the
@@ -207,7 +256,9 @@ class CollidingBoxes:
             .groupby("vert")
             .apply(max)
         )
-
+        ## Need to be corrected
+        # Move vertex too far away
+        # Move vertex that shouldn't be moved
         correction_upper = np.minimum(
             self.sheet.vert_df.loc[upper_bounds.index, self.sheet.coords],
             upper_bounds.values,
@@ -287,21 +338,70 @@ class CollidingBoxes:
 
         return lower_bound, upper_bound
 
+    def _face_bbox(self, face_edges):
+        """
+        Get the minimal box that contain the face
+        """
+        if "sz" in face_edges.columns:
+            points = face_edges[["sx", "sy", "sz"]].values
+        else:
+            points = face_edges[["sx", "sy"]].values
+        lower = points.min(axis=0)
+        upper = points.max(axis=0)
+        return pd.DataFrame(
+            [lower, upper], index=list("lh"), columns=self.coord[:len(lower)], dtype=float
+        ).T
 
-def _face_bbox(face_edges):
-    if "sz" in face_edges.columns:
-        points = face_edges[["sx", "sy", "sz"]].values
-    else:
-        points = face_edges[["sx", "sy"]].values
-    lower = points.min(axis=0)
-    upper = points.max(axis=0)
-    return pd.DataFrame(
-        [lower, upper], index=list("lh"), columns=list("xyz")[:len(lower)], dtype=float
-    ).T
+
+def _point_in_triangle(point, triangle):
+    """Returns True if the point is inside the triangle
+    and returns False if it falls outside.
+    - The argument *point* is a tuple with two elements
+    containing the X,Y coordinates respectively.
+    - The argument *triangle* is a tuple with three elements each
+    element consisting of a tuple of X,Y coordinates.
+
+    It works like this:
+    Walk clockwise or counterclockwise around the triangle
+    and project the point onto the segment we are crossing
+    by using the dot product.
+    Finally, check that the vector created is on the same side
+    for each of the triangle's segments.
+    """
+    # Unpack arguments
+    x, y = point
+    ax, ay = triangle[0]
+    bx, by = triangle[1]
+    cx, cy = triangle[2]
+    # Segment A to B
+    side_1 = (x - bx) * (ay - by) - (ax - bx) * (y - by)
+    # Segment B to C
+    side_2 = (x - cx) * (by - cy) - (bx - cx) * (y - cy)
+    # Segment C to A
+    side_3 = (x - ax) * (cy - ay) - (cx - ax) * (y - ay)
+    # All the signs must be positive or all negative
+    return (side_1 < 0.0) == (side_2 < 0.0) == (side_3 < 0.0)
+
+
+def _line_intersection(line1, line2):
+    xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
+
+    def det(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    div = det(xdiff, ydiff)
+    if div == 0:
+        #         raise Exception('lines do not intersect')
+        return np.NaN, np.NaN
+
+    d = (det(*line1), det(*line2))
+    x = det(d, xdiff) / div
+    y = det(d, ydiff) / div
+    return x, y
 
 
 def revert_positions(sheet, position_buffer, intersecting_edges):
-
     unique_edges = np.unique(intersecting_edges)
     unique_verts = np.unique(sheet.edge_df.loc[unique_edges, ["srce", "trgt"]])
     sheet.vert_df.loc[unique_verts, sheet.coords] = position_buffer.loc[unique_verts]
