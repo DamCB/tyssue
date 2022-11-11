@@ -34,13 +34,20 @@ It's main focus is on **vertex based epithelium models**.
 ### What kind of Models does it implement?
 
 The first model implemented is the one described in
-Monier et al. [monier2015apico]. It is an example of a vertex model,
+Monier et al. [monier_apico-basal_2015]. It is an example of a vertex model,
 where the interactions are only evaluated on the apical surface sheet
 of the epithelium. The second class of models is still at an
 stage. They implement a description of the tissue's rheology, within a
 dissipation function formalism.
 
 ![The two models considered](doc/illus/two_models.png)
+
+### What kind of geometry does it modeled ?
+`tyssue` allows to model different geometries in 2D and in 3D.  Presentation of the different geometries and how to create them are shown in this [notebook](https://github.com/DamCB/tyssue-demo/blob/master/01-Geometry.ipynb). 
+<p align="center">
+ <img src="doc/illus/geometry.png" width="500">
+</p>
+
 
 ### General Structure of the modeling API
 
@@ -107,7 +114,7 @@ fig, ax = sheet_view(sheet)
 * Easy to extend.
 * 2D (matplotlib) and 3D (ipyvolume) customisable visualisation.
 * Easy quasistatic model definition.
-* Self collision detection. **new in 0.3**
+* Self collision detection in 2D. **new in 0.3**
 
 
 ### Documentation
@@ -183,6 +190,24 @@ You can also install tyssue from PyPi, this is a CGAL-less version (pure python)
 
 See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary python environment.
 
+## How to cite 
+If you find `tyssue` useful please cite [this repository](https://github.com/DamCB/tyssue) using its DOI as follows:
+
+> Theis, Suzanne, Gay, (2021). Tyssue: an epithelium simulation library. Journal of Open Source Software, 6(62), 2973 doi:[https://doi.org/10.21105/joss.02973](https://doi.org/10.21105/joss.02973)
+> 
+> Zenodo doi:10.5281/zenodo.4817609
+
+## Publications
+If `tyssue` has made a substantial contribution to your work, please let us know about your publication, and we’ll add your article here.
+
+[martinArp23dependentMechanical2021] Martin E, Theis S, Gay G, Monier B, Rouvière C, Suzanne M. Arp2/3-dependent mechanical control of morphogenetic robustness in an inherently challenging environment. Dev Cell. 2021 doi: [10.1016/j.devcel.2021.01.005](10.1016/j.devcel.2021.01.005)  
+Related repository: [https://github.com/suzannelab/polarity](https://github.com/suzannelab/polarity) 
+
+[graciaMechanicalImpactEpithelial2019] Gracia M, Theis S, Proag A, Gay G, Benassayag C, Suzanne M. Mechanical impact of epithelial-mesenchymal transition on epithelial morphogenesis in Drosophila. Nat Commun. 2019 doi: [10.1038/s41467-019-10720-0](10.1038/s41467-019-10720-0)  
+Related repository: [https://github.com/suzannelab/invagination](https://github.com/suzannelab/invagination)
+
+[monier_apico-basal_2015] Monier B, Gettings M, Gay G, Mangeat T, Schott S, Guarner A, Suzanne M. Apico-basal forces exerted by apoptotic cells drive epithelium folding. Nature. 2015 doi: [10.1038/nature14152](10.1038/nature14152)  
+Related repository: [https://github.com/glyg/leg-joint](https://github.com/glyg/leg-joint)
 
 ## Licence
 
@@ -197,15 +222,15 @@ If GPL licencing is too restrictive for your intended usage, please contact the 
 
 * There is a [Bibtex file here](doc/bibliography/tyssue.bib) with collected relevant publications.
 
-The tyssue library stemed from a refactoring of the `leg-joint` code used in [monier2015apico].
+The tyssue library stemed from a refactoring of the `leg-joint` code used in [monier_apico-basal_2015].
 
 
-[monier2015apico]: Monier, B. et al. Apico-basal forces exerted by
+[monier_apico-basal_2015]: Monier, B. et al. Apico-basal forces exerted by
   apoptotic cells drive epithelium folding. Nature 518, 245–248 (2015).
 
-[Tamulonis2013]: Tamulonis, C. Cell-based models. (Universiteit ven Amsterdam, 2013). doi:10.1177/1745691612459060.
+[tamulonis_cell_2013]: Tamulonis, C. Cell-based models. (Universiteit ven Amsterdam, 2013). doi:10.1177/1745691612459060.
 
-[Tlili2013]: Tlili,S. et al. Mechanical formalism for tissue dynamics. 6, 23 (2013).
+[tlili_mechanical_2013]: Tlili,S. et al. Mechanical formalism for tissue dynamics. 6, 23 (2013).
 
 ## Research notice
 Please note that this repository is participating in a study into sustainability
