@@ -154,6 +154,17 @@ class CollidingBoxes2D(CollidingBoxes):
             return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge1
         if _point_in_triangle(self.sheet.edge_df.loc[edge2][['tx', 'ty']].to_numpy(), triangle1):
             return self.sheet.edge_df.loc[edge2]['trgt'], self.sheet.edge_df.loc[edge2]['face'], edge1
+
+        # search inside full face
+        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['sx', 'sy']].to_numpy(), self.sheet.edge_df.loc[edge2]['face']):
+            return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge2
+        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['tx', 'ty']].to_numpy(), self.sheet.edge_df.loc[edge2]['face']):
+            return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge2
+        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['sx', 'sy']].to_numpy(), self.sheet.edge_df.loc[edge1]['face']):
+            return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge1
+        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['tx', 'ty']].to_numpy(), self.sheet.edge_df.loc[edge1]['face']):
+            return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge1
+
         return np.NaN, np.NaN, np.NaN
 
     def solve_collisions(self, shyness=1e-10):
@@ -382,6 +393,15 @@ def _point_in_triangle(point, triangle):
     # All the signs must be positive or all negative
     return (side_1 < 0.0) == (side_2 < 0.0) == (side_3 < 0.0)
 
+import matplotlib.path as mplPath
+from tyssue.core.objects import _ordered_edges
+
+def _point_in_polygon(sheet, point, face):
+    edge_index = sheet.edge_df[sheet.edge_df['face']==face].index
+    ordered_vert_index = np.array(_ordered_edges(sheet.edge_df.loc[edge_index][['srce', 'trgt', 'face']])).flatten()[0::3]
+    poly_path = mplPath.Path(np.array(sheet.vert_df.loc[ordered_vert_index][['x','y']]))
+#     point = np.array(sheet.edge_df.loc[8][['tx', 'ty']])
+    return poly_path.contains_point(point)
 
 def _line_intersection(line1, line2):
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
