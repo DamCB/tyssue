@@ -29,6 +29,8 @@ def auto_collisions(fun):
         eptm, geom = args[:2]
         eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
         res = fun(*args, **kwargs)
+        solve_self_intersect_face(eptm)
+        geom.update_all(eptm)
         if isinstance(eptm, Sheet):
             change = solve_sheet_collisions(eptm, eptm.position_buffer)
         else:
@@ -39,6 +41,40 @@ def auto_collisions(fun):
         return res
 
     return with_collision_correction
+
+
+def solve_self_intersect_face(eptm):
+    for f in range(eptm.Nf):
+        sorted_edge = np.array(_ordered_edges(
+            eptm.edge_df[eptm.edge_df['face'] == f][['srce', 'trgt', 'face']])).flatten()[3::4]
+        angle_list = np.arctan2(
+            eptm.edge_df.loc[sorted_edge]['sy'].to_numpy() - eptm.edge_df.loc[sorted_edge]['fy'].to_numpy(),
+            eptm.edge_df.loc[sorted_edge]['sx'].to_numpy() - eptm.edge_df.loc[sorted_edge][
+                'fx'].to_numpy()) * 180 / np.pi + 180
+
+        angle_e = pd.DataFrame(angle_list, index=sorted_edge, columns=['angle'])
+
+        if np.where(np.min(angle_e['angle']) == angle_e['angle'])[0] != 0:
+            # print("reorder")
+            # print(angle_e)
+            pos_s = np.where(np.min(angle_e['angle']) == angle_e['angle'])[0][0]
+            angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
+
+        angle_e = pd.concat([angle_e, angle_e.iloc[[0]]])
+        angle_e.iloc[-1]['angle'] += 360
+
+        if not pd.Series(angle_e['angle']).is_monotonic_increasing:
+            # print("list angle is not monotonic")
+            # print(sorted_edge)
+            # print(eptm.edge_df[eptm.edge_df['face'] == f][['srce', 'trgt', 'face', 'sx', 'sy', 'tx', 'ty']])
+            # print(angle_e)
+            pos_s = np.where(angle_e.diff()['angle'] < 0)[0][0]
+            v1 = eptm.edge_df.loc[angle_e.index[pos_s]]['srce']
+            v2 = eptm.edge_df.loc[angle_e.index[pos_s - 1]]['srce']
+            v1_x, v1_y = eptm.vert_df.loc[v1][['x', 'y']]
+            v2_x, v2_y = eptm.vert_df.loc[v2][['x', 'y']]
+            eptm.vert_df.loc[v1, ['x', 'y']] = v2_x, v2_y
+            eptm.vert_df.loc[v2, ['x', 'y']] = v1_x, v1_y
 
 
 def solve_bulk_collisions(eptm, position_buffer):
@@ -86,7 +122,6 @@ def solve_sheet_collisions(sheet, position_buffer):
         `True` if the positions of some vertices were changed
 
     """
-
     intersecting_edges = self_intersections(sheet)
     if intersecting_edges.shape[0]:
         log.info("%d intersections were detected", intersecting_edges.shape[0])

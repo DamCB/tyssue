@@ -911,12 +911,15 @@ def _ordered_edges(face_edges):
     edges: list of 3 ints
         srce, trgt, face indices, ordered
     """
-    srces, trgts, faces = face_edges[["srce", "trgt", "face"]].values.T
-    srce, trgt, face_ = srces[0], trgts[0], faces[0]
-    edges = [[srce, trgt, face_]]
+    face_edges = face_edges.copy()
+    face_edges["edge"] = face_edges.index
+    srces, trgts, faces, edge = face_edges[["srce", "trgt", "face", "edge"]].values.T
+    srce, trgt, face_, edge_ = srces[0], trgts[0], faces[0], edge[0]
+    edges = [[srce, trgt, face_, edge_]]
     for face_ in faces[1:]:
         srce, trgt = trgt, trgts[srces == trgt][0]
-        edges.append([srce, trgt, face_])
+        edge_ = face_edges[(face_edges["srce"] == srce)]["edge"].to_numpy()[0]
+        edges.append([srce, trgt, face_, edge_])
     return edges
 
 
