@@ -44,7 +44,9 @@ def auto_collisions(fun):
 
 
 def solve_self_intersect_face(eptm):
-    for f in range(eptm.Nf):
+    face_self_intersect = eptm.edge_df.groupby("face").apply(_do_face_self_intersect)
+
+    for f in face_self_intersect[face_self_intersect].index:
         sorted_edge = np.array(_ordered_edges(
             eptm.edge_df[eptm.edge_df['face'] == f][['srce', 'trgt', 'face']])).flatten()[3::4]
         angle_list = np.arctan2(
@@ -55,26 +57,41 @@ def solve_self_intersect_face(eptm):
         angle_e = pd.DataFrame(angle_list, index=sorted_edge, columns=['angle'])
 
         if np.where(np.min(angle_e['angle']) == angle_e['angle'])[0] != 0:
-            # print("reorder")
-            # print(angle_e)
             pos_s = np.where(np.min(angle_e['angle']) == angle_e['angle'])[0][0]
             angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
 
         angle_e = pd.concat([angle_e, angle_e.iloc[[0]]])
         angle_e.iloc[-1]['angle'] += 360
 
-        if not pd.Series(angle_e['angle']).is_monotonic_increasing:
-            # print("list angle is not monotonic")
-            # print(sorted_edge)
-            # print(eptm.edge_df[eptm.edge_df['face'] == f][['srce', 'trgt', 'face', 'sx', 'sy', 'tx', 'ty']])
-            # print(angle_e)
-            pos_s = np.where(angle_e.diff()['angle'] < 0)[0][0]
-            v1 = eptm.edge_df.loc[angle_e.index[pos_s]]['srce']
-            v2 = eptm.edge_df.loc[angle_e.index[pos_s - 1]]['srce']
+        pos_s = np.where(angle_e.diff()['angle'] < 0)[0][0]
+        v1 = eptm.edge_df.loc[angle_e.index[pos_s]]['srce']
+        v2 = eptm.edge_df.loc[angle_e.index[pos_s - 1]]['srce']
+        if eptm.vert_df.loc[v1]['segment'] == eptm.vert_df.loc[v2]['segment']:
             v1_x, v1_y = eptm.vert_df.loc[v1][['x', 'y']]
             v2_x, v2_y = eptm.vert_df.loc[v2][['x', 'y']]
             eptm.vert_df.loc[v1, ['x', 'y']] = v2_x, v2_y
             eptm.vert_df.loc[v2, ['x', 'y']] = v1_x, v1_y
+
+
+def _do_face_self_intersect(edge):
+    sorted_edge = np.array(_ordered_edges(
+        edge[['srce', 'trgt', 'face']])).flatten()[3::4]
+    angle_list = np.arctan2(
+        edge.loc[sorted_edge]['sy'].to_numpy() - edge.loc[sorted_edge]['fy'].to_numpy(),
+        edge.loc[sorted_edge]['sx'].to_numpy() - edge.loc[sorted_edge][
+            'fx'].to_numpy()) * 180 / np.pi + 180
+
+    angle_e = pd.DataFrame(angle_list, index=sorted_edge, columns=['angle'])
+
+    if np.where(np.min(angle_e['angle']) == angle_e['angle'])[0] != 0:
+        pos_s = np.where(np.min(angle_e['angle']) == angle_e['angle'])[0][0]
+        angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
+
+    angle_e = pd.concat([angle_e, angle_e.iloc[[0]]])
+    angle_e.iloc[-1]['angle'] += 360
+    if not pd.Series(angle_e['angle']).is_monotonic_increasing:
+        return True
+    return False
 
 
 def solve_bulk_collisions(eptm, position_buffer):
