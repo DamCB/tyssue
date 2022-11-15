@@ -103,7 +103,7 @@ def set_data_columns(datasets, specs, reset=False):
                 df[col] = default
 
 
-def data_at_opposite(sheet, edge_data, free_value=None):
+def data_at_opposite(sheet, edge_data, free_value=None, column=""):
     """
     Returns a pd.DataFrame with the values of the input edge_data
     at the opposite edges. For free edges, optionaly replaces Nan values
@@ -113,6 +113,8 @@ def data_at_opposite(sheet, edge_data, free_value=None):
     ----------
     sheet: a :class:`Sheet` instance
     edge_data:  dataframe contain value of edge
+    free_value: value used to replace Nan
+    column: string: column name so store opposite value in Sheet.edge_df
 
     Returns
     -------
@@ -136,8 +138,10 @@ def data_at_opposite(sheet, edge_data, free_value=None):
         )
     if free_value is not None:
         opposite = opposite.replace(np.nan, free_value)
-
-    return opposite
+    if column:
+        sheet.edge_df[column] = opposite
+    else:
+        return opposite
 
 
 def get_sub_eptm(eptm, edges, copy=False):
