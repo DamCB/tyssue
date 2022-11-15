@@ -201,15 +201,16 @@ def sheet_view(sheet, coords=COORDS, ax=None, cbar_axis=None, **draw_specs_kw):
     draw_specs = sheet_spec()
     spec_updater(draw_specs, draw_specs_kw)
 
-    if (ax is None) or (cbar_axis is None):
+    if (ax is None) and (cbar_axis is None):
         fig = plt.figure()
+        grid0 = plt.GridSpec(10, 10)
+        grid0.update(wspace=0.0)
+        ax = fig.add_subplot(grid0[:, :9])
     else:
-        fig = ax.get_figure()
-
-    grid0 = plt.GridSpec(10, 10)
-    grid0.update(wspace=0.0)
-
-    ax = fig.add_subplot(grid0[:, :9])
+        if ax is None:
+            fig, ax = plt.subplots()
+        else:
+            fig = ax.get_figure()
 
     vert_spec = draw_specs["vert"]
     if vert_spec["visible"]:
