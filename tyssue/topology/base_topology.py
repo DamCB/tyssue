@@ -120,7 +120,7 @@ def add_vert(eptm, edge):
     eptm.edge_df.loc[new_edges, "trgt"] = trgt
 
     new_opp_edges = []
-    if len(opposites.index) != 0:
+    if len(opposites.index):
         eptm.edge_df.loc[opposites.index, "srce"] = new_vert
         eptm.edge_df = pd.concat([eptm.edge_df, opposites], ignore_index=True)
         new_opp_edges = eptm.edge_df.index[-opposites.index.size :]

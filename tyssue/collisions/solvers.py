@@ -3,7 +3,9 @@ from functools import wraps
 
 import numpy as np
 import pandas as pd
+import matplotlib.path as mplPath
 
+from ..core.objects import _ordered_edges
 from ..core.sheet import Sheet, get_outer_sheet
 from ..core.monolayer import Monolayer
 from .intersection import self_intersections
@@ -226,7 +228,8 @@ class CollidingBoxes2D(CollidingBoxes):
     def solve_collisions(self, shyness=1e-10):
         id_vert_change = []
         for e1, e2 in self.edge_pairs:
-            if (e1 not in id_vert_change) and (e2 not in id_vert_change):
+            vertices = self.sheet.edge_df.loc[[e1,e2]][['srce', 'trgt']].to_numpy().flatten()
+            if vertices.all() not in id_vert_change:
                 vert_inside, face, edge = self._find_vert_inside(e1, e2)
                 if not np.isnan(vert_inside):
 
@@ -448,10 +451,6 @@ def _point_in_triangle(point, triangle):
     side_3 = (x - ax) * (cy - ay) - (cx - ax) * (y - ay)
     # All the signs must be positive or all negative
     return (side_1 < 0.0) == (side_2 < 0.0) == (side_3 < 0.0)
-
-
-import matplotlib.path as mplPath
-from tyssue.core.objects import _ordered_edges
 
 
 def _point_in_polygon(sheet, point, face):

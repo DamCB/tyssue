@@ -42,7 +42,7 @@ dissipation function formalism.
 
 ![The two models considered](doc/illus/two_models.png)
 
-### What kind of geometry does it modeled ?
+### What kind of geometry does it model ?
 `tyssue` allows to model different geometries in 2D and in 3D.  Presentation of the different geometries and how to create them are shown in this [notebook](https://github.com/DamCB/tyssue-demo/blob/master/01-Geometry.ipynb). 
 <p align="center">
  <img src="doc/illus/geometry.png" width="500">
@@ -114,7 +114,7 @@ fig, ax = sheet_view(sheet)
 * Easy to extend.
 * 2D (matplotlib) and 3D (ipyvolume) customisable visualisation.
 * Easy quasistatic model definition.
-* Self collision detection in 2D. **new in 0.3**
+* Self collision detection in 2D. **new in 0.9**
 
 
 ### Documentation
@@ -198,7 +198,9 @@ If you find `tyssue` useful please cite [this repository](https://github.com/Dam
 > Zenodo doi:10.5281/zenodo.4817609
 
 ## Publications
-If `tyssue` has made a substantial contribution to your work, please let us know about your publication, and we’ll add your article here.
+If `tyssue` has made a substantial contribution to your work, please edit this file and open a PR.
+
+[rahman_cell_2022] Rahman T and Wan LQ. Cell Jamming Regulates Epithelial Chiral Morphogenesis. SSRN Scholarly Paper. March 2022. [https://doi.org/10.2139/ssrn.4052248](https://doi.org/10.2139/ssrn.4052248)
 
 [martinArp23dependentMechanical2021] Martin E, Theis S, Gay G, Monier B, Rouvière C, Suzanne M. Arp2/3-dependent mechanical control of morphogenetic robustness in an inherently challenging environment. Dev Cell. 2021 doi: [10.1016/j.devcel.2021.01.005](10.1016/j.devcel.2021.01.005)  
 Related repository: [https://github.com/suzannelab/polarity](https://github.com/suzannelab/polarity) 
