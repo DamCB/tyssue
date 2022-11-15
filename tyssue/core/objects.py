@@ -478,6 +478,57 @@ class Epithelium:
         """
         return self._lvl_sum(df, "cell")
 
+    def _lvl_mean(self, df, lvl):
+        df_ = df
+        if isinstance(df, np.ndarray):
+            df_ = pd.DataFrame(df, index=self.edge_df.index)
+        elif isinstance(df, pd.Series):
+            df_ = df.to_frame()
+        elif lvl not in df.columns:
+            df_ = df.copy()
+        df_[lvl] = self.edge_df[lvl]
+        return df_.groupby(lvl).mean()
+
+    def mean_srce(self, df):
+        """Means the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["srce"]`
+
+        Returns
+        -------
+        mean : :class:`pd.DataFrame` the mean data, indexed by the source vertices.
+        """
+        return self._lvl_mean(df, "srce")
+
+    def mean_trgt(self, df):
+        """Means the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["trgt"]`
+
+        Returns
+        -------
+        mean : :class:`pd.DataFrame` the mean data, indexed by the source vertices.
+        """
+        return self._lvl_mean(df, "trgt")
+
+    def mean_face(self, df):
+        """Means the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["face"]`
+
+        Returns
+        -------
+        mean : :class:`pd.DataFrame` the mean data, indexed by the source vertices.
+        """
+        return self._lvl_mean(df, "face")
+
+    def mean_cell(self, df):
+        """Means the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["cell"]`
+
+        Returns
+        -------
+        mean : :class:`pd.DataFrame` the mean data, indexed by the source vertices.
+        """
+        return self._lvl_mean(df, "cell")
+
     def get_orbits(self, center, periph):
         """Returns a dataframe with a `(center, edge)` MultiIndex with `periph`
         elements.
