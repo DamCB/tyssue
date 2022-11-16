@@ -34,7 +34,7 @@ It's main focus is on **vertex based epithelium models**.
 ### What kind of Models does it implement?
 
 The first model implemented is the one described in
-Monier et al. [monier_apico-basal_2015]. It is an example of a vertex model,
+Monier et al.<sup id="a1">[1](#f1)</sup>. It is an example of a vertex model,
 where the interactions are only evaluated on the apical surface sheet
 of the epithelium. The second class of models is still at an
 stage. They implement a description of the tissue's rheology, within a
@@ -127,7 +127,7 @@ fig, ax = sheet_view(sheet)
 
 tyssue@framaliste.org - https://framalistes.org/sympa/info/tyssue
 
-Subscribe ➙ https://framalistes.org/sympa/subscribe/tyssue
+Subscribe ➙ https://framalistes.org/sympa/subscribe/tyssue  
 Unsubscribe ➙ https://framalistes.org/sympa/sigrequest/tyssue
 
 
@@ -200,15 +200,17 @@ If you find `tyssue` useful please cite [this repository](https://github.com/Dam
 ## Publications
 If `tyssue` has made a substantial contribution to your work, please edit this file and open a PR.
 
-[rahman_cell_2022] Rahman T and Wan LQ. Cell Jamming Regulates Epithelial Chiral Morphogenesis. SSRN Scholarly Paper. March 2022. [https://doi.org/10.2139/ssrn.4052248](https://doi.org/10.2139/ssrn.4052248)
+Rahman T and Wan LQ. Cell Jamming Regulates Epithelial Chiral Morphogenesis. SSRN Scholarly Paper. 2022. doi: [10.2139/ssrn.4052248](https://doi.org/10.2139/ssrn.4052248)
 
-[martinArp23dependentMechanical2021] Martin E, Theis S, Gay G, Monier B, Rouvière C, Suzanne M. Arp2/3-dependent mechanical control of morphogenetic robustness in an inherently challenging environment. Dev Cell. 2021 doi: [10.1016/j.devcel.2021.01.005](10.1016/j.devcel.2021.01.005)  
+Courcoubetis G, Xu C, Nuzhdin SV, Haas S. Avalanches during epithelial tissue growth; Uniform Growth and a drosophila eye disc model, PLOS Computational Biology 2022 doi: [10.1371/journal.pcbi.1009952](https://doi.org/10.1371/journal.pcbi.1009952)
+
+Martin E, Theis S, Gay G, Monier B, Rouvière C, Suzanne M. Arp2/3-dependent mechanical control of morphogenetic robustness in an inherently challenging environment. Dev Cell. 2021 doi: [10.1016/j.devcel.2021.01.005](https://doi.org/10.1016/j.devcel.2021.01.005)  
 Related repository: [https://github.com/suzannelab/polarity](https://github.com/suzannelab/polarity) 
 
-[graciaMechanicalImpactEpithelial2019] Gracia M, Theis S, Proag A, Gay G, Benassayag C, Suzanne M. Mechanical impact of epithelial-mesenchymal transition on epithelial morphogenesis in Drosophila. Nat Commun. 2019 doi: [10.1038/s41467-019-10720-0](10.1038/s41467-019-10720-0)  
+Gracia M, Theis S, Proag A, Gay G, Benassayag C, Suzanne M. Mechanical impact of epithelial-mesenchymal transition on epithelial morphogenesis in Drosophila. Nat Commun. 2019 doi: [10.1038/s41467-019-10720-0](https://doi.org/10.1038/s41467-019-10720-0)  
 Related repository: [https://github.com/suzannelab/invagination](https://github.com/suzannelab/invagination)
 
-[monier_apico-basal_2015] Monier B, Gettings M, Gay G, Mangeat T, Schott S, Guarner A, Suzanne M. Apico-basal forces exerted by apoptotic cells drive epithelium folding. Nature. 2015 doi: [10.1038/nature14152](10.1038/nature14152)  
+Monier B, Gettings M, Gay G, Mangeat T, Schott S, Guarner A, Suzanne M. Apico-basal forces exerted by apoptotic cells drive epithelium folding. Nature. 2015 doi: [10.1038/nature14152](https://doi.org/10.1038/nature14152)    
 Related repository: [https://github.com/glyg/leg-joint](https://github.com/glyg/leg-joint)
 
 ## Licence
@@ -220,20 +222,6 @@ Versions 2.4 and earlier were distributed under the [Mozilla Public Licence](htt
 
 If GPL licencing is too restrictive for your intended usage, please contact the maintainer.
 
-## Bibliography
-
-* There is a [Bibtex file here](doc/bibliography/tyssue.bib) with collected relevant publications.
-
-The tyssue library stemed from a refactoring of the `leg-joint` code used in [monier_apico-basal_2015].
-
-
-[monier_apico-basal_2015]: Monier, B. et al. Apico-basal forces exerted by
-  apoptotic cells drive epithelium folding. Nature 518, 245–248 (2015).
-
-[tamulonis_cell_2013]: Tamulonis, C. Cell-based models. (Universiteit ven Amsterdam, 2013). doi:10.1177/1745691612459060.
-
-[tlili_mechanical_2013]: Tlili,S. et al. Mechanical formalism for tissue dynamics. 6, 23 (2013).
-
 ## Research notice
 Please note that this repository is participating in a study into sustainability
  of open source projects. Data will be gathered about this repository for
@@ -244,3 +232,7 @@ Data collected will include number of contributors, number of PRs, time taken to
 
 For more information, please visit
 [our informational page](https://sustainable-open-science-and-software.github.io/) or download our [participant information sheet](https://sustainable-open-science-and-software.github.io/assets/PIS_sustainable_software.pdf).
+
+<hr/>
+
+<b id="f1">1</b> : Monier B, Gettings M, Gay G, Mangeat T, Schott S, Guarner A, Suzanne M. Apico-basal forces exerted by apoptotic cells drive epithelium folding. Nature. 2015 doi: [10.1038/nature14152](https://doi.org/10.1038/nature14152) [↩](#a1)
