@@ -46,34 +46,30 @@ def auto_collisions(fun):
 
 
 def solve_self_intersect_face(eptm):
+    eptm.reset_index(order=True)
+    eptm.edge_df["angle_"] = np.arctan2(
+        eptm.edge_df['sy'] - eptm.edge_df['fy'],
+        eptm.edge_df['sx'] - eptm.edge_df['fx'])
+
     face_self_intersect = eptm.edge_df.groupby("face").apply(_do_face_self_intersect)
 
     for f in face_self_intersect[face_self_intersect].index:
-        sorted_edge = np.array(_ordered_edges(
-            eptm.edge_df[eptm.edge_df['face'] == f][['srce', 'trgt', 'face']])).flatten()[3::4]
-        if _check_convexity(eptm.edge_df.loc[sorted_edge][['sx', 'sy']].to_numpy()):
-            angle_list = np.arctan2(
-                eptm.edge_df.loc[sorted_edge]['sy'].to_numpy() - eptm.edge_df.loc[sorted_edge]['fy'].to_numpy(),
-                eptm.edge_df.loc[sorted_edge]['sx'].to_numpy() - eptm.edge_df.loc[sorted_edge][
-                    'fx'].to_numpy())
+        angle_e = eptm.edge_df[eptm.edge_df["angle" == f]]["angle_"]
+        if np.argmin(angle_e) != 0:
+            pos_s = np.argmin(angle_e)
+            angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
 
-            angle_e = pd.DataFrame(angle_list, index=sorted_edge, columns=['angle'])
+        angle_e = pd.concat([angle_e, angle_e.iloc[[0]]])
+        angle_e.iloc[-1] += 2 * np.pi
 
-            if np.argmin(angle_e['angle']) != 0:
-                pos_s = np.argmin(angle_e['angle'])
-                angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
+        pos_s = np.where(angle_e.diff()['angle'] < 0)[0][0]
+        v1 = eptm.edge_df.loc[angle_e.index[pos_s]]['srce']
+        v2 = eptm.edge_df.loc[angle_e.index[pos_s - 1]]['srce']
 
-            angle_e = pd.concat([angle_e, angle_e.iloc[[0]]])
-            angle_e.iloc[-1]['angle'] += 2*np.pi
-
-            pos_s = np.where(angle_e.diff()['angle'] < 0)[0][0]
-            v1 = eptm.edge_df.loc[angle_e.index[pos_s]]['srce']
-            v2 = eptm.edge_df.loc[angle_e.index[pos_s - 1]]['srce']
-
-            v1_x, v1_y = eptm.vert_df.loc[v1][['x', 'y']]
-            v2_x, v2_y = eptm.vert_df.loc[v2][['x', 'y']]
-            eptm.vert_df.loc[v1, ['x', 'y']] = v2_x, v2_y
-            eptm.vert_df.loc[v2, ['x', 'y']] = v1_x, v1_y
+        v1_x, v1_y = eptm.vert_df.loc[v1][['x', 'y']]
+        v2_x, v2_y = eptm.vert_df.loc[v2][['x', 'y']]
+        eptm.vert_df.loc[v1, ['x', 'y']] = v2_x, v2_y
+        eptm.vert_df.loc[v2, ['x', 'y']] = v1_x, v1_y
 
 
 def _check_convexity(polygon):
@@ -85,7 +81,7 @@ def _check_convexity(polygon):
         v_y = polygon[i + 1][1] - polygon[i][1]
         u = polygon[i + 2]
 
-        if (i == 0):  # in first loop direction is unknown, so save it in res
+        if i == 0:  # in first loop direction is unknown, so save it in res
             res = u[0] * v_y - u[1] * v_x + v_x * p[1] - v_y * p[0];
         else:
             newres = u[0] * v_y - u[1] * v_x + v_x * p[1] - v_y * p[0];
@@ -96,22 +92,14 @@ def _check_convexity(polygon):
 
 
 def _do_face_self_intersect(edge):
-    sorted_edge = np.array(_ordered_edges(
-        edge[['srce', 'trgt', 'face']])).flatten()[3::4]
-    angle_list = np.arctan2(
-        edge.loc[sorted_edge]['sy'].to_numpy() - edge.loc[sorted_edge]['fy'].to_numpy(),
-        edge.loc[sorted_edge]['sx'].to_numpy() - edge.loc[sorted_edge][
-            'fx'].to_numpy())
-
-    angle_e = pd.DataFrame(angle_list, index=sorted_edge, columns=['angle'])
-
-    if np.argmin(angle_e['angle']) != 0:
-        pos_s = np.argmin(angle_e['angle'])
+    angle_e = edge["angle_"]
+    if np.argmin(angle_e) != 0:
+        pos_s = np.argmin(angle_e)
         angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
 
     angle_e = pd.concat([angle_e, angle_e.iloc[[0]]])
-    angle_e.iloc[-1]['angle'] += 2*np.pi
-    if not pd.Series(angle_e['angle']).is_monotonic_increasing:
+    angle_e.iloc[-1] += 2 * np.pi
+    if (not pd.Series(angle_e).is_monotonic_increasing) and (_check_convexity(edge[['sx', 'sy']].to_numpy())):
         return True
     return False
 
@@ -248,7 +236,7 @@ class CollidingBoxes2D(CollidingBoxes):
     def solve_collisions(self, shyness=1e-10):
         id_vert_change = []
         for e1, e2 in self.edge_pairs:
-            vertices = self.sheet.edge_df.loc[[e1,e2]][['srce', 'trgt']].to_numpy().flatten()
+            vertices = self.sheet.edge_df.loc[[e1, e2]][['srce', 'trgt']].to_numpy().flatten()
             if vertices.all() not in id_vert_change:
                 vert_inside, face, edge = self._find_vert_inside(e1, e2)
                 if not np.isnan(vert_inside):
