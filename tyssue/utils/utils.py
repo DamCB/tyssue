@@ -97,7 +97,7 @@ def set_data_columns(datasets, specs, reset=False):
         for col, default in spec.items():
             if col in df.columns and reset:
                 logger.info(
-                    "Reseting column %s of the %s" " dataset with new specs", col, name
+                    "Reseting column %s of the %s dataset with new specs", col, name
                 )
             if col not in df.columns or reset:
                 df[col] = default
