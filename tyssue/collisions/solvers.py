@@ -46,21 +46,24 @@ def auto_collisions(fun):
 
 
 def solve_self_intersect_face(eptm):
-    eptm.reset_index(order=True)
-    eptm.edge_df["angle_"] = np.arctan2(
-        eptm.edge_df['sy'] - eptm.edge_df['fy'],
-        eptm.edge_df['sx'] - eptm.edge_df['fx'])
-
     face_self_intersect = eptm.edge_df.groupby("face").apply(_do_face_self_intersect)
 
     for f in face_self_intersect[face_self_intersect].index:
-        angle_e = eptm.edge_df[eptm.edge_df["angle" == f]]["angle_"]
-        if np.argmin(angle_e) != 0:
-            pos_s = np.argmin(angle_e)
+        sorted_edge = np.array(_ordered_edges(
+            eptm.edge_df[eptm.edge_df['face'] == f][['srce', 'trgt', 'face']])).flatten()[3::4]
+        angle_list = np.arctan2(
+            eptm.edge_df.loc[sorted_edge]['sy'].to_numpy() - eptm.edge_df.loc[sorted_edge]['fy'].to_numpy(),
+            eptm.edge_df.loc[sorted_edge]['sx'].to_numpy() - eptm.edge_df.loc[sorted_edge][
+                'fx'].to_numpy())
+
+        angle_e = pd.DataFrame(angle_list, index=sorted_edge, columns=['angle'])
+
+        if np.argmin(angle_e['angle']) != 0:
+            pos_s = np.argmin(angle_e['angle'])
             angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
 
         angle_e = pd.concat([angle_e, angle_e.iloc[[0]]])
-        angle_e.iloc[-1] += 2 * np.pi
+        angle_e.iloc[-1]['angle'] += 2 * np.pi
 
         pos_s = np.where(angle_e.diff()['angle'] < 0)[0][0]
         v1 = eptm.edge_df.loc[angle_e.index[pos_s]]['srce']
@@ -92,14 +95,24 @@ def _check_convexity(polygon):
 
 
 def _do_face_self_intersect(edge):
-    angle_e = edge["angle_"]
-    if np.argmin(angle_e) != 0:
-        pos_s = np.argmin(angle_e)
+    sorted_edge = np.array(_ordered_edges(
+        edge[['srce', 'trgt', 'face']])).flatten()[3::4]
+    angle_list = np.arctan2(
+        edge.loc[sorted_edge]['sy'].to_numpy() - edge.loc[sorted_edge]['fy'].to_numpy(),
+        edge.loc[sorted_edge]['sx'].to_numpy() - edge.loc[sorted_edge][
+            'fx'].to_numpy())
+
+    angle_e = pd.DataFrame(angle_list, index=sorted_edge, columns=['angle'])
+
+    if np.argmin(angle_e['angle']) != 0:
+        pos_s = np.argmin(angle_e['angle'])
         angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
 
     angle_e = pd.concat([angle_e, angle_e.iloc[[0]]])
-    angle_e.iloc[-1] += 2 * np.pi
-    if (not pd.Series(angle_e).is_monotonic_increasing) and (_check_convexity(edge[['sx', 'sy']].to_numpy())):
+    angle_e.iloc[-1]['angle'] += 2 * np.pi
+
+    if (not pd.Series(angle_e['angle']).is_monotonic_increasing) and (
+    _check_convexity(edge.loc[sorted_edge][['sx', 'sy']].to_numpy())):
         return True
     return False
 
