@@ -7,6 +7,28 @@ import pandas as pd
 logger = logging.getLogger(name=__name__)
 
 
+def to_mesh(sheet):
+    cell_types = {
+        3: "triangle",
+        4: "quad"}
+    max_nsides = sheet.face_df["num_sides"].max() + 1
+    cell_types.update(
+        {
+            i: f"polygon" for i in range(5, max_nsides)
+        }
+    )
+    sheet.reset_index(order=True)
+    sheet.edge_df["f_sides"] = sheet.upcast_face("num_sides")
+    cells = [
+        ('line', sheet.edge_df[["srce", "trgt"]].to_numpy())
+    ]
+    for n, edges in sheet.edge_df.groupby("f_sides"):
+        polys = np.vstack(edges.groupby("face").apply(lambda e: e["srce"].values).values)
+        cells.append((cell_types[n], polys))
+    mesh = meshio.Mesh(points=sheet.vert_df[sheet.coords].to_numpy(), cells=cells)
+    return mesh
+
+
 def save_triangular_mesh(filename, eptm):
     coords = eptm.coords
     eptm.reset_index(order=True)
