@@ -50,24 +50,29 @@ def solve_self_intersect_face(eptm):
 
     for f in face_self_intersect[face_self_intersect].index:
         sorted_edge = np.array(_ordered_edges(
-            eptm.edge_df[eptm.edge_df['face'] == f][['srce', 'trgt', 'face']])).flatten()[3::4]
+            eptm.edge_df[eptm.edge_df["face"] == f][["srce", "trgt", "face"]])).flatten()[3::4]
         angle_list = np.arctan2(
-            eptm.edge_df.loc[sorted_edge]['sy'].to_numpy() - eptm.edge_df.loc[sorted_edge]['fy'].to_numpy(),
-            eptm.edge_df.loc[sorted_edge]['sx'].to_numpy() - eptm.edge_df.loc[sorted_edge][
-                'fx'].to_numpy())
+            eptm.edge_df.loc[sorted_edge]["sy"].to_numpy() - eptm.edge_df.loc[sorted_edge]["fy"].to_numpy(),
+            eptm.edge_df.loc[sorted_edge]["sx"].to_numpy() - eptm.edge_df.loc[sorted_edge][
+                "fx"].to_numpy())
 
         angle_e = pd.DataFrame(angle_list, index=sorted_edge, columns=['angle'])
 
-        if np.argmin(angle_e['angle']) != 0:
-            pos_s = np.argmin(angle_e['angle'])
+        if np.argmin(angle_e["angle"]) != 0:
+            pos_s = np.argmin(angle_e["angle"])
             angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
+            # Fix if the swap is between the 2 lowest angle value
+            if ((angle_e.iloc[-1]["angle"] > angle_e.iloc[0]["angle"]) and (
+                    angle_e.iloc[-1]["angle"] < angle_e.iloc[-2]["angle"])):
+                pos_s = angle_e.shape[0] - 1
+                angle_e = pd.concat([angle_e.iloc[pos_s:], angle_e.iloc[:pos_s]])
 
         angle_e = pd.concat([angle_e, angle_e.iloc[[0]]])
-        angle_e.iloc[-1]['angle'] += 2 * np.pi
+        angle_e.iloc[-1]["angle"] += 2 * np.pi
 
-        pos_s = np.where(angle_e.diff()['angle'] < 0)[0][0]
-        v1 = eptm.edge_df.loc[angle_e.index[pos_s]]['srce']
-        v2 = eptm.edge_df.loc[angle_e.index[pos_s - 1]]['srce']
+        pos_s = np.where(angle_e.diff()["angle"] < 0)[0][0]
+        v1 = eptm.edge_df.loc[angle_e.index[pos_s]]["srce"]
+        v2 = eptm.edge_df.loc[angle_e.index[pos_s - 1]]["srce"]
 
         v1_x, v1_y = eptm.vert_df.loc[v1][['x', 'y']]
         v2_x, v2_y = eptm.vert_df.loc[v2][['x', 'y']]
@@ -112,7 +117,7 @@ def _do_face_self_intersect(edge):
     angle_e.iloc[-1]['angle'] += 2 * np.pi
 
     if (not pd.Series(angle_e['angle']).is_monotonic_increasing) and (
-    _check_convexity(edge.loc[sorted_edge][['sx', 'sy']].to_numpy())):
+            _check_convexity(edge.loc[sorted_edge][['sx', 'sy']].to_numpy())):
         return True
     return False
 
@@ -222,27 +227,27 @@ class CollidingBoxes2D(CollidingBoxes):
                      self.sheet.edge_df.loc[edge2][['fx', 'fy']].to_numpy()]
 
         if _point_in_triangle(self.sheet.edge_df.loc[edge1][['sx', 'sy']].to_numpy(), triangle2):
-            return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge2
+            return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge2
         if _point_in_triangle(self.sheet.edge_df.loc[edge1][['tx', 'ty']].to_numpy(), triangle2):
-            return self.sheet.edge_df.loc[edge1]['trgt'], self.sheet.edge_df.loc[edge1]['face'], edge2
+            return self.sheet.edge_df.loc[edge1]['trgt'], self.sheet.edge_df.loc[edge2]['face'], edge2
         if _point_in_triangle(self.sheet.edge_df.loc[edge2][['sx', 'sy']].to_numpy(), triangle1):
-            return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge1
+            return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge1
         if _point_in_triangle(self.sheet.edge_df.loc[edge2][['tx', 'ty']].to_numpy(), triangle1):
-            return self.sheet.edge_df.loc[edge2]['trgt'], self.sheet.edge_df.loc[edge2]['face'], edge1
+            return self.sheet.edge_df.loc[edge2]['trgt'], self.sheet.edge_df.loc[edge1]['face'], edge1
 
         # search inside full face
-        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['sx', 'sy']].to_numpy(),
-                             self.sheet.edge_df.loc[edge2]['face']):
-            return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge2
-        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['tx', 'ty']].to_numpy(),
-                             self.sheet.edge_df.loc[edge2]['face']):
-            return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge2
-        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['sx', 'sy']].to_numpy(),
-                             self.sheet.edge_df.loc[edge1]['face']):
-            return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge1
-        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['tx', 'ty']].to_numpy(),
-                             self.sheet.edge_df.loc[edge1]['face']):
-            return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge1
+        # if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['sx', 'sy']].to_numpy(),
+        #                      self.sheet.edge_df.loc[edge2]['face']):
+        #     return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge2
+        # if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['tx', 'ty']].to_numpy(),
+        #                      self.sheet.edge_df.loc[edge2]['face']):
+        #     return self.sheet.edge_df.loc[edge1]['trgt'], self.sheet.edge_df.loc[edge1]['face'], edge2
+        # if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['sx', 'sy']].to_numpy(),
+        #                      self.sheet.edge_df.loc[edge1]['face']):
+        #     return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge1
+        # if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['tx', 'ty']].to_numpy(),
+        #                      self.sheet.edge_df.loc[edge1]['face']):
+        #     return self.sheet.edge_df.loc[edge2]['trgt'], self.sheet.edge_df.loc[edge2]['face'], edge1
 
         return np.NaN, np.NaN, np.NaN
 
@@ -253,13 +258,13 @@ class CollidingBoxes2D(CollidingBoxes):
             if vertices.all() not in id_vert_change:
                 vert_inside, face, edge = self._find_vert_inside(e1, e2)
                 if not np.isnan(vert_inside):
-
-                    new_pos = _line_intersection(
-                        (self.sheet.vert_df.loc[vert_inside][['x', 'y']], self.sheet.face_df.loc[face][['x', 'y']]),
-                        (self.sheet.edge_df.loc[edge][['sx', 'sy']], self.sheet.edge_df.loc[edge][['tx', 'ty']]))
-                    if not np.isnan(new_pos[0]):
-                        self.sheet.vert_df.loc[vert_inside, self.sheet.coords] = new_pos
-                        id_vert_change.append(vert_inside)
+                    if vert_inside not in id_vert_change:
+                        new_pos = _line_intersection(
+                            (self.sheet.vert_df.loc[vert_inside][['x', 'y']], self.sheet.face_df.loc[face][['x', 'y']]),
+                            (self.sheet.edge_df.loc[edge][['sx', 'sy']], self.sheet.edge_df.loc[edge][['tx', 'ty']]))
+                        if not np.isnan(new_pos[0]):
+                            self.sheet.vert_df.loc[vert_inside, self.sheet.coords] = new_pos
+                            id_vert_change.append(vert_inside)
         return True
 
 
