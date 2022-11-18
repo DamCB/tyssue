@@ -236,35 +236,42 @@ class CollidingBoxes2D(CollidingBoxes):
             return self.sheet.edge_df.loc[edge2]['trgt'], self.sheet.edge_df.loc[edge1]['face'], edge1
 
         # search inside full face
-        # if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['sx', 'sy']].to_numpy(),
-        #                      self.sheet.edge_df.loc[edge2]['face']):
-        #     return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge2
-        # if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['tx', 'ty']].to_numpy(),
-        #                      self.sheet.edge_df.loc[edge2]['face']):
-        #     return self.sheet.edge_df.loc[edge1]['trgt'], self.sheet.edge_df.loc[edge1]['face'], edge2
-        # if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['sx', 'sy']].to_numpy(),
-        #                      self.sheet.edge_df.loc[edge1]['face']):
-        #     return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge1
-        # if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['tx', 'ty']].to_numpy(),
-        #                      self.sheet.edge_df.loc[edge1]['face']):
-        #     return self.sheet.edge_df.loc[edge2]['trgt'], self.sheet.edge_df.loc[edge2]['face'], edge1
+        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['sx', 'sy']].to_numpy(),
+                             self.sheet.edge_df.loc[edge2]['face']):
+            return self.sheet.edge_df.loc[edge1]['srce'], self.sheet.edge_df.loc[edge2]['face'], edge2
+        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge1][['tx', 'ty']].to_numpy(),
+                             self.sheet.edge_df.loc[edge2]['face']):
+            return self.sheet.edge_df.loc[edge1]['trgt'], self.sheet.edge_df.loc[edge2]['face'], edge2
+        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['sx', 'sy']].to_numpy(),
+                             self.sheet.edge_df.loc[edge1]['face']):
+            return self.sheet.edge_df.loc[edge2]['srce'], self.sheet.edge_df.loc[edge1]['face'], edge1
+        if _point_in_polygon(self.sheet, self.sheet.edge_df.loc[edge2][['tx', 'ty']].to_numpy(),
+                             self.sheet.edge_df.loc[edge1]['face']):
+            return self.sheet.edge_df.loc[edge2]['trgt'], self.sheet.edge_df.loc[edge1]['face'], edge1
 
         return np.NaN, np.NaN, np.NaN
 
     def solve_collisions(self, shyness=1e-10):
         id_vert_change = []
         for e1, e2 in self.edge_pairs:
-            vertices = self.sheet.edge_df.loc[[e1, e2]][['srce', 'trgt']].to_numpy().flatten()
-            if vertices.all() not in id_vert_change:
-                vert_inside, face, edge = self._find_vert_inside(e1, e2)
-                if not np.isnan(vert_inside):
-                    if vert_inside not in id_vert_change:
-                        new_pos = _line_intersection(
-                            (self.sheet.vert_df.loc[vert_inside][['x', 'y']], self.sheet.face_df.loc[face][['x', 'y']]),
-                            (self.sheet.edge_df.loc[edge][['sx', 'sy']], self.sheet.edge_df.loc[edge][['tx', 'ty']]))
-                        if not np.isnan(new_pos[0]):
-                            self.sheet.vert_df.loc[vert_inside, self.sheet.coords] = new_pos
-                            id_vert_change.append(vert_inside)
+            # Dont fix if crossing occur between two neighboring cells or between "2 same" cell.
+            if (self.sheet.edge_df.loc[e1]['face'] != self.sheet.edge_df.loc[e2]['face']) and (
+                    self.sheet.edge_df.loc[e1]['face'] not in self.sheet.get_neighbors(
+                    self.sheet.edge_df.loc[e2]['face'])):
+                vertices = self.sheet.edge_df.loc[[e1, e2]][['srce', 'trgt']].to_numpy().flatten()
+                if vertices.all() not in id_vert_change:
+                    vert_inside, face, edge = self._find_vert_inside(e1, e2)
+                    if not np.isnan(vert_inside):
+                        if vert_inside not in id_vert_change:
+                            new_pos = _line_intersection(
+                                (self.sheet.vert_df.loc[vert_inside][['x', 'y']],
+                                 self.sheet.face_df.loc[face][['x', 'y']]),
+                                (
+                                    self.sheet.edge_df.loc[edge][['sx', 'sy']],
+                                    self.sheet.edge_df.loc[edge][['tx', 'ty']]))
+                            if not np.isnan(new_pos[0]):
+                                self.sheet.vert_df.loc[vert_inside, self.sheet.coords] = new_pos
+                                id_vert_change.append(vert_inside)
         return True
 
 
