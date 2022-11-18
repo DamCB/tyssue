@@ -93,7 +93,7 @@ def sheet_spec():
 
 
 def periodic_sheet():
-    spec = flat_sheet()
+    spec = planar_sheet()
     spec["settings"].update({"boundaries": {"x": [-1, 1], "y": [-1, 1]}})
     return spec
 

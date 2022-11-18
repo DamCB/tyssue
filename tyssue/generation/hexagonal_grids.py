@@ -7,7 +7,7 @@ from math import tau
 import numpy as np
 import pandas as pd
 
-from ..config.geometry import flat_sheet
+from ..config.geometry import flat_sheet, planar_sheet
 from .utils import make_df
 
 
@@ -277,7 +277,10 @@ def three_faces_sheet(zaxis=False):
 
     edge_idx = pd.Index(range(_edge_e_idx.shape[0]), name="edge")
 
-    specifications = flat_sheet()
+    if zaxis:
+        specifications = flat_sheet()
+    else:
+        specifications = planar_sheet()
 
     # ## Faces DataFrame
     face_df = make_df(index=face_idx, spec=specifications["face"])
