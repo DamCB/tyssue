@@ -7,7 +7,6 @@ import matplotlib.path as mplPath
 
 from ..core.objects import _ordered_edges
 from ..core.sheet import Sheet, get_outer_sheet
-from ..core.monolayer import Monolayer
 from .intersection import self_intersections
 
 log = logging.getLogger(__name__)
@@ -78,21 +77,25 @@ def solve_self_intersect_face(eptm):
         v2_x, v2_y = eptm.vert_df.loc[v2][['x', 'y']]
         eptm.vert_df.loc[v1, ['x', 'y']] = v2_x, v2_y
         eptm.vert_df.loc[v2, ['x', 'y']] = v1_x, v1_y
+        mask = np.repeat(False, eptm.Nf)
+        mask[f] = True
+        if self_intersections(eptm.extract(mask)).size > 0:
+            eptm.vert_df.loc[v1, ['x', 'y']] = v1_x, v1_y
+            eptm.vert_df.loc[v2, ['x', 'y']] = v2_x, v2_y
 
 
 def _check_convexity(polygon):
     res = 0
     for i in range(polygon.shape[0] - 2):
         p = polygon[i]
-        tmp = polygon[i + 1]
         v_x = polygon[i + 1][0] - polygon[i][0]
         v_y = polygon[i + 1][1] - polygon[i][1]
         u = polygon[i + 2]
 
         if i == 0:  # in first loop direction is unknown, so save it in res
-            res = u[0] * v_y - u[1] * v_x + v_x * p[1] - v_y * p[0];
+            res = u[0] * v_y - u[1] * v_x + v_x * p[1] - v_y * p[0]
         else:
-            newres = u[0] * v_y - u[1] * v_x + v_x * p[1] - v_y * p[0];
+            newres = u[0] * v_y - u[1] * v_x + v_x * p[1] - v_y * p[0]
             if ((newres > 0 and res < 0) or (newres < 0 and res > 0)):
                 return False
 
@@ -510,6 +513,9 @@ def _line_intersection(line1, line2):
     d = (det(*line1), det(*line2))
     x = det(d, xdiff) / div
     y = det(d, ydiff) / div
+
+    x = x + 0.10 * (line1[1][0] - x)
+    y = y + 0.10 * (line1[1][1] - y)
     return x, y
 
 
