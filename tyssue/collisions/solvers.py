@@ -266,12 +266,13 @@ class CollidingBoxes2D(CollidingBoxes):
                     vert_inside, face, edge = self._find_vert_inside(e1, e2)
                     if not np.isnan(vert_inside):
                         if vert_inside not in id_vert_change:
-                            new_pos = _line_intersection(
-                                (self.sheet.vert_df.loc[vert_inside][['x', 'y']],
-                                 self.sheet.face_df.loc[face][['x', 'y']]),
-                                (
-                                    self.sheet.edge_df.loc[edge][['sx', 'sy']],
-                                    self.sheet.edge_df.loc[edge][['tx', 'ty']]))
+                            new_pos = vertex_repulse(self.sheet, vert_inside)
+                            # new_pos = _line_intersection(
+                            #     (self.sheet.vert_df.loc[vert_inside][['x', 'y']],
+                            #      self.sheet.face_df.loc[face][['x', 'y']]),
+                            #     (
+                            #         self.sheet.edge_df.loc[edge][['sx', 'sy']],
+                            #         self.sheet.edge_df.loc[edge][['tx', 'ty']]))
                             if not np.isnan(new_pos[0]):
                                 self.sheet.vert_df.loc[vert_inside, self.sheet.coords] = new_pos
                                 id_vert_change.append(vert_inside)
@@ -496,6 +497,23 @@ def _point_in_polygon(sheet, point, face):
     poly_path = mplPath.Path(np.array(sheet.vert_df.loc[ordered_vert_index][['x', 'y']]))
     #     point = np.array(sheet.edge_df.loc[8][['tx', 'ty']])
     return poly_path.contains_point(point)
+
+
+def vertex_repulse(eptm, vertex):
+    try:
+        face1, face2 = eptm.edge_df[eptm.edge_df['srce'] == vertex]["face"].to_numpy()
+    except:
+        #         print("vertex at border")
+        return np.nan, np.nan
+
+    vec1 = [eptm.vert_df.loc[vertex]['x'] - eptm.face_df.loc[face1]['x'],
+            eptm.vert_df.loc[vertex]['y'] - eptm.face_df.loc[face1]['y'], ]
+
+    vec2 = [eptm.vert_df.loc[vertex]['x'] - eptm.face_df.loc[face2]['x'],
+            eptm.vert_df.loc[vertex]['y'] - eptm.face_df.loc[face2]['y'], ]
+
+    new_pos = eptm.vert_df.loc[vertex][list('xy')].to_numpy() - np.add(vec1, vec2) / 2 * 0.5
+    return new_pos
 
 
 def _line_intersection(line1, line2):
