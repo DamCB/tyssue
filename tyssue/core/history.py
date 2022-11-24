@@ -64,10 +64,10 @@ class History:
                 " Use save_only instead. "
             )
 
-        extra_cols = {k: list(sheet.datasets[k].columns) for k in sheet.datasets}
-
         if save_only is not None:
-            extra_cols = defaultdict(list, **extra_cols)
+            extra_cols = defaultdict(list, **save_only)
+        else:
+            extra_cols = {k: list(sheet.datasets[k].columns) for k in sheet.datasets}
 
         self.sheet = sheet
 
@@ -393,28 +393,19 @@ class HistoryHdf5(History):
         dtypes_ = {k: df.dtypes for k, df in self.sheet.datasets.items()}
 
         for element, df in self.sheet.datasets.items():
-            diff_col = set(dtypes_[element].keys()).difference(
-                set(self.dtypes[element].keys())
-            )
-            if diff_col:
-                warnings.warn(
-                    "New columns {} will not be saved in the {} table".format(
-                        diff_col, element
-                    )
+            old_types = self.dtypes[element].to_dict()
+            new_types = {k: dtypes_[element].to_dict()[k] for k in old_types.keys()}
+
+            if new_types != old_types:
+                changed_type = {
+                    k: old_types[k]
+                    for k in old_types
+                    if k in new_types and old_types[k] != new_types[k]
+                }
+                raise ValueError(
+                    f"There is a change of datatype in {element} table"
+                    f" in {changed_type} columns"
                 )
-            else:
-                old_types = self.dtypes[element].to_dict()
-                new_types = dtypes_[element].to_dict()
-                if new_types != old_types:
-                    changed_type = {
-                        k: old_types[k]
-                        for k in old_types
-                        if k in new_types and old_types[k] != new_types[k]
-                    }
-                    raise ValueError(
-                        f"There is a change of datatype in {element} table"
-                        f" in {changed_type} columns"
-                    )
 
         if (self.save_every is None) or (
             self.index % (int(self.save_every / self.dt)) == 0

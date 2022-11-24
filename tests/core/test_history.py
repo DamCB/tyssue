@@ -229,6 +229,37 @@ def test_historyHDF5_save_every():
         p.unlink()
 
 
+def test_historyHDF5_save_only():
+    sheet = Sheet("3", *three_faces_sheet())
+    sheet.vert_df["extra"] = 0
+    history = HistoryHdf5(
+        sheet,
+        save_every=2,
+        dt=1,
+        hf5file="out.hf5",
+        save_only={
+            "edge": [
+                "length",
+            ],
+            "face": ["area"],
+        },
+    )
+
+    assert "area" in history.datasets["face"].columns
+    assert "length" in history.datasets["edge"].columns
+    assert "dx" not in history.datasets["edge"].columns
+    assert set(history.datasets["vert"].columns) == set(sheet.coords + ["time", "vert"])
+
+    for i in range(6):
+        history.record(time_stamp=i)
+    sheet_ = history.retrieve(0)
+    for elem, dset in sheet_.datasets.items():
+        assert dset.shape[0] == sheet.datasets[elem].shape[0]
+
+    for p in Path(".").glob("out*.hf5"):
+        p.unlink()
+
+
 def test_historyHDF5_itemsize():
     sheet = Sheet("3", *three_faces_sheet())
     sheet.vert_df["segment"] = "apical"
@@ -263,11 +294,13 @@ def test_historyHDF5_itemsize():
 
 def test_historyHDF5_save_other_sheet():
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(
-        sheet,
-        save_only={"edge": ["dx"], "face": ["area"], "vert": ["segment"]},
-        hf5file="out.hf5",
-    )
+    with pytest.warns(UserWarning):
+        # segment is not in the original vert dataset and we ask to save it
+        history = HistoryHdf5(
+            sheet,
+            save_only={"edge": ["dx"], "face": ["area"], "vert": ["segment"]},
+            hf5file="out.hf5",
+        )
 
     for element in sheet.datasets:
         assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
@@ -322,20 +355,6 @@ def test_to_and_from_archive():
         assert sheet_.Nv == sheet.Nv
     finally:
         os.remove("test.hf5")
-
-
-def test_unsaved_col():
-    sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(
-        sheet,
-        hf5file="test.hf5",
-    )
-    history.record()
-    history.record()
-    sheet.face_df["new_col"] = 0
-    with pytest.warns(UserWarning):
-        history.record()
-    os.remove("test.hf5")
 
 
 def test_change_col_types():

@@ -226,7 +226,7 @@ def three_faces_sheet_array():
     return points, edges, (Nc, Nv, Ne)
 
 
-def three_faces_sheet(zaxis=False):
+def three_faces_sheet(zaxis=True):
     """
     Creates the apical junctions mesh of three packed hexagonal faces.
     If `zaxis` is `True` (defaults to False), adds a `z` coordinates,
