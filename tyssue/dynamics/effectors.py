@@ -70,7 +70,28 @@ class AbstractEffector:
 
 # Works on an `Epithelium` object's {cls.element} elements.
 # """
+class Repulsion(AbstractEffector):
+    dimensions = units.line_elasticity
+    magnitude = "cell_repulstion"
+    label = "Cell Repulstion"
+    element = "vert"
+    specs = {
+        "vert": {"repulse_u": 0, "repulse_v": 0.0}
+    }
 
+    #     @staticmethod
+    #     def energy(eptm):
+    #         return eptm.face_df.eval(
+    #             "0.5 * is_alive"
+    #             "* perimeter_elasticity"
+    #             "* (perimeter - prefered_perimeter)** 2"
+    #         )
+
+    @staticmethod
+    def gradient(eptm):
+        grad = eptm.vert_df[["repulse_u", "repulse_v"]]
+        grad.columns = ["g" + c for c in eptm.coords]
+        return grad, None
 
 class LengthElasticity(AbstractEffector):
     """Elastic half edge"""
