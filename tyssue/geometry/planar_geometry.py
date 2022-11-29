@@ -57,19 +57,19 @@ class PlanarGeometry(BaseGeometry):
             Z_gauss = gaussian_repulsion(grid,
                                          sheet,
                                          f,
-                                         1, 0.5)
+                                         1)
             face_repulsion[:, :, f] = Z_gauss
 
-        sheet.vert_df['repulse_u'] = 0
-        sheet.vert_df['repulse_v'] = 0
+        sheet.vert_df['repulse_u'] = 0.
+        sheet.vert_df['repulse_v'] = 0.
         for v in range(sheet.Nv):
             faces = sheet.edge_df[sheet.edge_df["srce"] == v]['face'].to_numpy()
             v_repulsion = np.sum(face_repulsion[:, :, np.delete(np.arange(sheet.Nf), (faces))], axis=2)
             U, V = calculate_vector_field(v_repulsion)
-            sheet.vert_df.loc[v, 'repulse_u'] = U[np.where(np.isclose(grid[0], sheet.vert_df.loc[v, 'x'], rtol=0.01, atol=0.1))[1][0],
-                                                  np.where(np.isclose(grid[1], sheet.vert_df.loc[v, 'y'], rtol=0.01, atol=0.1))[0][0]]
-            sheet.vert_df.loc[v, 'repulse_v'] = V[np.where(np.isclose(grid[0], sheet.vert_df.loc[v, 'x'], rtol=0.01, atol=0.1))[1][0],
-                                                  np.where(np.isclose(grid[1], sheet.vert_df.loc[v, 'y'], rtol=0.01, atol=0.1))[0][0]]
+            sheet.vert_df.loc[v, 'repulse_u'] = U[np.where(np.isclose(grid[0], sheet.vert_df.loc[v, 'x'], rtol=0.01, atol=0.1))[0][0],
+                                                  np.where(np.isclose(grid[1], sheet.vert_df.loc[v, 'y'], rtol=0.01, atol=0.1))[1][0]]
+            sheet.vert_df.loc[v, 'repulse_v'] = V[np.where(np.isclose(grid[0], sheet.vert_df.loc[v, 'x'], rtol=0.01, atol=0.1))[0][0],
+                                                  np.where(np.isclose(grid[1], sheet.vert_df.loc[v, 'y'], rtol=0.01, atol=0.1))[1][0]]
 
 
     @staticmethod
@@ -193,7 +193,7 @@ def _ordered_edges(face_edges):
 
 from skimage.draw import line_aa
 from scipy import ndimage
-def gaussian_repulsion(grid, sheet, face, width, sigma):
+def gaussian_repulsion(grid, sheet, face, sigma):
     """
     Créer un profil de repulsion générique qui va être utilisé pour toutes les cellules.
     Parameters
@@ -238,7 +238,7 @@ def gaussian_repulsion(grid, sheet, face, width, sigma):
 
 def calculate_vector_field(Z):
     U, V = np.gradient(Z, 1, 1)
-    U = -U
-    V = -V
+    U = U
+    V = V
 
     return U, V
