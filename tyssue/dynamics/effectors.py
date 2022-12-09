@@ -72,24 +72,20 @@ class AbstractEffector:
 # """
 class Repulsion(AbstractEffector):
     dimensions = units.line_elasticity
-    magnitude = "cell_repulstion"
-    label = "Cell Repulstion"
+    magnitude = "cell_repulsion"
+    label = "Cell Repulsion"
     element = "vert"
     specs = {
-        "vert": {"repulse_u": 0, "repulse_v": 0.0}
+        "vert": {"force_repulsion": 1, "repulse_u": 0, "repulse_v": 0.0}
     }
 
-    #     @staticmethod
-    #     def energy(eptm):
-    #         return eptm.face_df.eval(
-    #             "0.5 * is_alive"
-    #             "* perimeter_elasticity"
-    #             "* (perimeter - prefered_perimeter)** 2"
-    #         )
+    # @staticmethod
+    # def energy(eptm):
+    #     return eptm.vert_df.eval("0")
 
     @staticmethod
     def gradient(eptm):
-        grad = eptm.vert_df[["repulse_u", "repulse_v"]]
+        grad = eptm.specs['vert']["force_repulsion"] * eptm.vert_df[["repulse_u", "repulse_v"]]
         grad.columns = ["g" + c for c in eptm.coords]
         return grad, None
 

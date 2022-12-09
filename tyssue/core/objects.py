@@ -942,6 +942,12 @@ and try what you where doing again
         self.face_df.loc[face_pairs[:, 0], "opposite"] = face_pairs[:, 1]
         self.face_df.loc[face_pairs[:, 1], "opposite"] = face_pairs[:, 0]
 
+    def ordered_edges(self):
+        """Returns "srce", "trgt", "face" and "edge" indices
+        organized clockwise for all faces
+        """
+        return self.edge_df.groupby("face").apply(_ordered_edges)
+
 
 def get_opposite_faces(eptm):
     warnings.warn("Deprecated, use `eptm.get_opposite_faces()` instead")
@@ -949,7 +955,7 @@ def get_opposite_faces(eptm):
 
 
 def _ordered_edges(face_edges):
-    """Returns "srce", "trgt" and "face" indices
+    """Returns "srce", "trgt" "face" and "edge" indices
     organized clockwise for each face.
 
     Parameters
@@ -960,7 +966,7 @@ def _ordered_edges(face_edges):
     Returns
     -------
     edges: list of 3 ints
-        srce, trgt, face indices, ordered
+        srce, trgt, face, edge indices, ordered
     """
     face_edges = face_edges.copy()
     face_edges["edge"] = face_edges.index
