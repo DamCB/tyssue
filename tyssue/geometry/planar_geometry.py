@@ -1,7 +1,7 @@
 import numpy as np
 
 from .base_geometry import BaseGeometry
-from skimage.draw import line_aa
+from skimage.draw import polygon
 from scipy import ndimage
 
 
@@ -50,20 +50,16 @@ class PlanarGeometry(BaseGeometry):
         # Create globale grid
         grid = np.mgrid[np.min(sheet.vert_df['x']) - 0.1:np.max(sheet.vert_df['x']) + 0.1:0.1,
                np.min(sheet.vert_df['y']) - 0.1:np.max(sheet.vert_df['y']) + 0.1:0.1]
-        face_repulsion = gaussian_repulsion(grid, sheet, 1)
+        face_repulsion = gaussian_repulsion(grid, sheet)
 
-        sheet.vert_df['repulse_u'] = 0.
-        sheet.vert_df['repulse_v'] = 0.
+        sheet.vert_df['v_repulsion'] = 0
+        sheet.vert_df['grid'] = 0
         for v in range(sheet.Nv):
             faces = sheet.edge_df[sheet.edge_df["srce"] == v]['face'].to_numpy()
-            v_repulsion = np.sum(face_repulsion[:, :, np.delete(np.arange(sheet.Nf), (faces))], axis=2)
-            U, V = calculate_vector_field(v_repulsion)
-            sheet.vert_df.loc[v, 'repulse_u'] = U[
-                np.where(np.isclose(grid[0], sheet.vert_df.loc[v, 'x'], rtol=0.01, atol=0.1))[0][0],
-                np.where(np.isclose(grid[1], sheet.vert_df.loc[v, 'y'], rtol=0.01, atol=0.1))[1][0]]
-            sheet.vert_df.loc[v, 'repulse_v'] = V[
-                np.where(np.isclose(grid[0], sheet.vert_df.loc[v, 'x'], rtol=0.01, atol=0.1))[0][0],
-                np.where(np.isclose(grid[1], sheet.vert_df.loc[v, 'y'], rtol=0.01, atol=0.1))[1][0]]
+            v_repulsion = np.sum(face_repulsion[:, :, np.delete(np.arange(sheet.Nf), faces)], axis=2)
+            # v_repulsion = ndimage.gaussian_filter(v_repulsion, sigma=1)
+            sheet.vert_df.loc[v, 'v_repulsion'] = [v_repulsion]
+            sheet.vert_df.loc[v, 'grid'] = [grid]
 
     @staticmethod
     def face_projected_pos(sheet, face, psi):
@@ -159,12 +155,10 @@ class WeightedPerimeterPlanarGeometry(PlanarGeometry):
         )
 
 
-def gaussian_repulsion(grid, sheet, sigma):
+def gaussian_repulsion(grid, sheet):
     """
-    Créer un profil de repulsion générique qui va être utilisé pour toutes les cellules.
     Parameters
     ----------
-    width : prendre plus grand qu'une largeur moyenne de cellule
 
     Returns
     -------
@@ -172,37 +166,19 @@ def gaussian_repulsion(grid, sheet, sigma):
     Y : np.array of y position
     Z : np.array of field repulsion value
     """
-
-    X, Y = grid
     shape = list(grid[0].shape)
     shape.append(sheet.Nf)
     face_repulsion = np.zeros(shape)
     face_ord_edges = sheet.ordered_edges()
 
     for face in range(sheet.Nf):
-        x_center = sheet.face_df.loc[face]['x']
-        y_center = sheet.face_df.loc[face]['y']
-        Z = np.zeros(X.shape)
-        Z[:] = Z[:] + np.exp(- ((X - x_center) / sigma) ** 2 - ((Y - y_center) / sigma) ** 2)
-
         # apply cell mask
-        Z_MASK = np.zeros(Z.shape)
         pos_v = list(np.array(face_ord_edges[face]).flatten()[1::4])
         pos_v.append(pos_v[0])
-        for p in range(len(pos_v) - 1):
-            rr, cc, val = line_aa(np.where(np.isclose(Y, sheet.vert_df.loc[pos_v[p], 'y'], rtol=0.01, atol=0.1))[1][0],
-                                  np.where(np.isclose(X, sheet.vert_df.loc[pos_v[p], 'x'], rtol=0.01, atol=0.1))[0][0],
-                                  np.where(np.isclose(Y, sheet.vert_df.loc[pos_v[p + 1], 'y'], rtol=0.01, atol=0.1))[1][
-                                      0],
-                                  np.where(np.isclose(X, sheet.vert_df.loc[pos_v[p + 1], 'x'], rtol=0.01, atol=0.1))[0][
-                                      0])
-            Z_MASK[cc, rr] = 1
 
-        Z_MASK = ndimage.binary_fill_holes(Z_MASK).astype(int)
-        face_repulsion[:, :, face] = Z * Z_MASK
+        xx = np.argmin(np.abs([grid[0][:, 0] - x for x in sheet.vert_df.loc[pos_v, "x"]]), axis=1)
+        yy = np.argmin(np.abs([grid[1][0, :] - y for y in sheet.vert_df.loc[pos_v, "y"]]), axis=1)
+
+        rr, cc = polygon(xx, yy)
+        face_repulsion[rr, cc, face] = 1
     return face_repulsion
-
-
-def calculate_vector_field(Z):
-    U, V = np.gradient(Z, 1, 1)
-    return U, V
