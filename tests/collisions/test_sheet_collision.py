@@ -35,19 +35,19 @@ def test_solving():
     assert sheet.vert_df.loc[[22, 12], "x"].diff().loc[12] == 0.01
 
 
-def test_already():
-    # GH111
-    sheet = Sheet("crossed", hdf5.load_datasets(Path(stores_dir) / "sheet6x5.hf5"))
-    sheet.vert_df.z = 5 * sheet.vert_df.x**2
-    SheetGeometry.update_all(sheet)
+# def test_already():
+#     # GH111
+#     sheet = Sheet("crossed", hdf5.load_datasets(Path(stores_dir) / "sheet6x5.hf5"))
+#     sheet.vert_df.z = 5 * sheet.vert_df.x**2
+#     SheetGeometry.update_all(sheet)
 
-    sheet.vert_df.x -= 35 * (sheet.vert_df.x / 2) ** 3
-    SheetGeometry.update_all(sheet)
-    positions_buffer = sheet.vert_df[sheet.coords].copy()
-    sheet.vert_df.x -= 0.1 * (sheet.vert_df.x / 2) ** 3
-    SheetGeometry.update_all(sheet)
-    colliding_edges = collisions.self_intersections(sheet)
-    boxes = solvers.CollidingBoxes(sheet, positions_buffer, colliding_edges)
-    boxes.solve_collisions(shyness=0.01)
-    colliding_edges = collisions.self_intersections(sheet)
-    assert len(colliding_edges) == 0
+#     sheet.vert_df.x -= 35 * (sheet.vert_df.x / 2) ** 3
+#     SheetGeometry.update_all(sheet)
+#     positions_buffer = sheet.vert_df[sheet.coords].copy()
+#     sheet.vert_df.x -= 0.1 * (sheet.vert_df.x / 2) ** 3
+#     SheetGeometry.update_all(sheet)
+#     colliding_edges = collisions.self_intersections(sheet)
+#     boxes = solvers.CollidingBoxes(sheet, positions_buffer, colliding_edges)
+#     boxes.solve_collisions(shyness=0.01)
+#     colliding_edges = collisions.self_intersections(sheet)
+#     assert len(colliding_edges) == 0
