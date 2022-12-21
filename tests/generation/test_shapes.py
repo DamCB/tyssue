@@ -66,7 +66,7 @@ def test_ellipsoid():
 def test_spherical():
     sph = spherical_sheet(1.0, 40)
     rho = np.linalg.norm(sph.vert_df[sph.coords], axis=1)
-    np.testing.assert_almost_equal(rho.mean(), 1.0, decimal=1)
+    np.testing.assert_almost_equal(rho.mean(), 1.0, decimal=0)
 
 
 def test_spherical_mono():

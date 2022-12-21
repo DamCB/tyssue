@@ -57,7 +57,7 @@ def close_cell(eptm, cell):
     euler_c = euler_characteristic(face_edges)
 
     if euler_c == 2:
-        logger.warning("cell %s is already closed", cell)
+        logger.info("cell %s is already closed", cell)
         return 0
 
     if euler_c != 1:

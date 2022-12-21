@@ -211,7 +211,7 @@ def test_find_transitions():
     eptm.settings["threshold_length"] = 2e-1
 
     ih, hi = find_rearangements(eptm)
-    assert len(ih) == 0
+    assert len(ih) == 1
     assert len(hi) == 0
 
 

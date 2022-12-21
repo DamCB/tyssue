@@ -1,8 +1,11 @@
 import os
 
+import numpy as np
+
 from tyssue.config.geometry import cylindrical_sheet
 from tyssue.core.sheet import Sheet
 from tyssue.generation import three_faces_sheet
+from tyssue.geometry.planar_geometry import PlanarGeometry
 from tyssue.geometry.sheet_geometry import SheetGeometry as geom
 from tyssue.io.hdf5 import load_datasets
 from tyssue.stores import stores_dir
@@ -11,6 +14,7 @@ from tyssue.topology.base_topology import (
     close_face,
     condition_4i,
     condition_4ii,
+    remove_face,
 )
 from tyssue.topology.sheet_topology import cell_division, split_vert, type1_transition
 
@@ -109,6 +113,23 @@ def test_close_face():
 
     close_face(sheet, face)
     assert sheet.Ne == Ne
+
+
+def test_remove_face():
+    sheet = Sheet.planar_sheet_2d("flat", 6, 7, 1, 1, noise=1e-6)
+    geom = PlanarGeometry
+
+    to_cut = sheet.cut_out([(0.1, 6), (0.1, 6.0)])
+    sheet.remove(to_cut, trim_borders=True)
+    sheet.sanitize(trim_borders=True)
+
+    geom.center(sheet)
+    geom.update_all(sheet)
+
+    remove_face(sheet, 13)
+    geom.update_all(sheet)
+
+    assert np.all(np.isfinite(sheet.vert_df.iloc[-1]))
 
 
 def test_merge_border_edges():

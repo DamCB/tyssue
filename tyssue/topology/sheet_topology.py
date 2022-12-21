@@ -45,7 +45,7 @@ def split_vert(
 
     base_split_vert(sheet, vert, face, connected, epsilon, recenter)
     new_edges = []
-    for face_ in connected["face"].unique():
+    for face_ in connected["face"]:
         new_edge = close_face(sheet, face_)
         if new_edge is not None:
             new_edges.append(new_edge)

@@ -189,7 +189,9 @@ def remove_face(sheet, face):
 
     edges = sheet.edge_df[sheet.edge_df["face"] == face]
     verts = edges["srce"].unique()
-    new_vert_data = sheet.vert_df.loc[verts].mean(numeric_only=True)
+
+    new_vert_data = sheet.vert_df.loc[verts[0] : verts[0]].copy()
+    new_vert_data[sheet.coords] = sheet.vert_df.loc[verts, sheet.coords].mean()
     sheet.vert_df = pd.concat(
         [sheet.vert_df, pd.DataFrame(new_vert_data)], ignore_index=True
     )
