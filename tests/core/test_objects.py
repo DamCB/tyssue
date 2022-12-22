@@ -1111,3 +1111,18 @@ def test_get_force_inference():
         assert edge.tension > 1.5
     for _, edge in sheet.edge_df[sheet.edge_df.angle < 45].iterrows():
         assert edge.tension < 1.5
+
+
+def test_diff_srce_trgt():
+    sheet = Sheet.planar_sheet_2d("jam", 10, 10, 1, 1, noise=0)
+    PlanarGeometry.update_all(sheet)
+    sheet.vert_df.drop(
+        [
+            45,
+        ],
+        axis=0,
+        inplace=True,
+    )
+    assert set(sheet.edge_df.trgt) != set(sheet.vert_df.index)
+    sheet.reset_index()
+    assert set(sheet.edge_df.trgt) == set(sheet.vert_df.index)

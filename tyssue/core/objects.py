@@ -685,8 +685,17 @@ class Epithelium:
 
             try:
                 merge_border_edges(self)
-            except IndexError:
-                log.info()
+            except IndexError as err:
+                print(
+                    """An index problem prevents cutting
+This is sometimes due to degeneracies in vertices positions
+You can try jittering the epithelium with something like:
+   rdm_pos = np.random.normal(size=1e-6, shape=(sheet.Nv, sheet.ndim))
+   sheet.vert_df[sheet.coords] += pos
+and try what you where doing again
+"""
+                )
+                raise err
         if order_edges:
             self.reset_index(order=True)
 
@@ -730,8 +739,9 @@ class Epithelium:
         log.debug("reseting index for %s", self.identifier)
         self.topo_changed = True
         # remove disconnected vertices and faces
-        self.vert_df = self.vert_df.reindex(set(self.edge_df.srce))
-        self.vert_df = self.vert_df.reindex(set(self.edge_df.trgt))
+        self.vert_df = self.vert_df.reindex(
+            set(self.edge_df.srce).union(set(self.edge_df.trgt))
+        )
         self.face_df = self.face_df.reindex(set(self.edge_df.face))
 
         new_vidx = pd.Series(np.arange(self.vert_df.shape[0]), index=self.vert_df.index)
