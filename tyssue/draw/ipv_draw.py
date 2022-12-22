@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 import pandas as pd
 from ipywidgets import interact
-from matplotlib import cm
+from matplotlib import colormaps
 
 from ..config.draw import sheet_spec
 from ..utils.utils import get_sub_eptm, spec_updater
@@ -193,7 +193,7 @@ def face_mesh(sheet, coords, **face_draw_specs):
 def _wire_color_from_sequence(edge_spec, sheet):
     """ """
     color_ = edge_spec["color"]
-    cmap = cm.get_cmap(edge_spec.get("colormap", "viridis"))
+    cmap = colormaps[edge_spec.get("colormap", "viridis")]
     if color_.shape in [(sheet.Nv, 3), (sheet.Nv, 4)]:
         return np.asarray(color_)
     if color_.shape == (sheet.Nv,):
@@ -221,7 +221,7 @@ def _wire_color_from_sequence(edge_spec, sheet):
 def _face_color_from_sequence(face_spec, sheet):
     color_ = face_spec["color"]
 
-    cmap = cm.get_cmap(face_spec.get("colormap", "viridis"))
+    cmap = colormaps[face_spec.get("colormap", "viridis")]
     Nf, Ne = sheet.Nf, sheet.Ne
     color_min, color_max = face_spec.get("color_range", (color_.min(), color_.max()))
 

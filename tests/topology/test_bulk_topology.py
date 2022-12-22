@@ -79,13 +79,12 @@ def test_close_cell():
     assert np.all(np.isfinite(eptm.face_df.x))
 
 
-def test_close_already_closed(caplog):
+def test_close_already_closed():
 
     dsets = hdf5.load_datasets(Path(stores_dir) / "with_4sided_cell.hf5")
     mono = Monolayer("4", dsets)
     cell = mono.cell_df.query("num_faces != 4").index[0]
     close_cell(mono, cell)
-    assert caplog.record_tuples[-1][2] == "cell %s is already closed" % cell
 
 
 def test_close_two_holes():

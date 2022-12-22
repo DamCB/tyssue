@@ -870,7 +870,7 @@ class Epithelium:
 
         face_pairs = (
             face_v2[cardinal == 2]
-            .groupby(level=0)
+            .groupby(level=0, group_keys=True)
             .apply(lambda df: dict(enumerate(df)))
             .values.reshape((-1, 2))
         )

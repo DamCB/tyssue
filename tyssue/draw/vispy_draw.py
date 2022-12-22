@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import vispy as vp
-from matplotlib import cm
+from matplotlib import colormaps
 from vispy import app, scene
 
 from ..config.draw import sheet_spec
@@ -67,7 +67,7 @@ def face_visual(sheet, coords=None, **draw_specs_kw):
             columns=["R", "G", "B", "A"][: colors.shape[1]],
         )
     elif colors.shape == (sheet.Nf,):
-        cmap = cm.get_cmap(draw_specs.get("colormap", "viridis"))
+        cmap = colormaps[draw_specs.get("colormap", "viridis")]
         color_min, color_max = draw_specs.get(
             "color_range", (colors.min(), colors.max())
         )

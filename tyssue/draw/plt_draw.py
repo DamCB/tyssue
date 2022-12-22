@@ -1,6 +1,7 @@
 """
 Matplotlib based plotting
 """
+import logging
 import pathlib
 import shutil
 import subprocess
@@ -12,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from ipywidgets import interactive
-from matplotlib import cm
+from matplotlib import colormaps
 from matplotlib.collections import LineCollection, PatchCollection, PolyCollection
 from matplotlib.patches import Arc, FancyArrow, PathPatch
 from matplotlib.path import Path
@@ -21,6 +22,8 @@ from ..config.draw import sheet_spec
 from ..utils.utils import get_sub_eptm, spec_updater
 
 COORDS = ["x", "y"]
+
+log = logging.getLogger(__name__)
 
 
 def browse_history(
@@ -233,7 +236,7 @@ def sheet_view(sheet, coords=COORDS, ax=None, cbar_axis=None, **draw_specs_kw):
         return fig, ax
     else:
         cbar_axis = fig.add_subplot(grid0[:, 9])
-        cmap = cm.get_cmap(axis_spec.get("color_bar_cmap"))
+        cmap = colormaps[axis_spec.get("color_bar_cmap")]
         if not axis_spec.get("color_bar_range"):
             warnings.warn(
                 """Since the quanity of interest should be normalized
@@ -255,7 +258,7 @@ according to the normalization used. Default 0 to 1 range is used.
             cb1.set_label("a.u.")
         else:
             cb1.set_label(axis_spec.get("color_bar_label"))
-        return fig, [ax, cbar_axis]
+        return fig, ax
 
 
 def draw_face(sheet, coords, ax, **draw_spec_kw):
@@ -316,7 +319,7 @@ def parse_face_specs(face_draw_specs, sheet):
 
 def _face_color_from_sequence(face_spec, sheet):
     color_ = face_spec["color"]
-    cmap = cm.get_cmap(face_spec.get("colormap", "viridis"))
+    cmap = colormaps[face_spec.get("colormap", "viridis")]
     color_min, color_max = face_spec.get("color_range", (color_.min(), color_.max()))
 
     if color_.shape in [(sheet.Nf, 3), (sheet.Nf, 4)]:
@@ -324,7 +327,7 @@ def _face_color_from_sequence(face_spec, sheet):
 
     elif color_.shape == (sheet.Nf,):
         if np.ptp(color_) < 1e-10:
-            warnings.warn("Attempting to draw a colormap " "with a uniform value")
+            log.info("Attempting to draw a colormap " "with a uniform value")
             return np.ones((sheet.Nf, 3)) * 0.5
 
         normed = (color_ - color_min) / (color_max - color_min)
@@ -368,7 +371,9 @@ def draw_edge(sheet, coords, ax, **draw_spec_kw):
             FancyArrow(*edge[[sx, sy, dx, dy]], **arrow_specs)
             for idx, edge in sheet.edge_df[app_length > 1e-6].iterrows()
         ]
-        ax.add_collection(PatchCollection(patches, False, **collections_specs))
+        ax.add_collection(
+            PatchCollection(patches, match_original=False, **collections_specs)
+        )
     else:
         segments = sheet.edge_df[[sx, sy, tx, ty]].to_numpy().reshape((-1, 2, 2))
         ax.add_collection(LineCollection(segments, **collections_specs))
@@ -410,7 +415,7 @@ def _wire_color_from_sequence(edge_spec, sheet):
     color_ = edge_spec["color"]
 
     color_min, color_max = edge_spec.get("color_range", (color_.min(), color_.max()))
-    cmap = cm.get_cmap(edge_spec.get("colormap", "viridis"))
+    cmap = colormaps[edge_spec.get("colormap", "viridis")]
     if color_.shape in [(sheet.Nv, 3), (sheet.Nv, 4)]:
         return (sheet.upcast_srce(color_) + sheet.upcast_trgt(color_)) / 2
     elif color_.shape == (sheet.Nv,):
