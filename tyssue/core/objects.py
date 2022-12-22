@@ -683,7 +683,10 @@ class Epithelium:
         if trim_borders:
             from ..topology.base_topology import merge_border_edges
 
-            merge_border_edges(self)
+            try:
+                merge_border_edges(self)
+            except IndexError:
+                log.info()
         if order_edges:
             self.reset_index(order=True)
 
@@ -727,9 +730,8 @@ class Epithelium:
         log.debug("reseting index for %s", self.identifier)
         self.topo_changed = True
         # remove disconnected vertices and faces
-        self.vert_df = self.vert_df.reindex(
-            set(self.edge_df.srce).union(self.edge_df.trgt)
-        )
+        self.vert_df = self.vert_df.reindex(set(self.edge_df.srce))
+        self.vert_df = self.vert_df.reindex(set(self.edge_df.trgt))
         self.face_df = self.face_df.reindex(set(self.edge_df.face))
 
         new_vidx = pd.Series(np.arange(self.vert_df.shape[0]), index=self.vert_df.index)
