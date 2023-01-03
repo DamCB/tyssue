@@ -5,10 +5,11 @@ from tyssue import SheetGeometry as geom
 from tyssue.generation import three_faces_sheet
 from tyssue.io import meshes
 
+
 def test_to_mesh():
     sheet = Sheet("test", *three_faces_sheet())
     mesh = meshes.to_mesh(sheet)
-    assert sheet.Nf == mesh.point.shape[0]
+    assert sheet.Nv == mesh.points.shape[0]
     assert sheet.Nf == mesh.cells[1].data.shape[0]
     
 

@@ -26,7 +26,7 @@ class PlanarGeometry(BaseGeometry):
         cls.update_normals(sheet)
         cls.update_areas(sheet)
         cls.update_perimeters(sheet)
-        cls.update_repulsion(sheet)
+        # cls.update_repulsion(sheet)
 
     @staticmethod
     def update_normals(sheet):
