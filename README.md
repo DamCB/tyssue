@@ -4,29 +4,23 @@
 
 <hr/>
 
-[![Build Status](https://travis-ci.org/DamCB/tyssue.svg?branch=master)](https://travis-ci.org/DamCB/tyssue)
-
-[![Coverage Status](https://coveralls.io/repos/DamCB/tyssue/badge.svg)](https://coveralls.io/r/DamCB/tyssue)
-
-[![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/
-)
-
-[![DOI](https://zenodo.org/badge/32533164.svg)](https://zenodo.org/badge/latestdoi/32533164) [![Join the chat at https://gitter.im/DamCB/tyssue](https://badges.gitter.im/DamCB/tyssue.svg)](https://gitter.im/DamCB/tyssue?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-
-
 | Name | Downloads | Version | Platforms |
 | --- | --- | --- | --- |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-tyssue-green.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) |
 
+| Coverage | Doc | CHAT |
+| --- | --- | --- |
+| [![Coverage Status](https://coveralls.io/repos/DamCB/tyssue/badge.svg)](https://coveralls.io/r/DamCB/tyssue) | [![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/) |  [![Join the chat at https://gitter.im/DamCB/tyssue](https://badges.gitter.im/DamCB/tyssue.svg)](https://gitter.im/DamCB/tyssue?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
+
+
 # tyssue is now published in the Journal of Open Source Software!
 
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.02973/status.svg)](https://doi.org/10.21105/joss.02973)
-
-
+| ZENODO DOI | JOSS DOI | 
+| --- | --- |
+| [![DOI](https://zenodo.org/badge/32533164.svg)](https://zenodo.org/badge/latestdoi/32533164) | [![DOI](https://joss.theoj.org/papers/10.21105/joss.02973/status.svg)](https://doi.org/10.21105/joss.02973) |
 
 The `tyssue` library seeks to provide a unified interface to implement
-bio-mechanical models of living tissues.
+biomechanical models of living tissues.
 It's main focus is on **vertex based epithelium models**.
 
 ## Overview
@@ -36,7 +30,7 @@ It's main focus is on **vertex based epithelium models**.
 The first model implemented is the one described in
 Monier et al.<sup id="a1">[1](#f1)</sup>. It is an example of a vertex model,
 where the interactions are only evaluated on the apical surface sheet
-of the epithelium. The second class of models is still at an
+of the epithelium. The second class of models is still at a
 stage. They implement a description of the tissue's rheology, within a
 dissipation function formalism.
 
@@ -57,7 +51,7 @@ dissipation function formalism.
 
 Each biological question, be it in morphogenesis or cancer studies is
 unique, and requires tweeking of the models developed by the
-physicists. Most of the modelling softwares follow an architecture
+physicists. Most of the modelling software follow an architecture
 based on a core C++ engine with a combinaison of markup or scripting
 capacities to run specific simulation.
 
@@ -68,13 +62,13 @@ possibilities as open as possible.
 > Separate structure, geometry and models
 
 We seek to have a design as modular as possible, to allow the same
-epithlium mesh to be fed to different physical models.
+epithelium mesh to be fed to different physical models.
 
 > Accessible, easy to use data structures
 
 The core of the tyssue library rests on two structures: a set of
 `pandas DataFrame` holding the tissue geometry and associated data,
-and nested dictionnaries holding the model parameters, variables and
+and nested dictionaries holding the model parameters, variables and
 default values.
 
 ![Tyssue data structure](doc/illus/tyssue_data_management.png)
@@ -86,7 +80,7 @@ methods to manipulate indexing of the dataframes to ease calculations.
 The mesh structure is heavily inspired by
 [CGAL Linear Cell Complexes](http://doc.cgal.org/latest/Linear_cell_complex/index.html),
 most importantly, in the case of a 2D vertex sheet for example, each
-junction edge between the cells is "splitted" between two oriented **half
+junction edge between the cells is "splited" between two oriented **half
 edges**.
 
 
@@ -106,6 +100,10 @@ PlanarGeometry.update_all(sheet)
 sheet.sanitize()
 fig, ax = sheet_view(sheet)
 ```
+
+## Visualisation
+Thanks to @kephale, there is a napari plugin to visualise tyssue simulation output.  
+You can find it [here](https://github.com/kephale/napari-tyssue).
 
 ### Features
 
@@ -146,7 +144,9 @@ Unsubscribe ➙ https://framalistes.org/sympa/sigrequest/tyssue
 As all the dependencies are already completely supported in
 python 3.x, **we won't be maintaining a python 2.x version**, because
 it's time to move on...
-
+<details>
+  <summary>Show dependencies</summary>
+  
 ### Core
 
 - CGAL > 4.7
@@ -169,6 +169,9 @@ it's time to move on...
 - pytest
 - coverage
 - pytest-cov
+
+</details>
+
 
 ## Install
 
@@ -200,9 +203,12 @@ If you find `tyssue` useful please cite [this repository](https://github.com/Dam
 ## Publications
 If `tyssue` has made a substantial contribution to your work, please edit this file and open a PR.
 
+Fiorentino J and Scialdone A. The role of cell geometry and cell-cell communication in gradient sensing. PLoS Comput Biol. 2022 doi: [10.1371/journal.pcbi.1009552](10.1371/journal.pcbi.1009552)  
+Related repository: [https://github.com/ScialdoneLab/2DLEGI](https://github.com/ScialdoneLab/2DLEGI)
+
 Rahman T and Wan LQ. Cell Jamming Regulates Epithelial Chiral Morphogenesis. SSRN Scholarly Paper. 2022. doi: [10.2139/ssrn.4052248](https://doi.org/10.2139/ssrn.4052248)
 
-Courcoubetis G, Xu C, Nuzhdin SV, Haas S. Avalanches during epithelial tissue growth; Uniform Growth and a drosophila eye disc model, PLOS Computational Biology 2022 doi: [10.1371/journal.pcbi.1009952](https://doi.org/10.1371/journal.pcbi.1009952)
+Courcoubetis G, Xu C, Nuzhdin SV, Haas S. Avalanches during epithelial tissue growth; Uniform Growth and a drosophila eye disc model, PLoS Comput Biol 2022 doi: [10.1371/journal.pcbi.1009952](https://doi.org/10.1371/journal.pcbi.1009952)
 
 Martin E, Theis S, Gay G, Monier B, Rouvière C, Suzanne M. Arp2/3-dependent mechanical control of morphogenetic robustness in an inherently challenging environment. Dev Cell. 2021 doi: [10.1016/j.devcel.2021.01.005](https://doi.org/10.1016/j.devcel.2021.01.005)  
 Related repository: [https://github.com/suzannelab/polarity](https://github.com/suzannelab/polarity) 
