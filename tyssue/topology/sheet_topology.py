@@ -241,6 +241,17 @@ def face_division(sheet, mother, vert_a, vert_b):
     return daughter
 
 
+def drop_face(eptm, face, geom, **kwargs):
+    """
+    Removes the face indexed by "face" and all associated edges to allow holes
+    """
+    edge = eptm.edge_df.loc[(eptm.edge_df['face'] == face)].index
+
+    eptm.remove(edge, **kwargs)
+    eptm.sanitize(trim_borders = True)
+    geom.update_all(eptm)
+
+
 def resolve_t1s(sheet, geom, model, solver, max_iter=60):
 
     l_th = sheet.settings["threshold_length"]

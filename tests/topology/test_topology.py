@@ -16,7 +16,7 @@ from tyssue.topology.base_topology import (
     condition_4ii,
     remove_face,
 )
-from tyssue.topology.sheet_topology import cell_division, split_vert, type1_transition
+from tyssue.topology.sheet_topology import cell_division, split_vert, type1_transition, drop_face
 
 
 def test_condition4i():
@@ -40,7 +40,6 @@ def test_condition4ii():
 
 
 def test_division():
-
     h5store = os.path.join(stores_dir, "small_hexagonal.hf5")
 
     datasets = load_datasets(h5store, data_names=["face", "vert", "edge"])
@@ -58,7 +57,6 @@ def test_division():
 
 
 def test_t1_transition():
-
     h5store = os.path.join(stores_dir, "small_hexagonal.hf5")
     datasets = load_datasets(h5store, data_names=["face", "vert", "edge"])
     specs = cylindrical_sheet()
@@ -91,7 +89,6 @@ def test_t1_at_border():
 
 
 def test_split_vert():
-
     datasets, specs = three_faces_sheet()
     sheet = Sheet("3cells_2D", datasets, specs)
     geom.update_all(sheet)
@@ -137,10 +134,29 @@ def test_merge_border_edges():
     sheet.get_opposite()
     sheet.sanitize(trim_borders=True)
     assert (
-        sheet.edge_df[sheet.edge_df["opposite"] < 0]
-        .groupby("face")["opposite"]
-        .sum()
-        .min()
-        == -1
+            sheet.edge_df[sheet.edge_df["opposite"] < 0]
+            .groupby("face")["opposite"]
+            .sum()
+            .min()
+            == -1
     )
     assert not set(sheet.vert_df.index).difference(sheet.edge_df.srce)
+
+
+def test_drop_face():
+    init_sheet = Sheet.planar_sheet_2d("planar", 6, 7, 1, 1)
+    init_sheet.sanitize(trim_borders=True, order_edges=True)
+    geom = PlanarGeometry
+    sheet = init_sheet.copy(deep_copy=True)
+
+    drop_face(sheet, 12, geom)
+    drop_face(sheet, 11, geom)
+
+    assert sheet.Nf == init_sheet.Nf - 2
+    assert sheet.Nv == init_sheet.Nv - 2
+    assert sheet.Ne == init_sheet.Ne - 14
+
+    sheet.get_opposite()
+    init_sheet.get_opposite()
+    assert sheet.edge_df[sheet.edge_df['opposite'] == -1].shape[0] == \
+           init_sheet.edge_df[init_sheet.edge_df['opposite'] == -1].shape[0] + 8
