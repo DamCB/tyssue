@@ -87,7 +87,7 @@ class Repulsion(AbstractEffector):
         x = np.argmin(np.abs([grid[0][:, 0] - x for x in eptm.vert_df["x"]]), axis=1)
         y = np.argmin(np.abs([grid[1][0, :] - y for y in eptm.vert_df["y"]]), axis=1)
         repulse = [eptm.vert_df.loc[v, "v_repulsion"][0][x[v], y[v]] for v in range(eptm.Nv)]
-        return np.array(eptm.specs['vert']["force_repulsion"] * repulse)
+        return np.array(eptm.specs['vert']["force_repulsion"]) * repulse
 
     @staticmethod
     def gradient(eptm):
@@ -102,7 +102,7 @@ class Repulsion(AbstractEffector):
             repulse_u.append(U[x[v], y[v]])
             repulse_v.append(V[x[v], y[v]])
 
-        grad = eptm.specs['vert']["force_repulsion"] * pd.DataFrame(np.array([repulse_u, repulse_v]).T)
+        grad = np.array(eptm.specs['vert']["force_repulsion"]) * pd.DataFrame(np.array([repulse_u, repulse_v]).T)
         grad.columns = ["g" + c for c in eptm.coords]
         return grad, None
 

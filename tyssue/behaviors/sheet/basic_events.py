@@ -94,8 +94,6 @@ def division(sheet, manager, **kwargs):
 
     division_spec["critical_vol"] *= sheet.specs["face"]["prefered_vol"]
 
-    print(sheet.face_df.loc[face, "vol"], division_spec["critical_vol"])
-
     if sheet.face_df.loc[face, "vol"] < division_spec["critical_vol"]:
         increase(
             sheet, "face", face, division_spec["growth_rate"], "prefered_vol", True
