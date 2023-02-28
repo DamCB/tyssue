@@ -11,7 +11,7 @@ def test_to_mesh():
     mesh = meshes.to_mesh(sheet)
     assert sheet.Nv == mesh.points.shape[0]
     assert sheet.Nf == mesh.cells[1].data.shape[0]
-    
+
 
 def test_save_import_triangular_mesh():
     sheet = Sheet("test", *three_faces_sheet())

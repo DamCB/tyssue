@@ -14,7 +14,7 @@ def to_mesh(sheet):
     max_nsides = sheet.face_df["num_sides"].max() + 1
     cell_types.update(
         {
-            i: f"polygon" for i in range(5, max_nsides)
+            i: f'{"polygon"}' for i in range(5, max_nsides)
         }
     )
     sheet.reset_index(order=True)

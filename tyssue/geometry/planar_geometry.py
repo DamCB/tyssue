@@ -2,7 +2,6 @@ import numpy as np
 
 from .base_geometry import BaseGeometry
 from skimage.draw import polygon
-from scipy import ndimage
 
 
 class PlanarGeometry(BaseGeometry):

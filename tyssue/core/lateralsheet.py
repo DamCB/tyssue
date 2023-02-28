@@ -1,8 +1,3 @@
-import warnings
-
-import numpy as np
-import pandas as pd
-
 from .objects import get_prev_edges
 from .sheet import Sheet
 
