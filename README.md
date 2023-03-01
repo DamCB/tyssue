@@ -101,25 +101,35 @@ sheet.sanitize()
 fig, ax = sheet_view(sheet)
 ```
 
-## Visualisation
-Thanks to @kephale, there is a napari plugin to visualise tyssue simulation output.  
-You can find it [here](https://github.com/kephale/napari-tyssue).
-
-### Features
-
-* Easy data manipulation.
-* Multiple geometries (Sheets in 2D and 3D, monolayers, bulk).
-* Easy to extend.
-* 2D (matplotlib) and 3D (ipyvolume) customisable visualisation.
-* Easy quasistatic model definition.
-* Self collision detection in 2D. **new in 0.9**
-
-
 ### Documentation
 
 * The documentation is now browsable on [tyssue.io](http://tyssue.io)
 * The old documentation is still browsable online [here](http://tyssue.readthedocs.io/en/latest/)
 * Introduction notebooks are available [here](https://github.com/DamCB/tyssue-demo).
+
+## Visualisation
+Thanks to @kephale, there is a napari plugin to visualise tyssue simulation output.  
+You can find it [here](https://github.com/kephale/napari-tyssue).
+
+
+### What's new in 1.0 ? 
+* No collision in 2D (use effector `Repulsion`)
+* Add new geometry : 2D lateral geometry
+* Add mean calculation in `Epithelium`
+* Add `sheet` conversion to `mesh` from `Meshio`
+* Allow hole in 2D sheet
+* Fix some visualisation
+
+### Roadmap
+You are welcome to participate in the development of `Tyssue`.  
+What is planned for the future of `Tyssue`?
+* Solve collision in 2.5D & 3D
+* Use ZARR instead of HDF5 as base file format
+* Upgrade geometry creation 
+  * Compound geometry to form complex shape
+  * Use biological image as blueprint
+* Add rheology model
+* Switch to github-action for continuous integration
 
 ### Mailing list:
 
