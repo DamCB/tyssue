@@ -213,10 +213,12 @@ If you find `tyssue` useful please cite [this repository](https://github.com/Dam
 ## Publications
 If `tyssue` has made a substantial contribution to your work, please edit this file and open a PR.
 
+Lou Y, Rupprecht JF, Theis S, Hiraiwa T, and Saunders TE. Curvature-induced cell rearrangements in biological tissues. Phys. Rev. Lett. 2023. doi: [10.1103/PhysRevLett.130.108401](https://doi.org/10.1103/PhysRevLett.130.108401) 
+
+Rahman T, Peters F and Wan LQ. Cell Jamming Regulates Epithelial Chiral Morphogenesis. J Biomech. 2023. doi: [10.1016/j.jbiomech.2023.111435](https://doi.org/10.1016/j.jbiomech.2023.111435)
+
 Fiorentino J and Scialdone A. The role of cell geometry and cell-cell communication in gradient sensing. PLoS Comput Biol. 2022 doi: [10.1371/journal.pcbi.1009552](10.1371/journal.pcbi.1009552)  
 Related repository: [https://github.com/ScialdoneLab/2DLEGI](https://github.com/ScialdoneLab/2DLEGI)
-
-Rahman T and Wan LQ. Cell Jamming Regulates Epithelial Chiral Morphogenesis. SSRN Scholarly Paper. 2022. doi: [10.2139/ssrn.4052248](https://doi.org/10.2139/ssrn.4052248)
 
 Courcoubetis G, Xu C, Nuzhdin SV, Haas S. Avalanches during epithelial tissue growth; Uniform Growth and a drosophila eye disc model, PLoS Comput Biol 2022 doi: [10.1371/journal.pcbi.1009952](https://doi.org/10.1371/journal.pcbi.1009952)
 
