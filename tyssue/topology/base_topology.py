@@ -210,6 +210,9 @@ def remove_face(sheet, face):
         warnings.warn(f"something fishy with face {face}")
         sheet.edge_df.drop(remanent, axis=0, inplace=True)
 
+    sheet.lineage.add_node(str(sheet.face_df.loc[face]['unique_id']),
+                           color='black')
+
     sheet.face_df.drop(face, axis=0, inplace=True)
     sheet.vert_df.drop(verts, axis=0, inplace=True)
 

@@ -103,6 +103,14 @@ def division(sheet, manager, **kwargs):
         daughter = cell_division(sheet, face, division_spec["geom"])
         sheet.face_df.loc[daughter, "id"] = sheet.face_df.id.max() + 1
 
+        sheet.face_df.loc[daughter, "unique_id"] = sheet.specs['face']['unique_id_max']+1
+        sheet.specs['face']['unique_id_max'] += 1
+
+        sheet.lineage.add_node(str(sheet.face_df.loc[daughter]['unique_id']),
+                               color='grey')
+        sheet.lineage.add_edge(str(sheet.face_df.loc[face]['unique_id']),
+                               str(sheet.face_df.loc[daughter]['unique_id']))
+
 
 default_contraction_spec = {
     "face_id": -1,

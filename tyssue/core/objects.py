@@ -9,6 +9,7 @@ from itertools import product
 
 import numpy as np
 import pandas as pd
+import networkx as nx
 
 from ..geometry.planar_geometry import PlanarGeometry
 from ..geometry.sheet_geometry import SheetGeometry
@@ -150,6 +151,17 @@ class Epithelium:
         self.position_buffer = None
         self.topo_changed = False
         self.is_ordered = False
+
+        # Add columns of unique_id in order to follow topology change
+        # Add last unique index value in specs
+        for elem, df in self.datasets.items():
+            self.datasets[elem]['unique_id'] = self.datasets[elem].index
+            self.specs[elem]['unique_id_max'] = self.datasets[elem].shape[0]
+
+        # Add cell lineage graphe
+        self.lineage = nx.DiGraph()
+        self.lineage.add_nodes_from([str(i) for i in self.datasets['face']['unique_id']],
+                                    color='grey')
 
     @property
     def vert_df(self):
