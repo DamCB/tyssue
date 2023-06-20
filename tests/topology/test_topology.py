@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import pandas as pd
 
 from tyssue.config.geometry import cylindrical_sheet
 from tyssue.core.sheet import Sheet
@@ -23,7 +24,7 @@ def test_condition4i():
     sheet = Sheet("test", *three_faces_sheet())
     assert len(condition_4i(sheet)) == 0
 
-    sheet.edge_df = sheet.edge_df.append(sheet.edge_df.iloc[-1], ignore_index=True)
+    sheet.edge_df = pd.concat([sheet.edge_df, sheet.edge_df.iloc[-1:]])
     sheet.edge_df.index.name = "edge"
     sheet.reset_index()
     sheet.reset_topo()
@@ -40,7 +41,6 @@ def test_condition4ii():
 
 
 def test_division():
-
     h5store = os.path.join(stores_dir, "small_hexagonal.hf5")
 
     datasets = load_datasets(h5store, data_names=["face", "vert", "edge"])
@@ -58,7 +58,6 @@ def test_division():
 
 
 def test_t1_transition():
-
     h5store = os.path.join(stores_dir, "small_hexagonal.hf5")
     datasets = load_datasets(h5store, data_names=["face", "vert", "edge"])
     specs = cylindrical_sheet()
@@ -91,7 +90,6 @@ def test_t1_at_border():
 
 
 def test_split_vert():
-
     datasets, specs = three_faces_sheet()
     sheet = Sheet("3cells_2D", datasets, specs)
     geom.update_all(sheet)
