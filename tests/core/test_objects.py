@@ -26,7 +26,6 @@ from tyssue.stores import stores_dir
 
 
 def test_3faces():
-
     datasets, specs = three_faces_sheet()
     eptm = Epithelium("3faces_2D", datasets, specs)
     assert (eptm.Nc, eptm.Nv, eptm.Ne) == (3, 13, 18)
@@ -74,7 +73,7 @@ def test_opposite():
     )
     assert_array_equal(true_opp, opposites)
 
-    edge_df = datasets["edge"].append(datasets["edge"].loc[0], ignore_index=True)
+    edge_df = pd.concat([datasets["edge"], datasets["edge"].loc[:0]])
     edge_df.index.name = "edge"
     with pytest.warns(UserWarning):
         opposites = get_opposite(edge_df)
@@ -105,7 +104,6 @@ def test_opposite():
 
 
 def test_extra_indices():
-
     datasets = {}
     tri_verts = [[0, 0], [1, 0], [-0.5, 3**0.5 / 2], [-0.5, -(3**0.5) / 2]]
 
@@ -222,7 +220,6 @@ def test_sort_eastwest():
 
 
 def test_update_rank():
-
     sheet = Sheet("3", *three_faces_sheet())
     sheet.update_rank()
     np.testing.assert_array_equal(
@@ -496,7 +493,6 @@ def test_polygons():
 
 
 def test_face_polygons_exception():
-
     datasets = {}
     tri_verts = [[0, 0], [1, 0], [-0.5, 3**0.5 / 2], [-0.5, -(3**0.5) / 2]]
 
@@ -1040,7 +1036,6 @@ def test_ordered_edges():
 
 
 def test_get_prev_edges():
-
     tri_face = Epithelium("3", *three_faces_sheet())
     prev = get_prev_edges(tri_face).values
     expected = np.array([5, 0, 1, 2, 3, 4, 11, 6, 7, 8, 9, 10, 17, 12, 13, 14, 15, 16])
@@ -1048,7 +1043,6 @@ def test_get_prev_edges():
 
 
 def test_get_next_edges():
-
     tri_face = Epithelium("3", *three_faces_sheet())
     prev = get_next_edges(tri_face).values
     expected = np.array([1, 2, 3, 4, 5, 0, 7, 8, 9, 10, 11, 6, 13, 14, 15, 16, 17, 12])
