@@ -55,10 +55,13 @@ class PlanarGeometry(BaseGeometry):
         sheet.vert_df['grid'] = 0
         for v in range(sheet.Nv):
             faces = sheet.edge_df[sheet.edge_df["srce"] == v]['face'].to_numpy()
-            v_repulsion = np.sum(face_repulsion[:, :, np.delete(np.arange(sheet.Nf), faces)], axis=2)
-            # v_repulsion = ndimage.gaussian_filter(v_repulsion, sigma=1)
+            sum_ = np.sum(face_repulsion, axis=2)
+            sub_ = np.sum(face_repulsion[:, :, faces], axis=2)
+            v_repulsion = sum_ - sub_
             sheet.vert_df.loc[v, 'v_repulsion'] = [v_repulsion]
             sheet.vert_df.loc[v, 'grid'] = [grid]
+            v_repulsion = None
+            del v_repulsion
 
     @staticmethod
     def face_projected_pos(sheet, face, psi):
