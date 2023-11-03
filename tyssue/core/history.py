@@ -328,6 +328,10 @@ class HistoryHdf5(History):
                             )
                         )
                         break
+        
+        with pd.HDFStore(self.hf5file, "r") as file:
+            self._time_stamps = file.select("vert", columns=["time"])["time"].unique()
+
         if sheet is None:
             last = self.time_stamps[-1]
             with pd.HDFStore(self.hf5file, "r") as file:
@@ -368,9 +372,7 @@ class HistoryHdf5(History):
 
     @property
     def time_stamps(self, element="vert"):
-        with pd.HDFStore(self.hf5file, "r") as file:
-            times = file.select(element, columns=["time"])["time"].unique()
-        return times
+        return self._time_stamps
 
     def record(self, time_stamp=None, sheet=None):
         """Appends a copy of the sheet datasets to the history HDF file.
