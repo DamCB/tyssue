@@ -20,6 +20,7 @@ dependencies:
 - notebook
 - quantities
 - ipython
+- ipython_genutils
 - ipywidgets
 - pythreejs
 - ipyvolume
