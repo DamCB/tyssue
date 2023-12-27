@@ -150,3 +150,42 @@ def bulk_spec():
         "id": 0,
     }
     return spec
+
+def lateral_spec():
+    """
+       Specification for a 2D lateral sheet
+       """
+    spec = {
+        "edge": {
+            "srce": 0,
+            "trgt": 0,
+            "length": 1.0,
+            "face": 0,
+            "dx": 0.0,
+            "dy": 0.0,
+            "sx": 0.0,
+            "sy": 0.0,
+            "tx": 0.0,
+            "ty": 0.0,
+            "fx": 0.0,
+            "fy": 0.0,
+            "segment": "",
+        },
+        "vert": {
+            "is_active": 1,
+            "x": 0.0,
+            "y": 0.0,
+            "segment": "",
+        },
+        "face": {
+            "x": 0.0,
+            "y": 0.0,
+            "is_alive": 1,
+            "perimeter": 0.0,
+            "area": 0.0,
+            "num_sides": 6,
+            "id": 0,
+        },
+        "settings": {"geometry": "lateral"},
+    }
+    return spec

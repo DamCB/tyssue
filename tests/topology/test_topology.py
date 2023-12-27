@@ -142,3 +142,26 @@ def test_merge_border_edges():
         == -1
     )
     assert not set(sheet.vert_df.index).difference(sheet.edge_df.srce)
+
+
+def test_remove_face():
+    init_sheet = Sheet.planar_sheet_2d("planar", 6, 7, 1, 1)
+    init_sheet.sanitize(trim_borders=True, order_edges=True)
+    geom = PlanarGeometry
+    sheet = init_sheet.copy(deep_copy=True)
+
+    remove_face(sheet, 12)
+    geom.update_all(sheet)
+    remove_face(sheet, 11)
+    geom.update_all(sheet)
+
+    # assert sheet.Nf == init_sheet.Nf - 2
+    # assert sheet.Nv == init_sheet.Nv - 2
+    # assert sheet.Ne == init_sheet.Ne - 14
+
+    # sheet.get_opposite()
+    # init_sheet.get_opposite()
+    # assert (
+    #     sheet.edge_df[sheet.edge_df["opposite"] == -1].shape[0]
+    #     == init_sheet.edge_df[init_sheet.edge_df["opposite"] == -1].shape[0] + 8
+    # )

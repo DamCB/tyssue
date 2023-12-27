@@ -119,11 +119,13 @@ def add_vert(eptm, edge):
     eptm.edge_df.loc[new_edges, "srce"] = new_vert
     eptm.edge_df.loc[new_edges, "trgt"] = trgt
 
-    eptm.edge_df.loc[opposites.index, "srce"] = new_vert
-    eptm.edge_df = pd.concat([eptm.edge_df, opposites], ignore_index=True)
-    new_opp_edges = eptm.edge_df.index[-opposites.index.size :]
-    eptm.edge_df.loc[new_opp_edges, "trgt"] = new_vert
-    eptm.edge_df.loc[new_opp_edges, "srce"] = trgt
+    new_opp_edges = []
+    if len(opposites.index):
+        eptm.edge_df.loc[opposites.index, "srce"] = new_vert
+        eptm.edge_df = pd.concat([eptm.edge_df, opposites], ignore_index=True)
+        new_opp_edges = eptm.edge_df.index[-opposites.index.size :]
+        eptm.edge_df.loc[new_opp_edges, "trgt"] = new_vert
+        eptm.edge_df.loc[new_opp_edges, "srce"] = trgt
 
     # ## Sheet special case
     if len(new_edges) == 1:
@@ -207,6 +209,9 @@ def remove_face(sheet, face):
     if remanent.shape[0]:
         warnings.warn(f"something fishy with face {face}")
         sheet.edge_df.drop(remanent, axis=0, inplace=True)
+
+    sheet.lineage.add_node(str(sheet.face_df.loc[face]['unique_id']),
+                           color='black')
 
     sheet.face_df.drop(face, axis=0, inplace=True)
     sheet.vert_df.drop(verts, axis=0, inplace=True)

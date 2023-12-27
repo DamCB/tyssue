@@ -10,6 +10,7 @@ from .. import config
 from ..core.monolayer import Monolayer
 from ..core.objects import Epithelium, get_prev_edges
 from ..core.sheet import Sheet, get_outer_sheet
+from ..core.lateralsheet import LateralSheet
 from ..geometry.bulk_geometry import ClosedMonolayerGeometry
 from ..geometry.sheet_geometry import (
     ClosedSheetGeometry,
@@ -176,6 +177,101 @@ def generate_ring(Nf, R_in, R_out, R_vit=None, apical="in"):
 
     ring.reset_topo()
     return ring
+
+
+"""
+Flat lateral 2D sheet
+"""
+def generate_lateral_tissue(Nf, length, height):
+    """
+    Generate a 2D lateral tyssue object
+
+    Parameters
+    ----------
+    Nf : int
+        The number of cells in the tissue
+    length : int
+        Length of the tissue
+    height : float
+        Height  of the cell
+
+    Returns
+    -------
+    eptm : :class:'LateralSheet'
+        2D lateral tissue
+    """
+
+    specs = config.geometry.lateral_spec()
+    Ne = Nf * 4
+    Nv = Nf * 2
+
+    vert_df = pd.DataFrame(
+        index=pd.Index(range(Nv + 2), name="vert"),
+        columns=specs["vert"].keys(),
+        dtype=float
+    )
+
+    edge_df = pd.DataFrame(
+        index=pd.Index(range(Ne), name="edge"),
+        columns=specs["edge"].keys(),
+        dtype=float
+    )
+
+    face_df = pd.DataFrame(
+        index=pd.Index(range(Nf), name="face"),
+        columns=specs["face"].keys(),
+        dtype=float
+    )
+
+    inner_edges = np.array(
+        [
+            [f0, v0, v1 + 1]
+            for f0, v0, v1 in zip(range(Nf), range(Nf), range(Nf))
+        ]
+    )
+
+    outer_edges = np.zeros_like(inner_edges)
+    outer_edges[:, 0] = inner_edges[:, 0]
+    outer_edges[:, 1] = inner_edges[:, 2] + (Nf + 1)
+    outer_edges[:, 2] = inner_edges[:, 1] + (Nf + 1)
+
+    left_spokes = np.zeros_like(inner_edges)
+    left_spokes[:, 0] = inner_edges[:, 0]
+    left_spokes[:, 1] = outer_edges[:, 2]
+    left_spokes[:, 2] = inner_edges[:, 1]
+
+    right_spokes = np.zeros_like(inner_edges)
+    right_spokes[:, 0] = inner_edges[:, 0]
+    right_spokes[:, 1] = inner_edges[:, 2]
+    right_spokes[:, 2] = outer_edges[:, 1]
+
+    edges = np.concatenate([inner_edges, outer_edges, left_spokes, right_spokes])
+
+    edge_df[["face", "srce", "trgt"]] = edges
+    edge_df[["face", "srce", "trgt"]] = edge_df[["face", "srce", "trgt"]].astype(int)
+
+    # Setting vertices position
+    vert_df.loc[range(Nf + 1), "x"] = [length / Nf * i for i in range(Nf + 1)]
+    vert_df.loc[range(Nf + 1), "y"] = 0
+    vert_df.loc[range(Nf + 1, 2 * (Nf + 1)), "x"] = [length / Nf * i for i in range(Nf + 1)]
+    vert_df.loc[range(Nf + 1, 2 * (Nf + 1)), "y"] = height
+
+    vert_df["segment"] = "basal"
+    edge_df["segment"] = "basal"
+    edge_df.loc[range(Nf, 2 * Nf), "segment"] = "apical"
+    vert_df.loc[range(Nf + 1, 2 * (Nf + 1)), "segment"] = "apical"
+
+    edge_df.loc[range(2 * Nf, 4 * Nf), "segment"] = "lateral"
+
+    vert_df['is_active'] = 1
+    face_df['is_alive'] = 1
+
+    datasets = {"vert": vert_df, "edge": edge_df, "face": face_df}
+
+    lateral = LateralSheet("lateral", datasets, specs, coords=["x", "y"])
+
+    lateral.reset_topo()
+    return lateral
 
 
 """

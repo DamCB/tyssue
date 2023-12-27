@@ -129,11 +129,17 @@ def edge_mesh(sheet, coords, **edge_specs):
     elif hasattr(spec["color"], "__len__"):
         color = _wire_color_from_sequence(spec, sheet)[:, :3]
 
-    u, v, w = coords
+    if len(coords) == 2:
+        u, v = coords
+        z = np.repeat(0, sheet.Nv)
+    if len(coords) == 3:
+        u, v, w = coords
+        z = sheet.vert_df[w],
+
     mesh = ipv.Mesh(
         x=sheet.vert_df[u],
         y=sheet.vert_df[v],
-        z=sheet.vert_df[w],
+        z=z,
         lines=sheet.edge_df[["srce", "trgt"]].astype(dtype=np.uint32),
         color=color,
     )

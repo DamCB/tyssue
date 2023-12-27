@@ -9,6 +9,7 @@ from itertools import product
 
 import numpy as np
 import pandas as pd
+import networkx as nx
 
 from ..geometry.planar_geometry import PlanarGeometry
 from ..geometry.sheet_geometry import SheetGeometry
@@ -150,6 +151,17 @@ class Epithelium:
         self.position_buffer = None
         self.topo_changed = False
         self.is_ordered = False
+
+        # Add columns of unique_id in order to follow topology change
+        # Add last unique index value in specs
+        for elem, df in self.datasets.items():
+            self.datasets[elem]['unique_id'] = self.datasets[elem].index
+            self.specs[elem]['unique_id_max'] = self.datasets[elem].shape[0]
+
+        # Add cell lineage graphe
+        self.lineage = nx.DiGraph()
+        self.lineage.add_nodes_from([str(i) for i in self.datasets['face']['unique_id']],
+                                    color='grey')
 
     @property
     def vert_df(self):
@@ -477,6 +489,57 @@ class Epithelium:
         summed : :class:`pd.DataFrame` the summed data, indexed by the source vertices.
         """
         return self._lvl_sum(df, "cell")
+
+    def _lvl_mean(self, df, lvl):
+        df_ = df
+        if isinstance(df, np.ndarray):
+            df_ = pd.DataFrame(df, index=self.edge_df.index)
+        elif isinstance(df, pd.Series):
+            df_ = df.to_frame()
+        elif lvl not in df.columns:
+            df_ = df.copy()
+        df_[lvl] = self.edge_df[lvl]
+        return df_.groupby(lvl).mean()
+
+    def mean_srce(self, df):
+        """Means the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["srce"]`
+
+        Returns
+        -------
+        mean : :class:`pd.DataFrame` the mean data, indexed by the source vertices.
+        """
+        return self._lvl_mean(df, "srce")
+
+    def mean_trgt(self, df):
+        """Means the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["trgt"]`
+
+        Returns
+        -------
+        mean : :class:`pd.DataFrame` the mean data, indexed by the source vertices.
+        """
+        return self._lvl_mean(df, "trgt")
+
+    def mean_face(self, df):
+        """Means the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["face"]`
+
+        Returns
+        -------
+        mean : :class:`pd.DataFrame` the mean data, indexed by the source vertices.
+        """
+        return self._lvl_mean(df, "face")
+
+    def mean_cell(self, df):
+        """Means the values of the edge-indexed dataframe `df` grouped by
+        the values of `self.edge_df["cell"]`
+
+        Returns
+        -------
+        mean : :class:`pd.DataFrame` the mean data, indexed by the source vertices.
+        """
+        return self._lvl_mean(df, "cell")
 
     def get_orbits(self, center, periph):
         """Returns a dataframe with a `(center, edge)` MultiIndex with `periph`
@@ -891,6 +954,12 @@ and try what you where doing again
         self.face_df.loc[face_pairs[:, 0], "opposite"] = face_pairs[:, 1]
         self.face_df.loc[face_pairs[:, 1], "opposite"] = face_pairs[:, 0]
 
+    def ordered_edges(self):
+        """Returns "srce", "trgt", "face" and "edge" indices
+        organized clockwise for all faces
+        """
+        return self.edge_df.groupby("face").apply(_ordered_edges)
+
 
 def get_opposite_faces(eptm):
     warnings.warn("Deprecated, use `eptm.get_opposite_faces()` instead")
@@ -898,7 +967,7 @@ def get_opposite_faces(eptm):
 
 
 def _ordered_edges(face_edges):
-    """Returns "srce", "trgt" and "face" indices
+    """Returns "srce", "trgt" "face" and "edge" indices
     organized clockwise for each face.
 
     Parameters
@@ -909,14 +978,17 @@ def _ordered_edges(face_edges):
     Returns
     -------
     edges: list of 3 ints
-        srce, trgt, face indices, ordered
+        srce, trgt, face, edge indices, ordered
     """
-    srces, trgts, faces = face_edges[["srce", "trgt", "face"]].values.T
-    srce, trgt, face_ = srces[0], trgts[0], faces[0]
-    edges = [[srce, trgt, face_]]
+    face_edges = face_edges.copy()
+    face_edges["edge"] = face_edges.index
+    srces, trgts, faces, edge = face_edges[["srce", "trgt", "face", "edge"]].values.T
+    srce, trgt, face_, edge_ = srces[0], trgts[0], faces[0], edge[0]
+    edges = [[srce, trgt, face_, edge_]]
     for face_ in faces[1:]:
         srce, trgt = trgt, trgts[srces == trgt][0]
-        edges.append([srce, trgt, face_])
+        edge_ = face_edges[(face_edges["srce"] == srce)]["edge"].to_numpy()[0]
+        edges.append([srce, trgt, face_, edge_])
     return edges
 
 

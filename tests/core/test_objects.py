@@ -1012,12 +1012,12 @@ def test_ordered_edges():
 
     res_edges_2d = _ordered_edges(eptm.edge_df.loc[eptm.edge_df["face"] == 0])
     expected_edges_2d = [
-        [0, 1, 0],
-        [1, 2, 0],
-        [2, 3, 0],
-        [3, 4, 0],
-        [4, 5, 0],
-        [5, 0, 0],
+        [0, 1, 0, 0],
+        [1, 2, 0, 1],
+        [2, 3, 0, 2],
+        [3, 4, 0, 3],
+        [4, 5, 0, 4],
+        [5, 0, 0, 5],
     ]
     expected_vert_idxs = [idxs[0] for idxs in expected_edges_2d]
     assert res_edges_2d == expected_edges_2d

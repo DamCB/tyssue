@@ -2,6 +2,7 @@
 Generic forces and energies
 """
 import numpy as np
+import pandas as pd
 
 from ..utils import to_nd
 from . import units
@@ -70,6 +71,40 @@ class AbstractEffector:
 
 # Works on an `Epithelium` object's {cls.element} elements.
 # """
+class Repulsion(AbstractEffector):
+    dimensions = units.line_elasticity
+    magnitude = "cell_repulsion"
+    label = "Cell Repulsion"
+    element = "vert"
+    specs = {
+        "vert": {"force_repulsion": 1.0,
+                 "v_repulsion": 0.0}
+    }
+
+    @staticmethod
+    def energy(eptm):
+        grid = eptm.vert_df.loc[0, "grid"][0]
+        x = np.argmin(np.abs([grid[0][:, 0] - x for x in eptm.vert_df["x"]]), axis=1)
+        y = np.argmin(np.abs([grid[1][0, :] - y for y in eptm.vert_df["y"]]), axis=1)
+        repulse = [eptm.vert_df.loc[v, "v_repulsion"][0][x[v], y[v]] for v in range(eptm.Nv)]
+        return np.array(eptm.specs['vert']["force_repulsion"]) * repulse
+
+    @staticmethod
+    def gradient(eptm):
+        repulse_u = []
+        repulse_v = []
+        grid = eptm.vert_df.loc[0, "grid"][0]
+
+        x = np.argmin(np.abs([grid[0][:, 0] - x for x in eptm.vert_df["x"]]), axis=1)
+        y = np.argmin(np.abs([grid[1][0, :] - y for y in eptm.vert_df["y"]]), axis=1)
+        for v in range(eptm.Nv):
+            U, V = np.gradient(eptm.vert_df.loc[v, "v_repulsion"][0], 1, 1)
+            repulse_u.append(U[x[v], y[v]])
+            repulse_v.append(V[x[v], y[v]])
+
+        grad = np.array(eptm.specs['vert']["force_repulsion"]) * pd.DataFrame(np.array([repulse_u, repulse_v]).T)
+        grad.columns = ["g" + c for c in eptm.coords]
+        return grad, None
 
 
 class LengthElasticity(AbstractEffector):

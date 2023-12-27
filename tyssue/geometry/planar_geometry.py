@@ -1,6 +1,7 @@
 import numpy as np
 
 from .base_geometry import BaseGeometry
+from skimage.draw import polygon
 
 
 class PlanarGeometry(BaseGeometry):
@@ -24,6 +25,7 @@ class PlanarGeometry(BaseGeometry):
         cls.update_normals(sheet)
         cls.update_areas(sheet)
         cls.update_perimeters(sheet)
+        # cls.update_repulsion(sheet)
 
     @staticmethod
     def update_normals(sheet):
@@ -43,6 +45,25 @@ class PlanarGeometry(BaseGeometry):
         sheet.face_df["area"] = sheet.sum_face(sheet.edge_df["sub_area"])
 
     @staticmethod
+    def update_repulsion(sheet):
+        # Create globale grid
+        grid = np.mgrid[np.min(sheet.vert_df['x']) - 0.1:np.max(sheet.vert_df['x']) + 0.1:0.1,
+               np.min(sheet.vert_df['y']) - 0.1:np.max(sheet.vert_df['y']) + 0.1:0.1]
+        face_repulsion = gaussian_repulsion(grid, sheet)
+
+        sheet.vert_df['v_repulsion'] = 0
+        sheet.vert_df['grid'] = 0
+        for v in range(sheet.Nv):
+            faces = sheet.edge_df[sheet.edge_df["srce"] == v]['face'].to_numpy()
+            sum_ = np.sum(face_repulsion, axis=2)
+            sub_ = np.sum(face_repulsion[:, :, faces], axis=2)
+            v_repulsion = sum_ - sub_
+            sheet.vert_df.loc[v, 'v_repulsion'] = [v_repulsion]
+            sheet.vert_df.loc[v, 'grid'] = [grid]
+            v_repulsion = None
+            del v_repulsion
+
+    @staticmethod
     def face_projected_pos(sheet, face, psi):
         """
         returns the sheet vertices position translated to center the face
@@ -53,10 +74,10 @@ class PlanarGeometry(BaseGeometry):
         rot_pos = sheet.vert_df[sheet.coords].copy()
         face_x, face_y = sheet.face_df.loc[face, ["x", "y"]]
         rot_pos.x = (sheet.vert_df.x - face_x) * np.cos(psi) - (
-            sheet.vert_df.y - face_y
+                sheet.vert_df.y - face_y
         ) * np.sin(psi)
         rot_pos.y = (sheet.vert_df.x - face_x) * np.sin(psi) + (
-            sheet.vert_df.y - face_y
+                sheet.vert_df.y - face_y
         ) * np.cos(psi)
 
         return rot_pos
@@ -85,8 +106,8 @@ class AnnularGeometry(PlanarGeometry):
         apical_edge_pos = (srce_pos + trgt_pos) / 2
         apical_edge_coords = eptm.edge_df.loc[eptm.apical_edges, ["dx", "dy"]]
         eptm.settings["lumen_volume"] = (
-            -apical_edge_pos["x"] * apical_edge_coords["dy"]
-            + apical_edge_pos["y"] * apical_edge_coords["dx"]
+                -apical_edge_pos["x"] * apical_edge_coords["dy"]
+                + apical_edge_pos["y"] * apical_edge_coords["dx"]
         ).values.sum()
 
 
@@ -134,3 +155,32 @@ class WeightedPerimeterPlanarGeometry(PlanarGeometry):
             .sort_index(level=1)
             .to_numpy()
         )
+
+
+def gaussian_repulsion(grid, sheet):
+    """
+    Parameters
+    ----------
+
+    Returns
+    -------
+    X : np.array of x position
+    Y : np.array of y position
+    Z : np.array of field repulsion value
+    """
+    shape = list(grid[0].shape)
+    shape.append(sheet.Nf)
+    face_repulsion = np.zeros(shape)
+    face_ord_edges = sheet.ordered_edges()
+
+    for face in range(sheet.Nf):
+        # apply cell mask
+        pos_v = list(np.array(face_ord_edges[face]).flatten()[1::4])
+        pos_v.append(pos_v[0])
+
+        xx = np.argmin(np.abs([grid[0][:, 0] - x for x in sheet.vert_df.loc[pos_v, "x"]]), axis=1)
+        yy = np.argmin(np.abs([grid[1][0, :] - y for y in sheet.vert_df.loc[pos_v, "y"]]), axis=1)
+
+        rr, cc = polygon(xx, yy)
+        face_repulsion[rr, cc, face] = 1
+    return face_repulsion
