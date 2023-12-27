@@ -19,6 +19,7 @@ dependencies:
 - jupyter
 - notebook
 - quantities
+- ipython
 - ipywidgets
 - pythreejs
 - ipyvolume

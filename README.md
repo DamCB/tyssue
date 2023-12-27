@@ -1,12 +1,33 @@
 # tyssue : An epithelium simulation library
 
+
+## [ANN] Working on a 1.0 release
+
+Dear tyssue user or prospective user, I come with good bearings.
+
+This commit to the **new default branch `main` is the official start of the 1.0 release. It is long overdue and there is a lot of house keeping.
+
+### Short term
+
+- [ ] fix CI w/ github actions
+- [ ] Readthedocs with mkdoc
+- [ ] Tests
+- [ ] Notebook tests
+- [ ] Merge PRs #263 #274
+- [ ] Tests
+- [ ] Check Polarization notebooks
+
+
+
+
+
+
+
+
 ![A nice banner](doc/illus/banner.png)
 
 <hr/>
 
-[![Build Status](https://travis-ci.org/DamCB/tyssue.svg?branch=master)](https://travis-ci.org/DamCB/tyssue)
-
-[![Coverage Status](https://coveralls.io/repos/DamCB/tyssue/badge.svg)](https://coveralls.io/r/DamCB/tyssue)
 
 [![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/
 )
