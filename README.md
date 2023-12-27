@@ -1,9 +1,44 @@
 # tyssue : An epithelium simulation library
 
+
+## [ANN] Working on a 1.0 release
+
+Dear tyssue user or prospective user, I come with good bearings.
+
+This commit to the **new default branch `main` is the official start of the 1.0 release. It is long overdue and there is a lot of house keeping.
+
+### Short term
+
+- [ ] fix CI w/ github actions
+- [ ] Readthedocs with mkdoc
+- [ ] Tests
+- [ ] Notebook tests
+- [ ] Merge PRs #263 #274
+- [ ] Tests
+- [ ] Check Polarization notebooks
+
+
+
+
+
+
+
+
 ![A nice banner](doc/illus/banner.png)
 
 <hr/>
 
+<<<<<<< HEAD
+=======
+
+[![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/
+)
+
+[![DOI](https://zenodo.org/badge/32533164.svg)](https://zenodo.org/badge/latestdoi/32533164) [![Join the chat at https://gitter.im/DamCB/tyssue](https://badges.gitter.im/DamCB/tyssue.svg)](https://gitter.im/DamCB/tyssue?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+
+
+>>>>>>> main
 | Name | Downloads | Version | Platforms |
 | --- | --- | --- | --- |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-tyssue-green.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) |

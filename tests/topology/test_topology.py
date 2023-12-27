@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import pandas as pd
 
 from tyssue.config.geometry import cylindrical_sheet
 from tyssue.core.sheet import Sheet
@@ -23,7 +24,7 @@ def test_condition4i():
     sheet = Sheet("test", *three_faces_sheet())
     assert len(condition_4i(sheet)) == 0
 
-    sheet.edge_df = sheet.edge_df.append(sheet.edge_df.iloc[-1], ignore_index=True)
+    sheet.edge_df = pd.concat([sheet.edge_df, sheet.edge_df.iloc[-1:]])
     sheet.edge_df.index.name = "edge"
     sheet.reset_index()
     sheet.reset_topo()
