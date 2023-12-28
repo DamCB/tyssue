@@ -163,7 +163,7 @@ ext_modules = [
 ]
 
 
-write_version_py()
+# write_version_py()
 setup(
     name=DISTNAME,
     description=DESCRIPTION,

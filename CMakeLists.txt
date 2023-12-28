@@ -1,9 +1,8 @@
+project(tyssue)
+
 cmake_minimum_required(VERSION 3.5.0)
 set(CMAKE_VERBOSE_MAKEFILE ON)
-
-cmake_minimum_required(VERSION 3.5...3.26)
-
-project(tyssue)
+find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
 
 
@@ -28,6 +27,7 @@ if (NOT CGAL_FOUND)
 endif()
 
 
+
 # include helper file
 include( ${CGAL_USE_FILE})
 
@@ -40,6 +40,9 @@ include_directories (${COLLISION_SRCE} ${GENERATION_SRCE})
 # Assumes pybind11 is a subdirectory at the project root
 # Make sure you git cloned tyssue recursively
 add_subdirectory(pybind11)
+
+
+
 pybind11_add_module(c_collisions ${SOURCES} "${COLLISION_SRCE}/c_collisions.cpp" )
 pybind11_add_module(mesh_generation ${SOURCES} "${GENERATION_SRCE}/mesh_generation.cpp" )
 # pybind11_add_module(tyssue.collisions.cpp.c_collisions src/tyssue/collisions/cpp/c_collisions)
