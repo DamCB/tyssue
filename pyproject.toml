@@ -40,7 +40,7 @@ test = [
   "scikit-build-core"
 ]
 dev = [
-  "hatch-conda",
+  "setuptools_scm",
   "pytest",
   "pytest-cov",
   "pytest-docker-compose",
