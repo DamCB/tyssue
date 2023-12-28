@@ -1,15 +1,14 @@
-project(tyssue)
+cmake_minimum_required(VERSION 3.15...3.26)
 
-cmake_minimum_required(VERSION 3.5.0)
+project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
+set(PYBIND11_FINDPYTHON ON)
+find_package(pybind11 CONFIG REQUIRED)
 
 
 ##############################################################################
-
-# Add custom CMake modules
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 # Some screen output
 message(STATUS "OS detected: ${CMAKE_SYSTEM_NAME}")
@@ -30,20 +29,15 @@ endif()
 
 # include helper file
 include( ${CGAL_USE_FILE})
+message(STATUS "CGAL_USE_FILE: ${CGAL_USE_FILE}")
 
 
 set (COLLISION_SRCE "src/tyssue/collisions/cpp")
+pybind11_add_module(c_collisions MODULE "${COLLISION_SRCE}/c_collisions.cpp" )
+install(TARGETS c_collisions DESTINATION ${COLLISION_SRCE})
+message(STATUS "installed c_collisions")
+
+
 set (GENERATION_SRCE "src/tyssue/generation/cpp")
-
-include_directories (${COLLISION_SRCE} ${GENERATION_SRCE})
-
-# Assumes pybind11 is a subdirectory at the project root
-# Make sure you git cloned tyssue recursively
-add_subdirectory(pybind11)
-
-
-
-pybind11_add_module(c_collisions ${SOURCES} "${COLLISION_SRCE}/c_collisions.cpp" )
-pybind11_add_module(mesh_generation ${SOURCES} "${GENERATION_SRCE}/mesh_generation.cpp" )
-# pybind11_add_module(tyssue.collisions.cpp.c_collisions src/tyssue/collisions/cpp/c_collisions)
-# pybind11_add_module(tyssue.generation.cpp.mesh_generation src/generation/cpp/mesh_generation)
+pybind11_add_module(mesh_generation MODULE "${GENERATION_SRCE}/mesh_generation.cpp" )
+install(TARGETS mesh_generation DESTINATION ${GENERATION_SRCE})
