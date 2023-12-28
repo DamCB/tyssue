@@ -79,17 +79,8 @@ cmake.args = [
 cmake.verbose = true
 
 
-[tool.setuptools]
-include_package_data = true
-# external modules are declared in CMakelists.txt
-dependencies = []
-
 [tool.setuptools.package-dir]
 tyssue = "tyssue"
-# # mypkg.module corresponds to lib/module.py
-# "mypkg.subpkg1" = "lib1"
-
-
 
 
 [project.optional-dependencies]
