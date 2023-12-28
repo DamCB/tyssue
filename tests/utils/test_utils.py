@@ -3,7 +3,7 @@ import pytest
 from numpy.testing import assert_allclose, assert_almost_equal, assert_array_equal
 from scipy.spatial import Voronoi
 
-from tyssue import Monolayer, Sheet
+from tyssue import Monolayer, Sheet, Epithelium
 from tyssue import SheetGeometry
 from tyssue import SheetGeometry as geom
 from tyssue import config
@@ -105,7 +105,7 @@ def test_data_at_opposite_array():
 def test_single_cell():
     grid = hexa_grid3d(6, 4, 3)
     datasets = from_3d_voronoi(Voronoi(grid))
-    sheet = Sheet("test", datasets)
+    sheet = Epithelium("test", datasets)
     eptm = utils.single_cell(sheet, 1)
     assert len(eptm.edge_df) == len(sheet.edge_df[sheet.edge_df["cell"] == 1])
 
