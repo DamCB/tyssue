@@ -1,5 +1,9 @@
 name: Python Package using Conda
 
+env:
+  CIBW_TEST_REQUIRES: pytest
+  CIBW_TEST_COMMAND: "pytest src/{project}/tests"
+
 on: [push]
 
 jobs:

@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.5.0)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+cmake_minimum_required(VERSION 3.5...3.26)
+
 project(tyssue)
+
+
 
 ##############################################################################
 
@@ -28,8 +32,8 @@ endif()
 include( ${CGAL_USE_FILE})
 
 
-set (COLLISION_SRCE "tyssue/collisions/cpp")
-set (GENERATION_SRCE "tyssue/generation/cpp")
+set (COLLISION_SRCE "src/tyssue/collisions/cpp")
+set (GENERATION_SRCE "src/tyssue/generation/cpp")
 
 include_directories (${COLLISION_SRCE} ${GENERATION_SRCE})
 
@@ -38,3 +42,5 @@ include_directories (${COLLISION_SRCE} ${GENERATION_SRCE})
 add_subdirectory(pybind11)
 pybind11_add_module(c_collisions ${SOURCES} "${COLLISION_SRCE}/c_collisions.cpp" )
 pybind11_add_module(mesh_generation ${SOURCES} "${GENERATION_SRCE}/mesh_generation.cpp" )
+# pybind11_add_module(tyssue.collisions.cpp.c_collisions src/tyssue/collisions/cpp/c_collisions)
+# pybind11_add_module(tyssue.generation.cpp.mesh_generation src/generation/cpp/mesh_generation)
