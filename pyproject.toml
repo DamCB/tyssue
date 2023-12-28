@@ -28,9 +28,9 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   # "Typing :: Typed",
 ]
-version = "1.0.pre"
+#version = "1.0.pre"
 license.file = "LICENSE"
-# dynamic = ["version"]
+dynamic = ["version"]
 
 [project.optional-dependencies]
 test = [
