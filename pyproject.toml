@@ -6,23 +6,6 @@
 requires = ["scikit-build-core>=0.3.3", "pybind11"]
 build-backend = "scikit_build_core.build"
 
-[tool.hatch.build.targets.wheel]
-artifacts = [
-    "*.so*",
-    "*.a*",
-    "*.lib*",
-    "src/tyssue/config/*/*.json",
-    "src/tyssue/stores/*.*"
-]
-
-
-[tool.cibuildwheel]
-test-command = "make test"
-# test-extras = ["test"]
-#test-skip = ["*universal2:arm64"]
-build-verbosity = 1
-
-
 [project]
 name = "tyssue"
 authors = [
@@ -45,40 +28,9 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   # "Typing :: Typed",
 ]
-"version" = "1.0.pre"
+version = "1.0.pre"
+license.file = "LICENSE"
 # dynamic = ["version"]
-
-[tool.hatch.envs.tyssue]
-type = "conda"
-command = "conda"
-conda-forge = false
-environment-file = "environment.yml"
-
-
-[tool.scikit-build]
-sdist.exclude = [".github"]
-sdist.cmake = true
-cmake.minimum-version = "3.26.1"
-ninja.minimum-version = "1.11"
-wheel.expand-macos-universal-tags = true
-sdist.include = [
-  "CMakeLists.txt",
-  "pybind11/tools",
-  "pybind11/include",
-  "pybind11/CMakeLists.txt",
-]
-build-dir = "build"
-cmake.args = [
-  "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${SOURCES}",
-  "-DCMAKE_BUILD_TYPE=Release",
-]
-
-cmake.verbose = true
-
-
-[tool.setuptools.package-dir]
-tyssue = "tyssue"
-
 
 [project.optional-dependencies]
 test = [
@@ -107,12 +59,34 @@ Homepage = "https://githib.com/damcb/tyssue"
 Discussions = "https://githib.com/damcb/tyssue/discussions"
 Changelog = "https://githib.com/damcb/tyssue/releases"
 
-[tool.hatch]
-version.path = "src/tyssue/version.py"
-envs.default.dependencies = [
-  "pytest",
-  "pytest-cov",
+[tool.scikit-build]
+minimum-version = "0.4"
+build-dir = "build/{wheel_tag}"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+
+sdist.exclude = [".github"]
+sdist.include = [
+  "CMakeLists.txt",
+  "pybind11/tools",
+  "pybind11/include",
+  "pybind11/CMakeLists.txt",
+  "src/tyssue/_version.py",
 ]
+cmake.verbose = true
+
+[tool.setuptools_scm]
+write_to = "src/tyssue/_version.py"
+
+
+[tool.cibuildwheel]
+test-command = "make test"
+build-verbosity = 1
+
+[tool.setuptools.package-dir]
+tyssue = "tyssue"
+
+
+
 
 
 [tool.pytest.ini_options]
@@ -128,7 +102,7 @@ xfail_strict = true
 filterwarnings = [
   "error",
   "ignore::DeprecationWarning",
-   "default::ResourceWarning"
+  "default::ResourceWarning"
 ]
 log_cli_level = "INFO"
 testpaths = [
