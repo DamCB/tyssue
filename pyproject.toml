@@ -73,7 +73,7 @@ sdist.include = [
 build-dir = "build"
 cmake.args = [
   "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${SOURCES}",
-  "-DCMAKE_BUILD_TYPE=Debug",
+  "-DCMAKE_BUILD_TYPE=Release",
 ]
 
 cmake.verbose = true
@@ -108,6 +108,7 @@ Homepage = "https://githib.com/damcb/tyssue"
 "Bug Tracker" = "https://githib.com/damcb/tyssue/issues"
 Discussions = "https://githib.com/damcb/tyssue/discussions"
 Changelog = "https://githib.com/damcb/tyssue/releases"
+
 [tool.hatch]
 version.path = "src/tyssue/version.py"
 envs.default.dependencies = [

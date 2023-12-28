@@ -2,7 +2,7 @@ name: Python Package using Conda
 
 env:
   CIBW_TEST_REQUIRES: pytest
-  CIBW_TEST_COMMAND: "pytest src/{project}/tests"
+  CIBW_TEST_COMMAND: "pytest tests"
 
 on: [push]
 
@@ -29,7 +29,7 @@ jobs:
         environment-file: environment.yml
     - name: install tyssue
       shell: bash -l {0}
-      run: python setup.py install
+      run: pip install --no-build-isolation --config-settings=editable.rebuild=true -v
     - name: Lint with flake8
       shell: bash -l {0}
       run: |
