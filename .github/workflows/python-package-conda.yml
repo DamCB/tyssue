@@ -27,7 +27,7 @@ jobs:
         channel-priority: true
         activate-environment: tyssue
         environment-file: environment.yml
-    - name: install tyssue
+    - name: install tyssue github action
       shell: bash -l {0}
       run: pip install --no-build-isolation --config-settings=editable.rebuild=true -v
     - name: Lint with flake8
