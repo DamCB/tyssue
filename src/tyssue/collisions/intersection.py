@@ -1,7 +1,7 @@
 import numpy as np
 
 try:
-    from .cpp import c_collisions
+    from tyssue_cpp import c_collisions
 except ImportError:
     print(
         "collision solver could not be imported "
