@@ -9,6 +9,6 @@ from .shapes import *  # noqa
 from .utils import *  # noqa
 
 try:
-    from .cpp import mesh_generation  # noqa
+    from tyssue_cpp import mesh_generation  # noqa
 except ImportError:
     print("C++ extensions are not available for this version")
