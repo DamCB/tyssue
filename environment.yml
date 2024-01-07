@@ -3,6 +3,7 @@ channels:
 - conda-forge
 
 dependencies:
+- python=3.10
 - cmake
 - pybind11
 - pip
@@ -10,7 +11,6 @@ dependencies:
 - mpfr
 - gmp
 - cgal
-- python>=3.6
 - numpy
 - scipy
 - matplotlib
@@ -29,3 +29,4 @@ dependencies:
 - zarr
 - xarray
 - scikit-build-core
+- setuptools-scm

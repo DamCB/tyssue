@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.15...3.26)
 
 project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
+message(STATUS '${SKBUILD_PROJECT_NAME}')
 set(CMAKE_VERBOSE_MAKEFILE ON)
 find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
+find_package(Python COMPONENTS Interpreter Development.Embed REQUIRED)
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
 
@@ -33,11 +35,11 @@ message(STATUS "CGAL_USE_FILE: ${CGAL_USE_FILE}")
 
 
 set (COLLISION_SRCE "src/tyssue/collisions/cpp")
-pybind11_add_module(c_collisions MODULE "${COLLISION_SRCE}/c_collisions.cpp" )
+pybind11_add_module(c_collisions SHARED "${COLLISION_SRCE}/c_collisions.cpp" )
 install(TARGETS c_collisions DESTINATION ${COLLISION_SRCE})
 message(STATUS "installed c_collisions")
 
 
 set (GENERATION_SRCE "src/tyssue/generation/cpp")
-pybind11_add_module(mesh_generation MODULE "${GENERATION_SRCE}/mesh_generation.cpp" )
+pybind11_add_module(mesh_generation SHARED "${GENERATION_SRCE}/mesh_generation.cpp" )
 install(TARGETS mesh_generation DESTINATION ${GENERATION_SRCE})

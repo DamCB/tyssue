@@ -40,10 +40,9 @@ test = [
   "scikit-build-core"
 ]
 dev = [
-  "setuptools_scm",
   "pytest",
   "pytest-cov",
-  "pytest-docker-compose",
+  "scikit-build-core",
   "pre-commit",
 ]
 docs = [
