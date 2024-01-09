@@ -85,50 +85,49 @@ void write_polygon_mesh(Mesh& mesh, std::string filename)
 }
 
 
-// PYBIND11_MODULE(tyssue_cpp, m)
-// {
-//   auto coll = m.def_submodule("c_collisions", "This is A.");
+PYBIND11_MODULE(_collisions, m)
+{
 
-//   coll.def("write_polygon_mesh", &write_polygon_mesh);
-//   coll.def("sheet_to_surface_mesh", &sheet_to_surface_mesh);
-//   coll.def("does_self_intersect", &does_self_intersect);
-//   coll.def("self_intersections", &self_intersections);
+  m.def("write_polygon_mesh", &write_polygon_mesh);
+  m.def("sheet_to_surface_mesh", &sheet_to_surface_mesh);
+  m.def("does_self_intersect", &does_self_intersect);
+  m.def("self_intersections", &self_intersections);
 
-//     py::class_<Mesh>(m, "Mesh")
-//                 .def(py::init<>())
-//                 .def(py::init<Mesh&>())
-//                 .def("number_of_vertices",
-//                      [](Mesh& m)
-//                      {
-//                         return coll.number_of_vertices();
-//                      })
-//                 .def("number_of_faces",
-//                      [](Mesh& m)
-//                      {
-//                         return coll.number_of_faces();
-//                      })
-//                     .def("get_vertices",
-//                     [](Mesh& m)
-//                     {
-//                         std::vector<float> verts;
-//                         for (Mesh::Vertex_index vi : coll.vertices()) {
-//                             K::Point_3 pt = coll.point(vi);
-//                             verts.push_back((float)pt.x());
-//                             verts.push_back((float)pt.y());
-//                             verts.push_back((float)pt.z());
-//                         }
-//                         return verts;
-//                     })
-//                     .def("get_faces",
-//                     [](Mesh& m)
-//                     {
-//                         std::vector<uint32_t> indices;
-//                         for (Mesh::Face_index face_index : coll.faces()) {
-//                             CGAL::Vertex_around_face_circulator<Mesh> vcirc(coll.halfedge(face_index), m), done(vcirc);
-//                             do indices.push_back(*vcirc++); while (vcirc != done);
-//                         }
-//                         return indices;
-//                     })
-//     ;
+    py::class_<Mesh>(m, "Mesh")
+                .def(py::init<>())
+                .def(py::init<Mesh&>())
+                .def("number_of_vertices",
+                     [](Mesh& m)
+                     {
+                        return m.number_of_vertices();
+                     })
+                .def("number_of_faces",
+                     [](Mesh& m)
+                     {
+                        return m.number_of_faces();
+                     })
+                    .def("get_vertices",
+                    [](Mesh& m)
+                    {
+                        std::vector<float> verts;
+                        for (Mesh::Vertex_index vi : m.vertices()) {
+                            K::Point_3 pt = m.point(vi);
+                            verts.push_back((float)pt.x());
+                            verts.push_back((float)pt.y());
+                            verts.push_back((float)pt.z());
+                        }
+                        return verts;
+                    })
+                    .def("get_faces",
+                    [](Mesh& m)
+                    {
+                        std::vector<uint32_t> indices;
+                        for (Mesh::Face_index face_index : m.faces()) {
+                            CGAL::Vertex_around_face_circulator<Mesh> vcirc(m.halfedge(face_index), m), done(vcirc);
+                            do indices.push_back(*vcirc++); while (vcirc != done);
+                        }
+                        return indices;
+                    })
+    ;
 
-// }
+}

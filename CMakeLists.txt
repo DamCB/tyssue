@@ -30,14 +30,9 @@ message(STATUS "CGAL_USE_FILE: ${CGAL_USE_FILE}")
 
 set (CPP_SRC "src/tyssue_cpp/")
 
-# This is needed
-pybind11_add_module(tyssue_cpp MODULE "src/main.cpp" )
-install(TARGETS tyssue_cpp DESTINATION ${SKBUILD_PROJECT_NAME})
 
 pybind11_add_module(_mesh_generation MODULE "${CPP_SRC}/mesh_generation.cpp" )
 install(TARGETS _mesh_generation DESTINATION ${SKBUILD_PROJECT_NAME})
 
-set (COLLISION_SRCE "src/tyssue_cpp")
 pybind11_add_module(_collisions SHARED "${CPP_SRC}/c_collisions.cpp" )
 install(TARGETS _collisions DESTINATION ${SKBUILD_PROJECT_NAME})
-message(STATUS "installed c_collisions")
