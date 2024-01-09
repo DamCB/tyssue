@@ -28,17 +28,6 @@ This commit to the **new default branch `main` is the official start of the 1.0 
 
 <hr/>
 
-<<<<<<< HEAD
-=======
-
-[![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/
-)
-
-[![DOI](https://zenodo.org/badge/32533164.svg)](https://zenodo.org/badge/latestdoi/32533164) [![Join the chat at https://gitter.im/DamCB/tyssue](https://badges.gitter.im/DamCB/tyssue.svg)](https://gitter.im/DamCB/tyssue?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-
-
->>>>>>> main
 | Name | Downloads | Version | Platforms |
 | --- | --- | --- | --- |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-tyssue-green.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) |
@@ -50,7 +39,7 @@ This commit to the **new default branch `main` is the official start of the 1.0 
 
 # tyssue is now published in the Journal of Open Source Software!
 
-| ZENODO DOI | JOSS DOI | 
+| ZENODO DOI | JOSS DOI |
 | --- | --- |
 | [![DOI](https://zenodo.org/badge/32533164.svg)](https://zenodo.org/badge/latestdoi/32533164) | [![DOI](https://joss.theoj.org/papers/10.21105/joss.02973/status.svg)](https://doi.org/10.21105/joss.02973) |
 
@@ -72,7 +61,7 @@ dissipation function formalism.
 ![The two models considered](doc/illus/two_models.png)
 
 ### What kind of geometry does it model ?
-`tyssue` allows to model different geometries in 2D and in 3D.  Presentation of the different geometries and how to create them are shown in this [notebook](https://github.com/DamCB/tyssue-demo/blob/master/01-Geometry.ipynb). 
+`tyssue` allows to model different geometries in 2D and in 3D.  Presentation of the different geometries and how to create them are shown in this [notebook](https://github.com/DamCB/tyssue-demo/blob/master/01-Geometry.ipynb).
 <p align="center">
  <img src="doc/illus/geometry.png" width="500">
 </p>
@@ -143,11 +132,11 @@ fig, ax = sheet_view(sheet)
 * Introduction notebooks are available [here](https://github.com/DamCB/tyssue-demo).
 
 ## Visualisation
-Thanks to @kephale, there is a napari plugin to visualise tyssue simulation output.  
+Thanks to @kephale, there is a napari plugin to visualise tyssue simulation output.
 You can find it [here](https://github.com/kephale/napari-tyssue).
 
 
-### What's new in 1.0 ? 
+### What's new in 1.0 ?
 * No collision in 2D (use effector `Repulsion`)
 * Add new geometry : 2D lateral geometry
 * Add mean calculation in `Epithelium`
@@ -156,11 +145,11 @@ You can find it [here](https://github.com/kephale/napari-tyssue).
 * Fix some visualisation
 
 ### Roadmap
-You are welcome to participate in the development of `Tyssue`.  
+You are welcome to participate in the development of `Tyssue`.
 What is planned for the future of `Tyssue`?
 * Solve collision in 2.5D & 3D
 * Use ZARR instead of HDF5 as base file format
-* Upgrade geometry creation 
+* Upgrade geometry creation
   * Compound geometry to form complex shape
   * Use biological image as blueprint
 * Add rheology model
@@ -170,7 +159,7 @@ What is planned for the future of `Tyssue`?
 
 tyssue@framaliste.org - https://framalistes.org/sympa/info/tyssue
 
-Subscribe ➙ https://framalistes.org/sympa/subscribe/tyssue  
+Subscribe ➙ https://framalistes.org/sympa/subscribe/tyssue
 Unsubscribe ➙ https://framalistes.org/sympa/sigrequest/tyssue
 
 
@@ -191,7 +180,7 @@ python 3.x, **we won't be maintaining a python 2.x version**, because
 it's time to move on...
 <details>
   <summary>Show dependencies</summary>
-  
+
 ### Core
 
 - CGAL > 4.7
@@ -238,32 +227,32 @@ You can also install tyssue from PyPi, this is a CGAL-less version (pure python)
 
 See [INSTALL.md](INSTALL.md) for a step by step install, including the necessary python environment.
 
-## How to cite 
+## How to cite
 If you find `tyssue` useful please cite [this repository](https://github.com/DamCB/tyssue) using its DOI as follows:
 
 > Theis, Suzanne, Gay, (2021). Tyssue: an epithelium simulation library. Journal of Open Source Software, 6(62), 2973 doi:[https://doi.org/10.21105/joss.02973](https://doi.org/10.21105/joss.02973)
-> 
+>
 > Zenodo doi:10.5281/zenodo.4817609
 
 ## Publications
 If `tyssue` has made a substantial contribution to your work, please edit this file and open a PR.
 
-Lou Y, Rupprecht JF, Theis S, Hiraiwa T, and Saunders TE. Curvature-induced cell rearrangements in biological tissues. Phys. Rev. Lett. 2023. doi: [10.1103/PhysRevLett.130.108401](https://doi.org/10.1103/PhysRevLett.130.108401) 
+Lou Y, Rupprecht JF, Theis S, Hiraiwa T, and Saunders TE. Curvature-induced cell rearrangements in biological tissues. Phys. Rev. Lett. 2023. doi: [10.1103/PhysRevLett.130.108401](https://doi.org/10.1103/PhysRevLett.130.108401)
 
 Rahman T, Peters F and Wan LQ. Cell Jamming Regulates Epithelial Chiral Morphogenesis. J Biomech. 2023. doi: [10.1016/j.jbiomech.2023.111435](https://doi.org/10.1016/j.jbiomech.2023.111435)
 
-Fiorentino J and Scialdone A. The role of cell geometry and cell-cell communication in gradient sensing. PLoS Comput Biol. 2022 doi: [10.1371/journal.pcbi.1009552](10.1371/journal.pcbi.1009552)  
+Fiorentino J and Scialdone A. The role of cell geometry and cell-cell communication in gradient sensing. PLoS Comput Biol. 2022 doi: [10.1371/journal.pcbi.1009552](10.1371/journal.pcbi.1009552)
 Related repository: [https://github.com/ScialdoneLab/2DLEGI](https://github.com/ScialdoneLab/2DLEGI)
 
 Courcoubetis G, Xu C, Nuzhdin SV, Haas S. Avalanches during epithelial tissue growth; Uniform Growth and a drosophila eye disc model, PLoS Comput Biol 2022 doi: [10.1371/journal.pcbi.1009952](https://doi.org/10.1371/journal.pcbi.1009952)
 
-Martin E, Theis S, Gay G, Monier B, Rouvière C, Suzanne M. Arp2/3-dependent mechanical control of morphogenetic robustness in an inherently challenging environment. Dev Cell. 2021 doi: [10.1016/j.devcel.2021.01.005](https://doi.org/10.1016/j.devcel.2021.01.005)  
-Related repository: [https://github.com/suzannelab/polarity](https://github.com/suzannelab/polarity) 
+Martin E, Theis S, Gay G, Monier B, Rouvière C, Suzanne M. Arp2/3-dependent mechanical control of morphogenetic robustness in an inherently challenging environment. Dev Cell. 2021 doi: [10.1016/j.devcel.2021.01.005](https://doi.org/10.1016/j.devcel.2021.01.005)
+Related repository: [https://github.com/suzannelab/polarity](https://github.com/suzannelab/polarity)
 
-Gracia M, Theis S, Proag A, Gay G, Benassayag C, Suzanne M. Mechanical impact of epithelial-mesenchymal transition on epithelial morphogenesis in Drosophila. Nat Commun. 2019 doi: [10.1038/s41467-019-10720-0](https://doi.org/10.1038/s41467-019-10720-0)  
+Gracia M, Theis S, Proag A, Gay G, Benassayag C, Suzanne M. Mechanical impact of epithelial-mesenchymal transition on epithelial morphogenesis in Drosophila. Nat Commun. 2019 doi: [10.1038/s41467-019-10720-0](https://doi.org/10.1038/s41467-019-10720-0)
 Related repository: [https://github.com/suzannelab/invagination](https://github.com/suzannelab/invagination)
 
-Monier B, Gettings M, Gay G, Mangeat T, Schott S, Guarner A, Suzanne M. Apico-basal forces exerted by apoptotic cells drive epithelium folding. Nature. 2015 doi: [10.1038/nature14152](https://doi.org/10.1038/nature14152)    
+Monier B, Gettings M, Gay G, Mangeat T, Schott S, Guarner A, Suzanne M. Apico-basal forces exerted by apoptotic cells drive epithelium folding. Nature. 2015 doi: [10.1038/nature14152](https://doi.org/10.1038/nature14152)
 Related repository: [https://github.com/glyg/leg-joint](https://github.com/glyg/leg-joint)
 
 ## Licence
