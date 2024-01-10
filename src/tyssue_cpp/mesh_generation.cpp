@@ -62,7 +62,7 @@ std::vector<std::tuple<double, double, double>> make_spherical(double num_points
 }
 
 
-PYBIND11_MODULE(mesh_generation, m)
+PYBIND11_MODULE(_mesh_generation, m)
 {
     m.def("make_spherical", &make_spherical);
 }

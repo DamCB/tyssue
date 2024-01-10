@@ -21,14 +21,14 @@ from ..geometry.utils import update_spherical
 from ..topology import type1_transition
 from .from_voronoi import from_3d_voronoi
 
-try:
-    from .cpp import mesh_generation
-except ImportError:
-    print(
-        "CGAL-based mesh generation utilities not found, you may need to install"
-        " CGAL and build from source"
-    )
-    mesh_generation = None
+from .._mesh_generation import make_spherical
+
+# except ImportError:
+#     print(
+#         "CGAL-based mesh generation utilities not found, you may need to install"
+#         " CGAL and build from source"
+#     )
+#     make_sphertical = None
 
 from ..utils import single_cell, swap_apico_basal
 from .modifiers import extrude
@@ -208,26 +208,23 @@ def generate_lateral_tissue(Nf, length, height):
     vert_df = pd.DataFrame(
         index=pd.Index(range(Nv + 2), name="vert"),
         columns=specs["vert"].keys(),
-        dtype=float
+        dtype=float,
     )
 
     edge_df = pd.DataFrame(
         index=pd.Index(range(Ne), name="edge"),
         columns=specs["edge"].keys(),
-        dtype=float
+        dtype=float,
     )
 
     face_df = pd.DataFrame(
         index=pd.Index(range(Nf), name="face"),
         columns=specs["face"].keys(),
-        dtype=float
+        dtype=float,
     )
 
     inner_edges = np.array(
-        [
-            [f0, v0, v1 + 1]
-            for f0, v0, v1 in zip(range(Nf), range(Nf), range(Nf))
-        ]
+        [[f0, v0, v1 + 1] for f0, v0, v1 in zip(range(Nf), range(Nf), range(Nf))]
     )
 
     outer_edges = np.zeros_like(inner_edges)
@@ -253,7 +250,9 @@ def generate_lateral_tissue(Nf, length, height):
     # Setting vertices position
     vert_df.loc[range(Nf + 1), "x"] = [length / Nf * i for i in range(Nf + 1)]
     vert_df.loc[range(Nf + 1), "y"] = 0
-    vert_df.loc[range(Nf + 1, 2 * (Nf + 1)), "x"] = [length / Nf * i for i in range(Nf + 1)]
+    vert_df.loc[range(Nf + 1, 2 * (Nf + 1)), "x"] = [
+        length / Nf * i for i in range(Nf + 1)
+    ]
     vert_df.loc[range(Nf + 1, 2 * (Nf + 1)), "y"] = height
 
     vert_df["segment"] = "basal"
@@ -263,8 +262,8 @@ def generate_lateral_tissue(Nf, length, height):
 
     edge_df.loc[range(2 * Nf, 4 * Nf), "segment"] = "lateral"
 
-    vert_df['is_active'] = 1
-    face_df['is_alive'] = 1
+    vert_df["is_active"] = 1
+    face_df["is_alive"] = 1
 
     datasets = {"vert": vert_df, "edge": edge_df, "face": face_df}
 
@@ -384,7 +383,7 @@ def spherical_sheet(radius, Nf, Lloyd_relax=False, **kwargs):
     the given number of cells
     """
 
-    centers = np.array(mesh_generation.make_spherical(Nf))
+    centers = np.array(make_spherical(Nf))
     eptm = sheet_from_cell_centers(centers, **kwargs)
 
     rhos = (eptm.vert_df[eptm.coords] ** 2).sum(axis=1).mean()
@@ -542,7 +541,6 @@ def Lloyd_relaxation(sheet, geom, steps=10, coords=None, update_method=None):
 
 
 def update_on_sphere(sheet):
-
     update_spherical(sheet)
 
     thetas = sheet.face_df["theta"].to_numpy()

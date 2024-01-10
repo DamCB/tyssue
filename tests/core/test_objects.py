@@ -325,9 +325,10 @@ def test_settings_getter_setter():
 
 
 def test_number_getters():
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)
-    eptm = Epithelium("3faces_3D", datasets, specs)
+
+    eptm = Epithelium("3faces_3D", datasets)
 
     assert eptm.Nc == datasets["cell"].shape[0]
     assert eptm.Nv == datasets["vert"].shape[0]
@@ -336,9 +337,9 @@ def test_number_getters():
 
 
 def test_upcast():
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)
-    eptm = Epithelium("3faces_3D", datasets, specs)
+    eptm = Epithelium("3faces_3D", datasets)
     eptm.cell_df["test_data"] = eptm.cell_df.index
     eptm.face_df["test_data"] = eptm.face_df.index
     eptm.vert_df["test_data"] = eptm.vert_df.index
@@ -357,17 +358,17 @@ def test_upcast():
 
 
 def test_upcast_ndarray():
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)
-    eptm = Epithelium("3faces_3D", datasets, specs)
+    eptm = Epithelium("3faces_3D", datasets)
     data = np.arange(eptm.Nv * 3).reshape((eptm.Nv, 3))
     assert eptm.upcast_srce(data).shape == (eptm.Ne, 3)
 
 
 def test_summation():
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)
-    eptm = Epithelium("3faces_3D", datasets, specs)
+    eptm = Epithelium("3faces_3D", datasets)
     data = eptm.edge_df.index.values
     assert_array_equal(
         eptm.sum_cell(data).values.flatten(), np.array([1278, 1926, 2574])
@@ -468,9 +469,9 @@ def test_summation():
 
 
 def test_orbits():
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d)
-    eptm = Epithelium("3faces_3D", datasets, specs)
+    eptm = Epithelium("3faces_3D", datasets)
 
     expected_res_cell = datasets["edge"].groupby("srce").apply(lambda df: df["cell"])
     expected_res_face = datasets["edge"].groupby("face").apply(lambda df: df["trgt"])
@@ -479,9 +480,9 @@ def test_orbits():
 
 
 def test_polygons():
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d, scale=1 / 3.0)
-    eptm = Epithelium("3faces_3D", datasets, specs)
+    eptm = Epithelium("3faces_3D", datasets)
     RNRGeometry.update_all(eptm)
     with raises(ValueError):
         eptm.face_polygons()
@@ -607,10 +608,10 @@ def test_invalid_valid_sanitize():
 
 
 def test_remove():
-    datasets, specs = three_faces_sheet()
+    datasets, _ = three_faces_sheet()
     datasets = extrude(datasets, method="translation")
 
-    eptm = Epithelium("3Faces_3D", datasets, specs)
+    eptm = Epithelium("3Faces_3D", datasets)
 
     dict_after = {
         "srce": {
@@ -1054,9 +1055,9 @@ def test_get_simple_index():
     idx = get_simple_index(tri_face.edge_df)
     assert idx.shape == (15,)
 
-    datasets_2d, specs = three_faces_sheet(zaxis=True)
+    datasets_2d, _ = three_faces_sheet(zaxis=True)
     datasets = extrude(datasets_2d, scale=1 / 3.0)
-    eptm = Epithelium("3faces_3D", datasets, specs)
+    eptm = Epithelium("3faces_3D", datasets)
     idx = get_simple_index(eptm.edge_df)
     assert idx.shape == (43,)
 

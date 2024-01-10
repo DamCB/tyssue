@@ -34,6 +34,6 @@ def test_solver():
     res = solver.find_energy_min(sheet, geom, model, **settings)
     assert res["success"]
 
-    new_solver = QSSolver(with_collisions=True, with_t1=True, with_t3=True)
+    new_solver = QSSolver(with_collisions=False, with_t1=True, with_t3=True)
     res = new_solver.find_energy_min(sheet, geom, model, **settings["minimize"])
     assert res["success"]

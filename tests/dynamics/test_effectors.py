@@ -49,8 +49,8 @@ def test_effectors():
 
 # def test_repulsion():
 #     sheet_dsets, specs = three_faces_sheet()
-#     specs['vert']['force_repulsion'] = 10
-#     sheet = Sheet("test", sheet_dsets, specs, coords=list('xy'))
+#     specs["vert"]["force_repulsion"] = 10
+#     sheet = Sheet("test", sheet_dsets, specs, coords=list("xy"))
 #     PlanarGeometry.update_all(sheet)
 #     PlanarGeometry.update_repulsion(sheet)
 

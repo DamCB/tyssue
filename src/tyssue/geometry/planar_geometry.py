@@ -44,6 +44,25 @@ class PlanarGeometry(BaseGeometry):
         sheet.edge_df["sub_area"] = sheet.edge_df["nz"] / 2
         sheet.face_df["area"] = sheet.sum_face(sheet.edge_df["sub_area"])
 
+    # @staticmethod
+    # def update_repulsion(sheet):
+    #     # Create globale grid
+    #     grid = np.mgrid[np.min(sheet.vert_df['x']) - 0.1:np.max(sheet.vert_df['x']) + 0.1:0.1,
+    #            np.min(sheet.vert_df['y']) - 0.1:np.max(sheet.vert_df['y']) + 0.1:0.1]
+    #     face_repulsion = gaussian_repulsion(grid, sheet)
+
+    #     sheet.vert_df['v_repulsion'] = 0
+    #     sheet.vert_df['grid'] = 0
+    #     for v in range(sheet.Nv):
+    #         faces = sheet.edge_df[sheet.edge_df["srce"] == v]['face'].to_numpy()
+    #         sum_ = np.sum(face_repulsion, axis=2)
+    #         sub_ = np.sum(face_repulsion[:, :, faces], axis=2)
+    #         v_repulsion = sum_ - sub_
+    #         sheet.vert_df.loc[v, 'v_repulsion'] = [v_repulsion]
+    #         sheet.vert_df.loc[v, 'grid'] = [grid]
+    #         v_repulsion = None
+    #         del v_repulsion
+
     @staticmethod
     def update_repulsion(sheet):
         # Create globale grid
@@ -178,8 +197,12 @@ def gaussian_repulsion(grid, sheet):
         pos_v = list(np.array(face_ord_edges[face]).flatten()[1::4])
         pos_v.append(pos_v[0])
 
-        xx = np.argmin(np.abs([grid[0][:, 0] - x for x in sheet.vert_df.loc[pos_v, "x"]]), axis=1)
-        yy = np.argmin(np.abs([grid[1][0, :] - y for y in sheet.vert_df.loc[pos_v, "y"]]), axis=1)
+        xx = np.argmin(
+            np.abs([grid[0][:, 0] - x for x in sheet.vert_df.loc[pos_v, "x"]]), axis=1
+        )
+        yy = np.argmin(
+            np.abs([grid[1][0, :] - y for y in sheet.vert_df.loc[pos_v, "y"]]), axis=1
+        )
 
         rr, cc = polygon(xx, yy)
         face_repulsion[rr, cc, face] = 1
