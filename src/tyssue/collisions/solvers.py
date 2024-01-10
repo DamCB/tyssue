@@ -461,10 +461,10 @@ class CollidingBoxes3D(CollidingBoxes):
         fe0p = self.edge_buffer[self.sheet.edge_df["face"] == f0].copy()
         fe1p = self.edge_buffer[self.sheet.edge_df["face"] == f1].copy()
 
-        bb0c = _face_bbox(fe0c)
-        bb1c = _face_bbox(fe1c)
-        bb0p = _face_bbox(fe0p)
-        bb1p = _face_bbox(fe1p)
+        bb0c = self._face_bbox(fe0c)
+        bb1c = self._face_bbox(fe1c)
+        bb0p = self._face_bbox(fe0p)
+        bb1p = self._face_bbox(fe1p)
 
         dr0 = bb0c - bb0p
         dr1 = bb1c - bb1p
