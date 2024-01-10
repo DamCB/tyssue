@@ -454,7 +454,6 @@ class CollidingBoxes3D(CollidingBoxes):
         return True
 
     def _collision_plane(self, face_pair, shyness):
-
         f0, f1 = face_pair
 
         fe0c = self.sheet.edge_df[self.sheet.edge_df["face"] == f0].copy()

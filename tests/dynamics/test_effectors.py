@@ -13,6 +13,7 @@ from tyssue.dynamics.effectors import (
     PerimeterElasticity,
     RadialTension,
     SurfaceTension,
+    #    Repulsion
 )
 from tyssue.generation import three_faces_sheet
 from tyssue.utils import testing
@@ -34,7 +35,6 @@ bulk_effectors = [CellAreaElasticity, CellVolumeElasticity]
 
 
 def test_effectors():
-
     sheet_dsets, specs = three_faces_sheet()
     sheet = Sheet("test", sheet_dsets, specs)
     mono = Monolayer.from_flat_sheet("test", sheet, config.geometry.bulk_spec())

@@ -28,6 +28,12 @@ This commit to the **new default branch `main` is the official start of the 1.0 
 
 <hr/>
 
+[![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/
+)
+
+[![DOI](https://zenodo.org/badge/32533164.svg)](https://zenodo.org/badge/latestdoi/32533164) [![Join the chat at https://gitter.im/DamCB/tyssue](https://badges.gitter.im/DamCB/tyssue.svg)](https://gitter.im/DamCB/tyssue?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+
 | Name | Downloads | Version | Platforms |
 | --- | --- | --- | --- |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-tyssue-green.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/tyssue.svg)](https://anaconda.org/conda-forge/tyssue) |
@@ -136,7 +142,9 @@ Thanks to @kephale, there is a napari plugin to visualise tyssue simulation outp
 You can find it [here](https://github.com/kephale/napari-tyssue).
 
 
+
 ### What's new in 1.0 ?
+
 * No collision in 2D (use effector `Repulsion`)
 * Add new geometry : 2D lateral geometry
 * Add mean calculation in `Epithelium`
@@ -145,6 +153,12 @@ You can find it [here](https://github.com/kephale/napari-tyssue).
 * Fix some visualisation
 
 ### Roadmap
+
+You are welcome to participate in the development of `Tyssue`.
+What is planned for the future of `Tyssue`?
+* Solve collision in 2.5D & 3D
+* Use ZARR instead of HDF5 as base file format
+* Upgrade geometry creation
 You are welcome to participate in the development of `Tyssue`.
 What is planned for the future of `Tyssue`?
 * Solve collision in 2.5D & 3D
@@ -242,6 +256,7 @@ Lou Y, Rupprecht JF, Theis S, Hiraiwa T, and Saunders TE. Curvature-induced cell
 Rahman T, Peters F and Wan LQ. Cell Jamming Regulates Epithelial Chiral Morphogenesis. J Biomech. 2023. doi: [10.1016/j.jbiomech.2023.111435](https://doi.org/10.1016/j.jbiomech.2023.111435)
 
 Fiorentino J and Scialdone A. The role of cell geometry and cell-cell communication in gradient sensing. PLoS Comput Biol. 2022 doi: [10.1371/journal.pcbi.1009552](10.1371/journal.pcbi.1009552)
+
 Related repository: [https://github.com/ScialdoneLab/2DLEGI](https://github.com/ScialdoneLab/2DLEGI)
 
 Courcoubetis G, Xu C, Nuzhdin SV, Haas S. Avalanches during epithelial tissue growth; Uniform Growth and a drosophila eye disc model, PLoS Comput Biol 2022 doi: [10.1371/journal.pcbi.1009952](https://doi.org/10.1371/journal.pcbi.1009952)
@@ -253,6 +268,7 @@ Gracia M, Theis S, Proag A, Gay G, Benassayag C, Suzanne M. Mechanical impact of
 Related repository: [https://github.com/suzannelab/invagination](https://github.com/suzannelab/invagination)
 
 Monier B, Gettings M, Gay G, Mangeat T, Schott S, Guarner A, Suzanne M. Apico-basal forces exerted by apoptotic cells drive epithelium folding. Nature. 2015 doi: [10.1038/nature14152](https://doi.org/10.1038/nature14152)
+
 Related repository: [https://github.com/glyg/leg-joint](https://github.com/glyg/leg-joint)
 
 ## Licence

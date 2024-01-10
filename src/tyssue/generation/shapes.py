@@ -182,8 +182,6 @@ def generate_ring(Nf, R_in, R_out, R_vit=None, apical="in"):
 """
 Flat lateral 2D sheet
 """
-
-
 def generate_lateral_tissue(Nf, length, height):
     """
     Generate a 2D lateral tyssue object
