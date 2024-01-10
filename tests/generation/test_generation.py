@@ -75,7 +75,7 @@ def test_subdivide():
     assert subdivided["vert"].shape[0] == 14
 
     datasets_3d = extrude(datasets, method="translation")
-    sheet_3d = Sheet("test3d", datasets_3d, specs)
+    sheet_3d = Epithelium("test3d", datasets_3d)
     subdivided_3d = subdivide_faces(sheet_3d, [0])
     assert subdivided_3d["face"].shape[0] == 24
     assert subdivided_3d["edge"].shape[0] == 120

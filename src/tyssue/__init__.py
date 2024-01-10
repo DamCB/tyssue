@@ -16,6 +16,5 @@ from .geometry.bulk_geometry import (  # noqa
 from .geometry.multisheetgeometry import MultiSheetGeometry  # noqa
 from .geometry.planar_geometry import PlanarGeometry  # noqa
 from .geometry.sheet_geometry import ClosedSheetGeometry, SheetGeometry  # noqa
-from .version import version as __version__  # noqa
 
 logger = logging.getLogger("tyssue")  # noqa

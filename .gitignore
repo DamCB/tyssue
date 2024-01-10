@@ -83,3 +83,5 @@ dist/
 .pytest_cacheflycheck_*
 
 .idea/
+
+*_version.py

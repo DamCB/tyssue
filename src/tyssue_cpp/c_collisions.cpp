@@ -85,15 +85,13 @@ void write_polygon_mesh(Mesh& mesh, std::string filename)
 }
 
 
-PYBIND11_MODULE(c_collisions, m)
+PYBIND11_MODULE(_collisions, m)
 {
-    m.def("write_polygon_mesh", &write_polygon_mesh);
 
-    m.def("sheet_to_surface_mesh", &sheet_to_surface_mesh);
-
-    m.def("does_self_intersect", &does_self_intersect);
-
-    m.def("self_intersections", &self_intersections);
+  m.def("write_polygon_mesh", &write_polygon_mesh);
+  m.def("sheet_to_surface_mesh", &sheet_to_surface_mesh);
+  m.def("does_self_intersect", &does_self_intersect);
+  m.def("self_intersections", &self_intersections);
 
     py::class_<Mesh>(m, "Mesh")
                 .def(py::init<>())

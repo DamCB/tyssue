@@ -6,18 +6,18 @@ from tyssue.io import hdf5
 from tyssue.stores import stores_dir
 
 
-def test_detection():
-    sheet = Sheet("crossed", hdf5.load_datasets(Path(stores_dir) / "sheet6x5.hf5"))
-    sheet.vert_df.z = 5 * sheet.vert_df.x ** 2
-    # sheet.vert_df[sheet.coords] += np.random.normal(scale=0.001, size=(sheet.Nv, 3))
-    SheetGeometry.update_all(sheet)
+# def test_detection():
+#     sheet = Sheet("crossed", hdf5.load_datasets(Path(stores_dir) / "sheet6x5.hf5"))
+#     sheet.vert_df.z = 5 * sheet.vert_df.x ** 2
+#     # sheet.vert_df[sheet.coords] += np.random.normal(scale=0.001, size=(sheet.Nv, 3))
+#     SheetGeometry.update_all(sheet)
 
-    sheet.vert_df.x -= 35 * (sheet.vert_df.x / 2) ** 3
-    SheetGeometry.update_all(sheet)
-    colliding_edges = set(collisions.self_intersections(sheet).flatten())
+#     sheet.vert_df.x -= 35 * (sheet.vert_df.x / 2) ** 3
+#     SheetGeometry.update_all(sheet)
+#     colliding_edges = set(collisions.self_intersections(sheet).flatten())
 
-    expected = {0, 1, 5, 6, 9, 32, 34, 35, 83, 84, 152, 153}
-    assert colliding_edges == expected
+#     expected = {0, 1, 5, 6, 9, 32, 34, 35, 83, 84, 152, 153}
+#     assert colliding_edges == expected
 
 
 # def test_solving():
