@@ -128,7 +128,6 @@ class History:
 
         """
         with pd.HDFStore(hf5file, "a") as store:
-
             for key, df in self.datasets.items():
                 kwargs = {"data_columns": ["time"]}
                 if "segment" in df.columns:
@@ -328,9 +327,8 @@ class HistoryHdf5(History):
                             )
                         )
                         break
-        
-        with pd.HDFStore(self.hf5file, "r") as file:
-            self._time_stamps = file.select("vert", columns=["time"])["time"].unique()
+
+        self._time_stamps = None
 
         if sheet is None:
             last = self.time_stamps[-1]
@@ -372,6 +370,11 @@ class HistoryHdf5(History):
 
     @property
     def time_stamps(self, element="vert"):
+        if self._time_stamps is None:
+            with pd.HDFStore(self.hf5file, "r") as file:
+                self._time_stamps = file.select(element, columns=["time"])[
+                    "time"
+                ].unique()
         return self._time_stamps
 
     def record(self, time_stamp=None, sheet=None):
