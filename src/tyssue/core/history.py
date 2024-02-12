@@ -328,19 +328,15 @@ class HistoryHdf5(History):
                         )
                         break
 
-            with pd.HDFStore(self.hf5file, "r") as file:
-                self._time_stamps = file.select("vert", columns=["time"])[
-                    "time"
-                ].unique()
-        else:
-            self._time_stamps = np.zeros(1)
+        with pd.HDFStore(self.hf5file, "r") as file:
+            self._time_stamps = file.select("vert", columns=["time"])["time"].unique()
 
         if sheet is None:
             last = self.time_stamps[-1]
             with pd.HDFStore(self.hf5file, "r") as file:
                 keys = file.keys()
             if r"\cell" in keys:
-                sheet = Epithelium(last)
+                sheet = Epithelium("test", last)
 
         History.__init__(self, sheet, save_every, dt, save_only)
         self.dtypes = {

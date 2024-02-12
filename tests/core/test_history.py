@@ -127,13 +127,13 @@ def test_overwrite_time():
     assert sheet_.Nv == sheet.Nv
 
 
-def test_overwrite_tim_hdf5e():
+def test_overwrite_tim_hdf5e(out_hf5):
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet, hf5file="out.hf5")
+    history = HistoryHdf5(sheet, hf5file=out_hf5)
     history.record(time_stamp=1)
     history.record(time_stamp=1)
     sheet_ = history.retrieve(1)
-    os.remove("out.hf5")
+    os.remove(out_hf5)
     assert sheet_.Nv == sheet.Nv
 
 
@@ -146,7 +146,7 @@ def test_retrieve_bulk():
     RNRGeometry.update_all(eptm_)
 
 
-def test_historyHDF5_path_warning():
+def test_historyHDF5_path_warning(out_hf5):
 
     sheet = Sheet("3", *three_faces_sheet())
     with pytest.warns(UserWarning):
@@ -154,16 +154,16 @@ def test_historyHDF5_path_warning():
         history.record(time_stamp=0)
 
     with pytest.warns(UserWarning):
-        history = HistoryHdf5(sheet, hf5file="out.hf5")
+        history = HistoryHdf5(sheet, hf5file=out_hf5)
         history.record(time_stamp=0)
 
-    for p in Path(".").glob("out*.hf5"):
+    for p in out_hf5.parent.glob("out*.hf5"):
         p.unlink()
 
 
-def test_historyHDF5_retrieve():
+def test_historyHDF5_retrieve(out_hf5):
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet, hf5file="out.hf5")
+    history = HistoryHdf5(sheet, hf5file=out_hf5)
 
     for element in sheet.datasets:
         assert sheet.datasets[element].shape[0] == history.datasets[element].shape[0]
@@ -178,13 +178,13 @@ def test_historyHDF5_retrieve():
     for elem, dset in sheet_.datasets.items():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
         assert dset.time.unique()[0] == 1
-    for p in Path(".").glob("out*.hf5"):
+    for p in out_hf5.parent.glob("out*.hf5"):
         p.unlink()
 
 
-def test_historyHDF5_retrieve_columns():
+def test_historyHDF5_retrieve_columns(out_hf5):
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet, hf5file="out.hf5")
+    history = HistoryHdf5(sheet, hf5file=out_hf5)
 
     history.record(time_stamp=0)
     sheet.vert_df.loc[0, "x"] = 1000
@@ -192,18 +192,18 @@ def test_historyHDF5_retrieve_columns():
     retrieved = history.retrieve_columns("vert", ["time", "x", "y"])
     assert retrieved.shape == (2 * sheet.Nv, 3)
     assert retrieved.iloc[sheet.Nv]["x"] == 1000
-    for p in Path(".").glob("out*.hf5"):
+    for p in out_hf5.parent.glob("out*.hf5"):
         p.unlink()
 
 
-def test_historyHDF5_save_every():
+def test_historyHDF5_save_every(out_hf5):
     sheet = Sheet("3", *three_faces_sheet())
 
     history = HistoryHdf5(
         sheet,
         save_every=2,
         dt=1,
-        hf5file="out.hf5",
+        hf5file=out_hf5,
     )
 
     for element in sheet.datasets:
@@ -225,18 +225,18 @@ def test_historyHDF5_save_every():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
         assert dset.time.unique()[0] == 2
 
-    for p in Path(".").glob("out*.hf5"):
+    for p in out_hf5.parent.glob("out*.hf5"):
         p.unlink()
 
 
-def test_historyHDF5_save_only():
+def test_historyHDF5_save_only(out_hf5):
     sheet = Sheet("3", *three_faces_sheet())
     sheet.vert_df["extra"] = 0
     history = HistoryHdf5(
         sheet,
         save_every=2,
         dt=1,
-        hf5file="out.hf5",
+        hf5file=out_hf5,
         save_only={
             "edge": [
                 "length",
@@ -256,16 +256,16 @@ def test_historyHDF5_save_only():
     for elem, dset in sheet_.datasets.items():
         assert dset.shape[0] == sheet.datasets[elem].shape[0]
 
-    for p in Path(".").glob("out*.hf5"):
+    for p in out_hf5.parent.glob("out*.hf5"):
         p.unlink()
 
 
-def test_historyHDF5_itemsize():
+def test_historyHDF5_itemsize(out_hf5):
     sheet = Sheet("3", *three_faces_sheet())
     sheet.vert_df["segment"] = "apical"
     history = HistoryHdf5(
         sheet,
-        hf5file="out.hf5",
+        hf5file=out_hf5,
     )
 
     for element in sheet.datasets:
@@ -288,18 +288,18 @@ def test_historyHDF5_itemsize():
     sheet3_ = history.retrieve(3)
     assert sheet3_.face_df.loc[0, "area"] == 12.0
 
-    for p in Path(".").glob("out*.hf5"):
+    for p in out_hf5.parent.glob("out*.hf5"):
         p.unlink()
 
 
-def test_historyHDF5_save_other_sheet():
+def test_historyHDF5_save_other_sheet(out_hf5):
     sheet = Sheet("3", *three_faces_sheet())
     with pytest.warns(UserWarning):
         # segment is not in the original vert dataset and we ask to save it
         history = HistoryHdf5(
             sheet,
             save_only={"edge": ["dx"], "face": ["area"], "vert": ["segment"]},
-            hf5file="out.hf5",
+            hf5file=out_hf5,
         )
 
     for element in sheet.datasets:
@@ -315,57 +315,57 @@ def test_historyHDF5_save_other_sheet():
     sheet2_ = history.retrieve(2)
     assert sheet2_.face_df.loc[0, "area"] == 12.0
 
-    for p in Path(".").glob("out*.hf5"):
+    for p in out_hf5.parent.glob("out*.hf5"):
         p.unlink()
 
 
-def test_historyHDF5_from_archive():
+def test_historyHDF5_from_archive(test_hf5):
 
     sheet = Sheet("3", *three_faces_sheet())
-    history = HistoryHdf5(sheet, hf5file="test.hf5")
+    history = HistoryHdf5(sheet, hf5file=test_hf5)
     history.record()
     history.record()
     history.record()
 
-    retrieved = HistoryHdf5.from_archive("test.hf5")
+    retrieved = HistoryHdf5.from_archive(test_hf5)
     try:
         assert isinstance(retrieved.sheet, type(sheet))
     finally:
-        os.remove("test.hf5")
+        os.remove(test_hf5)
 
 
-def test_retrieve_coords():
+def test_retrieve_coords(test_hf5):
     sheet = Sheet("3", *three_faces_sheet())
     history = History(sheet)
     history.record()
     assert history.retrieve(0).coords == sheet.coords
 
 
-def test_to_and_from_archive():
+def test_to_and_from_archive(test_hf5):
 
     sheet = Sheet("3", *three_faces_sheet())
     history = History(sheet)
     history.record()
     history.record()
     history.record()
-    history.to_archive("test.hf5")
-    history_h = HistoryHdf5.from_archive("test.hf5")
+    history.to_archive(test_hf5)
+    history_h = HistoryHdf5.from_archive(test_hf5)
     sheet_ = history_h.retrieve(2)
     try:
         assert sheet_.Nv == sheet.Nv
     finally:
-        os.remove("test.hf5")
+        os.remove(test_hf5)
 
 
-def test_change_col_types():
+def test_change_col_types(test_hf5):
     sheet = Sheet("3", *three_faces_sheet())
     history = HistoryHdf5(
         sheet,
-        hf5file="test.hf5",
+        hf5file=test_hf5,
     )
     history.record()
     history.record()
     sheet.face_df["z"] = "abc"
     with pytest.raises(ValueError):
         history.record()
-    os.remove("test.hf5")
+    os.remove(test_hf5)

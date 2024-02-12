@@ -155,13 +155,14 @@ class Epithelium:
         # Add columns of unique_id in order to follow topology change
         # Add last unique index value in specs
         for elem, df in self.datasets.items():
-            self.datasets[elem]['unique_id'] = self.datasets[elem].index
-            self.specs[elem]['unique_id_max'] = self.datasets[elem].shape[0]
+            self.datasets[elem]["unique_id"] = self.datasets[elem].index
+            self.specs[elem]["unique_id_max"] = self.datasets[elem].shape[0]
 
         # Add cell lineage graphe
         self.lineage = nx.DiGraph()
-        self.lineage.add_nodes_from([str(i) for i in self.datasets['face']['unique_id']],
-                                    color='grey')
+        self.lineage.add_nodes_from(
+            [str(i) for i in self.datasets["face"]["unique_id"]], color="grey"
+        )
 
     @property
     def vert_df(self):
@@ -331,7 +332,6 @@ class Epithelium:
         return self.cell_df.shape[0]
 
     def _upcast(self, idx, df):
-
         # Assumes a flat index
         upcast = df.take(idx, axis=0)
         try:
@@ -671,7 +671,7 @@ class Epithelium:
 
         e.g. has only closed polygons and polyhedra
         """
-        return np.alltrue(self.get_valid())
+        return np.all(self.get_valid())
 
     def get_valid(self):
         """Set the 'is_valid' column to true if the faces are all closed polygons,
@@ -1053,14 +1053,12 @@ def euler_characteristic(edge_df):
 
 
 def _next_edge(edf):
-
     edf["edge"] = edf.index
     next_edge = edf.set_index("srce", append=False).loc[edf["trgt"], "edge"].values
     return pd.Series(index=edf.index, data=next_edge)
 
 
 def _prev_edge(edf):
-
     edf["edge"] = edf.index
     next_edge = edf.set_index("trgt", append=False).loc[edf["srce"], "edge"].values
     return pd.Series(index=edf.index, data=next_edge)
