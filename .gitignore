@@ -83,3 +83,4 @@ dist/
 .pytest_cacheflycheck_*
 
 .idea/
+src/tyssue/_version.py
