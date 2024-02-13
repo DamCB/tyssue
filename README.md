@@ -9,12 +9,12 @@ This commit to the **new default branch `main` is the official start of the 1.0 
 
 ### Short term
 
-- [ ] fix CI w/ github actions
+- [X] fix CI w/ github actions
 - [ ] Readthedocs with mkdoc
-- [ ] Tests
-- [ ] Notebook tests
-- [ ] Merge PRs #263 #274
-- [ ] Tests
+- [x] Tests
+- [x] Notebook tests
+- [x] Merge PRs #263 #274
+- [x] Tests
 - [ ] Check Polarization notebooks
 
 

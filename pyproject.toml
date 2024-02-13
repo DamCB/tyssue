@@ -37,6 +37,8 @@ test = [
   "nox",
   "pytest",
   "pytest-cov",
+  "scikit-build-core",
+  "nbval"
   "scikit-build-core"
 ]
 dev = [
@@ -44,6 +46,7 @@ dev = [
   "pytest-cov",
   "scikit-build-core",
   "pre-commit",
+  "nbval"
 ]
 docs = [
   "Sphinx",

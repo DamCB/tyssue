@@ -671,7 +671,7 @@ class Epithelium:
 
         e.g. has only closed polygons and polyhedra
         """
-        return np.alltrue(self.get_valid())
+        return np.all(self.get_valid())
 
     def get_valid(self):
         """Set the 'is_valid' column to true if the faces are all closed polygons,
