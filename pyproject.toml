@@ -39,6 +39,7 @@ test = [
   "pytest-cov",
   "scikit-build-core",
   "nbval"
+  "scikit-build-core"
 ]
 dev = [
   "pytest",
