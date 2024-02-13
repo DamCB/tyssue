@@ -303,6 +303,11 @@ class HistoryHdf5(History):
             self.hf5file = Path(hf5file)
 
         if self.hf5file.exists():
+            with pd.HDFStore(self.hf5file, "r") as file:
+                self._time_stamps = file.select("vert", columns=["time"])[
+                    "time"
+                ].unique()
+
             if overwrite:
                 tb = traceback.extract_stack(limit=2)
                 if "from_archive" not in tb[0].name:
@@ -328,19 +333,8 @@ class HistoryHdf5(History):
                         )
                         break
 
-            with pd.HDFStore(self.hf5file, "r") as file:
-                self._time_stamps = file.select("vert", columns=["time"])[
-                    "time"
-                ].unique()
         else:
-            self._time_stamps = np.zeros(1)
-
-        if sheet is None:
-            last = self.time_stamps[-1]
-            with pd.HDFStore(self.hf5file, "r") as file:
-                keys = file.keys()
-            if r"\cell" in keys:
-                sheet = Epithelium(last)
+            self._time_stamps = np.empty((0,))
 
         History.__init__(self, sheet, save_every, dt, save_only)
         self.dtypes = {
@@ -375,7 +369,14 @@ class HistoryHdf5(History):
 
     @property
     def time_stamps(self, element="vert"):
+        if not self._time_stamps.shape[0]:
+            with pd.HDFStore(self.hf5file, "r") as file:
+                self._time_stamps = file.select("vert", columns=["time"])[
+                    "time"
+                    ].unique()
+
         return self._time_stamps
+
 
     def record(self, time_stamp=None, sheet=None):
         """Appends a copy of the sheet datasets to the history HDF file.
@@ -394,6 +395,10 @@ class HistoryHdf5(History):
             self.time = time_stamp
         else:
             self.time += 1.0
+
+        # invalidate _time_stamp cache:
+        self._time_stamps = np.empty((0,))
+
 
         dtypes_ = {k: df.dtypes for k, df in self.sheet.datasets.items()}
 
