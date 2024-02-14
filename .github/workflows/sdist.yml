@@ -1,4 +1,4 @@
-name: Build and upload to PyPI
+name: Gen sdist and upload to PyPI
 
 env:
   CIBW_TEST_REQUIRES: pytest
