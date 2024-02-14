@@ -5,11 +5,9 @@ message(STATUS '${SKBUILD_PROJECT_NAME}')
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 
-if(SKBUILD)
-  set(Python_EXECUTABLE "${PYTHON_EXECUTABLE}")
-  set(Python_INCLUDE_DIR "${PYTHON_INCLUDE_DIR}")
-  set(Python_LIBRARY "${PYTHON_LIBRARY}")
-endif()
+set(Python_EXECUTABLE "${PYTHON_EXECUTABLE}")
+set(Python_INCLUDE_DIR "${PYTHON_INCLUDE_DIR}")
+set(Python_LIBRARY "${PYTHON_LIBRARY}")
 
 find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
