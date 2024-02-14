@@ -10,8 +10,8 @@ set(Python_INCLUDE_DIR "${PYTHON_INCLUDE_DIR}")
 set(Python_LIBRARY "${PYTHON_LIBRARY}")
 
 find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(Python COMPONENTS Interpreter Development.Embed REQUIRED)
 
-#find_package(Python COMPONENTS Interpreter Development.Embed REQUIRED)
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
 
