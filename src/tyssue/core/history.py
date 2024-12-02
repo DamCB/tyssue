@@ -81,7 +81,7 @@ class History:
 
         self.datasets = {}
         self.columns = {}
-        self.columns = {}
+        self.dicts = {}
         vcols = sheet.coords + extra_cols["vert"]
         vcols = list(set(vcols))
         self.vcols = _filter_columns(vcols, sheet.vert_df.columns, "vertex")
