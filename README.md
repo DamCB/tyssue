@@ -1,4 +1,4 @@
-# tyssue : An epithelium simulation library
+![image](https://github.com/user-attachments/assets/490bdbd8-d051-465b-b67b-7ad5c3120480)![image](https://github.com/user-attachments/assets/d8bc4294-1fd7-47e8-84f2-6ef1c7186698)# tyssue : An epithelium simulation library
 
 
 ## [ANN] Working on a 1.0 release
@@ -130,6 +130,13 @@ fig, ax = sheet_view(sheet)
 * The documentation is now browsable on [tyssue.io](http://tyssue.io)
 * The old documentation is still browsable online [here](http://tyssue.readthedocs.io/en/latest/)
 * Introduction notebooks are available [here](https://github.com/DamCB/tyssue-demo).
+
+### Quick view with Colab
+
+To quickly try out and get an intution on how tyssue works, a jupyter notebook has been developed in [Google Colab](https://colab.research.google.com/github/DamCB/tyssue/blob/main/notebooks/basic_usage_quick.ipynb).
+Google Colab is an on-line jupyter notebook that requires no setup and is free to use.
+To use it, simply sign in with your Google account and run all of the cells. 
+Feel free to try different geometries, topologies, and mechanical properties that you can set within the Google Colab environment.
 
 ## Visualisation
 Thanks to @kephale, there is a napari plugin to visualise tyssue simulation output.
