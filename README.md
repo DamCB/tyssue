@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/490bdbd8-d051-465b-b67b-7ad5c3120480)![image](https://github.com/user-attachments/assets/d8bc4294-1fd7-47e8-84f2-6ef1c7186698)# tyssue : An epithelium simulation library
+# tyssue : An epithelium simulation library
 
 
 ## [ANN] Working on a 1.0 release
