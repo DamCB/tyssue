@@ -81,6 +81,7 @@ class History:
 
         self.datasets = {}
         self.columns = {}
+        self.dicts = {}
         vcols = sheet.coords + extra_cols["vert"]
         vcols = list(set(vcols))
         self.vcols = _filter_columns(vcols, sheet.vert_df.columns, "vertex")
@@ -88,6 +89,7 @@ class History:
         if "time" not in self.vcols:
             _vert_h["time"] = 0
         self.datasets["vert"] = _vert_h
+        self.dicts["vert"] = {}
         self.columns["vert"] = self.vcols
 
         fcols = extra_cols["face"]
@@ -96,6 +98,7 @@ class History:
         if "time" not in self.fcols:
             _face_h["time"] = 0
         self.datasets["face"] = _face_h
+        self.dicts["face"] = {}
         self.columns["face"] = self.fcols
 
         if sheet.cell_df is not None:
@@ -105,6 +108,7 @@ class History:
             if "time" not in self.ccols:
                 _cell_h["time"] = 0
             self.datasets["cell"] = _cell_h
+            self.dicts["cell"] = {}
             self.columns["cell"] = self.ccols
             extra_cols["edge"].append("cell")
 
@@ -115,6 +119,7 @@ class History:
         if "time" not in self.ecols:
             _edge_h["time"] = 0
         self.datasets["edge"] = _edge_h
+        self.dicts["edge"] = {}
         self.columns["edge"] = self.ecols
 
     def __len__(self):
@@ -156,7 +161,8 @@ class History:
 
     def record(self, time_stamp=None):
         """Appends a copy of the sheet datasets to the history instance.
-
+        Appends to the corresponding dict. Use update_datasets() method
+        to create the self.datasets dataframes as in the previous implementation
         Parameters
         ----------
         time_stamp : float, save specific timestamp
@@ -171,25 +177,24 @@ class History:
             self.index % (int(self.save_every / self.dt)) == 0
         ):
             for element in self.datasets:
-                hist = self.datasets[element]
                 cols = self.columns[element]
                 df = self.sheet.datasets[element][cols].reset_index(drop=False)
                 if "time" not in cols:
-                    times = pd.Series(np.ones((df.shape[0],)) * self.time, name="time")
-                    df = pd.concat([df, times], ignore_index=False, axis=1, sort=False)
-                else:
                     df["time"] = self.time
-
-                if self.time in hist["time"]:
+                if f"{self.time}" in self.dicts[element].keys():
                     # erase previously recorded time point
-                    hist = hist[hist["time"] != self.time]
+                    self.dicts[element].pop(f"{self.time}")
 
-                hist = pd.concat([hist, df], ignore_index=True, axis=0, sort=False)
-
-                self.datasets[element] = hist
+                self.dicts[element].update({f"{self.time}": df})
 
         self.index += 1
 
+    def update_datasets(self):
+        """Concatenate all datasets in self.datasets into self.datasets as pd.DataFrame objects
+        """
+        for element in self.sheet.datasets:
+            self.datasets[element] = pd.concat(self.dicts[element].values(), ignore_index=True)
+    
     def retrieve(self, time):
         """Return datasets at time `time`.
 
