@@ -1,0 +1,20 @@
+{
+"face": {
+    "contractility": 0.04,
+    "vol_elasticity": 1.0,
+    "prefered_height": 10.0,
+    "prefered_area": 24.0,
+    "prefered_vol": 0.0
+    },
+"vert": {
+    "radial_tension": 0.0
+     },
+"edge": {
+    "anchor_tension": 0.12,
+    "line_tension": 0.12
+     },
+"settings": {
+    "grad_norm_factor": 1.0,
+    "nrj_norm_factor": 1.0
+    }
+}

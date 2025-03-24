@@ -1,0 +1,22 @@
+{
+    "face": {
+	"contractility": 0.04,
+	"area_elasticity": 1.0,
+	"prefered_area": 1.0,
+	"is_alive": 1
+    },
+    "edge": {
+	"ux": 0.0,
+	"uy": 0.0,
+	"uz": 0.0,
+	"line_tension": 0.12,
+	"is_active": 1
+    },
+    "vert": {
+	"is_active": 1
+    },
+    "settings": {
+	"grad_norm_factor": 1.0,
+	"nrj_norm_factor": 1.0
+    }
+}

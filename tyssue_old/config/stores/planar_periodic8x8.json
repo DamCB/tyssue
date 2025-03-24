@@ -1,0 +1,1 @@
+{"edge": {"trgt": 0, "nz": 0.0, "length": 0.0, "face": 0, "srce": 0, "dx": 0.0, "dy": 0.0, "sx": 0.0, "sy": 0.0, "tx": 0.0, "ty": 0.0, "fx": 0.0, "fy": 0.0}, "vert": {"y": 0.0, "is_active": 1, "x": 0.0}, "face": {"y": 0.0, "is_alive": 1, "perimeter": 0.0, "area": 0.0, "x": 0.0, "num_sides": 6}, "settings": {"boundaries": {"x": [-0.1, 8], "y": [-0.1, 8]}}}

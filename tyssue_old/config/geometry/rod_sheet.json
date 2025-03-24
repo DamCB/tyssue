@@ -1,0 +1,39 @@
+{
+"face": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0,
+    "num_sides": 6,
+    "area": 1.0,
+    "perimeter": 1.0,
+    "is_alive": 1
+    },
+ "vert": {
+     "x": 0.0,
+     "y": 0.0,
+     "z": 0.0,
+     "is_active": 1,
+     "rho": 0.0,
+     "height": 0.0,
+     "basal_shift": 4.0,
+     "left_tip": false,
+     "right_tip": false
+     },
+"edge": {
+    "srce": 0,
+    "trgt": 0,
+    "face": 0,
+    "dx": 0.0,
+    "dy": 0.0,
+    "dz": 0.0,
+    "nx": 0.0,
+    "ny": 0.0,
+    "nz": 1.0,
+    "length": 0.0
+    },
+"settings": {
+    "geometry": "rod",
+    "height_axis": "z",
+    "ab": [0.0, 0.0]
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "face": {
+	"contractility": 0.04,
+	"vol_elasticity": 1.0,
+	"prefered_height": 24.0,
+	"prefered_area": 12.0,
+	"prefered_vol": 288.0
+    },
+    "vert": {
+	"radial_tension": 0.0,
+	"is_active": 1
+    },
+    "edge": {
+	"ux": 0.0,
+	"uy": 0.0,
+	"uz": 0.0,
+	"line_tension": 0.12,
+	"is_active": 1
+    },
+    "settings": {
+	"grad_norm_factor": 1.0,
+	"nrj_norm_factor": 1.0
+    }
+}

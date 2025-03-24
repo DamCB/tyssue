@@ -1,0 +1,31 @@
+{
+    "edge": {
+	"visible": true,
+        "width": 0.5,
+        "head_width": 0.0,
+        "length_includes_head": true,
+        "shape": "right",
+        "color": "#2b5d0a",
+        "alpha": 0.8,
+        "zorder": 1,
+	"colormap": "viridis"
+    },
+    "vert": {
+        "visible": false,
+        "s": 100,
+        "color": "#000a4b",
+        "alpha": 0.3,
+        "zorder": 2
+    },
+    "grad": {
+        "color":"#000a4b",
+        "alpha":0.5,
+        "width":0.04
+    },
+    "face": {
+        "visible": false,
+        "color":"#8aa678",
+        "alpha": 1.0,
+        "zorder": -1
+    }
+}
