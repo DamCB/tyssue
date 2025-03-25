@@ -13,7 +13,7 @@ from .utils import make_df
 
 def hexa_grid2d(nx, ny, distx, disty, noise=None):
     """Creates an hexagonal grid of points"""
-    cy, cx = np.mgrid[0:ny, 0:nx]
+    cy, cx = np.mgrid[0:ny+2, 0:nx+2]
     cx = cx.astype(float)
     cy = cy.astype(float)
     cx[::2, :] += 0.5
