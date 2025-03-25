@@ -136,8 +136,8 @@ def test_IH_transition():
     assert eptm.Nv == Nv + 1
 
     invalid = eptm.get_invalid()
-    assert np.alltrue(1 - invalid)
-    assert np.alltrue(eptm.edge_df["sub_vol"] > 0)
+    assert np.all(1 - invalid)
+    assert np.all(eptm.edge_df["sub_vol"] > 0)
     assert (
         eptm.face_df[eptm.face_df.segment == "apical"].shape[0] == eptm.cell_df.shape[0]
     )
@@ -156,7 +156,7 @@ def test_split_vert():
     BulkGeometry.update_all(eptm)
 
     invalid = eptm.get_invalid()
-    assert np.alltrue(1 - invalid)
+    assert np.all(1 - invalid)
 
 
 def test_HI_transition():
@@ -179,8 +179,8 @@ def test_HI_transition():
     assert eptm.Nv == Nv
 
     invalid = eptm.get_invalid()
-    assert np.alltrue(1 - invalid)
-    assert np.alltrue(eptm.edge_df["sub_vol"] > 0)
+    assert np.all(1 - invalid)
+    assert np.all(eptm.edge_df["sub_vol"] > 0)
 
 
 def test_find_transitions():
