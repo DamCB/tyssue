@@ -380,43 +380,43 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
     return eptm
 
 
-def spherical_sheet(radius, Nf, Lloyd_relax=False, **kwargs):
-    """Returns a spherical sheet with the given radius and (approximately)
-    the given number of cells
-    """
+# def spherical_sheet(radius, Nf, Lloyd_relax=False, **kwargs):
+#     """Returns a spherical sheet with the given radius and (approximately)
+#     the given number of cells
+#     """
+#
+#     centers = np.array(make_spherical(Nf))
+#     eptm = sheet_from_cell_centers(centers, **kwargs)
+#
+#     rhos = (eptm.vert_df[eptm.coords] ** 2).sum(axis=1).mean()
+#     ClosedSheetGeometry.scale(eptm, radius / rhos, eptm.coords)
+#
+#     ClosedSheetGeometry.update_all(eptm)
+#     if Lloyd_relax:
+#         eptm = Lloyd_relaxation(
+#             eptm, ClosedSheetGeometry, steps=100, update_method=update_on_sphere
+#         )
+#
+#     return eptm
 
-    centers = np.array(make_spherical(Nf))
-    eptm = sheet_from_cell_centers(centers, **kwargs)
 
-    rhos = (eptm.vert_df[eptm.coords] ** 2).sum(axis=1).mean()
-    ClosedSheetGeometry.scale(eptm, radius / rhos, eptm.coords)
-
-    ClosedSheetGeometry.update_all(eptm)
-    if Lloyd_relax:
-        eptm = Lloyd_relaxation(
-            eptm, ClosedSheetGeometry, steps=100, update_method=update_on_sphere
-        )
-
-    return eptm
-
-
-def spherical_monolayer(R_in, R_out, Nc, apical="out", Lloyd_relax=False):
-    """Returns a spherical monolayer with the given inner and
-    outer radii, and approximately the gieven number of cells.
-
-    The `apical` argument can be 'in' out 'out' to specify wether
-    the apical face of the cells faces inward or outward, reespectively.
-    """
-    sheet = spherical_sheet(R_in, Nc, Lloyd_relax=Lloyd_relax)
-    delta_R = R_out - R_in
-    mono = Monolayer("mono", extrude(sheet.datasets, method="normals", scale=-delta_R))
-    if apical == "out":
-        swap_apico_basal(mono)
-    else:
-        mono.settings["lumen_side"] = "apical"
-
-    ClosedMonolayerGeometry.update_all(mono)
-    return mono
+# def spherical_monolayer(R_in, R_out, Nc, apical="out", Lloyd_relax=False):
+#     """Returns a spherical monolayer with the given inner and
+#     outer radii, and approximately the gieven number of cells.
+#
+#     The `apical` argument can be 'in' out 'out' to specify wether
+#     the apical face of the cells faces inward or outward, reespectively.
+#     """
+#     sheet = spherical_sheet(R_in, Nc, Lloyd_relax=Lloyd_relax)
+#     delta_R = R_out - R_in
+#     mono = Monolayer("mono", extrude(sheet.datasets, method="normals", scale=-delta_R))
+#     if apical == "out":
+#         swap_apico_basal(mono)
+#     else:
+#         mono.settings["lumen_side"] = "apical"
+#
+#     ClosedMonolayerGeometry.update_all(mono)
+#     return mono
 
 
 def sheet_from_cell_centers(points, noise=0, interp_s=1e-4):
