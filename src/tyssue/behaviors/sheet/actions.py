@@ -39,6 +39,9 @@ def merge_vertices(sheet):
         collapse_edge(sheet, short[0], allow_two_sided=False)
         short = sheet.edge_df[sheet.edge_df["length"] < d_min].index.to_numpy()
         np.random.shuffle(short)
+
+    sheet.network_changed = True
+
     return 0
 
 
