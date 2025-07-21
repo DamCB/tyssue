@@ -3,13 +3,20 @@
 
 """
 import logging
-import warnings
-
 import numpy as np
+import pandas as pd
+import warnings
+import random
 
+from itertools import count
+from scipy.integrate import solve_ivp
+
+
+from ..core.history import History
 from ..behaviors.event_manager import EventManager
 from ..behaviors.sheet.basic_events import reconnect
-from ..core.history import History
+from ..topology.sheet_topology import cell_division
+
 
 log = logging.getLogger(__name__)
 MAX_ITER = 1000
@@ -27,7 +34,11 @@ def set_pos(eptm, geom, pos):
 
 
 class EulerSolver:
-    """Explicit Euler solver"""
+    """Explicit Euler solver
+
+
+
+    """
 
     def __init__(
         self,
@@ -79,7 +90,7 @@ class EulerSolver:
         if auto_reconnect:
             if manager is None:
                 manager = EventManager()
-            if "reconnect" not in [n[0].__name__ for n in manager.next]:
+            if not "reconnect" in [n[0].__name__ for n in manager.next]:
                 manager.append(reconnect)
 
         self.manager = manager
@@ -92,7 +103,8 @@ class EulerSolver:
         ].values.ravel()
 
     def set_pos(self, pos):
-        """Updates the eptm vertices position"""
+        """Updates the eptm vertices position
+        """
         return self._set_pos(self.eptm, self.geom, pos)
 
     def record(self, t):
@@ -132,6 +144,9 @@ class EulerSolver:
                 self.eptm.topo_changed = False
             self.record(t)
 
+            if t == tf:
+                self.history.update_datasets()
+
     def ode_func(self, t, pos):
         """Computes the models' gradient.
 
@@ -139,11 +154,6 @@ class EulerSolver:
         Returns
         -------
         dot_r : 1D np.ndarray of shape (self.eptm.Nv * self.eptm.dim, )
-
-        .. math::
-
-        \frac{dr_i}{dt} = -\frac{\nabla U_i}{\eta_i}
-
         """
 
         grad_U = self.model.compute_gradient(self.eptm).loc[self.eptm.active_verts]
@@ -152,6 +162,108 @@ class EulerSolver:
             / self.eptm.vert_df.loc[self.eptm.active_verts, "viscosity"].values[:, None]
         ).ravel()
 
+class EulerSolverDivision(EulerSolver):
+
+    def solve(self, tf, dt, torque, on_topo_change=None, topo_change_args=()):
+        """Solves the system of differential equations from the current time
+        to tf with steps of dt with a forward Euler method.
+
+        Parameters
+        ----------
+        tf : float, final time when we stop solving
+        dt : float, time step
+        on_topo_change : function, optional, default None
+            function of `self.eptm`
+        topo_change_args : tuple, arguments passed to `on_topo_change`
+
+        """
+        self.eptm.settings["dt"] = dt
+
+        for t in np.arange(self.prev_t, tf + dt, dt):
+
+            pos = self.current_pos
+            dot_r = self.ode_func(t, pos)
+            if self.bounds is not None:
+                dot_r = np.clip(dot_r, *self.bounds)
+            pos = pos + dot_r * dt
+            self.set_pos(pos)
+            self.prev_t = t
+
+            if t%1==0 or t%0.5==0:
+                try:
+                    mother = random.choice(self.eptm.face_df.loc[(self.eptm.face_df["ventral"] == 1) & (self.eptm.face_df['area'] >= 0.7)].index)
+                    mother_torque = self.eptm.face_df.loc[mother, "torque_coef"]
+                    daughter = cell_division(self.eptm, mother, self.geom, angle = np.pi/2)
+                    self.eptm.face_df.loc[self.eptm.face_df.index == daughter, "torque_coef"] = mother_torque
+                    self.eptm.face_df.loc[self.eptm.face_df.index == daughter, "ventral"] = 1
+
+                except:
+                    pass
+
+            if self.manager is not None:
+                self.manager.execute(self.eptm)
+                self.geom.update_all(self.eptm)
+                self.manager.update()
+
+            if self.eptm.topo_changed:
+                log.info("Topology changed")
+                if on_topo_change is not None:
+                    on_topo_change(*topo_change_args)
+                self.eptm.topo_changed = False
+            self.record(t)
+
+            if t == tf:
+                self.history.update_datasets()
+
+class EulerSolverDiv(EulerSolver):
+
+    def solve(self, tf, dt, torque, on_topo_change=None, topo_change_args=()):
+        """Solves the system of differential equations from the current time
+        to tf with steps of dt with a forward Euler method.
+
+        Parameters
+        ----------
+        tf : float, final time when we stop solving
+        dt : float, time step
+        on_topo_change : function, optional, default None
+            function of `self.eptm`
+        topo_change_args : tuple, arguments passed to `on_topo_change`
+
+        """
+        self.eptm.settings["dt"] = dt
+
+        for t in np.arange(self.prev_t, tf + dt, dt):
+
+            pos = self.current_pos
+            dot_r = self.ode_func(t, pos)
+            if self.bounds is not None:
+                dot_r = np.clip(dot_r, *self.bounds)
+            pos = pos + dot_r * dt
+            self.set_pos(pos)
+            self.prev_t = t
+
+            if t%1==0 or t%0.5==0:
+                try:
+                    mother = random.choice(self.eptm.face_df.loc[(self.eptm.face_df["torque_coef"] == torque)  & (self.eptm.face_df['area'] >= 0.7)].index)
+                    daughter = cell_division(self.eptm, mother, self.geom, angle = np.pi/2)
+                    self.eptm.face_df.loc[self.eptm.face_df.index == daughter, "torque_coef"] = torque
+                except:
+                    pass
+
+            if self.manager is not None:
+                self.manager.execute(self.eptm)
+                self.geom.update_all(self.eptm)
+                self.manager.update()
+
+            if self.eptm.topo_changed:
+                log.info("Topology changed")
+                if on_topo_change is not None:
+                    on_topo_change(*topo_change_args)
+                self.eptm.topo_changed = False
+            self.record(t)
+
+            if t == tf:
+                self.history.update_datasets()
 
 class IVPSolver:
     def __init__(self, *args, **kwargs):

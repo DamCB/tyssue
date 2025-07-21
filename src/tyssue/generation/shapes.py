@@ -21,7 +21,7 @@ from ..geometry.utils import update_spherical
 from ..topology import type1_transition
 from .from_voronoi import from_3d_voronoi
 
-from .._mesh_generation import make_spherical
+# from .._mesh_generation import make_spherical
 
 # except ImportError:
 #     print(
