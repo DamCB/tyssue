@@ -54,6 +54,8 @@ def split_vert(
         sheet.reset_index()
         sheet.reset_topo()
 
+    sheet.network_changed = True
+
     return new_edges
 
 
@@ -170,6 +172,9 @@ def cell_division(sheet, mother, geom, angle=None):
     if sheet.settings.get("boundaries") is not None and mother_on_periodic_boundary:
         sheet.specs["settings"]["boundaries"] = saved_boundary
         geom.update_all(sheet)
+
+    sheet.network_changed = True
+
     return daughter
 
 

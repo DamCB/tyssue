@@ -1,8 +1,10 @@
+from cmath import sqrt
 import numpy as np
 import pandas as pd
+import math
 
 from .planar_geometry import PlanarGeometry
-from .utils import rotation_matrices, rotation_matrix
+from .utils import rotation_matrix, rotation_matrices
 
 
 class SheetGeometry(PlanarGeometry):
@@ -25,11 +27,12 @@ class SheetGeometry(PlanarGeometry):
         cls.update_ucoords(sheet)
         cls.update_length(sheet)
         cls.update_centroid(sheet)
-        cls.update_height(sheet)
+        # cls.update_height(sheet)
         cls.update_normals(sheet)
         cls.update_areas(sheet)
         cls.update_perimeters(sheet)
         cls.update_vol(sheet)
+        cls.update_boundary_index(sheet)
 
     @staticmethod
     def update_normals(sheet):
@@ -49,7 +52,7 @@ class SheetGeometry(PlanarGeometry):
         Updates the normal coordniate of each (srce, trgt, face) face.
         """
         sheet.edge_df["sub_area"] = (
-            np.linalg.norm(sheet.edge_df[sheet.ncoords], axis=1) / 2
+                np.linalg.norm(sheet.edge_df[sheet.ncoords], axis=1) / 2
         )
         sheet.face_df["area"] = sheet.sum_face(sheet.edge_df["sub_area"])
 
@@ -61,7 +64,7 @@ class SheetGeometry(PlanarGeometry):
 
         """
         sheet.edge_df["sub_vol"] = (
-            sheet.upcast_srce(sheet.vert_df["height"]) * sheet.edge_df["sub_area"]
+                sheet.upcast_srce(sheet.vert_df["height"]) * sheet.edge_df["sub_area"]
         )
         sheet.face_df["vol"] = sheet.sum_face(sheet.edge_df["sub_vol"])
 
@@ -123,7 +126,18 @@ class SheetGeometry(PlanarGeometry):
 
         edge_height = sheet.upcast_srce(sheet.vert_df[["height", "rho"]])
         edge_height.set_index(sheet.edge_df["face"], append=True, inplace=True)
-        sheet.face_df[["height", "rho"]] = edge_height.groupby(level="face").mean()
+        sheet.face_df[["height", "rho"]] = edge_height.mean(level="face")
+
+    @staticmethod
+    def update_boundary_index(eptm):
+
+        eptm.vert_df['boundary'] = 0
+
+        eptm.get_opposite()
+
+        boundary_verts = eptm.edge_df.loc[eptm.edge_df['opposite'] == -1, 'trgt'].to_numpy()
+
+        eptm.vert_df.loc[boundary_verts, "boundary"] = 1
 
     @classmethod
     def reset_scafold(cls, sheet):
@@ -193,16 +207,15 @@ class SheetGeometry(PlanarGeometry):
            The rotated, relative positions of the face's vertices
         """
 
-        rel_pos = sheet.edge_df.query(f"face == {face}")[["srce", "rx", "ry", "rz"]]
-        rel_pos = rel_pos.set_index("srce")
-        rel_pos.index.name = "vert"
+        face_orbit = sheet.edge_df[sheet.edge_df["face"] == face]["srce"]
+        rel_pos = (sheet.vert_df.loc[face_orbit.to_numpy(), sheet.coords].to_numpy() - sheet.face_df.loc[
+            face, sheet.coords].to_numpy())
         _, _, rotation = np.linalg.svd(
-            rel_pos.to_numpy().astype(float), full_matrices=False
-        )
+            rel_pos, full_matrices=False)
         if psi:
             rotation = np.dot(rotation_matrix(psi, [0, 0, 1]), rotation)
         rot_pos = pd.DataFrame(
-            np.dot(rel_pos, rotation.T), index=rel_pos.index, columns=sheet.coords
+            np.dot(rel_pos, rotation.T), index=face_orbit, columns=sheet.coords
         )
         return rot_pos
 
@@ -213,8 +226,8 @@ class SheetGeometry(PlanarGeometry):
         vertices are mostly in the u, v plane.
 
         If method is 'normal', face is oriented with it's normal along w
-        if method is 'svd', the u, v, w is determined through
-        singular value decompostion of the face vertices relative  positions.
+        if method is 'svd', the u, v, w is determined through singular value decompostion
+        of the face vertices relative  positions.
 
         svd is slower but more effective at reducing face dimensionality.
 
@@ -297,6 +310,229 @@ class SheetGeometry(PlanarGeometry):
             rotated = np.einsum("ikj, ik -> ij", rots, rel_srce_pos)
         return np.arctan2(rotated[:, 1], rotated[:, 0])
 
+    @staticmethod
+    def update_boundary_index(sheet):
+        """Updates the vert_df and edge_df dataframes with a 'boundary' column
+        that takes values 0 and 1 with 1 denoting that an edge or vertex lies
+        on the tissue boundary, and 0 when it does not.
+
+        """
+
+        sheet.vert_df['boundary'] = 0
+        sheet.edge_df['boundary'] = 0
+
+        sheet.get_opposite()
+
+        sheet.edge_df.loc[sheet.edge_df['opposite'] == -1, 'boundary'] = 1
+        boundary_verts = sheet.edge_df.loc[sheet.edge_df['opposite'] == -1, 'trgt'].to_numpy()
+
+        sheet.vert_df.loc[boundary_verts, "boundary"] = 1
+
+
+class CylinderGeometryInit(SheetGeometry):
+
+    @staticmethod
+    def update_boundary_index(sheet):
+
+        sheet.vert_df['boundary'] = 0
+        sheet.edge_df['boundary'] = 0
+
+        sheet.get_opposite()
+
+        sheet.edge_df.loc[sheet.edge_df['opposite'] == -1, 'boundary'] = 1
+        boundary_verts = sheet.edge_df.loc[sheet.edge_df['opposite'] == -1, 'trgt'].to_numpy()
+
+        sheet.vert_df.loc[boundary_verts, "boundary"] = 1
+
+    @staticmethod
+    def update_tangents(sheet):
+
+        vert_coords = sheet.vert_df[sheet.coords]
+        vert_coords.loc[:, "z"] = 0
+        vert_coords = vert_coords.values
+        normal = np.column_stack((np.zeros(sheet.Nv), np.zeros(sheet.Nv), np.ones(sheet.Nv)))
+
+        tangent = np.cross(vert_coords, normal)
+        tangent = pd.DataFrame(tangent)
+
+        tangent.columns = ["t" + u for u in sheet.coords]
+
+        length = pd.DataFrame(tangent.eval("sqrt(tx**2 + ty**2 +tz**2)"), columns=['length'])
+        tangent["length"] = length["length"]
+
+        tangent = tangent[['tx', 'ty', 'tz']].div(length.length, axis=0)
+
+        for u in sheet.coords:
+            sheet.vert_df["t" + u] = tangent["t" + u]
+
+    @staticmethod
+    def update_face_tangents(sheet):
+
+        face_coords = sheet.face_df[sheet.coords]
+        face_coords["z"] = 0
+        face_coords = sheet.face_df[sheet.coords].values
+        normal = np.column_stack((np.zeros(sheet.Nf), np.zeros(sheet.Nf), np.ones(sheet.Nf)))
+
+        tangent = np.cross(face_coords, normal)
+        tangent = pd.DataFrame(tangent)
+
+        tangent.columns = ["t" + u for u in sheet.coords]
+
+        length = pd.DataFrame(tangent.eval("sqrt(tx**2 + ty**2 +tz**2)"), columns=['length'])
+        tangent["length"] = length["length"]
+
+        tangent = tangent[['tx', 'ty', 'tz']].div(length.length, axis=0)
+
+        for u in sheet.coords:
+            sheet.face_df["t" + u] = tangent["t" + u]
+
+    @staticmethod
+    def update_face_distance(sheet):
+        sheet.face_df['distance_z_axis'] = sheet.face_df.eval(
+            "sqrt(x** 2 + y** 2)"
+        )
+
+    @staticmethod
+    def update_vert_distance(sheet):
+        sheet.vert_df['distance_z_axis'] = sheet.vert_df.eval(
+            "sqrt(x** 2 + y** 2)"
+        )
+
+    @staticmethod
+    def update_vert_deviation(sheet):
+        if "dev_length" not in sheet.vert_df.columns:
+            sheet.vert_df["dev_length"] = np.nan
+        if "dx" not in sheet.vert_df.columns:
+            sheet.vert_df["dx"] = np.nan
+        if "dy" not in sheet.vert_df.columns:
+            sheet.vert_df["dy"] = np.nan
+        if "dz" not in sheet.vert_df.columns:
+            sheet.vert_df["dz"] = np.nan
+
+        edge_np = sheet.edge_df.to_numpy()
+        edge_dict = dict(zip(sheet.edge_df.columns,
+                             list(range(0, len(sheet.edge_df.columns)))))
+        vert_np = sheet.vert_df.to_numpy()
+        vert_dict = dict(zip(sheet.vert_df.columns,
+                             list(range(0, len(sheet.vert_df.columns)))))
+
+        grad1 = np.nan
+        grad2 = np.nan
+        gradt = np.nan
+        lenth = []
+
+        for i in sheet.vert_df.index:
+            mask = (i == edge_np[:, edge_dict["srce"]])
+            neighbor_verts = edge_np[mask, edge_dict["trgt"]].tolist()
+            neighbor_verts = vert_np[neighbor_verts][:, [vert_dict["x"], vert_dict["y"], vert_dict["z"]]]
+            vert_coords = vert_np[i, [vert_dict["x"], vert_dict["y"], vert_dict["z"]]]
+
+            if len(neighbor_verts) >= 3:
+                center = (neighbor_verts[0] + neighbor_verts[1] + neighbor_verts[2]) / 3
+
+                grad = np.array(vert_coords) - np.array(center)
+
+                length = np.linalg.norm(grad)
+
+                grad = grad / length
+
+            else:
+                grad = np.array([0, 0, 0])
+
+            if i == 0:
+                grad1 = grad
+
+            if i == 1:
+                grad2 = grad
+                gradt = np.vstack((grad1, grad2))
+
+            if i >= 2:
+                gradt = np.vstack((gradt, grad))
+
+            lenth.append(length)
+
+        gradt = pd.DataFrame(gradt, columns=['dx', 'dy', 'dz'])
+        sheet.vert_df[['dx', 'dy', 'dz']] = gradt
+        sheet.vert_df['dev_length'] = lenth
+
+    @staticmethod
+    def update_vert_deviation2(sheet):
+        if "dev_length" not in sheet.vert_df.columns:
+            sheet.vert_df["dev_length"] = np.nan
+        if "dx" not in sheet.vert_df.columns:
+            sheet.vert_df["dx"] = np.nan
+        if "dy" not in sheet.vert_df.columns:
+            sheet.vert_df["dy"] = np.nan
+        if "dz" not in sheet.vert_df.columns:
+            sheet.vert_df["dz"] = np.nan
+
+        for i in sheet.vert_df.index:
+            vert = sheet.vert_df.loc[i, ["x", "y", "z"]].to_numpy()
+            neighbors = sheet.edge_df.loc[sheet.edge_df["srce"] == 6, ["tx", "ty", "tz"]].to_numpy()
+            center = neighbors.sum(axis=0) / len(neighbors)
+            grad = vert - center
+            length = np.linalg.norm(grad)
+            sheet.vert_df[['dx', 'dy', 'dz']] = grad
+            sheet.vert_df['dev_length'] = length
+
+    @staticmethod
+    def update_lumen_vol(sheet):
+        lumen_pos_faces = sheet.edge_df[["f" + c for c in sheet.coords]].to_numpy()
+        lumen_sub_vol = (
+                np.sum((lumen_pos_faces) * sheet.edge_df[sheet.ncoords].to_numpy(), axis=1)
+                / 6
+        )
+        lumen_volume_gross = sum(lumen_sub_vol)
+
+        top_verts = sheet.vert_df.loc[(sheet.vert_df["boundary"] == 1) & (sheet.vert_df["z"] > 0)]
+        top_radius = top_verts["distance_z_axis"].values.mean()
+        top_height = top_verts["z"].values.mean()
+        top_volume = (1 / 3) * math.pi * top_radius ** 2 * top_height
+
+        bot_verts = sheet.vert_df.loc[(sheet.vert_df["boundary"] == 1) & (sheet.vert_df["z"] < 0)]
+        bot_radius = bot_verts["distance_z_axis"].values.mean()
+        bot_height = -bot_verts["z"].values.mean()
+        bot_volume = (1 / 3) * math.pi * bot_radius ** 2 * bot_height
+
+        sheet.settings["lumen_vol"] = top_volume + bot_volume + lumen_volume_gross
+
+    @staticmethod
+    def update_boundary_radius(sheet):
+        sheet.vert_df[["cx", "cy", "cz"]] = np.nan
+        sheet.vert_df.loc[(sheet.vert_df["boundary"] == 1) & (sheet.vert_df["z"] <= 0), ["cx", "cy", "cz"]] = (
+                    sheet.vert_df.loc[(sheet.vert_df["boundary"] == 1) & (sheet.vert_df["z"] <= 0), ["x", "y", "z"]] -
+                    sheet.settings["bot_center"]).to_numpy()
+        sheet.vert_df.loc[(sheet.vert_df["boundary"] == 1) & (sheet.vert_df["z"] >= 0), ["cx", "cy", "cz"]] = (
+                    sheet.vert_df.loc[(sheet.vert_df["boundary"] == 1) & (sheet.vert_df["z"] >= 0), ["x", "y", "z"]] -
+                    sheet.settings["top_center"]).to_numpy()
+        sheet.vert_df["bound_rad"] = sheet.vert_df.eval("(cx**2 + cy**2 + cz**2) ** 0.5")
+        sheet.vert_df[["cx", "cy", "cz"]] = sheet.vert_df[["cx", "cy", "cz"]].div(sheet.vert_df["bound_rad"], axis=0)
+        sheet.vert_df.fillna(0, inplace=True)
+
+    @classmethod
+    def update_all(cls, sheet):
+        super().update_all(sheet)
+        cls.update_boundary_index(sheet)
+        cls.update_tangents(sheet)
+        # cls.update_face_tangents(sheet)
+        # cls.update_face_distance(sheet)
+        cls.update_vert_distance(sheet)
+        cls.update_vert_deviation(sheet)
+        cls.update_lumen_vol(sheet)
+        # cls.update_boundary_radius(sheet)
+
+
+class CylinderGeometry(CylinderGeometryInit):
+
+    @classmethod
+    def update_all(cls, sheet):
+        super().update_all(sheet)
+        cls.update_preflumen_volume(sheet)
+
+    @staticmethod
+    def update_preflumen_volume(sheet):
+        sheet.settings["lumen_prefered_vol"] = sheet.settings["vol_cell"] * len(sheet.face_df)
+
 
 class ClosedSheetGeometry(SheetGeometry):
     """Geometry for a closed 2.5D sheet.
@@ -314,54 +550,24 @@ class ClosedSheetGeometry(SheetGeometry):
     def update_lumen_vol(sheet):
         lumen_pos_faces = sheet.edge_df[["f" + c for c in sheet.coords]].to_numpy()
         lumen_sub_vol = (
-            np.sum((lumen_pos_faces) * sheet.edge_df[sheet.ncoords].to_numpy(), axis=1)
-            / 6
+                np.sum((lumen_pos_faces) * sheet.edge_df[sheet.ncoords].to_numpy(), axis=1)
+                / 6
         )
         sheet.settings["lumen_vol"] = sum(lumen_sub_vol)
-
-
-class MidlineBoundaryGeometry(ClosedSheetGeometry):
-    @classmethod
-    def update_all(cls, eptm):
-        super().update_all(eptm)
-        cls.update_delta_boundary(eptm)
-
-    @staticmethod
-    def update_delta_boundary(eptm):
-        midline_boudary_stiffness = eptm.settings.get(
-            "midline_boundary_stiffness", False
-        )
-        # update boundary transgression
-        # leftright = 1|-1 depending on x position at start
-        # x / abs(x) = 1|-1 depending on current x position
-        # (x/abs(x)) - leftright = 0 if both are equal (vert has not crossed midline)
-        #                        = -2 if both are unequal and current x is negative
-        #                        = 2 if both are unequal and current x is positive
-        # hence, take (0|2|-2)*0.5x to get the distance from x axis as a positive number
-
-        if midline_boudary_stiffness is not False:
-            if "leftright" not in eptm.vert_df.columns:
-                eptm.vert_df["leftright"] = np.sign(eptm.vert_df["x"])
-            eptm.vert_df["delta_boundary"] = (
-                (np.sign(eptm.vert_df["x"]) - eptm.vert_df["leftright"])
-                * eptm.vert_df["x"]
-                / 2
-            )
 
 
 class EllipsoidGeometry(ClosedSheetGeometry):
     @staticmethod
     def update_height(eptm):
-
         a, b, c = eptm.settings["abc"]
         eptm.vert_df["theta"] = np.arcsin((eptm.vert_df.z / c).clip(-1, 1))
         eptm.vert_df["vitelline_rho"] = a * np.cos(eptm.vert_df["theta"])
         eptm.vert_df["basal_shift"] = (
-            eptm.vert_df["vitelline_rho"] - eptm.specs["vert"]["basal_shift"]
+                eptm.vert_df["vitelline_rho"] - eptm.specs["vert"]["basal_shift"]
         )
         eptm.vert_df["delta_rho"] = (
-            np.linalg.norm(eptm.vert_df[["x", "y"]], axis=1)
-            - eptm.vert_df["vitelline_rho"]
+                np.linalg.norm(eptm.vert_df[["x", "y"]], axis=1)
+                - eptm.vert_df["vitelline_rho"]
         ).clip(lower=0)
 
         SheetGeometry.update_height(eptm)
@@ -378,13 +584,9 @@ class WeightedPerimeterEllipsoidLameGeometry(ClosedSheetGeometry):
     of perimeter is based on weight of each junction.
 
     Meaning if all junction of a cell have the same weight, perimeter is
-    calculated as a usual perimeter calculation
-    .. math::
-         p = \\sum l_{ij}
+    calculated as a usual perimeter calculation (p = l_ij + l_jk + l_km + l_mn + l_ni)
     Otherwise, weight parameter allowed more or less importance of a junction in the
-    perimeter calculation
-    .. math::
-         p = \\sum w_{ij} \\, l_{ij}
+    perimeter calculation (p = w_ij*l_ij + w_jk*l_jk + w_km*l_km + w_mn*l_mn + w_ni*l_ni)
 
     In this geometry, a sphere surrounding the tissue, meaning a force is apply only at
     the extremity of the tissue; `eptm.vert_df['delta_rho']` is computed as the
@@ -422,7 +624,6 @@ class WeightedPerimeterEllipsoidLameGeometry(ClosedSheetGeometry):
 
     @staticmethod
     def update_height(eptm):
-
         eptm.vert_df["rho"] = np.linalg.norm(eptm.vert_df[eptm.coords], axis=1)
         r = eptm.settings["barrier_radius"]
         eptm.vert_df["delta_rho"] = (eptm.vert_df["rho"] - r).clip(0)
@@ -430,7 +631,6 @@ class WeightedPerimeterEllipsoidLameGeometry(ClosedSheetGeometry):
 
 
 def face_svd_(faces):
-
     rel_pos = faces[["rx", "ry", "rz"]]
     _, _, rotation = np.linalg.svd(rel_pos.astype(float), full_matrices=False)
     return rotation
