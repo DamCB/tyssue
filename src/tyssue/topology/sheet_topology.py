@@ -256,6 +256,7 @@ def drop_face(eptm, face, geom, **kwargs):
     eptm.sanitize(trim_borders = True)
     geom.update_all(eptm)
 
+    eptm.network_changed = True
 
 def resolve_t1s(sheet, geom, model, solver, max_iter=60):
 
