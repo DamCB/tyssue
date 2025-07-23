@@ -245,7 +245,6 @@ def face_division(sheet, mother, vert_a, vert_b):
     sheet.reset_topo()
     return daughter
 
-
 def drop_face(eptm, face, geom, **kwargs):
     """
     Removes the face indexed by "face" and all associated edges to allow holes
