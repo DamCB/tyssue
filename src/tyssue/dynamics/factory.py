@@ -240,7 +240,7 @@ Setting all default values to 1.0 for now
 
             grad_i = sum([g for g in (grad_s, grad_t, grad_v) if g is not None])
 
-            grad_i.loc[eptm.vert_df["boundary"]==1, ["gx", "gy", "gz"]] = 0
+            grad_i.loc[(eptm.vert_df["boundary"]==1) & (eptm.vert_df["z"] < 0), ["gx", "gy", "gz"]] = 0
 
             g = grad_i[["gx", "gy", "gz"]].values
             n = eptm.vert_df[["x", "y", "z"]].values
