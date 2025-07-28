@@ -1,6 +1,6 @@
 *.py[cod]
 
-# C extensions
+# C extensions 
 *.so
 *.lo
 *.la
