@@ -497,6 +497,10 @@ class CylinderGeometryInit(SheetGeometry):
         sheet.settings["lumen_vol"] = top_volume + bot_volume + lumen_volume_gross
 
     @staticmethod
+    def update_vol_cell(sheet):
+        sheet.settings["vol_cell"] = sheet.settings["lumen_vol"]/len(sheet.face_df)
+
+    @staticmethod
     def update_boundary_radius(sheet):
         sheet.vert_df[["cx", "cy", "cz"]] = np.nan
         sheet.vert_df.loc[(sheet.vert_df["boundary"] == 1) & (sheet.vert_df["z"] <= 0), ["cx", "cy", "cz"]] = (
@@ -519,6 +523,7 @@ class CylinderGeometryInit(SheetGeometry):
         cls.update_vert_distance(sheet)
         cls.update_vert_deviation(sheet)
         cls.update_lumen_vol(sheet)
+        # cls.update_vol_cell(sheet)
         # cls.update_boundary_radius(sheet)
 
 
@@ -527,7 +532,7 @@ class CylinderGeometry(CylinderGeometryInit):
     @classmethod
     def update_all(cls, sheet):
         super().update_all(sheet)
-        cls.update_preflumen_volume(sheet)
+        # cls.update_preflumen_volume(sheet)
 
     @staticmethod
     def update_preflumen_volume(sheet):

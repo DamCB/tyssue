@@ -11,16 +11,25 @@ class VesselGeometry(SheetGeometry):
     
     @staticmethod     
     def update_boundary_index(sheet):
-        
+    # Reset boundary flags
         sheet.vert_df['boundary'] = 0
         sheet.edge_df['boundary'] = 0
-        
+        sheet.face_df['boundary'] = 0
+
+        # Update opposite edges
         sheet.get_opposite()
-        
-        sheet.edge_df.loc[sheet.edge_df['opposite'] == -1, 'boundary'] = 1
-        boundary_verts = sheet.edge_df.loc[sheet.edge_df['opposite'] == -1, 'trgt'].to_numpy()
-        
-        sheet.vert_df.loc[boundary_verts, "boundary"] = 1
+
+        # Identify boundary edges
+        boundary_edges = sheet.edge_df['opposite'] == -1
+        sheet.edge_df.loc[boundary_edges, 'boundary'] = 1
+
+        # Set boundary vertices
+        boundary_verts = sheet.edge_df.loc[boundary_edges, 'trgt']
+        sheet.vert_df.loc[boundary_verts.unique(), 'boundary'] = 1
+
+        # Set boundary faces
+        boundary_faces = sheet.edge_df.loc[boundary_edges, 'face']
+        sheet.face_df.loc[boundary_faces.dropna().unique().astype(int), 'boundary'] = 1
 
     @staticmethod
     def update_tangents(sheet): 

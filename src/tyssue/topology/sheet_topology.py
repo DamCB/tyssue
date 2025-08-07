@@ -252,7 +252,7 @@ def drop_face(eptm, face, geom, **kwargs):
     edge = eptm.edge_df.loc[(eptm.edge_df['face'] == face)].index
 
     eptm.remove(edge, **kwargs)
-    eptm.sanitize(trim_borders = True)
+    eptm.sanitize(trim_borders = False)
     geom.update_all(eptm)
 
     eptm.network_changed = True

@@ -676,13 +676,13 @@ class SurfaceElasticity(AbstractEffector):
     @staticmethod
     def energy(eptm):
         return elastic_energy(
-            eptm.vert_df, "dev_length", "surface_elasticity * is_alive", "prefered_deviation"
+            eptm.vert_df, "dev_length", "surface_elasticity * is_active", "prefered_deviation"
         )
 
     @staticmethod
     def gradient(eptm):
         ka_a0_ = elastic_force(
-            eptm.vert_df, "dev_length", "surface_elasticity * is_alive", "prefered_deviation"
+            eptm.vert_df, "dev_length", "surface_elasticity * is_active", "prefered_deviation"
         )
 
         ka_a0 = to_nd(ka_a0_, len(eptm.coords))
