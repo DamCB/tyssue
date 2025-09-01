@@ -1,5 +1,16 @@
 # tyssue : An epithelium simulation library
 
+See [This mastodon thread for future work and migration details](https://biologists.social/@glyg/115128613157899428) 
+
+
+
+## [ANN] Migration to  codeberg
+
+Dear tyssue users and contributors,  I am looking for one or several (one can hope) maintainers for this library, for which I unfortunately cannot find any time.
+
+I think the mesh creation tool and the APIs could be salvaged, at the coat of the integration 
+
+
 
 ## [ANN] Working on a 1.0 release
 
