@@ -1,6 +1,21 @@
 # tyssue : An epithelium simulation library
 
 
+> [!IMPORTANT]  
+> The vivarium team in Conecticut considerably augmented and improved [tyssue](https://github.com/vivarium-collective/vivatyssue)
+> within their larger modeling framework. Go look it's great work.
+> I (@glyg) proposed to make **their fork the default tyssue** implementation
+> and cede them access to the pipy repository. This is still in discussion.
+> 
+> Please open an issue here if this impacts your work.
+
+
+> [!DANGER]
+> You have until **March 3rd 2026** to contact me if you have concerns.
+> After that, independent of @sniffo et al to  take up the codebase, I will
+> archive this repository, as I can't find time to properly maintain it, as the one-year-old unticked boxes bellow can attest.
+
+
 ## [ANN] Working on a 1.0 release
 
 Dear tyssue user or prospective user, I come with good bearings.
