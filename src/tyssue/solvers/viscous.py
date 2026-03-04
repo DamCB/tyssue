@@ -98,6 +98,9 @@ class EulerSolver:
     def record(self, t):
         self.history.record(time_stamp=t)
 
+    def update_datasets(self):
+        self.history.update_datasets()
+
     def solve(self, tf, dt, on_topo_change=None, topo_change_args=()):
         """Solves the system of differential equations from the current time
         to tf with steps of dt with a forward Euler method.
@@ -132,6 +135,9 @@ class EulerSolver:
                 self.eptm.topo_changed = False
             self.record(t)
 
+            if t == tf:
+                self.update_datasets()
+                
     def ode_func(self, t, pos):
         """Computes the models' gradient.
 
