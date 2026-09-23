@@ -3,14 +3,12 @@
 
 ## About this fork
 
-This is the maintained continuation of [`DamCB/tyssue`](https://github.com/DamCB/tyssue),
-originally created by Guillaume Gay, Sophie Theis, Magali Suzanne and the tyssue
-contributors. It is developed by the
-[vivarium-collective](https://github.com/vivarium-collective) with the upstream
-maintainers' agreement, remains GPL-3.0, and keeps the original author list and
-citation intact.
+This repository is a fork of [DamCB/tyssue](https://github.com/DamCB/tyssue),
+created by Guillaume Gay, Sophie Theis, Magali Suzanne and the tyssue contributors.
+With the agreement of the original authors, tyssue is developed here by the
+[vivarium-collective](https://github.com/vivarium-collective).
 
-Releases are published to PyPI as `tyssue`. Conda packaging is no longer maintained.
+Releases are published on PyPI under the name `tyssue`.
 
 ![A nice banner](doc/illus/banner.png)
 
@@ -20,9 +18,9 @@ Releases are published to PyPI as `tyssue`. Conda packaging is no longer maintai
 | --- | --- | --- |
 | [![PyPI version](https://img.shields.io/pypi/v/tyssue.svg)](https://pypi.org/project/tyssue/) | [![PyPI downloads](https://img.shields.io/pypi/dm/tyssue.svg)](https://pypi.org/project/tyssue/) | [![Python versions](https://img.shields.io/pypi/pyversions/tyssue.svg)](https://pypi.org/project/tyssue/) |
 
-| Coverage | Doc | CHAT |
+| Tests | Doc | CHAT |
 | --- | --- | --- |
-| [![Coverage Status](https://coveralls.io/repos/DamCB/tyssue/badge.svg)](https://coveralls.io/r/DamCB/tyssue) | [![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/) |  [![Join the chat at https://gitter.im/DamCB/tyssue](https://badges.gitter.im/DamCB/tyssue.svg)](https://gitter.im/DamCB/tyssue?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
+| [![Tests](https://github.com/vivarium-collective/vivatyssue/actions/workflows/tests.yml/badge.svg)](https://github.com/vivarium-collective/vivatyssue/actions/workflows/tests.yml) | [![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/) |  [![Join the chat at https://gitter.im/DamCB/tyssue](https://badges.gitter.im/DamCB/tyssue.svg)](https://gitter.im/DamCB/tyssue?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
 
 
 # tyssue is now published in the Journal of Open Source Software!
@@ -115,13 +113,12 @@ fig, ax = sheet_view(sheet)
 
 ### Documentation
 
-* The documentation is now browsable on [tyssue.io](http://tyssue.io)
 * The old documentation is still browsable online [here](http://tyssue.readthedocs.io/en/latest/)
 * Introduction notebooks are available [here](https://github.com/DamCB/tyssue-demo).
 
 ### Quick view with Colab
 
-To quickly try out and get an intution on how tyssue works, a jupyter notebook has been developed in [Google Colab](https://colab.research.google.com/github/DamCB/tyssue/blob/main/notebooks/basic_usage_quick.ipynb).
+To quickly try out and get an intution on how tyssue works, a jupyter notebook has been developed in [Google Colab](https://colab.research.google.com/github/vivarium-collective/vivatyssue/blob/main/notebooks/basic_usage_quick.ipynb).
 Google Colab is an on-line jupyter notebook that requires no setup and is free to use.
 To use it, simply sign in with your Google account and run all of the cells. 
 Feel free to try different geometries, topologies, and mechanical properties that you can set within the Google Colab environment.
@@ -132,7 +129,6 @@ You can find it [here](https://github.com/kephale/napari-tyssue).
 
 
 ### What's new in 1.0 ?
-* No collision in 2D (use effector `Repulsion`)
 * Add new geometry : 2D lateral geometry
 * Add mean calculation in `Epithelium`
 * Add `sheet` conversion to `mesh` from `Meshio`
@@ -148,7 +144,6 @@ What is planned for the future of `Tyssue`?
   * Compound geometry to form complex shape
   * Use biological image as blueprint
 * Add rheology model
-* Switch to github-action for continuous integration
 
 ### Mailing list:
 
@@ -162,11 +157,12 @@ Unsubscribe ➙ https://framalistes.org/sympa/sigrequest/tyssue
 
 * Bertrand Caré - @bcare
 * Cyprien Gay - @cypriengay
-* Guillaume Gay (maintainer) - @glyg
+* Guillaume Gay - @glyg
 * Hadrien Mary - @hadim
 * François Molino
 * Magali Suzanne
 * Sophie Theis - @sophietheis
+* Tasnif Rahman (maintainer) - @sniffo
 
 ## Dependencies
 
@@ -181,29 +177,41 @@ it's time to move on...
 - Python >= 3.10
 - numpy
 - scipy
-- matplotlib
 - pandas
+- matplotlib
+- networkx
+- meshio
+- quantities
+- scikit-image
 - pytables
+- ipywidgets
+
+### Visualisation (`tyssue[viz]`)
+
+- ipyvolume
+- pythreejs
+- vispy
 - jupyter
 - notebook
-- quantities
-- ipywidgets
-- pythreejs
-- ipyvolume
-- vispy
+
+### Zarr (`tyssue[zarr]`)
+
+- zarr
+- xarray
 
 ### Tests
 
 - pytest
-- coverage
 - pytest-cov
+- nbval
+- nox
 
 </details>
 
 
 ## Install
 
-tyssue is a pure python package, installed from PyPI:
+tyssue no longer depends on CGAL and is a pure python package, installed from PyPI:
 
 ```bash
 python -m pip install --upgrade tyssue
@@ -212,25 +220,23 @@ python -m pip install --upgrade tyssue
 ### Optional extras
 
 ```bash
-python -m pip install "tyssue[viz]"   # ipyvolume, pythreejs, vispy, jupyter — 3D/interactive views
-python -m pip install "tyssue[zarr]"  # zarr + xarray, for tyssue.io.zarr
+python -m pip install "tyssue[viz]"   # 3D and interactive visualisation
+python -m pip install "tyssue[zarr]"  # zarr file support
 ```
 
-The core install covers simulation and the matplotlib-based drawing in
-`tyssue.draw.plt_draw`. Anything needing a WebGL or Qt canvas lives in `viz`.
+The base install is enough to run simulations and to draw with matplotlib.
+The `viz` extra is needed for the ipyvolume and vispy 3D views.
 
 ### Writing gifs
 
-`create_gif` and `create_gif_3d` shell out to [ImageMagick](https://imagemagick.org),
-a system binary rather than a Python package, so install it separately:
+`create_gif` and `create_gif_3d` use [ImageMagick](https://imagemagick.org),
+which is not a python package and has to be installed separately:
 
 | Platform | Command |
 | --- | --- |
 | macOS | `brew install imagemagick` |
 | Debian/Ubuntu | `sudo apt install imagemagick` |
 | Windows | [installer](https://imagemagick.org/script/download.php#windows) |
-
-Everything else works without it.
 
 ### From source
 
