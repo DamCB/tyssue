@@ -18,6 +18,77 @@
   again: the CGAL `make_spherical` point generator was replaced by a numpy
   Fibonacci-spiral one, `generation.shapes.make_spherical`.
 
+## Topology: type 3 transitions, T3 renamed T2
+
+- **New type 3 transition** (Fletcher et al. 2013): a border vertex that comes
+  closer than `settings["t3_threshold"]` (default 1e-2) to a free edge of another
+  cell is merged into that edge. Topology operation
+  `topology.sheet_topology.t3_transition`, batched action
+  `behaviors.sheet.actions.t3_transitions` and self re-appending event
+  `behaviors.sheet.t3`. Enable it with `EulerSolver(..., with_t3=True)`
+  (previously a no-op) the same way `auto_reconnect` works. Only border
+  vertices and free edges are searched, with a Verlet candidate list
+  (`settings["t3_skin"]`, default `10 * t3_threshold`); without contacts it
+  costs ~1% of a step and leaves the trajectory bitwise unchanged.
+  `Sheet` only.
+- **The removal of small triangular faces is now called a type 2 transition**,
+  as in the vertex model literature: `QSSolver(with_t2=...)`,
+  `single_rearangement(..., with_t2=...)`, `all_rearangements(..., with_t2=...)`,
+  `lumen_closure(with_t2=...)` and `topology.auto_t2`. The former `with_t3`
+  arguments and `auto_t3` still work, with a `FutureWarning`, and behave as
+  before.
+- New `settings["detach_boundary"]` (default True): when False,
+  `detach_vertices` (and so `reconnect`) never detaches border vertices, which
+  keeps the rank 4 junctions left by T3 transitions.
+
+## Behaviour change: unit edge vectors
+
+- **Simulation results differ from earlier versions.** `update_all` computed the
+  unit edge vectors (`ux`, `uy`, `uz`) *before* the edge lengths, so they were
+  divided by the lengths of the previous call: off by the relative length change
+  since then (typically 0.04%, but up to 9x on short edges and 44x on edges just
+  created by a T1, whose row inherits its parent's length). Line tension and
+  contractility forces use them. Lengths are now computed first, so the vectors
+  are exact after a single `update_all` and the gradient matches the energy
+  (1.5% vs 7-31% relative error on a test sheet). `update_all` is now idempotent
+  for every geometry class except `WeightedPerimeterPlanarGeometry`, which
+  re-centres the vertices (see the new `idempotent_update` class attribute).
+- `EulerSolver` still updates the geometry after the vertex displacement every
+  step, and after the events whenever they changed anything (topology, or any
+  vertex moved, merged or split). It skips that second update only when the
+  queued events are `reconnect`, `t3` or `wait`, the geometry is idempotent, and
+  positions and topology are unchanged: `auto_reconnect` steps are ~4.5x faster.
+
+## Cylinder geometry
+
+- `CylinderGeometryInit.update_vert_deviation` now measures every vertex's
+  deviation from the mean position of **all** its neighbours (linked either way,
+  as on a free border), whatever its rank and whether or not it is on the
+  boundary. It used the first three neighbours listed in `edge_df`, so rosettes
+  (rank 4 and above) ignored some neighbours and changed value whenever the edge
+  table was reordered; rank 3 vertices are unchanged (up to rounding, ~1e-14).
+  It also failed with an `UnboundLocalError` on any open mesh whose first vertex
+  had fewer than three neighbours. It is now vectorised, independent of edge
+  order, and works with a non-contiguous vertex index. The unused and broken
+  `update_vert_deviation2` was removed.
+
+## Performance
+
+- `update_boundary_index` is cached on a topology signature and only recomputed
+  after a topology change (it used to run a full opposite-edge search on every
+  `SheetGeometry.update_all`): sheet solver steps are ~40% faster. It moved to
+  `PlanarGeometry` (still available on every geometry) and
+  `PlanarGeometry.update_all` now maintains the `boundary` columns too.
+- `reconnect` is ~150x faster (34 ms -> 0.2 ms per call on a 3k-vertex sheet):
+  `detach_vertices` built a dense (Nv, Nv) connectivity matrix every step to get
+  vertex ranks. New `utils.connectivity.vertex_rank` computes them from the edge
+  list and caches them until the topology changes; `Epithelium.update_rank` uses
+  it too. `merge_vertices` scans for short edges without pandas boolean
+  indexing. Results, including random draws, are unchanged.
+- `get_opposite` is ~8x faster (integer keys instead of a structured array
+  sort); with duplicated (`srce`, `trgt`) pairs the first row is now the one
+  matched, deterministically.
+
 ## Core
 
 - Set an `"id"` column by default

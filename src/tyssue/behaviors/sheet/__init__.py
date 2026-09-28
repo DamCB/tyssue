@@ -12,6 +12,7 @@ from .basic_events import (  # noqa
     division,
     face_elimination,
     reconnect,
+    t3,
     type1_transition,
 )
 from .delamination_events import constriction  # noqa

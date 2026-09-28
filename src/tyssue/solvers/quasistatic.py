@@ -8,7 +8,7 @@ import numpy as np
 from scipy import optimize
 
 from .. import config
-from ..topology import auto_t1, auto_t3
+from ..topology import _t2_flag, auto_t1, auto_t2
 from .base import TopologyChangeError, set_pos
 
 log = logging.getLogger(__name__)
@@ -32,31 +32,34 @@ class QSSolver:
       by the model
     """
 
-    def __init__(self, with_t1=False, with_t3=False):
+    def __init__(self, with_t1=False, with_t2=False, with_t3=None):
         """Creates a quasistatic gradient descent solver with optional
-        type1 and type3 transition solving routines.
+        type1 and type2 transition solving routines.
 
         Parameters
         ----------
         with_t1 : bool, default False
             whether or not to solve type 1 transitions at each
             iteration.
-        with_t3 : bool, default False
-            whether or not to solve type 3 transitions
+        with_t2 : bool, default False
+            whether or not to solve type 2 transitions
             (i.e. elimnation of small triangular faces) at each
             iteration.
+        with_t3 : bool, optional
+            deprecated alias of `with_t2`
 
         Those corrections are applied in this order: first the type 1, then the
-        type 3
+        type 2
 
         """
+        with_t2 = _t2_flag(with_t2, with_t3)
         self.set_pos = set_pos
         if with_t1:
             self.set_pos = auto_t1(self.set_pos)
-        if with_t3:
-            self.set_pos = auto_t3(self.set_pos)
+        if with_t2:
+            self.set_pos = auto_t2(self.set_pos)
         self.restart = True
-        self.rearange = with_t1 or with_t3
+        self.rearange = with_t1 or with_t2
         self.res = {"success": False, "message": "Not Started"}
         self.num_restarts = 0
 

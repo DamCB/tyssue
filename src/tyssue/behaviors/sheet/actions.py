@@ -9,13 +9,15 @@ import logging
 import warnings
 
 import numpy as np
+from scipy.spatial import cKDTree
 
 from ...core.sheet import Sheet
+from ...geometry.planar_geometry import update_boundary_index
 from ...topology.base_topology import collapse_edge
 from ...topology.bulk_topology import split_vert as bulk_split
 from ...topology.sheet_topology import remove_face
 from ...topology.sheet_topology import split_vert as sheet_split
-from ...topology.sheet_topology import type1_transition
+from ...topology.sheet_topology import t3_transition, type1_transition
 from ...utils import connectivity
 
 logger = logging.getLogger(__name__)
@@ -30,22 +32,26 @@ def merge_vertices(sheet):
 
     """
     d_min = sheet.settings.get("threshold_length", 1e-3)
-    # copy=True: pandas 3 hands back a read-only array, which shuffle rejects
-    short = sheet.edge_df[sheet.edge_df["length"] < d_min].index.to_numpy(copy=True)
+    short = _short_edges(sheet, d_min)
     np.random.shuffle(short)
     if not short.shape[0]:
         return -1
     logger.info(f"Collapsing {short.shape[0]} edges")
     while short.shape[0]:
         collapse_edge(sheet, short[0], allow_two_sided=False)
-        short = sheet.edge_df[sheet.edge_df["length"] < d_min].index.to_numpy(
-            copy=True
-        )
+        short = _short_edges(sheet, d_min)
         np.random.shuffle(short)
 
     sheet.network_changed = True
 
     return 0
+
+
+def _short_edges(sheet, d_min):
+    """Labels of the edges shorter than `d_min`, in edge_df order, as a
+    writeable array (pandas 3 hands back read-only ones, which shuffle rejects)."""
+    mask = sheet.edge_df["length"].to_numpy() < d_min
+    return sheet.edge_df.index[mask].to_numpy(copy=True)
 
 
 def detach_vertices(sheet):
@@ -55,14 +61,16 @@ def detach_vertices(sheet):
     Uses two probabilities `p_4` and `p_5p` stored in
     sheet.settings.
 
+    If `sheet.settings["detach_boundary"]` is False (default True), vertices on
+    the free border of a :class:`Sheet` are never detached. A type 3 transition leaves a rank 4
+    vertex on the border, which would otherwise eventually be split again.
+
     Parameters
     ----------
     sheet : a :class:`Sheet` object
 
     """
-    # sheet.update_rank()
-    st_connect = connectivity.srce_trgt_connectivity(sheet)
-    rank = ((st_connect + st_connect.T) > 0).sum(axis=0)
+    rank = connectivity.vertex_rank(sheet)
     if isinstance(sheet, Sheet):
         min_rank = 3
         split_vert = sheet_split
@@ -84,6 +92,15 @@ def detach_vertices(sheet):
     dice5p = np.random.random(rank5p.size)
 
     to_detach = np.concatenate([rank4[dice4 < p_4], rank5p[dice5p < p_5p]])
+    # filtered after the draws, so the random stream does not depend on it
+    if (
+        to_detach.size
+        and isinstance(sheet, Sheet)
+        and not sheet.settings.get("detach_boundary", True)
+    ):
+        update_boundary_index(sheet, with_faces=False)
+        on_border = sheet.vert_df.loc[to_detach, "boundary"].to_numpy() == 1
+        to_detach = to_detach[~on_border]
     if to_detach.size:
         logger.info(f"Detaching {to_detach.size} vertices")
         nv = sheet.Nv
@@ -92,6 +109,212 @@ def detach_vertices(sheet):
 
         if sheet.Nv != nv:
             sheet.network_changed = True
+
+
+def t3_transitions(sheet):
+    """Merges every border vertex closer than `t3_threshold` to a free edge of
+    another cell into that edge (type 3 transitions).
+
+    Uses `t3_threshold` (default 1e-2) and `t3_skin` (default
+    `10 * t3_threshold`) from `sheet.settings`.
+
+    Only border vertices and free edges are considered, as given by the boundary
+    index (see :meth:`PlanarGeometry.update_boundary_index`). Candidate pairs are
+    kept in a Verlet list: pairs closer than `t3_threshold + t3_skin` are found
+    once with a KD-tree and re-used until a border vertex has moved by more than
+    half the skin since, so most calls only compute a handful of distances.
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+
+    Returns
+    -------
+    the number of transitions performed, or -1 if the sheet has no free border
+    """
+    if not isinstance(sheet, Sheet):
+        raise TypeError("T3 transitions are only implemented for Sheet objects")
+
+    d_min = sheet.settings.get("t3_threshold", 1e-2)
+    skin = sheet.settings.get("t3_skin", 10 * d_min)
+    verts, edges, _ = find_t3_candidates(sheet, d_min, skin)
+    if verts is None:
+        return -1
+    if not len(verts):
+        return 0
+
+    used_verts, used_edges = set(), set()
+    done = 0
+    edge_index = sheet.edge_df.index
+    vert_index = sheet.vert_df.index
+    for v_pos, e_pos in zip(verts, edges):
+        vert, edge = vert_index[v_pos], edge_index[e_pos]
+        srce, trgt = sheet.edge_df.loc[edge, ["srce", "trgt"]]
+        # one transition per vertex and edge per call: the geometry around
+        # them changed, the next call re-evaluates the rest
+        if {vert, srce, trgt} & used_verts or edge in used_edges:
+            continue
+        if t3_transition(sheet, vert, edge, reindex=False) == 0:
+            used_verts.update((vert, srce, trgt))
+            used_edges.add(edge)
+            done += 1
+    if done:
+        sheet.reset_topo()
+        logger.info("Performed %d T3 transitions", done)
+    return done
+
+
+def find_t3_candidates(sheet, d_min, skin=None):
+    """Border vertex / free edge pairs closer than `d_min`, closest first.
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` object
+    d_min : float, the merge distance
+    skin : float, default `10 * d_min`, the Verlet list margin
+
+    Returns
+    -------
+    verts, edges : positional indices in vert_df and edge_df
+    dists : the corresponding vertex to edge distances
+
+    All three are None if the sheet has no free edge.
+    """
+    if skin is None:
+        skin = 10 * d_min
+    update_boundary_index(sheet, with_faces=False)
+    bnd = sheet._boundary
+    if not len(bnd.free_edges):
+        return None, None, None
+
+    # column by column: an order of magnitude faster than vert_df[coords]
+    pos = np.column_stack(
+        [sheet.vert_df[c].to_numpy(dtype=float) for c in sheet.coords]
+    )
+    cache = getattr(sheet, "_t3_cache", None)
+    if cache is None or cache["signature"] != bnd.signature:
+        cache = {"signature": bnd.signature, **_t3_topology(sheet, bnd)}
+        sheet._t3_cache = cache
+
+    # Verlet criterion: a point of a segment moves at most as far as its farther
+    # end, so while no border vertex moved by more than skin / 2, every pair now
+    # closer than d_min was closer than d_min + skin when the list was built.
+    if (
+        cache.get("d_min") != d_min
+        or cache.get("skin") != skin
+        or np.any(
+            np.linalg.norm(pos[cache["border"]] - cache["ref_pos"], axis=1) > skin / 2
+        )
+    ):
+        cand_v, cand_k = _t3_neighbor_list(bnd, cache, pos, d_min + skin)
+        cache.update(
+            d_min=d_min,
+            skin=skin,
+            ref_pos=pos[cache["border"]],
+            verts=cand_v,
+            free_k=cand_k,
+        )
+
+    cand_v, cand_k = cache["verts"], cache["free_k"]
+    if not len(cand_v):
+        empty = np.array([], dtype=np.int64)
+        return empty, empty, np.array([])
+
+    pa = pos[bnd.free_srce[cand_k]]
+    pb = pos[bnd.free_trgt[cand_k]]
+    pv = pos[cand_v]
+    ab = pb - pa
+    t = np.einsum("ij,ij->i", pv - pa, ab) / np.maximum(
+        np.einsum("ij,ij->i", ab, ab), 1e-30
+    )
+    dist = np.linalg.norm(pa + t[:, None] * ab - pv, axis=1)
+    # a projection close to an end is left to that end's own edges
+    close = (dist < d_min) & (t > 0.05) & (t < 0.95)
+    order = np.argsort(dist[close], kind="stable")
+    return (
+        cand_v[close][order],
+        bnd.free_edges[cand_k[close]][order],
+        dist[close][order],
+    )
+
+
+def _t3_topology(sheet, bnd):
+    """The parts of the T3 search that only depend on topology.
+
+    nv, nf     element counts the keys are built with
+    border     positional indices of every vertex on a free edge
+    face_keys  sorted `vert * Nf + face` keys, a border vertex in a face
+    link_keys  sorted `min * Nv + max` keys, a border vertex linked by an edge
+    """
+    edge_df = sheet.edge_df
+    nv, nf = len(sheet.vert_df), len(sheet.face_df)
+    border = np.union1d(bnd.free_srce, bnd.free_trgt)
+    on_border = np.zeros(nv + 1, dtype=bool)  # extra slot for get_indexer's -1
+    on_border[border] = True
+
+    e_srce = sheet.vert_df.index.get_indexer(edge_df["srce"].to_numpy())
+    e_trgt = sheet.vert_df.index.get_indexer(edge_df["trgt"].to_numpy())
+    e_face = sheet.face_df.index.get_indexer(edge_df["face"].to_numpy())
+
+    in_face = on_border[e_srce]
+    face_keys = np.unique(e_srce[in_face] * nf + e_face[in_face])
+    linked = on_border[e_srce] | on_border[e_trgt]
+    lo = np.minimum(e_srce[linked], e_trgt[linked])
+    hi = np.maximum(e_srce[linked], e_trgt[linked])
+    link_keys = np.unique(lo * nv + hi)
+    return {
+        "nv": nv,
+        "nf": nf,
+        "border": border,
+        "face_keys": face_keys,
+        "link_keys": link_keys,
+    }
+
+
+def _in_sorted(keys, sorted_keys):
+    """Membership of `keys` in the sorted array `sorted_keys`."""
+    if not len(sorted_keys):
+        return np.zeros(len(keys), dtype=bool)
+    idx = np.minimum(np.searchsorted(sorted_keys, keys), len(sorted_keys) - 1)
+    return sorted_keys[idx] == keys
+
+
+def _t3_neighbor_list(bnd, cache, pos, radius):
+    """(border vertex, free edge) pairs possibly closer than `radius`.
+
+    Returns positional vertex indices and indices into the boundary index
+    free-edge arrays. Pairs where the vertex belongs to the edge's face or is
+    linked to one of its ends can never merge and are dropped here.
+    """
+    empty = np.array([], dtype=np.int64)
+    pa = pos[bnd.free_srce]
+    pb = pos[bnd.free_trgt]
+    mid = (pa + pb) / 2
+    half = np.linalg.norm(pb - pa, axis=1) / 2
+
+    # a diverged (non finite) vertex can not be placed, it is left out
+    border = cache["border"]
+    border = border[np.isfinite(pos[border]).all(axis=1)]
+    edges_k = np.flatnonzero(np.isfinite(mid).all(axis=1) & np.isfinite(half))
+    if not (len(border) and len(edges_k)):
+        return empty, empty
+
+    tree = cKDTree(pos[border])
+    hits = tree.query_ball_point(mid[edges_k], half[edges_k] + radius)
+    counts = np.fromiter((len(h) for h in hits), dtype=np.int64, count=len(hits))
+    if not counts.sum():
+        return empty, empty
+    free_k = np.repeat(edges_k, counts)
+    verts = border[np.concatenate(hits).astype(np.int64)]
+
+    nv, nf = cache["nv"], cache["nf"]
+    in_face = _in_sorted(verts * nf + bnd.free_face[free_k], cache["face_keys"])
+    linked = np.zeros(len(verts), dtype=bool)
+    for end in (bnd.free_srce[free_k], bnd.free_trgt[free_k]):
+        key = np.minimum(verts, end) * nv + np.maximum(verts, end)
+        linked |= (verts == end) | _in_sorted(key, cache["link_keys"])
+    keep = ~(in_face | linked)
+    return verts[keep], free_k[keep]
 
 
 def set_value(sheet, element, index, set_value, col):

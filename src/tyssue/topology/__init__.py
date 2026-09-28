@@ -1,4 +1,5 @@
 import logging
+import warnings
 from functools import wraps
 from itertools import count
 
@@ -30,7 +31,7 @@ from .bulk_topology import (  # noqa: F401
     find_rearangements,
     fuse_lateral_faces,
 )
-from .sheet_topology import remove_face, type1_transition
+from .sheet_topology import remove_face, t3_transition, type1_transition
 
 MAX_ITER = 10
 logger = logging.getLogger(name=__name__)
@@ -44,26 +45,46 @@ class TopologyChangeError(ValueError):
     pass
 
 
-def all_rearangements(eptm, with_t3=True):
-    """Performs rearangements (T3/HI first) until
+def _t2_flag(with_t2, with_t3, stacklevel=3):
+    """Resolves the deprecated `with_t3` alias of `with_t2`."""
+    if with_t3 is None:
+        return with_t2
+    warnings.warn(
+        "`with_t3` is deprecated, use `with_t2`: the removal of small triangular "
+        "faces is a type 2 transition. In tyssue, T3 now refers to a border vertex "
+        "merging into a nearby free edge (see tyssue.behaviors.sheet.t3).",
+        FutureWarning,
+        stacklevel=stacklevel,
+    )
+    return with_t3
+
+
+def all_rearangements(eptm, with_t2=True, with_t3=None):
+    """Performs rearangements (T2/HI first) until
     there are none left or MAX_ITER is reached.
+
+    `with_t3` is a deprecated alias of `with_t2`.
     """
+    with_t2 = _t2_flag(with_t2, with_t3)
     for i in count():
         if i == MAX_ITER:
             return 2
-        retcode = single_rearangement(eptm, with_t3=with_t3)
+        retcode = single_rearangement(eptm, with_t2=with_t2)
         if retcode:  # No transition found
             return retcode
 
 
-def single_rearangement(eptm, with_t3=True):
+def single_rearangement(eptm, with_t2=True, with_t3=None):
     """Performs a single rearangement (if any) on epithelium `eptm`.
 
-    If `with_t3` is True and there are removeable faces, will perform
-    a type 3 or HI transition on one of those faces. If no such
+    If `with_t2` is True and there are removeable faces, will perform
+    a type 2 or HI transition on one of those faces. If no such
     transition should occur, will perform a type 1 or IH transition on one
     of the edges.
+
+    `with_t3` is a deprecated alias of `with_t2`.
     """
+    with_t2 = _t2_flag(with_t2, with_t3)
     edges, faces = find_rearangements(eptm)
 
     if len(edges):
@@ -77,7 +98,7 @@ def single_rearangement(eptm, with_t3=True):
             if not retcode:
                 return 0
 
-    elif len(faces) and with_t3:
+    elif len(faces) and with_t2:
         for i in count():
             if i == MAX_ITER:
                 return 3
@@ -128,11 +149,11 @@ def auto_t1(fun):
     return with_rearange
 
 
-def auto_t3(fun):
+def auto_t2(fun):
     @wraps(fun)
     def with_rearange(*args, **kwargs):
         eptm, geom = args[:2]
-        logger.debug("checking for t3s")
+        logger.debug("checking for t2s")
         res = fun(*args, **kwargs)
         tri_faces = find_HIs(eptm)
         if not len(tri_faces):
@@ -140,7 +161,7 @@ def auto_t3(fun):
         i = 0
         while len(tri_faces):
             smaller_face = tri_faces[0]
-            logger.debug("Performing t3 on face %d", smaller_face)
+            logger.debug("Performing t2 on face %d", smaller_face)
             if isinstance(eptm, Sheet):
                 remove_face(eptm, smaller_face)
             else:
@@ -153,9 +174,20 @@ def auto_t3(fun):
             if i > MAX_ITER:
                 break
         if eptm.position_buffer is not None:
-            logger.info("out T3 changed buffer")
+            logger.info("out T2 changed buffer")
             eptm.position_buffer = eptm.vert_df[eptm.coords].copy()
-        logger.info("performed %i T3", i)
+        logger.info("performed %i T2", i)
         return res
 
     return with_rearange
+
+
+def auto_t3(fun):
+    """Deprecated alias of :func:`auto_t2` (removal of small triangular faces)."""
+    warnings.warn(
+        "`auto_t3` is deprecated, use `auto_t2`: the removal of small triangular "
+        "faces is a type 2 transition.",
+        FutureWarning,
+        stacklevel=2,
+    )
+    return auto_t2(fun)

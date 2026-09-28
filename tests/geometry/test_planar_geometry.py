@@ -96,3 +96,149 @@ def test_update_repulsion():
     assert "grid" in eptm.vert_df.columns
     assert "v_repulsion" in eptm.vert_df.columns
     assert len(np.unique(eptm.vert_df.loc[1, "v_repulsion"])) > 1
+
+
+def _legacy_boundary_index(sheet):
+    """The boundary index as computed before it was cached (reference)."""
+    from tyssue.core.sheet import get_opposite
+
+    sheet.vert_df["boundary"] = 0
+    sheet.edge_df["boundary"] = 0
+    sheet.face_df["boundary"] = 0
+    sheet.edge_df["opposite"] = get_opposite(sheet.edge_df)
+    free = sheet.edge_df["opposite"] == -1
+    sheet.edge_df.loc[free, "boundary"] = 1
+    sheet.vert_df.loc[sheet.edge_df.loc[free, "trgt"].unique(), "boundary"] = 1
+    faces = sheet.edge_df.loc[free, "face"].dropna().unique().astype(int)
+    sheet.face_df.loc[faces, "boundary"] = 1
+
+
+def _boundary_meshes():
+    from tyssue import Sheet
+    from tyssue.generation import ellipsoid_sheet, three_faces_sheet
+
+    planar = Sheet.planar_sheet_2d("planar", 8, 8, 1, 1)
+    planar.sanitize()
+    flat = Sheet.planar_sheet_3d("flat", 8, 8, 1, 1)
+    flat.sanitize()
+    shuffled = flat.copy()
+    shuffled.vert_df = shuffled.vert_df.sample(frac=1, random_state=0)
+    return {
+        "planar_2d": planar,
+        "planar_3d": flat,
+        "shuffled_verts": shuffled,
+        "three_faces": Sheet("3f", *three_faces_sheet()),
+        "ellipsoid": ellipsoid_sheet(3, 3, 4, 12),
+    }
+
+
+@pytest.mark.parametrize("name", list(_boundary_meshes()))
+def test_update_boundary_index_matches_legacy(name):
+    sheet = _boundary_meshes()[name]
+    ref = sheet.copy()
+    _legacy_boundary_index(ref)
+    PlanarGeometry.update_boundary_index(sheet)
+    for df in ("vert_df", "edge_df", "face_df"):
+        got, exp = getattr(sheet, df)["boundary"], getattr(ref, df)["boundary"]
+        assert got.dtype == exp.dtype
+        np.testing.assert_array_equal(got.to_numpy(), exp.to_numpy())
+    np.testing.assert_array_equal(
+        sheet.edge_df["opposite"].to_numpy(), ref.edge_df["opposite"].to_numpy()
+    )
+    bnd = sheet._boundary
+    np.testing.assert_array_equal(
+        bnd.free_edges, np.flatnonzero(ref.edge_df["opposite"].to_numpy() == -1)
+    )
+    np.testing.assert_array_equal(
+        bnd.verts, np.flatnonzero(ref.vert_df["boundary"].to_numpy() == 1)
+    )
+
+
+def test_planar_update_all_sets_boundary():
+    from tyssue import Sheet
+
+    sheet = Sheet.planar_sheet_2d("planar", 6, 6, 1, 1)
+    sheet.sanitize()
+    PlanarGeometry.update_all(sheet)
+    for df in (sheet.vert_df, sheet.edge_df, sheet.face_df):
+        assert "boundary" in df.columns
+    assert sheet.edge_df["boundary"].sum() == (sheet.edge_df["opposite"] == -1).sum()
+
+
+def _count_get_opposite(monkeypatch):
+    import tyssue.core.sheet
+
+    calls = []
+    original = tyssue.core.sheet.get_opposite
+
+    def counting(edge_df, *args, **kwargs):
+        calls.append(1)
+        return original(edge_df, *args, **kwargs)
+
+    monkeypatch.setattr(tyssue.core.sheet, "get_opposite", counting)
+    return calls
+
+
+def test_boundary_index_is_cached(monkeypatch):
+    from tyssue import Sheet
+
+    sheet = Sheet.planar_sheet_2d("planar", 6, 6, 1, 1)
+    sheet.sanitize()
+    calls = _count_get_opposite(monkeypatch)
+    PlanarGeometry.update_boundary_index(sheet)
+    assert len(calls) == 1
+    sheet.vert_df["x"] += 0.1  # geometry only
+    PlanarGeometry.update_all(sheet)
+    PlanarGeometry.update_boundary_index(sheet)
+    assert len(calls) == 1
+
+    # a dropped column is restored
+    sheet.vert_df.drop(columns="boundary", inplace=True)
+    PlanarGeometry.update_boundary_index(sheet)
+    assert len(calls) == 2
+    assert "boundary" in sheet.vert_df.columns
+
+
+def test_boundary_index_follows_topology(monkeypatch):
+    from tyssue import Sheet
+
+    sheet = Sheet.planar_sheet_2d("planar", 6, 6, 1, 1)
+    sheet.sanitize()
+    PlanarGeometry.update_boundary_index(sheet)
+    calls = _count_get_opposite(monkeypatch)
+
+    # Rewired in place with the element counts unchanged, as after a T1:
+    # reversing a border face's orientation detaches it from its neighbours
+    face = sheet.edge_df.loc[sheet.edge_df["boundary"] == 1, "face"].iloc[0]
+    rows = sheet.edge_df["face"] == face
+    srce = sheet.edge_df.loc[rows, "srce"].to_numpy()
+    sheet.edge_df.loc[rows, "srce"] = sheet.edge_df.loc[rows, "trgt"].to_numpy()
+    sheet.edge_df.loc[rows, "trgt"] = srce
+    PlanarGeometry.update_boundary_index(sheet)
+    assert len(calls) == 1
+    ref = sheet.copy()
+    _legacy_boundary_index(ref)
+    np.testing.assert_array_equal(
+        sheet.edge_df["boundary"].to_numpy(), ref.edge_df["boundary"].to_numpy()
+    )
+
+    # a dataframe replaced wholesale
+    calls.clear()
+    sheet.edge_df = sheet.edge_df.copy()
+    PlanarGeometry.update_boundary_index(sheet)
+    assert len(calls) == 1
+
+
+def test_cylinder_boundary_index_keeps_face_column():
+    from tyssue import Sheet
+    from tyssue.geometry.cylinder_geometry import CylinderGeometryInit
+
+    sheet = Sheet.planar_sheet_3d("flat", 6, 6, 1, 1)
+    sheet.sanitize()
+    sheet.face_df["boundary"] = 7
+    CylinderGeometryInit.update_boundary_index(sheet)
+    assert (sheet.face_df["boundary"] == 7).all()
+    assert sheet.vert_df["boundary"].sum() > 0
+    # a later full index does write the face column
+    PlanarGeometry.update_boundary_index(sheet)
+    assert set(sheet.face_df["boundary"].unique()) == {0, 1}

@@ -301,8 +301,7 @@ class Epithelium:
         self.cell_df["num_ridges"] = self.edge_df.cell.value_counts()
 
     def update_rank(self):
-        st_connect = connectivity.srce_trgt_connectivity(self)
-        self.vert_df["rank"] = ((st_connect + st_connect.T) > 0).sum(axis=0)
+        self.vert_df["rank"] = connectivity.vertex_rank(self).copy()
 
     def reset_topo(self):
         """Recomputes the number of sides for the faces and the

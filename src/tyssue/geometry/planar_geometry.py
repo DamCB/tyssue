@@ -1,7 +1,124 @@
+import zlib
+from dataclasses import dataclass
+
 import numpy as np
+import pandas as pd
 
 from .base_geometry import BaseGeometry
 from skimage.draw import polygon
+
+
+@dataclass
+class BoundaryIndex:
+    """Positional arrays describing the free border of an epithelium.
+
+    Left on ``eptm._boundary`` by :meth:`PlanarGeometry.update_boundary_index`.
+    Everything here depends only on topology, so it is reused until the
+    topology signature changes.
+
+    free_edges  (k,) int  row positions in edge_df of half-edges with no opposite
+    free_srce   (k,) int  row positions in vert_df of their source vertices
+    free_trgt   (k,) int  row positions in vert_df of their target vertices
+    free_face   (k,) int  row positions in face_df of their faces
+    verts       (m,) int  row positions in vert_df of the vertices on the border
+    with_faces  bool      whether face_df['boundary'] was written too
+    """
+
+    signature: tuple
+    free_edges: np.ndarray
+    free_srce: np.ndarray
+    free_trgt: np.ndarray
+    free_face: np.ndarray
+    verts: np.ndarray
+    with_faces: bool = True
+
+
+def topology_signature(eptm):
+    """A cheap fingerprint of the epithelium's connectivity.
+
+    The element counts are not enough on their own: a type 1 transition leaves
+    Nv, Ne and Nf unchanged. The checksum covers the edge connectivity and every
+    index, and the ``id`` terms catch a dataframe replaced wholesale.
+    """
+    edge_df, vert_df, face_df = eptm.edge_df, eptm.vert_df, eptm.face_df
+    crc = 0
+    for arr in (
+        edge_df["srce"].to_numpy(),
+        edge_df["trgt"].to_numpy(),
+        edge_df["face"].to_numpy(),
+        edge_df.index.to_numpy(),
+        vert_df.index.to_numpy(),
+        face_df.index.to_numpy(),
+    ):
+        if arr.dtype.hasobject:  # no buffer to checksum, hash the values
+            arr = pd.util.hash_array(arr)
+        crc = zlib.crc32(np.ascontiguousarray(arr), crc)
+    return (
+        len(vert_df),
+        len(edge_df),
+        len(face_df),
+        crc,
+        id(vert_df),
+        id(edge_df),
+        id(face_df),
+    )
+
+
+def update_boundary_index(sheet, with_faces=True):
+    """Implementation of :meth:`PlanarGeometry.update_boundary_index`.
+
+    With ``with_faces=False`` the face_df 'boundary' column is left untouched,
+    as the cylinder geometries have always done.
+    """
+    sig = topology_signature(sheet)
+    cached = getattr(sheet, "_boundary", None)
+    if (
+        cached is not None
+        and cached.signature == sig
+        and "boundary" in sheet.vert_df.columns
+        and "boundary" in sheet.edge_df.columns
+        and "opposite" in sheet.edge_df.columns
+        and (not with_faces or (cached.with_faces and "boundary" in sheet.face_df.columns))
+    ):
+        return
+
+    # Imported here rather than at module level:
+    # core.objects imports this module, so a top-level import would cycle.
+    from ..core.sheet import get_opposite
+
+    edge_df = sheet.edge_df
+    opposite = get_opposite(edge_df)
+    edge_df["opposite"] = opposite
+    free = opposite == -1
+    free_edges = np.flatnonzero(free)
+
+    free_srce = sheet.vert_df.index.get_indexer(edge_df["srce"].to_numpy()[free])
+    free_trgt = sheet.vert_df.index.get_indexer(edge_df["trgt"].to_numpy()[free])
+    free_face = sheet.face_df.index.get_indexer(edge_df["face"].to_numpy()[free])
+
+    # A vertex is on the border when it is the target of a free edge; every
+    # vertex of a closed border ring is also the source of the next one.
+    verts = np.unique(free_trgt[free_trgt >= 0])
+
+    vert_flag = np.zeros(len(sheet.vert_df), dtype=np.int64)
+    vert_flag[verts] = 1
+
+    edge_df["boundary"] = free.astype(np.int64)
+    sheet.vert_df["boundary"] = vert_flag
+    if with_faces:
+        face_flag = np.zeros(len(sheet.face_df), dtype=np.int64)
+        face_flag[free_face[free_face >= 0]] = 1
+        sheet.face_df["boundary"] = face_flag
+
+    sheet._boundary = BoundaryIndex(
+        signature=sig,
+        free_edges=free_edges,
+        free_srce=free_srce,
+        free_trgt=free_trgt,
+        free_face=free_face,
+        verts=verts,
+        with_faces=with_faces,
+    )
 
 
 class PlanarGeometry(BaseGeometry):
@@ -16,16 +133,33 @@ class PlanarGeometry(BaseGeometry):
         * the face centroids
         * the normals to each edge associated face
         * the face areas
+        * the boundary index (only recomputed when the topology changed)
         """
 
         cls.update_dcoords(sheet)
-        cls.update_ucoords(sheet)
         cls.update_length(sheet)
+        cls.update_ucoords(sheet)  # after update_length: u = d / current length
         cls.update_centroid(sheet)
         cls.update_normals(sheet)
         cls.update_areas(sheet)
         cls.update_perimeters(sheet)
+        cls.update_boundary_index(sheet)
         # cls.update_repulsion(sheet)
+
+    @staticmethod
+    def update_boundary_index(sheet):
+        """Updates the vert_df, edge_df and face_df dataframes with a 'boundary'
+        column that takes values 0 and 1, with 1 denoting that a vertex, edge or
+        face lies on the tissue boundary, and 0 when it does not.
+
+        Also refreshes ``edge_df["opposite"]`` and leaves a
+        :class:`BoundaryIndex` on ``sheet._boundary``.
+
+        The boundary depends only on topology, so the work is skipped while the
+        topology signature (see :func:`topology_signature`) is unchanged and the
+        columns are still present.
+        """
+        update_boundary_index(sheet, with_faces=True)
 
     @staticmethod
     def update_normals(sheet):
@@ -132,6 +266,9 @@ class WeightedPerimeterPlanarGeometry(PlanarGeometry):
         p = \\sum_{ij} w_{ij} \\, l_{ij}
 
     """
+
+    # update_all re-centers the vertices, which moves them by rounding errors
+    idempotent_update = False
 
     @classmethod
     def update_all(cls, eptm):

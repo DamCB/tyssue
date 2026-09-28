@@ -18,7 +18,7 @@ def test_relaxation_convergance():
     specs["settings"]["boundaries"] = {"x": [-0.1, 8.1], "y": [-0.1, 8.1]}
     sheet = Sheet("periodic", dsets, specs)
     PlanarGeometry.update_all(sheet)
-    solver = QSSolver(with_t1=True, with_t3=False)
+    solver = QSSolver(with_t1=True, with_t2=False)
     nondim_specs = config.dynamics.quasistatic_plane_spec()
     dim_model_specs = model.dimensionalize(nondim_specs)
     sheet.update_specs(dim_model_specs, reset=True)

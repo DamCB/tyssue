@@ -3,22 +3,15 @@ import numpy as np
 import pandas as pd
 import math
 
+from .planar_geometry import update_boundary_index
 from .sheet_geometry import SheetGeometry
 
 class CylinderGeometryInit(SheetGeometry):
 
     @staticmethod
     def update_boundary_index(sheet):
-
-        sheet.vert_df['boundary'] = 0
-        sheet.edge_df['boundary'] = 0
-
-        sheet.get_opposite()
-
-        sheet.edge_df.loc[sheet.edge_df['opposite'] == -1, 'boundary'] = 1
-        boundary_verts = sheet.edge_df.loc[sheet.edge_df['opposite'] == -1, 'trgt'].to_numpy()
-
-        sheet.vert_df.loc[boundary_verts, "boundary"] = 1
+        # Vertex and edge flags only: the face 'boundary' column is left as is.
+        update_boundary_index(sheet, with_faces=False)
 
     @staticmethod
     def update_tangents(sheet):
@@ -76,80 +69,44 @@ class CylinderGeometryInit(SheetGeometry):
 
     @staticmethod
     def update_vert_deviation(sheet):
-        if "dev_length" not in sheet.vert_df.columns:
-            sheet.vert_df["dev_length"] = np.nan
-        if "dx" not in sheet.vert_df.columns:
-            sheet.vert_df["dx"] = np.nan
-        if "dy" not in sheet.vert_df.columns:
-            sheet.vert_df["dy"] = np.nan
-        if "dz" not in sheet.vert_df.columns:
-            sheet.vert_df["dz"] = np.nan
+        """Writes in `vert_df` the deviation of each vertex from the mean
+        position of its neighbours: its length in `dev_length` and the unit
+        vector from that mean to the vertex in `dx, dy, dz`, as read by
+        `SurfaceElasticity`.
 
-        edge_np = sheet.edge_df.to_numpy()
-        edge_dict = dict(zip(sheet.edge_df.columns,
-                             list(range(0, len(sheet.edge_df.columns)))))
-        vert_np = sheet.vert_df.to_numpy()
-        vert_dict = dict(zip(sheet.vert_df.columns,
-                             list(range(0, len(sheet.vert_df.columns)))))
+        The same rule applies to every vertex, whatever its rank and whether or
+        not it lies on the boundary. Neighbours linked in either direction are
+        counted, since on a free border a neighbour can be linked by an incoming
+        half-edge only. A vertex without neighbours gets a zero deviation.
+        """
+        vert_df, edge_df = sheet.vert_df, sheet.edge_df
+        pos = vert_df[["x", "y", "z"]].to_numpy(dtype=float)
+        n_verts = len(pos)
+        srce = vert_df.index.get_indexer(edge_df["srce"].to_numpy())
+        trgt = vert_df.index.get_indexer(edge_df["trgt"].to_numpy())
 
-        grad1 = np.nan
-        grad2 = np.nan
-        gradt = np.nan
-        lenth = []
+        # each (vertex, neighbour) pair once, whichever way the edge runs
+        linked = (srce >= 0) & (trgt >= 0) & (srce != trgt)
+        s, t = srce[linked].astype(np.int64), trgt[linked].astype(np.int64)
+        pairs = np.unique(np.concatenate([s * n_verts + t, t * n_verts + s]))
+        vert, neighbor = pairs // n_verts, pairs % n_verts
 
-        for i in sheet.vert_df.index:
-            mask = (i == edge_np[:, edge_dict["srce"]])
-            neighbor_verts = edge_np[mask, edge_dict["trgt"]].tolist()
-            neighbor_verts = vert_np[neighbor_verts][:, [vert_dict["x"], vert_dict["y"], vert_dict["z"]]]
-            vert_coords = vert_np[i, [vert_dict["x"], vert_dict["y"], vert_dict["z"]]]
+        neighbor_sum = np.zeros_like(pos)
+        np.add.at(neighbor_sum, vert, pos[neighbor])
+        degree = np.bincount(vert, minlength=n_verts)
+        has_neighbors = degree > 0
 
-            if len(neighbor_verts) >= 3:
-                center = (neighbor_verts[0] + neighbor_verts[1] + neighbor_verts[2]) / 3
+        deviation = np.zeros_like(pos)
+        deviation[has_neighbors] = (
+            pos[has_neighbors] - neighbor_sum[has_neighbors] / degree[has_neighbors, None]
+        )
+        dev_length = np.linalg.norm(deviation, axis=1)
+        grad = np.zeros_like(pos)
+        nonzero = dev_length > 0
+        grad[nonzero] = deviation[nonzero] / dev_length[nonzero, None]
 
-                grad = np.array(vert_coords) - np.array(center)
-
-                length = np.linalg.norm(grad)
-
-                grad = grad / length
-
-            else:
-                grad = np.array([0, 0, 0])
-
-            if i == 0:
-                grad1 = grad
-
-            if i == 1:
-                grad2 = grad
-                gradt = np.vstack((grad1, grad2))
-
-            if i >= 2:
-                gradt = np.vstack((gradt, grad))
-
-            lenth.append(length)
-
-        gradt = pd.DataFrame(gradt, columns=['dx', 'dy', 'dz'])
-        sheet.vert_df[['dx', 'dy', 'dz']] = gradt
-        sheet.vert_df['dev_length'] = lenth
-
-    @staticmethod
-    def update_vert_deviation2(sheet):
-        if "dev_length" not in sheet.vert_df.columns:
-            sheet.vert_df["dev_length"] = np.nan
-        if "dx" not in sheet.vert_df.columns:
-            sheet.vert_df["dx"] = np.nan
-        if "dy" not in sheet.vert_df.columns:
-            sheet.vert_df["dy"] = np.nan
-        if "dz" not in sheet.vert_df.columns:
-            sheet.vert_df["dz"] = np.nan
-
-        for i in sheet.vert_df.index:
-            vert = sheet.vert_df.loc[i, ["x", "y", "z"]].to_numpy()
-            neighbors = sheet.edge_df.loc[sheet.edge_df["srce"] == 6, ["tx", "ty", "tz"]].to_numpy()
-            center = neighbors.sum(axis=0) / len(neighbors)
-            grad = vert - center
-            length = np.linalg.norm(grad)
-            sheet.vert_df[['dx', 'dy', 'dz']] = grad
-            sheet.vert_df['dev_length'] = length
+        vert_df[["dx", "dy", "dz"]] = grad
+        vert_df["dev_length"] = dev_length
 
     @staticmethod
     def update_lumen_vol(sheet):
@@ -191,8 +148,7 @@ class CylinderGeometryInit(SheetGeometry):
 
     @classmethod
     def update_all(cls, sheet):
-        super().update_all(sheet)
-        cls.update_boundary_index(sheet)
+        super().update_all(sheet)  # includes cls.update_boundary_index
         cls.update_tangents(sheet)
         # cls.update_face_tangents(sheet)
         # cls.update_face_distance(sheet)

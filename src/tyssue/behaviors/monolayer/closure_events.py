@@ -27,7 +27,7 @@ e.g. ``manager.append(lumen_closure, **spec)``, while experimenting.
 
 import logging
 
-from ...topology import all_lateral_fusions, single_rearangement
+from ...topology import _t2_flag, all_lateral_fusions, single_rearangement
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +96,7 @@ default_lumen_closure_spec = {
     "margin": 0.5,
     "segment": "lateral",
     "with_rearrangements": True,
-    "with_t3": True,
+    "with_t2": True,
 }
 
 
@@ -106,7 +106,7 @@ def lumen_closure(eptm, manager, **kwargs):
     Each step this event
 
     1. performs a single boundary rearrangement (an IH/T1 or, if
-       ``with_t3``, an HI/T3 transition) -- the zipper that brings border
+       ``with_t2``, an HI/T2 transition) -- the zipper that brings border
        cells together, then
     2. fuses every apposed lateral-face pair between the approaching fronts.
 
@@ -119,14 +119,16 @@ def lumen_closure(eptm, manager, **kwargs):
         passed through to the lateral-face fusion topology functions.
     with_rearrangements : bool, default True
         whether to perform the IH/HI rearrangement step.
-    with_t3 : bool, default True
-        whether HI / T3 transitions are allowed in the rearrangement step.
+    with_t2 : bool, default True
+        whether HI / T2 transitions are allowed in the rearrangement step.
+        ``with_t3`` is accepted as a deprecated alias.
     """
     spec = default_lumen_closure_spec.copy()
     spec.update(kwargs)
+    spec["with_t2"] = _t2_flag(spec["with_t2"], spec.pop("with_t3", None))
 
     if spec["with_rearrangements"]:
-        single_rearangement(eptm, with_t3=spec["with_t3"])
+        single_rearangement(eptm, with_t2=spec["with_t2"])
 
     n_fused = all_lateral_fusions(
         eptm,

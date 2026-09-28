@@ -9,7 +9,7 @@ from tyssue.behaviors.event_manager import EventManager, wait
 from tyssue.behaviors.sheet.actions import ab_pull, decrease
 from tyssue.behaviors.sheet.actions import exchange as type1_at_shorter
 from tyssue.behaviors.sheet.actions import grow, increase, increase_linear_tension
-from tyssue.behaviors.sheet.actions import remove as type3
+from tyssue.behaviors.sheet.actions import remove as type2
 from tyssue.behaviors.sheet.actions import set_value
 from tyssue.behaviors.sheet.apoptosis_events import apoptosis
 from tyssue.behaviors.sheet.basic_events import (
@@ -288,7 +288,7 @@ def test_type1_at_shorter():
 def test_remove_face():
 
     sheet = Sheet("emin", *three_faces_sheet())
-    type3(sheet, 0, geom)
+    type2(sheet, 0, geom)
     assert sheet.Nf == 2
     assert sheet.Nv == 8
     assert sheet.Ne == 10
@@ -353,3 +353,226 @@ def test_grow():
     with pytest.warns(UserWarning):
         grow(sheet, 0, 1.2)
         assert sheet.face_df.loc[0, "prefered_vol"] == 1.2
+
+
+def _square_triangle(gap=0.005):
+    """A square and a triangle whose tip is `gap` away from the square's right
+    (free) edge."""
+    import pandas as pd
+
+    from tyssue.config.geometry import planar_spec
+    from tyssue.geometry.planar_geometry import PlanarGeometry
+
+    vert = pd.DataFrame(
+        {"x": [0.0, 1, 1, 0, 1 + gap, 2, 2], "y": [0.0, 0, 1, 1, 0.5, -0.5, 1.5]}
+    )
+    edge = pd.DataFrame(
+        {
+            "srce": [0, 1, 2, 3, 4, 5, 6],
+            "trgt": [1, 2, 3, 0, 5, 6, 4],
+            "face": [0, 0, 0, 0, 1, 1, 1],
+        }
+    )
+    face = pd.DataFrame({"x": [0.5, 1.7], "y": [0.5, 0.5]})
+    for df, name in ((vert, "vert"), (edge, "edge"), (face, "face")):
+        df.index.name = name
+    sheet = Sheet(
+        "sq_tri",
+        {"vert": vert, "edge": edge, "face": face},
+        specs=planar_spec(),
+        coords=["x", "y"],
+    )
+    PlanarGeometry.update_all(sheet)
+    return sheet
+
+
+def _two_patches(gap):
+    """Two hexagonal patches side by side, `gap` apart along x."""
+    import pandas as pd
+
+    from tyssue.config.geometry import planar_spec
+    from tyssue.geometry.planar_geometry import PlanarGeometry
+
+    patch = Sheet.planar_sheet_2d("patch", 5, 5, 1, 1)
+    patch.sanitize(trim_borders=True, order_edges=True)
+    width = patch.vert_df["x"].max() - patch.vert_df["x"].min()
+    datasets = {}
+    for name in ("vert", "edge", "face"):
+        left = patch.datasets[name].copy()
+        right = patch.datasets[name].copy()
+        right.index = right.index + len(left)
+        if name in ("vert", "face"):
+            right["x"] += width + gap
+        if name == "edge":
+            right[["srce", "trgt"]] += patch.Nv
+            right["face"] += patch.Nf
+        datasets[name] = pd.concat([left, right])
+    sheet = Sheet("two", datasets, specs=planar_spec(), coords=["x", "y"])
+    sheet.reset_index()
+    sheet.reset_topo()
+    PlanarGeometry.update_all(sheet)
+    return sheet
+
+
+def _brute_force_t3(sheet, d_min):
+    """Every (vertex, edge) pair eligible for a T3, by exhaustive search."""
+    edge_df = sheet.edge_df
+    pos = sheet.vert_df[sheet.coords]
+    free = edge_df[edge_df["opposite"] == -1]
+    border = set(free["srce"]) | set(free["trgt"])
+    linked = set(zip(edge_df["srce"], edge_df["trgt"]))
+    face_verts = edge_df.groupby("face")["srce"].apply(set)
+    pairs = set()
+    for edge, (a, b, face) in free[["srce", "trgt", "face"]].iterrows():
+        pa, pb = pos.loc[a].to_numpy(), pos.loc[b].to_numpy()
+        for v in border:
+            if v in (a, b) or v in face_verts[face]:
+                continue
+            if {(v, a), (a, v), (v, b), (b, v)} & linked:
+                continue
+            pv = pos.loc[v].to_numpy()
+            t = np.dot(pv - pa, pb - pa) / np.dot(pb - pa, pb - pa)
+            if np.linalg.norm(pa + t * (pb - pa) - pv) < d_min and 0.05 < t < 0.95:
+                pairs.add((v, edge))
+    return pairs
+
+
+def test_t3_candidates_match_brute_force(monkeypatch):
+    from tyssue.behaviors.sheet import actions
+    from tyssue.geometry.planar_geometry import PlanarGeometry
+
+    builds = []
+    neighbor_list = actions._t3_neighbor_list
+
+    def counting(*args, **kwargs):
+        builds.append(1)
+        return neighbor_list(*args, **kwargs)
+
+    monkeypatch.setattr(actions, "_t3_neighbor_list", counting)
+
+    rng = np.random.default_rng(42)
+    sheet = _two_patches(gap=0.4)
+    d_min, skin = 0.3, 0.1
+    right = sheet.vert_df["x"] > sheet.vert_df["x"].mean()
+    n_steps, n_found = 300, 0
+    for step in range(n_steps):
+        noise = rng.normal(0, 0.004, (sheet.Nv, 2))
+        if step % 50 == 25:
+            noise *= 20  # a jump larger than skin / 2, forces a rebuild
+        sheet.vert_df[["x", "y"]] += noise
+        # the patches drift towards and away from each other
+        sheet.vert_df.loc[right, "x"] -= 0.002 * np.sign(np.sin(step / 40))
+        PlanarGeometry.update_all(sheet)
+
+        verts, edges, dists = actions.find_t3_candidates(sheet, d_min, skin)
+        got = set(
+            zip(sheet.vert_df.index[verts].tolist(), sheet.edge_df.index[edges].tolist())
+        )
+        assert got == _brute_force_t3(sheet, d_min), f"step {step}"
+        assert np.all(np.diff(dists) >= 0)
+        n_found += len(got)
+    assert n_found > 0
+    # the candidate list is re-used most of the time
+    assert 1 < len(builds) < n_steps / 3
+
+
+def test_t3_transitions():
+    from tyssue.behaviors.sheet.actions import t3_transitions
+    from tyssue.geometry.planar_geometry import PlanarGeometry
+
+    sheet = _square_triangle(gap=0.005)
+    sheet.settings["t3_threshold"] = 0.01
+    ne = sheet.Ne
+    assert t3_transitions(sheet) == 1
+    PlanarGeometry.update_all(sheet)
+    assert sheet.Ne == ne + 1
+    assert sheet.validate()
+    assert t3_transitions(sheet) == 0
+
+    far = _square_triangle(gap=0.05)
+    far.settings["t3_threshold"] = 0.01
+    assert t3_transitions(far) == 0
+
+
+def test_t3_transitions_closed_sheet():
+    from tyssue.behaviors.sheet.actions import t3_transitions
+    from tyssue.generation import ellipsoid_sheet
+
+    sheet = ellipsoid_sheet(3, 3, 4, 12)
+    assert t3_transitions(sheet) == -1
+    assert getattr(sheet, "_t3_cache", None) is None
+
+
+def test_t3_transitions_sheet_only():
+    from tyssue.behaviors.sheet.actions import t3_transitions
+    from tyssue.core.monolayer import Monolayer
+    from tyssue.generation import extrude
+
+    sheet = _square_triangle()
+    sheet.vert_df["z"] = 0.0
+    sheet.face_df["z"] = 0.0
+    sheet.coords = ["x", "y", "z"]
+    mono = Monolayer("mono", extrude(sheet.datasets, method="translation"))
+    with pytest.raises(TypeError):
+        t3_transitions(mono)
+
+
+def test_t3_event_in_euler_solver():
+    from tyssue.collisions.intersections import find_intersections
+    from tyssue.dynamics import effectors, model_factory
+    from tyssue.geometry.planar_geometry import PlanarGeometry
+    from tyssue.solvers.viscous import EulerSolver
+
+    sheet = _square_triangle(gap=0.02)
+    model = model_factory([effectors.LineTension, effectors.FaceAreaElasticity])
+    sheet.update_specs(model.specs, reset=True)
+    sheet.face_df["prefered_area"] = sheet.face_df["area"]
+    sheet.edge_df["line_tension"] = 0.0
+    sheet.vert_df["viscosity"] = 1.0
+    sheet.settings["t3_threshold"] = 0.01
+    PlanarGeometry.update_all(sheet)
+
+    solver = EulerSolver(sheet, PlanarGeometry, model, with_t3=True)
+    assert solver.manager is not None
+    ne = sheet.Ne
+    for _ in range(5):
+        # the triangle moves towards the square
+        sheet.vert_df.loc[[4, 5, 6], "x"] -= 0.004
+        solver.solve(tf=solver.prev_t + 0.01, dt=0.01)
+    assert sheet.Ne == ne + 1
+    assert sheet.validate()
+    assert find_intersections(sheet).clean
+
+
+def test_detach_boundary_setting():
+    from tyssue.behaviors.sheet.actions import detach_vertices, t3_transitions
+    from tyssue.geometry.planar_geometry import PlanarGeometry
+
+    sheet = _two_patches(gap=0.004)
+    sheet.settings.update(t3_threshold=0.01, p_4=1e9, p_5p=1e9, dt=1.0)
+    assert t3_transitions(sheet) > 0
+    PlanarGeometry.update_all(sheet)
+    nv = sheet.Nv
+
+    kept = sheet.copy()
+    kept.settings.update(sheet.settings, detach_boundary=False)
+    PlanarGeometry.update_all(kept)
+    detach_vertices(kept)
+    assert kept.Nv == nv
+
+    detach_vertices(sheet)  # default: the T3 junction is a rank 4 vertex
+    assert sheet.Nv > nv
+
+
+def test_euler_solver_with_t3_sheet_only():
+    from tyssue.core.monolayer import Monolayer
+    from tyssue.generation import extrude
+    from tyssue.geometry.bulk_geometry import MonolayerGeometry
+    from tyssue.solvers.viscous import EulerSolver
+
+    sheet = _square_triangle()
+    sheet.vert_df["z"] = 0.0
+    sheet.face_df["z"] = 0.0
+    mono = Monolayer("mono", extrude(sheet.datasets, method="translation"))
+    with pytest.raises(ValueError, match="Sheet"):
+        EulerSolver(mono, MonolayerGeometry, None, with_t3=True)

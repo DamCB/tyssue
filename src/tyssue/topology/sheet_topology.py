@@ -116,6 +116,92 @@ def type1_transition(sheet, edge01, *, remove_tri_faces=True, multiplier=1.5):
     return 0
 
 
+def t3_transition(sheet, vert, edge, snap=True, reindex=True):
+    """Performs a type 3 transition: merges the border vertex `vert` into the
+    free (border) half-edge `edge` of another cell.
+
+    ::
+
+          v                    v
+          *          ->      /   \\
+      a ------> b         a *     * b
+
+    The half-edge a -> b of face F becomes a -> v and a new half-edge v -> b
+    is added to F, so that v is shared by its own cell(s) and F. Nothing is
+    removed; the free border now passes through v twice.
+
+    See Fletcher et al., Implementing vertex dynamics models of cell populations
+    in biology within a consistent computational framework, Progress in
+    Biophysics and Molecular Biology 113 (2013)
+
+    Parameters
+    ----------
+    sheet : a :class:`Sheet` instance
+    vert : int, index of the vertex to merge
+    edge : int, index of a half-edge with no opposite
+    snap : bool, default True
+        move `vert` onto its orthogonal projection on the edge
+    reindex : bool, default True
+        reset the topology (opposites) once the transition is done. Pass False
+        when chaining several transitions and call `sheet.reset_topo()` after.
+
+    Returns
+    -------
+    0 on success, -1 if the transition is not possible (`edge` is not free,
+    `vert` already belongs to its face or is linked to one of its ends)
+    """
+    edge_df = sheet.edge_df
+    srce, trgt, face = edge_df.loc[edge, ["srce", "trgt", "face"]].astype(int)
+    if vert in (srce, trgt):
+        return -1
+
+    is_opposite = (edge_df["srce"] == trgt) & (edge_df["trgt"] == srce)
+    in_face = (edge_df["face"] == face) & (edge_df["srce"] == vert)
+    linked = ((edge_df["srce"] == vert) & edge_df["trgt"].isin((srce, trgt))) | (
+        (edge_df["trgt"] == vert) & edge_df["srce"].isin((srce, trgt))
+    )
+    if is_opposite.any() or in_face.any() or linked.any():
+        return -1
+
+    if snap:
+        pos_a, pos_b, pos_v = (
+            sheet.vert_df.loc[v, sheet.coords].to_numpy(dtype=float)
+            for v in (srce, trgt, vert)
+        )
+        ab = pos_b - pos_a
+        t = np.clip(np.dot(pos_v - pos_a, ab) / max(np.dot(ab, ab), 1e-30), 0.0, 1.0)
+        sheet.vert_df.loc[vert, sheet.coords] = pos_a + t * ab
+
+    new_edge = edge_df.loc[edge:edge].copy()
+    new_edge["srce"] = vert
+    new_edge["trgt"] = trgt
+    if "unique_id" in new_edge.columns:
+        new_edge["unique_id"] = _reserve_unique_id(sheet, "edge")
+    # a fresh label rather than ignore_index: existing edge labels must stay
+    # valid so that several transitions can be chained before a reindex
+    new_edge.index = pd.Index([edge_df.index.max() + 1], name=edge_df.index.name)
+    edge_df.loc[edge, "trgt"] = vert
+    sheet.edge_df = pd.concat([edge_df, new_edge])
+
+    if reindex:
+        sheet.reset_topo()
+    sheet.network_changed = True
+    logger.debug("t3 transition of vertex %d on edge %d", vert, edge)
+    return 0
+
+
+def _reserve_unique_id(sheet, element):
+    """Next unused `unique_id` for `element`, advancing
+    `sheet.specs[element]['unique_id_max']` (the next free id)."""
+    specs = sheet.specs.setdefault(element, {})
+    df = sheet.datasets[element]
+    uid = int(specs.get("unique_id_max", 0) or 0)
+    if len(df) and "unique_id" in df.columns:
+        uid = max(uid, int(df["unique_id"].max()) + 1)
+    specs["unique_id_max"] = uid + 1
+    return uid
+
+
 def cell_division(sheet, mother, geom, angle=None):
     """Causes a cell to divide
 

@@ -18,6 +18,7 @@ from .actions import (
     increase_linear_tension,
     merge_vertices,
     remove,
+    t3_transitions,
 )
 
 logger = logging.getLogger(__name__)
@@ -60,6 +61,48 @@ def reconnect(sheet, manager, **kwargs):
         logger.info(f"Detached {sheet.Nv - nv} vertices")
 
     manager.append(reconnect, **kwargs)
+
+
+def t3(sheet, manager, **kwargs):
+    """Performs type 3 transitions: border vertices that come closer than
+    `t3_threshold` to a free edge of another cell are merged into that edge
+    (Fletcher et al. 2013).
+
+    kwargs overwrite their corresponding `sheet.settings` entries. Enabled with
+    `EulerSolver(..., with_t3=True)` or by appending it once to the manager, as
+    it re-appends itself every step.
+
+    Keyword Arguments
+    -----------------
+    t3_threshold : float, default 1e-2
+        the vertex to edge distance at which the merge happens
+    t3_skin : float, default 10 * t3_threshold
+        margin of the candidate list; a larger skin rebuilds it less often but
+        checks more pairs each step
+
+    Note
+    ----
+    The merged vertex is a rank 4 vertex on the border, which :func:`reconnect`
+    detaches with probability `p_4` per unit time. Set
+    `sheet.settings["detach_boundary"] = False` to keep T3 junctions when both
+    events run.
+
+    See Also
+    --------
+    :func:`tyssue.behaviors.sheet.actions.t3_transitions`
+    :func:`tyssue.topology.sheet_topology.t3_transition`
+
+    **Implementing vertex dynamics models of cell populations in biology within
+    a consistent computational framework** _Alexander G Fletcher, James M
+    Osborne, Philip K Maini, David J Gavaghan_ Progress in Biophysics and
+    Molecular Biology 113 (2013)
+    """
+    sheet.settings.update(kwargs)
+    n_t3 = t3_transitions(sheet)
+    if n_t3 > 0:
+        logger.info(f"Performed {n_t3} T3 transitions")
+
+    manager.append(t3, **kwargs)
 
 
 default_intersection_spec = {

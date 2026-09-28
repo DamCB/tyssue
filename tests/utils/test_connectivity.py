@@ -68,3 +68,44 @@ def test_verts_in_cell_connectivity():
     assert ccc[0][ccc[0] == 9].shape == (18,)
     assert ccc[0][ccc[0] == 18].shape == (6,)
     assert ccc[0][ccc[0] == 27].shape == (1,)
+
+
+def _dense_rank(eptm):
+    st = connectivity.srce_trgt_connectivity(eptm)
+    return ((st + st.T) > 0).sum(axis=0)
+
+
+def test_vertex_rank():
+    data, specs = three_faces_sheet()
+    planar = Sheet.planar_sheet_2d("planar", 8, 8, 1, 1)
+    planar.sanitize()
+    flat = Sheet.planar_sheet_3d("flat", 8, 8, 1, 1)
+    flat.sanitize()
+    for eptm in (
+        Sheet("test", data, specs),
+        planar,
+        flat,
+        Monolayer("test", extrude(data), bulk_spec()),
+    ):
+        np.testing.assert_array_equal(connectivity.vertex_rank(eptm), _dense_rank(eptm))
+
+    # cached until the topology changes
+    sheet = Sheet("test", data, specs)
+    rank = connectivity.vertex_rank(sheet)
+    assert connectivity.vertex_rank(sheet) is rank
+    sheet.edge_df.loc[0, "trgt"], sheet.edge_df.loc[1, "trgt"] = (
+        sheet.edge_df.loc[1, "trgt"],
+        sheet.edge_df.loc[0, "trgt"],
+    )
+    assert connectivity.vertex_rank(sheet) is not rank
+    np.testing.assert_array_equal(connectivity.vertex_rank(sheet), _dense_rank(sheet))
+
+
+def test_vertex_rank_non_contiguous_index():
+    data, specs = three_faces_sheet()
+    sheet = Sheet("test", data, specs)
+    expected = connectivity.vertex_rank(sheet).copy()
+    # relabel the vertices 10, 20, 30...
+    sheet.edge_df[["srce", "trgt"]] = (sheet.edge_df[["srce", "trgt"]] + 1) * 10
+    sheet.vert_df.index = (sheet.vert_df.index + 1) * 10
+    np.testing.assert_array_equal(connectivity.vertex_rank(sheet), expected)

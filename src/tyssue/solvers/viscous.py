@@ -13,13 +13,21 @@ from scipy.integrate import solve_ivp
 
 
 from ..core.history import History
+from ..core.sheet import Sheet
+from ..geometry.planar_geometry import topology_signature
 from ..behaviors.event_manager import EventManager
-from ..behaviors.sheet.basic_events import reconnect
+from ..behaviors.sheet.basic_events import reconnect, t3
 from ..topology.sheet_topology import cell_division
 
 
 log = logging.getLogger(__name__)
 MAX_ITER = 1000
+
+# Events that only ever modify vertex positions and topology, never a parameter
+# the geometry reads. When only these ran and they left positions and topology
+# exactly as `set_pos` computed the geometry for, the update that follows the
+# events would reproduce the same values, and is skipped.
+MESH_FLAGGING_EVENTS = frozenset({"wait", "reconnect", "t3"})
 
 
 def set_pos(eptm, geom, pos):
@@ -65,6 +73,13 @@ class EulerSolver:
         manager : a :class:`tyssue.EventManager` instance
         bounds : tuple of (min, max),
             bonds the displacement of the vertices at each time step
+        with_t1 : bool
+            deprecated, has no effect (use `auto_reconnect`)
+        with_t3 : bool
+            if True, will automatically perform type 3 transitions (border
+            vertices merging into a nearby free edge, see
+            :func:`tyssue.behaviors.sheet.basic_events.t3`), default False.
+            Only for :class:`Sheet` objects.
 
         """
 
@@ -72,12 +87,7 @@ class EulerSolver:
         if with_t1:
             warnings.warn("with_t1 is deprecated and has no effect")
             # self._set_pos = auto_t1(self._set_pos)
-        if with_t3:
-            warnings.warn("with_t3 is deprecated and has no effect")
-            # self._set_pos = auto_t3(self._set_pos)
 
-        # self.rearange = with_t1 or with_t3
-        # self.with_t3 = with_t3
         self.eptm = eptm
         self.geom = geom
         self.model = model
@@ -92,6 +102,17 @@ class EulerSolver:
                 manager = EventManager()
             if not "reconnect" in [n[0].__name__ for n in manager.next]:
                 manager.append(reconnect)
+
+        if with_t3:
+            if not isinstance(eptm, Sheet):
+                raise ValueError("with_t3 is only implemented for Sheet objects")
+            if manager is None:
+                # t3 runs from the first step, in place of the placeholder wait
+                manager = EventManager()
+                manager.current.clear()
+                manager.current.append((t3, {}))
+            elif not "t3" in [n[0].__name__ for n in manager.next]:
+                manager.append(t3)
 
         self.manager = manager
         self.bounds = bounds
@@ -133,9 +154,7 @@ class EulerSolver:
             self.set_pos(pos)
             self.prev_t = t
             if self.manager is not None:
-                self.manager.execute(self.eptm)
-                self.geom.update_all(self.eptm)
-                self.manager.update()
+                self.execute_events()
 
             if self.eptm.topo_changed:
                 log.info("Topology changed")
@@ -146,6 +165,43 @@ class EulerSolver:
 
             if t == tf:
                 self.history.update_datasets()
+
+    def execute_events(self):
+        """Executes the manager's current events, then updates the geometry.
+
+        The geometry update runs whenever the events changed anything: a
+        topology change, or any vertex moved, merged or split. It is only
+        skipped when all the events are in `MESH_FLAGGING_EVENTS`, the geometry
+        class declares an idempotent `update_all`, and the positions and
+        topology are exactly those `set_pos` computed the geometry for.
+        """
+        eptm = self.eptm
+        names = {behavior.__name__ for behavior, _ in self.manager.current}
+        can_skip = names <= MESH_FLAGGING_EVENTS and getattr(
+            self.geom, "idempotent_update", False
+        )
+        if can_skip:
+            signature = topology_signature(eptm)
+            positions = self._positions()
+        previous = getattr(eptm, "network_changed", False)
+        eptm.network_changed = False
+        self.manager.execute(eptm)
+        flagged = eptm.network_changed
+        eptm.network_changed = previous or flagged
+        if (
+            not can_skip
+            or flagged
+            or topology_signature(eptm) != signature
+            or not np.array_equal(self._positions(), positions)
+        ):
+            self.geom.update_all(eptm)
+        self.manager.update()
+
+    def _positions(self):
+        # column by column: an order of magnitude faster than vert_df[coords]
+        return np.column_stack(
+            [self.eptm.vert_df[c].to_numpy() for c in self.eptm.coords]
+        )
 
     def ode_func(self, t, pos):
         """Computes the models' gradient.
