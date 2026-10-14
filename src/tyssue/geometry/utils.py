@@ -61,10 +61,7 @@ def rotation_matrix(angle, direction):
     """
     sina = np.sin(angle)
     cosa = np.cos(angle)
-    # Callers pass lists, arrays and pandas Series. Normalise first: a Series
-    # indexes by label, so the `direction[2]` below would be a lookup rather
-    # than the z component. The division keeps making a fresh array, so the
-    # in-place `direction *= sina` cannot touch the caller's own data.
+    # positional indexing below, also for a pandas Series
     direction = np.asarray(direction, dtype=float)
     direction = direction / np.linalg.norm(direction)
     # rotation matrix around unit vector

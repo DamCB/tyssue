@@ -18,11 +18,7 @@ logger = logging.getLogger(name=__name__)
 
 
 def _write_mesh(*args, **kwargs):
-    """Call vispy's write_mesh, with an actionable error when vispy is absent.
-
-    Without this the missing import surfaced only at call time, as a bare
-    ``NameError: name 'write_mesh' is not defined``.
-    """
+    """Calls vispy's write_mesh, raising a clear error if vispy is missing."""
     if write_mesh is None:
         msg = (
             "The .OBJ export needs vispy. "

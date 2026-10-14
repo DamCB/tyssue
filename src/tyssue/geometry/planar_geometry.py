@@ -12,9 +12,8 @@ from skimage.draw import polygon
 class BoundaryIndex:
     """Positional arrays describing the free border of an epithelium.
 
-    Left on ``eptm._boundary`` by :meth:`PlanarGeometry.update_boundary_index`.
-    Everything here depends only on topology, so it is reused until the
-    topology signature changes.
+    Stored on ``eptm._boundary`` by :meth:`PlanarGeometry.update_boundary_index`
+    and reused until the topology changes.
 
     free_edges  (k,) int  row positions in edge_df of half-edges with no opposite
     free_srce   (k,) int  row positions in vert_df of their source vertices
@@ -36,9 +35,8 @@ class BoundaryIndex:
 def topology_signature(eptm):
     """A cheap fingerprint of the epithelium's connectivity.
 
-    The element counts are not enough on their own: a type 1 transition leaves
-    Nv, Ne and Nf unchanged. The checksum covers the edge connectivity and every
-    index, and the ``id`` terms catch a dataframe replaced wholesale.
+    Combines the element counts, a checksum of the edge connectivity and
+    indices (which changes on a type 1 transition), and the dataframes' ids.
     """
     edge_df, vert_df, face_df = eptm.edge_df, eptm.vert_df, eptm.face_df
     crc = 0
@@ -67,8 +65,7 @@ def topology_signature(eptm):
 def update_boundary_index(sheet, with_faces=True):
     """Implementation of :meth:`PlanarGeometry.update_boundary_index`.
 
-    With ``with_faces=False`` the face_df 'boundary' column is left untouched,
-    as the cylinder geometries have always done.
+    With ``with_faces=False`` the face_df 'boundary' column is left untouched.
     """
     sig = topology_signature(sheet)
     cached = getattr(sheet, "_boundary", None)
@@ -82,8 +79,7 @@ def update_boundary_index(sheet, with_faces=True):
     ):
         return
 
-    # Imported here rather than at module level:
-    # core.objects imports this module, so a top-level import would cycle.
+    # avoids a circular import
     from ..core.sheet import get_opposite
 
     edge_df = sheet.edge_df
@@ -96,8 +92,7 @@ def update_boundary_index(sheet, with_faces=True):
     free_trgt = sheet.vert_df.index.get_indexer(edge_df["trgt"].to_numpy()[free])
     free_face = sheet.face_df.index.get_indexer(edge_df["face"].to_numpy()[free])
 
-    # A vertex is on the border when it is the target of a free edge; every
-    # vertex of a closed border ring is also the source of the next one.
+    # border vertices are the targets of free edges
     verts = np.unique(free_trgt[free_trgt >= 0])
 
     vert_flag = np.zeros(len(sheet.vert_df), dtype=np.int64)
@@ -138,7 +133,7 @@ class PlanarGeometry(BaseGeometry):
 
         cls.update_dcoords(sheet)
         cls.update_length(sheet)
-        cls.update_ucoords(sheet)  # after update_length: u = d / current length
+        cls.update_ucoords(sheet)  # needs the current lengths
         cls.update_centroid(sheet)
         cls.update_normals(sheet)
         cls.update_areas(sheet)
@@ -152,12 +147,8 @@ class PlanarGeometry(BaseGeometry):
         column that takes values 0 and 1, with 1 denoting that a vertex, edge or
         face lies on the tissue boundary, and 0 when it does not.
 
-        Also refreshes ``edge_df["opposite"]`` and leaves a
-        :class:`BoundaryIndex` on ``sheet._boundary``.
-
-        The boundary depends only on topology, so the work is skipped while the
-        topology signature (see :func:`topology_signature`) is unchanged and the
-        columns are still present.
+        Also updates ``edge_df["opposite"]`` and stores a :class:`BoundaryIndex`
+        on ``sheet._boundary``. Does nothing if the topology has not changed.
         """
         update_boundary_index(sheet, with_faces=True)
 
@@ -167,8 +158,7 @@ class PlanarGeometry(BaseGeometry):
         rcoords = ["r" + c for c in sheet.coords]
         dcoords = ["d" + c for c in sheet.coords]
 
-        # np.cross on 2-vectors is deprecated in NumPy 2; in the plane the
-        # cross product has only a z component, so write it out.
+        # z component of the 2D cross product
         rx, ry = (sheet.edge_df[c] for c in rcoords)
         dx, dy = (sheet.edge_df[c] for c in dcoords)
         sheet.edge_df["nz"] = rx * dy - ry * dx

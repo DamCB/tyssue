@@ -48,8 +48,7 @@ def merge_vertices(sheet):
 
 
 def _short_edges(sheet, d_min):
-    """Labels of the edges shorter than `d_min`, in edge_df order, as a
-    writeable array (pandas 3 hands back read-only ones, which shuffle rejects)."""
+    """Labels of the edges shorter than `d_min`, as a writeable array."""
     mask = sheet.edge_df["length"].to_numpy() < d_min
     return sheet.edge_df.index[mask].to_numpy(copy=True)
 
@@ -62,8 +61,8 @@ def detach_vertices(sheet):
     sheet.settings.
 
     If `sheet.settings["detach_boundary"]` is False (default True), vertices on
-    the free border of a :class:`Sheet` are never detached. A type 3 transition leaves a rank 4
-    vertex on the border, which would otherwise eventually be split again.
+    the free border of a :class:`Sheet` are never detached, which keeps the
+    rank 4 border vertices left by type 3 transitions.
 
     Parameters
     ----------
@@ -92,7 +91,7 @@ def detach_vertices(sheet):
     dice5p = np.random.random(rank5p.size)
 
     to_detach = np.concatenate([rank4[dice4 < p_4], rank5p[dice5p < p_5p]])
-    # filtered after the draws, so the random stream does not depend on it
+    # filtered after the draws so the random stream is the same either way
     if (
         to_detach.size
         and isinstance(sheet, Sheet)
@@ -118,11 +117,8 @@ def t3_transitions(sheet):
     Uses `t3_threshold` (default 1e-2) and `t3_skin` (default
     `10 * t3_threshold`) from `sheet.settings`.
 
-    Only border vertices and free edges are considered, as given by the boundary
-    index (see :meth:`PlanarGeometry.update_boundary_index`). Candidate pairs are
-    kept in a Verlet list: pairs closer than `t3_threshold + t3_skin` are found
-    once with a KD-tree and re-used until a border vertex has moved by more than
-    half the skin since, so most calls only compute a handful of distances.
+    Candidate pairs closer than `t3_threshold + t3_skin` are kept in a Verlet
+    list, rebuilt when a border vertex has moved by more than half the skin.
 
     Parameters
     ----------
@@ -150,8 +146,7 @@ def t3_transitions(sheet):
     for v_pos, e_pos in zip(verts, edges):
         vert, edge = vert_index[v_pos], edge_index[e_pos]
         srce, trgt = sheet.edge_df.loc[edge, ["srce", "trgt"]]
-        # one transition per vertex and edge per call: the geometry around
-        # them changed, the next call re-evaluates the rest
+        # at most one transition per vertex and edge per call
         if {vert, srce, trgt} & used_verts or edge in used_edges:
             continue
         if t3_transition(sheet, vert, edge, reindex=False) == 0:
@@ -187,7 +182,7 @@ def find_t3_candidates(sheet, d_min, skin=None):
     if not len(bnd.free_edges):
         return None, None, None
 
-    # column by column: an order of magnitude faster than vert_df[coords]
+    # column by column, faster than vert_df[coords]
     pos = np.column_stack(
         [sheet.vert_df[c].to_numpy(dtype=float) for c in sheet.coords]
     )
@@ -196,9 +191,7 @@ def find_t3_candidates(sheet, d_min, skin=None):
         cache = {"signature": bnd.signature, **_t3_topology(sheet, bnd)}
         sheet._t3_cache = cache
 
-    # Verlet criterion: a point of a segment moves at most as far as its farther
-    # end, so while no border vertex moved by more than skin / 2, every pair now
-    # closer than d_min was closer than d_min + skin when the list was built.
+    # rebuild the list once a border vertex moved by more than skin / 2
     if (
         cache.get("d_min") != d_min
         or cache.get("skin") != skin
@@ -282,11 +275,7 @@ def _t3_neighbor_list(bnd, cache, pos, radius):
     """(border vertex, free edge) pairs possibly closer than `radius`.
 
     Returns positional vertex indices and indices into the boundary index
-    free-edge arrays. Pairs that can never merge are dropped here: the vertex
-    belongs to the edge's face, is one of its ends, or the merge would duplicate
-    a half-edge (a -> v or v -> b already exists, for the edge a -> b). A vertex
-    linked by v -> a or b -> v is kept: that transition zips two free edges (see
-    :func:`tyssue.topology.sheet_topology.t3_transition`).
+    free-edge arrays, without the pairs :func:`t3_transition` would refuse.
     """
     empty = np.array([], dtype=np.int64)
     pa = pos[bnd.free_srce]
@@ -294,7 +283,7 @@ def _t3_neighbor_list(bnd, cache, pos, radius):
     mid = (pa + pb) / 2
     half = np.linalg.norm(pb - pa, axis=1) / 2
 
-    # a diverged (non finite) vertex can not be placed, it is left out
+    # skip non finite positions
     border = cache["border"]
     border = border[np.isfinite(pos[border]).all(axis=1)]
     edges_k = np.flatnonzero(np.isfinite(mid).all(axis=1) & np.isfinite(half))
@@ -438,8 +427,7 @@ def ab_pull(sheet, face, radial_tension, distributed=False):
     if distributed:
         radial_tension = radial_tension / len(verts)
 
-    # Tension is continuous; an integer column (from e.g. a `= 0` default set
-    # by hand) cannot hold the increment and raises in future pandas.
+    # an integer column can not hold a float increment
     if sheet.vert_df["radial_tension"].dtype.kind in "iub":
         sheet.vert_df["radial_tension"] = sheet.vert_df["radial_tension"].astype(float)
 

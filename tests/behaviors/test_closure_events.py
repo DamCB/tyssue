@@ -1,18 +1,10 @@
 """Tests for the monolayer tissue-closure / fusion behaviors.
 
-- ``test_fuse_lateral_faces_*`` / ``test_find_fusion_*`` / ``test_propagation_*``
-  / ``test_offset_fronts_fuse_*`` exercise the lateral-face fusion operations
-  (:mod:`tyssue.topology.bulk_topology`): collision-triggered, polarity-typed
-  welds with a nucleation (distance + facing-angle) and a propagation
-  (fold-angle) trigger, driven through the closure behavior
-  (:mod:`tyssue.behaviors.monolayer.closure_events.fuse`) and an
-  :class:`~tyssue.behaviors.event_manager.EventManager`.
-- ``test_circular_tissue_lifts_by_apical_constriction`` demonstrates the
-  physical lift: a large hexagonal-disk monolayer constricting apically.
+Lateral-face fusion (:mod:`tyssue.topology.bulk_topology`), the ``fuse``
+event, and the lift of a monolayer by apical constriction.
 
-Each test renders a 3D gif of the recorded history to ``tests/behaviors/output/``
-(requires imagemagick's ``magick``; the rendering step is skipped if it is not
-installed).
+Some tests render a 3D gif to ``tests/behaviors/output/`` when imagemagick is
+installed.
 """
 from pathlib import Path
 
@@ -81,12 +73,7 @@ def _n_lateral_border(mono):
 
 
 def _n_vertex_components(mono):
-    """Number of connected components when cells are joined by a shared vertex.
-
-    Vertex-face fusion connects cells through shared vertices (a face interface
-    only emerges once enough vertices are stitched), so tissue connectivity is
-    measured at the vertex level here.
-    """
+    """Number of connected components when cells are joined by a shared vertex."""
     import networkx as nx
 
     graph = nx.Graph()
@@ -102,9 +89,8 @@ def _n_vertex_components(mono):
 def _incise(mono, axis="x"):
     """Splits a monolayer into two halves along the median of `axis`.
 
-    The vertices shared between the two halves are duplicated so the cut opens
-    into two coincident free walls (the exact inverse of a fusion), and the
-    cells on each side are returned.
+    Shared vertices are duplicated, leaving two coincident free walls.
+    Returns the cells on each side.
     """
     mid = mono.cell_df[axis].median()
     left = set(mono.cell_df[mono.cell_df[axis] < mid].index)
@@ -147,8 +133,7 @@ def _render(history, name):
     OUTPUT_DIR.mkdir(exist_ok=True)
     output = OUTPUT_DIR / name
     history.update_datasets()
-    # Render a 3D wireframe (edges + vertices): robust to the transient
-    # degenerate polygons that can appear while the topology is changing.
+    # wireframe: faces can be degenerate while the topology changes
     create_gif_3d(
         history,
         output.as_posix(),
@@ -167,9 +152,8 @@ def _render(history, name):
 # tests
 # --------------------------------------------------------------------------- #
 def _offset_fronts(nx=6, ny=5, gap=0.0, shear=0.5):
-    """A monolayer cut in two and brought together with a transverse shear, so
-    the two walls are *not* coincident: vertices of one front sit over the
-    interior of the other's faces. Returns (mono, left_cells, right_cells)."""
+    """A monolayer cut in two, with one half sheared so the walls are not
+    coincident. Returns (mono, left_cells, right_cells)."""
     mono = _flat_monolayer(nx, ny)
     left, right = _incise(mono)
     left_v = _half_verts(mono, left)
@@ -183,13 +167,8 @@ def _offset_fronts(nx=6, ny=5, gap=0.0, shear=0.5):
 
 
 def _pocket_monolayer():
-    """A minimal 2-vs-1 pocket: cell C's single wide lateral wall is apposed to
-    the walls of *two* cells A and B of the other front, with both end corners
-    already shared (as if two fusions had trapped an unequal number of cells).
-
-    Built as a flat 3-face sheet -- two unit squares A, B stacked in y and one
-    tall rectangle C beside them sharing only the two corner vertices -- then
-    extruded to a monolayer. Returns the monolayer; cells are A=0, B=1, C=2.
+    """Cell C's wide lateral wall apposed to the walls of cells A and B, with
+    both end corners shared. Cells are A=0, B=1, C=2.
     """
     verts = {0: (0, 0), 1: (1, 0), 2: (1, 1), 3: (0, 1),
              4: (1, 2), 5: (0, 2), 6: (2, 0), 7: (2, 2)}
@@ -348,10 +327,8 @@ def test_propagation_zips_a_registered_seam():
 def test_offset_fronts_fuse_via_event_manager():
     """Two sheared fronts are joined into one tissue by lateral-face fusion.
 
-    The walls are not coincident (a transverse shear offsets them by half a
-    cell), so this only closes because nucleation is gated on distance + facing
-    angle rather than two faces lining up. Fusion is driven through an
-    EventManager using the ``fuse`` behavior.
+    The walls are offset by half a cell. Fusion runs through the ``fuse``
+    event.
     """
     mono, left, right = _offset_fronts(gap=0.8)
     n_cells = mono.Nc
@@ -394,11 +371,7 @@ def test_offset_fronts_fuse_via_event_manager():
 def _circular_monolayer(num_t=40, radius=6.75):
     """A large flat circular monolayer built from a hexagonal disk.
 
-    Cell centres are laid out on a :func:`hexa_disk`, tessellated with
-    :func:`from_2d_voronoi` and extruded to a monolayer of unit thickness. With
-    ``num_t=40, radius=6.75`` this yields ~118 cells whose mean apical area is
-    ~1, so the prefered area/volume can be set to the current values with almost
-    no initial relaxation.
+    With the defaults, ~118 cells of apical area ~1 and unit thickness.
     """
     points = hexa_disk(num_t, radius)
     sheet = Sheet("disk", from_2d_voronoi(Voronoi(points)))
@@ -420,11 +393,8 @@ def _circular_monolayer(num_t=40, radius=6.75):
 def _apical_constriction_model(mono):
     """Builds the apical-constriction energy model and its parameters.
 
-    The model couples per-face area elasticity, cell-volume conservation, line
-    tension and face contractility. Prefered areas/volumes are set to the
-    current values (minimal initial relaxation), and only the apical edges carry
-    line tension (= 1), which constricts the apical surface and lifts the
-    tissue.
+    Area elasticity, volume elasticity, line tension and contractility, with
+    the prefered areas and volumes set to the current values.
     """
     model = model_factory(
         [
@@ -456,13 +426,8 @@ def _apical_constriction_model(mono):
 def test_circular_tissue_lifts_by_apical_constriction():
     """A large circular monolayer lifts off the plane by apical constriction.
 
-    Apical line tension is integrated with :class:`EulerSolver` on a ~118-cell
-    disk of unit-area cells and unit thickness. The tissue domes out of the
-    plane while preserving its cells and a valid mesh.
-
-    Note: a flat disk under apical line tension alone equilibrates at an open
-    spherical cup, it does not self-contact, so no fusion is expected here. The
-    seam-fusion machinery is exercised by ``test_two_halves_fuse_*`` instead.
+    The apical line tension is ramped up with :class:`QSSolver`. The tissue
+    forms an open cup, keeping its cells and a valid mesh; no fusion happens.
     """
     mono = _circular_monolayer()
     n_cells = mono.Nc
@@ -471,10 +436,7 @@ def test_circular_tissue_lifts_by_apical_constriction():
     assert abs(mono.face_df.loc[mono.apical_faces, "area"].mean() - 1.0) < 0.1
     assert abs(mono.cell_df["vol"].mean() - 1.0) < 0.15
 
-    # A perfectly flat disk is a symmetric saddle of the energy, so the
-    # out-of-plane direction is degenerate. We break that symmetry
-    # deterministically with a small initial dome; apical constriction then
-    # amplifies it into the lift.
+    # a small initial dome breaks the up/down symmetry of the flat disk
     r = np.hypot(mono.vert_df["x"], mono.vert_df["y"])
     mono.vert_df["z"] += 0.5 * (1.0 - (r / r.max()) ** 2)
     geom.update_all(mono)
@@ -482,9 +444,7 @@ def test_circular_tissue_lifts_by_apical_constriction():
 
     model = _apical_constriction_model(mono)
 
-    # Quasistatically ramp the apical line tension from 0 to 1, relaxing to the
-    # energy minimum at each step. This is deterministic and avoids the noisy,
-    # path-dependent buckling of an explicit integrator on a floppy sheet.
+    # ramp the apical line tension, relaxing to the energy minimum each step
     solver = QSSolver()
     history = History(mono)
     history.record(time_stamp=0.0)
@@ -495,12 +455,7 @@ def test_circular_tissue_lifts_by_apical_constriction():
         geom.update_all(mono)
         energy_before = model.compute_energy(mono)
         res = solver.find_energy_min(mono, geom, model)
-        # Deliberately not `assert res["success"]`. Past the buckling step the
-        # tissue sits in a shallow, stiff valley: L-BFGS-B stops on its ftol
-        # after one or two iterations with the gradient still O(1), and whether
-        # that reads as CONVERGENCE or as an ABNORMAL line-search stall comes
-        # down to the platform's floating point. What must hold is that the
-        # relaxation never made things worse at fixed tension.
+        # res["success"] depends on the platform; the energy must not increase
         assert np.isfinite(res["fun"])
         assert res["fun"] <= energy_before + 1e-8
         history.record(time_stamp=float(i))

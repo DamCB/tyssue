@@ -23,10 +23,8 @@ from ..topology.sheet_topology import cell_division
 log = logging.getLogger(__name__)
 MAX_ITER = 1000
 
-# Events that only ever modify vertex positions and topology, never a parameter
-# the geometry reads. When only these ran and they left positions and topology
-# exactly as `set_pos` computed the geometry for, the update that follows the
-# events would reproduce the same values, and is skipped.
+# Events that only change vertex positions and topology. When only these ran
+# and changed nothing, the geometry update after the events is skipped.
 MESH_FLAGGING_EVENTS = frozenset({"wait", "reconnect", "t3"})
 
 
@@ -76,8 +74,7 @@ class EulerSolver:
         with_t1 : bool
             deprecated, has no effect (use `auto_reconnect`)
         with_t3 : bool
-            if True, will automatically perform type 3 transitions (border
-            vertices merging into a nearby free edge, see
+            if True, will automatically perform type 3 transitions (see
             :func:`tyssue.behaviors.sheet.basic_events.t3`), default False.
             Only for :class:`Sheet` objects.
 
@@ -169,11 +166,9 @@ class EulerSolver:
     def execute_events(self):
         """Executes the manager's current events, then updates the geometry.
 
-        The geometry update runs whenever the events changed anything: a
-        topology change, or any vertex moved, merged or split. It is only
-        skipped when all the events are in `MESH_FLAGGING_EVENTS`, the geometry
-        class declares an idempotent `update_all`, and the positions and
-        topology are exactly those `set_pos` computed the geometry for.
+        The update is skipped only when all the events are in
+        `MESH_FLAGGING_EVENTS`, the geometry's `update_all` is idempotent, and
+        the events changed neither positions nor topology.
         """
         eptm = self.eptm
         names = {behavior.__name__ for behavior, _ in self.manager.current}
@@ -198,7 +193,7 @@ class EulerSolver:
         self.manager.update()
 
     def _positions(self):
-        # column by column: an order of magnitude faster than vert_df[coords]
+        # column by column, faster than vert_df[coords]
         return np.column_stack(
             [self.eptm.vert_df[c].to_numpy() for c in self.eptm.coords]
         )

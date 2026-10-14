@@ -52,9 +52,7 @@ def save_datasets(store, eptm, grp=None):
     -------
     the store object
     """
-    # mode="w" truncates any pre-existing store, so it has to happen once,
-    # before the datasets are appended one group at a time. Each group is
-    # created implicitly by the write below.
+    # overwrites any existing store
     root = zarr.open_group(store, mode="w")
     root.attrs.update(filter_settings(eptm.settings))
 

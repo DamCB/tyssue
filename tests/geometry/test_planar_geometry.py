@@ -207,8 +207,7 @@ def test_boundary_index_follows_topology(monkeypatch):
     PlanarGeometry.update_boundary_index(sheet)
     calls = _count_get_opposite(monkeypatch)
 
-    # Rewired in place with the element counts unchanged, as after a T1:
-    # reversing a border face's orientation detaches it from its neighbours
+    # reverse a border face: same element counts, new connectivity (as a T1)
     face = sheet.edge_df.loc[sheet.edge_df["boundary"] == 1, "face"].iloc[0]
     rows = sheet.edge_df["face"] == face
     srce = sheet.edge_df.loc[rows, "srce"].to_numpy()

@@ -9,9 +9,7 @@ from .ipv_draw import sheet_view as sheet_view_3d  # noqa
 from .plt_draw import create_gif, create_gif_3d, plot_forces, quick_edge_draw  # noqa
 from .plt_draw import sheet_view as sheet_view_2d  # noqa
 
-# vispy lives in the optional `viz` extra. ImportError must be caught alongside
-# OSError: catching OSError alone made a plain `pip install tyssue` unable to
-# import tyssue.draw at all, including the matplotlib-only drawing functions.
+# vispy is in the optional `viz` extra
 try:
     from .vispy_draw import sheet_view as sheet_view_vispy  # noqa
 except (ImportError, OSError):

@@ -1,7 +1,6 @@
 import logging
 
-# _version.py is written by hatch-vcs at build time and is not tracked in git,
-# so it is absent in a plain source checkout that has never been built.
+# _version.py is generated at build time
 try:
     from ._version import __version__
 except ImportError:  # pragma: no cover

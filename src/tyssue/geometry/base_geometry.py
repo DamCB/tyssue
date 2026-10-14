@@ -4,8 +4,7 @@ from ..utils.utils import to_nd
 
 
 class BaseGeometry:
-    #: True when calling `update_all` again on unchanged positions and topology
-    #: reproduces exactly the same values, so a solver may skip that call.
+    #: True if calling `update_all` twice gives the same values
     idempotent_update = True
 
     @staticmethod

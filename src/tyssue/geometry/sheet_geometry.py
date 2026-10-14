@@ -25,7 +25,7 @@ class SheetGeometry(PlanarGeometry):
         """
         cls.update_dcoords(sheet)
         cls.update_length(sheet)
-        cls.update_ucoords(sheet)  # after update_length: u = d / current length
+        cls.update_ucoords(sheet)  # needs the current lengths
         cls.update_centroid(sheet)
         cls.update_height(sheet)
         cls.update_normals(sheet)
@@ -124,12 +124,8 @@ class SheetGeometry(PlanarGeometry):
 
         sheet.vert_df["height"] = sheet.vert_df["rho"] - sheet.vert_df["basal_shift"]
 
-        # Face-level mean of the source vertices' height/rho. Equivalent to
-        #     upcast_srce(...).groupby(face).mean()
-        # but done with bincount: the groupby builds an Ne x 2 intermediate frame
-        # and dominated update_height (0.717 ms of 0.761 ms on a 704-face crypt),
-        # which matters because update_height is per-step for every backend.
-        # Faces carrying no edge get NaN, exactly as the groupby's reindex did.
+        # face mean of the source vertices' height and rho (NaN for faces
+        # without edges), with bincount rather than a slower groupby
         srce_pos = sheet.vert_df.index.get_indexer(sheet.edge_df["srce"])
         face_pos = sheet.face_df.index.get_indexer(sheet.edge_df["face"])
         counts = np.bincount(face_pos, minlength=sheet.face_df.shape[0])

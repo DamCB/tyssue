@@ -75,14 +75,8 @@ def division(monolayer, manager, **kwargs):
     """Cell division happens through cell growth up to a critical volume,
     followed by actual division of the cell.
 
-    This is the bulk / monolayer analogue of
-    :func:`tyssue.behaviors.sheet.basic_events.division`. Growth acts on the
-    cell's ``prefered_vol`` (the reference volume of the
-    :class:`~tyssue.dynamics.effectors.Volume_Elasticity` effector), just as
-    the sheet behavior grows the reference area of the ``Area_Elasticity``
-    effector. Division is triggered once the measured volume reaches a
-    critical volume, the volumetric counterpart of the ``critical_area``
-    threshold used by the area-based behaviors.
+    Monolayer version of :func:`tyssue.behaviors.sheet.basic_events.division`:
+    the cell's ``prefered_vol`` grows until its volume reaches `critical_vol`.
 
     Parameters
     ----------

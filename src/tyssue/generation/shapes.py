@@ -373,11 +373,7 @@ def ellipsoid_sheet(a, b, c, n_zs, **kwargs):
 def make_spherical(n_points):
     """Returns ``n_points`` points spread over the unit sphere.
 
-    The points are placed on a Fibonacci (golden angle) spiral: heights are
-    spaced evenly in ``z``, which gives equal-area bands, and each successive
-    point is rotated by the golden angle so that no band ever lines up with
-    another. This is a near-uniform sampling with no pole clustering, which is
-    what the cell centers of a spherical tissue need.
+    The points lie on a Fibonacci spiral, a near-uniform sampling.
 
     Parameters
     ----------

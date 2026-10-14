@@ -127,15 +127,11 @@ def t3_transition(sheet, vert, edge, snap=True, reindex=True):
       a ------> b         a *     * b
 
     The half-edge a -> b of face F becomes a -> v and a new half-edge v -> b
-    is added to F, so that v is shared by its own cell(s) and F. Nothing is
-    removed; the free border now passes through v twice.
+    is added to F, so that v is shared by its own cell(s) and F.
 
-    `v` may already be linked to an end of the edge by a free half-edge of
-    another face G, when the two free borders meet at that end: v -> a, or
-    b -> v. The new half-edge a -> v (or v -> b) of F is then the opposite of
-    G's, so the transition zips the two free edges into one edge shared by F
-    and G and closes the gap between them at that end. A link the other way round (a -> v or v -> b) would duplicate a half-edge
-    and is refused.
+    If v is already linked to the edge by a free half-edge v -> a or b -> v,
+    that half-edge and F's new one become opposites, joining the two borders
+    into one shared edge.
 
     See Fletcher et al., Implementing vertex dynamics models of cell populations
     in biology within a consistent computational framework, Progress in
@@ -155,8 +151,8 @@ def t3_transition(sheet, vert, edge, snap=True, reindex=True):
     Returns
     -------
     0 on success, -1 if the transition is not possible (`edge` is not free,
-    `vert` already belongs to its face, or is linked to one of its ends other
-    than by v -> a or b -> v)
+    `vert` already belongs to its face, or a half-edge a -> v or v -> b
+    already exists)
     """
     edge_df = sheet.edge_df
     srce, trgt, face = edge_df.loc[edge, ["srce", "trgt", "face"]].astype(int)
@@ -165,7 +161,7 @@ def t3_transition(sheet, vert, edge, snap=True, reindex=True):
 
     is_opposite = (edge_df["srce"] == trgt) & (edge_df["trgt"] == srce)
     in_face = (edge_df["face"] == face) & (edge_df["srce"] == vert)
-    # a -> v or v -> b would be created twice; v -> a and b -> v are zipped
+    # a -> v or v -> b would be created twice
     duplicated = ((edge_df["srce"] == srce) & (edge_df["trgt"] == vert)) | (
         (edge_df["srce"] == vert) & (edge_df["trgt"] == trgt)
     )
@@ -186,8 +182,7 @@ def t3_transition(sheet, vert, edge, snap=True, reindex=True):
     new_edge["trgt"] = trgt
     if "unique_id" in new_edge.columns:
         new_edge["unique_id"] = _reserve_unique_id(sheet, "edge")
-    # a fresh label rather than ignore_index: existing edge labels must stay
-    # valid so that several transitions can be chained before a reindex
+    # new label, so existing labels stay valid until the next reindex
     new_edge.index = pd.Index([edge_df.index.max() + 1], name=edge_df.index.name)
     edge_df.loc[edge, "trgt"] = vert
     sheet.edge_df = pd.concat([edge_df, new_edge])
@@ -200,8 +195,7 @@ def t3_transition(sheet, vert, edge, snap=True, reindex=True):
 
 
 def _reserve_unique_id(sheet, element):
-    """Next unused `unique_id` for `element`, advancing
-    `sheet.specs[element]['unique_id_max']` (the next free id)."""
+    """Next unused `unique_id` for `element`; advances `unique_id_max`."""
     specs = sheet.specs.setdefault(element, {})
     df = sheet.datasets[element]
     uid = int(specs.get("unique_id_max", 0) or 0)

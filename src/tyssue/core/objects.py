@@ -127,9 +127,7 @@ class Epithelium:
         self.update_specs(specs, reset=False)
 
         self.coords = coords
-        # Vertex positions are continuous: an integer coordinate column would
-        # silently truncate every displacement written to it (and raises in
-        # pandas 3). Coerce once here so no caller has to remember.
+        # float coordinates, so displacements are not truncated
         for c in coords:
             for name in ("vert", "face", "cell"):
                 df = datasets.get(name)
@@ -687,10 +685,7 @@ class Epithelium:
         """Set the 'is_valid' column to true if the faces are all closed polygons,
         and the cells closed polyhedra.
         """
-        # pandas 3.0 removed `include_groups` and now excludes the grouping
-        # column from each group; but `_test_valid`/`_ordered_edges` need the
-        # `face` column. Re-add it inside apply from the group key (`g.name`),
-        # reproducing the old include_groups=True behaviour.
+        # the groups exclude the `face` column, which _test_valid needs
         is_valid_face = self.edge_df.groupby("face")[["srce", "trgt"]].apply(
             lambda g: _test_valid(g.assign(face=g.name))
         )
@@ -704,21 +699,15 @@ class Epithelium:
         return is_valid
 
     def find_intersections(self, strict=False, cache=None, **kwargs):
-        """Detect where this epithelium has stopped being an embedding.
-
-        ``validate`` is purely combinatorial: it checks that faces are closed
-        polygons, and a bow-tie passes it. This is the geometric counterpart --
-        it finds faces whose boundary crosses itself, vertices that have ended up
-        inside a face they do not belong to, and faces that overlap.
+        """Finds self-crossing faces, vertices inside a face they don't belong
+        to, and overlapping faces. Unlike ``validate``, this checks geometry.
 
         Parameters
         ----------
         strict : bool, default False
-            also run the pairwise face-overlap test (catches a "lens" overlap in
-            which two faces cross with no vertex of either inside the other).
+            also run the slower pairwise face-overlap test
         cache : RingCache, optional
-            reuse a ring matrix from a previous call; it is rebuilt automatically
-            when the topology changes, which is what makes per-step calls cheap.
+            ring matrix from a previous call, rebuilt if the topology changed
 
         Returns
         -------
@@ -728,7 +717,7 @@ class Epithelium:
 
         See Also
         --------
-        :mod:`tyssue.collisions.intersections` : the tests and their cost
+        :mod:`tyssue.collisions.intersections`
         :func:`tyssue.behaviors.sheet.basic_events.check_intersections`
             to run this during a simulation
         """

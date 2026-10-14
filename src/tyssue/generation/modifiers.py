@@ -73,9 +73,7 @@ def extrude(apical_datasets, method="homotecy", scale=0.3, vector=[0, 0, -1]):
     basal_edge.index = basal_edge.index + Ne
     basal_edge["segment"] = "basal"
 
-    # np.nan (not a bare object frame): an all-NA *object* column poisons the
-    # concat below, silently turning srce/trgt/num_sides into object dtype, and
-    # pandas warns that a future version will keep doing so for every column.
+    # float NaN, so the concat below keeps numeric dtypes
     lateral_face = pd.DataFrame(
         np.nan, index=apical_edge.index + 2 * Nf, columns=apical_face.columns
     )
@@ -112,7 +110,7 @@ def extrude(apical_datasets, method="homotecy", scale=0.3, vector=[0, 0, -1]):
         "trgt"
     ].values
 
-    # The frame was created as float NaN, so the indices land in it as floats
+    # back to int after the float NaN frame
     for col in ("srce", "trgt", "face", "cell"):
         lateral_edge[col] = lateral_edge[col].astype(int)
 

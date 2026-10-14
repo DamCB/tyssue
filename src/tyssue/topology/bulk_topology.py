@@ -450,8 +450,7 @@ def find_IHs(eptm, shorts=None):
         return []
 
     def _short_edge(grp):
-        # `srce` is the grouping column, so it is not passed in; re-add it from
-        # the group key (see get_valid() for the same idiom).
+        # the groups exclude the grouping column
         df = grp.assign(srce=grp.name)
         return pd.Series(
             {
@@ -560,11 +559,8 @@ def fix_pinch(eptm):
 
 
 def _face_centroids_normals(eptm, faces):
-    """Returns the centroid and unit (Newell) normal of each face in `faces`.
-
-    Computed directly from vertex positions, so no geometry update is required
-    and the result is independent of the half-edge order within a face.
-    """
+    """Returns the centroid and unit normal of each face in `faces`, computed
+    from the vertex positions."""
     centroids, normals = {}, {}
     grouped = eptm.edge_df[eptm.edge_df["face"].isin(faces)].groupby("face")
     for face, edges in grouped:
@@ -590,8 +586,8 @@ def _ordered_boundary(eptm, face):
 
 
 def _lateral_apico_basal(eptm, face):
-    """Returns (apical_verts, basal_verts) of a lateral `face`, from the apical
-    / basal labels carried by its vertices."""
+    """Returns (apical_verts, basal_verts) of a lateral `face`, from the
+    vertices' `segment` column."""
     verts = _ordered_boundary(eptm, face)
     seg = eptm.vert_df.loc[verts, "segment"]
     apical = [v for v in verts if seg[v] == "apical"]
@@ -622,16 +618,11 @@ def _free_lateral_faces(eptm, segment="lateral"):
 def _split_lateral_face(eptm, face):
     """Cuts a free lateral quad in two across its apico-basal axis.
 
-    A new apical vertex is inserted on the face's apical edge and a new basal
-    vertex on its basal edge (each edge is split in the apical / basal cap face
-    too, via :func:`~tyssue.topology.base_topology.add_vert`), and the two are
-    joined by a new edge, dividing the wall into two coplanar lateral quads of
-    the same cell. This reconciles a valence mismatch in a closing seam: a single
-    wide wall apposed to two narrower walls of the other front (a "2-vs-1
-    pocket") is split so each piece can fuse with its own partner.
+    New vertices are added on the apical and basal edges and joined by a new
+    edge, giving two lateral quads of the same cell. Used when one wide face
+    is apposed to two narrower faces of the other front.
 
-    Returns ``(new_apical_vert, new_basal_vert, new_face)`` (indices valid until
-    the following ``reset_index``).
+    Returns ``(new_apical_vert, new_basal_vert, new_face)``.
     """
     def _segment_edge(face, kind):
         seg = eptm.vert_df["segment"]
@@ -645,8 +636,7 @@ def _split_lateral_face(eptm, face):
     nb, _, _ = add_vert(eptm, _segment_edge(face, "basal"))
     cell = int(eptm.edge_df.loc[eptm.edge_df["face"] == face, "cell"].iloc[0])
 
-    # cyclic boundary is [a1, na, a2, b1, nb, b2]; na and nb are antipodal, so
-    # the half-loop from na to nb is one of the two new quads (na, a2, b1, nb).
+    # boundary is [a1, na, a2, b1, nb, b2]: (na, a2, b1, nb) is the new face
     order = _ordered_boundary(eptm, face)
     n = len(order)
     ina = order.index(na)
@@ -684,18 +674,12 @@ def _split_lateral_face(eptm, face):
 def fuse_lateral_faces(eptm, face_g, face_f, validate=True):
     """Welds two apposed free lateral faces into one internal interface.
 
-    The vertices of `face_g` (cell A) and `face_f` (cell B) are matched
-    **within their apico-basal segment** -- apical vertices only to apical, basal
-    only to basal -- and welded pairwise, so the two faces end up with an
-    identical vertex set and :meth:`Epithelium.get_opposite_faces` registers them
-    as opposites. Vertices the two faces already share (a seam corner / edge from
-    a neighbouring fusion) are left in place; only the remaining ones are welded.
+    Unshared vertices are merged pairwise with their closest counterpart,
+    apical to apical and basal to basal, so the two faces become opposites.
+    Both faces need the same number of unshared apical and basal vertices.
 
-    The weld requires equal numbers of unshared apical (and basal) vertices on
-    the two faces -- the quad-quad case. A genuine valence/registration mismatch
-    (e.g. differing rim densities) returns -1 rather than fusing.
-
-    Returns 0 on success, -1 if it could not (validly) fuse.
+    Returns 0 on success, -1 if the faces can not be fused (or, with
+    `validate`, if the result is invalid, in which case it is rolled back).
     """
     if validate:
         vert_bak = eptm.vert_df.copy()
@@ -765,12 +749,10 @@ def find_fusion_nucleations(eptm, d_max=None, theta_face=45.0, margin=0.5,
                             segment="lateral"):
     """Finds apposed free lateral faces that are approaching but not yet joined.
 
-    A pair ``(g, f)`` is returned when both are free `segment` faces of two
-    **different, not-yet-adjacent** cells that do **not** already share an edge,
-    their outward normals are anti-parallel to within `theta_face`, and a vertex
-    of one lies within `d_max` of the other's plane (and laterally over it, to
-    within `margin`). This nucleates a seam where two fronts first meet, at any
-    relative angle -- no face coincidence required.
+    Returns pairs ``(g, f)`` of free `segment` faces of two non-adjacent cells
+    that share no edge, whose normals are anti-parallel within `theta_face`,
+    and where a vertex of g lies within `d_max` of f's plane and over f (within
+    `margin` of its radius).
     """
     faces = _free_lateral_faces(eptm, segment)
     if len(faces) < 2:
@@ -835,12 +817,8 @@ def find_fusion_nucleations(eptm, d_max=None, theta_face=45.0, margin=0.5,
 def find_fusion_propagations(eptm, theta_fold=20.0, segment="lateral"):
     """Finds free lateral faces that have folded together along a shared edge.
 
-    A pair ``(g, f)`` is returned when both are free `segment` faces of two
-    **different, not-yet-adjacent** cells that **share an edge** (the seam edge
-    welded by a neighbouring fusion) and whose *fold angle* about that edge is
-    below `theta_fold` -- i.e. the two flaps have closed onto each other. This
-    walks the seam outward from a nucleation as the rim closes. Same-front
-    neighbours are excluded because their cells are already face-adjacent.
+    Returns pairs ``(g, f)`` of free `segment` faces of two non-adjacent cells
+    that share an edge, with a fold angle about that edge below `theta_fold`.
     """
     faces = _free_lateral_faces(eptm, segment)
     if len(faces) < 2:
@@ -889,13 +867,9 @@ def find_fusion_propagations(eptm, theta_fold=20.0, segment="lateral"):
 def find_fusion_splits(eptm, theta_fold=20.0, segment="lateral"):
     """Finds wide walls straddling a valence mismatch in a closing seam.
 
-    A free `segment` face is returned when it has folded (within `theta_fold`)
-    against **two or more distinct** free `segment` faces belonging to different,
-    not-yet-adjacent cells -- i.e. a single wall apposed to two walls of the
-    other front (a "2-vs-1 pocket", left behind when two fusions trap an unequal
-    number of cells between them). Such a face must be split
-    (:func:`_split_lateral_face`) before the pocket can zip shut. Returns the
-    faces to split, widest mismatch first.
+    Returns the free `segment` faces folded (within `theta_fold`) against
+    faces of two or more other non-adjacent cells, which must be split before
+    they can fuse. Faces against the most cells come first.
     """
     faces = _free_lateral_faces(eptm, segment)
     if len(faces) < 3:
@@ -941,12 +915,9 @@ def all_lateral_fusions(eptm, d_max=None, theta_face=45.0, theta_fold=20.0,
                         margin=0.5, segment="lateral", validate=True):
     """Performs every available lateral-face fusion on `eptm`.
 
-    Each round it extends existing seams (:func:`find_fusion_propagations`) and
-    nucleates new ones (:func:`find_fusion_nucleations`), applies one valid
-    :func:`fuse_lateral_faces`, then re-detects (indices change). When a wall
-    straddles a valence mismatch (a "2-vs-1 pocket", :func:`find_fusion_splits`)
-    it is divided with :func:`_split_lateral_face` so the pocket can finish
-    zipping. Mismatched or invalid fusions are skipped.
+    Each round fuses one pair from :func:`find_fusion_propagations` or
+    :func:`find_fusion_nucleations`, or else splits a face returned by
+    :func:`find_fusion_splits`, until nothing changes.
 
     Returns the number of fusions performed (splits are not counted).
     """
@@ -960,8 +931,7 @@ def all_lateral_fusions(eptm, d_max=None, theta_face=45.0, theta_fold=20.0,
         ) + find_fusion_nucleations(
             eptm, d_max=d_max, theta_face=theta_face, margin=margin, segment=segment
         )
-        # don't fuse a wall that needs splitting first -- it would mis-weld the
-        # far corner of the wide wall onto a single narrow partner.
+        # faces that need splitting are not fused yet
         candidates = [
             (g, f) for g, f in candidates if g not in flagged and f not in flagged
         ]

@@ -10,7 +10,7 @@ class CylinderGeometryInit(SheetGeometry):
 
     @staticmethod
     def update_boundary_index(sheet):
-        # Vertex and edge flags only: the face 'boundary' column is left as is.
+        # face_df 'boundary' is left unchanged
         update_boundary_index(sheet, with_faces=False)
 
     @staticmethod
@@ -74,10 +74,8 @@ class CylinderGeometryInit(SheetGeometry):
         vector from that mean to the vertex in `dx, dy, dz`, as read by
         `SurfaceElasticity`.
 
-        The same rule applies to every vertex, whatever its rank and whether or
-        not it lies on the boundary. Neighbours linked in either direction are
-        counted, since on a free border a neighbour can be linked by an incoming
-        half-edge only. A vertex without neighbours gets a zero deviation.
+        Neighbours linked by an edge in either direction are counted. A vertex
+        without neighbours gets a zero deviation.
         """
         vert_df, edge_df = sheet.vert_df, sheet.edge_df
         pos = vert_df[["x", "y", "z"]].to_numpy(dtype=float)
@@ -148,7 +146,7 @@ class CylinderGeometryInit(SheetGeometry):
 
     @classmethod
     def update_all(cls, sheet):
-        super().update_all(sheet)  # includes cls.update_boundary_index
+        super().update_all(sheet)
         cls.update_tangents(sheet)
         # cls.update_face_tangents(sheet)
         # cls.update_face_distance(sheet)

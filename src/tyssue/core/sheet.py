@@ -461,8 +461,7 @@ class Sheet(Epithelium):
 
         grid = hexa_grid2d(nx, ny, distx, disty, noise)
         datasets = from_2d_voronoi(Voronoi(grid))
-        # float, not int: vertices are moved by continuous forces, and an int
-        # column silently truncates every displacement written to it
+        # float, so displacements are not truncated
         datasets["vert"]["z"] = 0.0
         datasets["face"]["z"] = 0.0
 
@@ -494,14 +493,12 @@ def get_opposite(edge_df, raise_if_invalid=False):
         if raise_if_invalid:
             raise ValueError("Duplicated pairs detected")
 
-    # Find opposites
-    # Create the "target" pairs we are looking for: (trgt, srce)
+    # the opposite of (srce, trgt) is (trgt, srce)
     flipped_pairs = np.zeros(len(srce), dtype=[('f0', srce.dtype), ('f1', trgt.dtype)])
     flipped_pairs['f0'], flipped_pairs['f1'] = trgt, srce
 
     # Find where flipped_pairs would fit into the sorted list of original pairs
     match_indices = np.searchsorted(sorted_pairs, flipped_pairs)
-
 
     valid_mask = (match_indices < len(pairs))
     actual_match_mask = valid_mask.copy()
@@ -517,8 +514,7 @@ def get_opposite(edge_df, raise_if_invalid=False):
 def _get_opposite_int(srce, trgt, edge_idx, raise_if_invalid=False):
     """:func:`get_opposite` for non-negative integer vertex indices.
 
-    Packs each (srce, trgt) pair into a single int64 key, which sorts about
-    eight times faster than the equivalent structured array.
+    Packs each (srce, trgt) pair into a single int64 key.
     """
     srce = srce.astype(np.int64, copy=False)
     trgt = trgt.astype(np.int64, copy=False)

@@ -2,27 +2,16 @@
 Tissue closure / fusion events
 ==============================
 
-Behaviors that close an open monolayer (e.g. the rim of a lifting tissue or
-two fronts coming into contact) into a continuous epithelium with a lumen.
+Behaviors that close an open monolayer (e.g. two fronts coming into contact)
+into a continuous epithelium with a lumen, by combining:
 
-These events bundle the topology operations needed for closure:
+- rearrangements (T1 / IH and T2 / HI transitions) at the boundary, and
+- fusion of apposed free lateral faces into one internal interface
+  (:func:`tyssue.topology.bulk_topology.fuse_lateral_faces`), apical vertices
+  to apical and basal to basal.
 
-- the local rearrangements (T1 / IH and T3 / HI transitions) that progressively
-  squeeze cells away from the boundary -- the "zipper" mechanism, and
-- the lateral-face fusion operation
-  (:func:`tyssue.topology.bulk_topology.fuse_lateral_faces`) that welds two
-  apposed free lateral walls into one internal interface. It is collision-
-  triggered (nucleation on distance + facing angle, propagation on the fold
-  angle of an existing seam) and polarity-typed (apical-to-apical, basal-to-
-  basal), so no coincidence between whole faces is required and a basal face can
-  never fuse to a lateral one. When two fusions trap an unequal number of cells
-  between them (a wide wall apposed to two narrower ones -- a "2-vs-1 pocket"),
-  the wide wall is split (:func:`tyssue.topology.bulk_topology.find_fusion_splits`)
-  so the pocket can finish zipping shut.
-
-The events are deliberately kept out of the solver's ``auto_reconnect`` path:
-add them to an :class:`~tyssue.behaviors.event_manager.EventManager` manually,
-e.g. ``manager.append(lumen_closure, **spec)``, while experimenting.
+Add them to an :class:`~tyssue.behaviors.event_manager.EventManager`, e.g.
+``manager.append(lumen_closure, **spec)``.
 """
 
 import logging
@@ -42,12 +31,8 @@ default_fuse_spec = {
 
 
 def fuse(eptm, manager, **kwargs):
-    """Fuses every apposed pair of lateral faces, then re-schedules itself.
-
-    This is the pure fusion step: it performs no rearrangement, only the
-    lateral-face fusion of fronts that have come into contact (nucleation where
-    two fronts first meet, propagation along an existing seam). It re-appends
-    itself to the manager so it keeps watching for new contacts every step.
+    """Fuses every apposed pair of free lateral faces, without
+    rearrangements. Re-appends itself every step.
 
     Keyword Arguments
     -----------------
@@ -103,15 +88,9 @@ default_lumen_closure_spec = {
 def lumen_closure(eptm, manager, **kwargs):
     """Drives a monolayer towards closure: rearrangements then lateral fusion.
 
-    Each step this event
-
-    1. performs a single boundary rearrangement (an IH/T1 or, if
-       ``with_t2``, an HI/T2 transition) -- the zipper that brings border
-       cells together, then
-    2. fuses every apposed lateral-face pair between the approaching fronts.
-
-    It re-appends itself, so adding it once to the manager keeps the closure
-    process running for the whole simulation.
+    Each step it performs a single rearrangement (IH/T1, or HI/T2 if
+    ``with_t2``), then fuses every apposed pair of lateral faces. Re-appends
+    itself every step.
 
     Keyword Arguments
     -----------------
@@ -120,8 +99,8 @@ def lumen_closure(eptm, manager, **kwargs):
     with_rearrangements : bool, default True
         whether to perform the IH/HI rearrangement step.
     with_t2 : bool, default True
-        whether HI / T2 transitions are allowed in the rearrangement step.
-        ``with_t3`` is accepted as a deprecated alias.
+        whether HI / T2 transitions are allowed; ``with_t3`` is a deprecated
+        alias.
     """
     spec = default_lumen_closure_spec.copy()
     spec.update(kwargs)

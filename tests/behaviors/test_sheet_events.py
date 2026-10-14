@@ -428,7 +428,7 @@ def _brute_force_t3(sheet, d_min):
         for v in border:
             if v in (a, b) or v in face_verts[face]:
                 continue
-            # a -> v or v -> b would be created twice (v -> a, b -> v zip)
+            # a -> v or v -> b would be created twice
             if {(a, v), (v, b)} & linked:
                 continue
             pv = pos.loc[v].to_numpy()

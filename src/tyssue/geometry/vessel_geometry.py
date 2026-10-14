@@ -11,26 +11,21 @@ class VesselGeometry(SheetGeometry):
 
     @staticmethod
     def update_tangents(sheet):
-        # Extract coordinates as NumPy arrays
         x = sheet.vert_df['x'].to_numpy()
         y = sheet.vert_df['y'].to_numpy()
 
-        # Analytical Cross Product
+        # tangent: (x, y, 0) x z
         tx = y
         ty = -x
 
-        # Calculate Length (Vectorized)
         length = np.hypot(tx, ty)
 
-        # Normalize
         with np.errstate(divide='ignore', invalid='ignore'):
             inv_length = 1.0 / length
 
-        # 5. Assign directly to DataFrame
-        # This assumes sheet.coords = ['x', 'y', 'z'], matching the original output naming
         sheet.vert_df['tx'] = tx * inv_length
         sheet.vert_df['ty'] = ty * inv_length
-        sheet.vert_df['tz'] = 0.0  # Z-component is always 0 in this projection
+        sheet.vert_df['tz'] = 0.0
 
     @staticmethod
     def update_vert_distance(sheet):

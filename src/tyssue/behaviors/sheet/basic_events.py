@@ -68,24 +68,21 @@ def t3(sheet, manager, **kwargs):
     `t3_threshold` to a free edge of another cell are merged into that edge
     (Fletcher et al. 2013).
 
-    kwargs overwrite their corresponding `sheet.settings` entries. Enabled with
-    `EulerSolver(..., with_t3=True)` or by appending it once to the manager, as
-    it re-appends itself every step.
+    kwargs overwrite their corresponding `sheet.settings` entries. Enable with
+    `EulerSolver(..., with_t3=True)` or append it once to the manager; it
+    re-appends itself every step.
 
     Keyword Arguments
     -----------------
     t3_threshold : float, default 1e-2
         the vertex to edge distance at which the merge happens
     t3_skin : float, default 10 * t3_threshold
-        margin of the candidate list; a larger skin rebuilds it less often but
-        checks more pairs each step
+        margin of the candidate list
 
     Note
     ----
-    The merged vertex is a rank 4 vertex on the border, which :func:`reconnect`
-    detaches with probability `p_4` per unit time. Set
-    `sheet.settings["detach_boundary"] = False` to keep T3 junctions when both
-    events run.
+    :func:`reconnect` can detach the rank 4 border vertices T3 creates. Set
+    `sheet.settings["detach_boundary"] = False` to keep them.
 
     See Also
     --------
@@ -117,54 +114,34 @@ default_intersection_spec = {
 
 
 def check_intersections(sheet, manager, **kwargs):
-    """Check each step whether the tissue is still an embedding.
+    """Checks for folded or overlapping faces.
 
-    Enabled the same way as :func:`reconnect` -- append it once to the manager and
-    it re-appends itself every step::
+    Append it once to the manager; it re-appends itself every step::
 
-        manager.append(check_intersections)
         manager.append(check_intersections, raise_on_detect=True)
 
-    Nothing in a vertex model's energy resists a face passing through itself: face
-    area is a sum of *unsigned* sub-triangle areas, so a fold contributes positive
-    area and the area elasticity feels no restoring force, while ``reconnect`` only
-    reacts to *short edges*. A fold is therefore silent and permanent unless
-    something looks for it, which is what this does.
-
-    It only reports -- it never modifies the mesh. Repair belongs to a callback.
-
-    kwargs overwrite their corresponding ``sheet.settings`` entries.
+    It only reports and never modifies the mesh. The latest report is stored in
+    ``sheet.settings["intersections"]``. Other kwargs overwrite their
+    corresponding ``sheet.settings`` entries.
 
     Keyword Arguments
     -----------------
     every : int, default 1
-        run the detection every ``every``-th step, re-appending itself in between.
-        The full check costs ~14 ms on a 750-cell sheet, so ``every=1`` adds ~17
-        minutes to a 72,000-step run; a fold develops over hundreds of steps, so
-        ``every=10`` or more loses nothing in practice.
+        run the check every ``every``-th step
     strict : bool, default False
-        also run the pairwise face-overlap test, which catches a "lens" overlap in
-        which two faces cross without either one's vertex landing inside the other.
-        The only test whose cost is not negligible.
+        also run the slower pairwise face-overlap test
     trigger : {None, "folded"}, default None
-        ``"folded"`` only looks for contained vertices around faces that are
-        already self-crossing, which is much cheaper. Sound only where every
-        intrusion comes from a folded face -- true of the crypt (measured 62/62)
-        but NOT a theorem: two convex cells can slide through each other with
-        neither ring self-crossing.
+        ``"folded"`` only looks for contained vertices around self-crossing
+        faces; faster, but misses convex cells sliding through each other
     raise_on_detect : bool, default False
-        raise ``IntersectionError`` on the first defect, to stop a run at the step
-        it goes wrong rather than at the end.
+        raise ``IntersectionError`` on the first defect
     on_detect : callable, optional
-        called as ``on_detect(sheet, report)`` whenever a defect is found.
+        called as ``on_detect(sheet, report)`` whenever a defect is found
     max_span_rad : float, optional
-        faces whose surface normal turns by more than this across the face are
-        reported as *undecidable* instead of folded, because no plane represents
-        them. Defaults to 30 degrees.
+        faces more curved than this (default 30 degrees) are reported as
+        *undecidable* instead of folded
     history : list, optional
-        a list to append ``(sheet.settings.get("time"), report)`` to each step.
-
-    The most recent report is always left on ``sheet.settings["intersections"]``.
+        ``(sheet.settings.get("time"), report)`` is appended to it each step
 
     See Also
     --------
@@ -186,8 +163,7 @@ def check_intersections(sheet, manager, **kwargs):
     if spec["max_span_rad"] is not None:
         detect_kwargs["max_span_rad"] = spec["max_span_rad"]
 
-    # the ring matrix depends only on topology, so it is reused between topology
-    # changes -- that is what keeps the per-step cost near a millisecond
+    # the ring matrix is reused until the topology changes
     report = find_intersections(
         sheet, cache=sheet.settings.get("_intersection_cache"), **detect_kwargs
     )
@@ -198,8 +174,7 @@ def check_intersections(sheet, manager, **kwargs):
         spec["history"].append((sheet.settings.get("time"), report))
 
     if not report.clean:
-        # a fold is permanent, so logging every step would emit the same line tens
-        # of thousands of times -- report only when the tally actually changes
+        # only log when the counts change
         tally = (len(report.folded), len(report.contained), len(report.overlaps),
                  len(report.open_rings), len(report.undecidable))
         if tally != sheet.settings.get("_intersection_tally"):

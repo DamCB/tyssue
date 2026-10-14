@@ -24,7 +24,7 @@ class BulkGeometry(SheetGeometry):
         """
         cls.update_dcoords(eptm)
         cls.update_length(eptm)
-        cls.update_ucoords(eptm)  # after update_length: u = d / current length
+        cls.update_ucoords(eptm)  # needs the current lengths
         cls.update_perimeters(eptm)
         cls.update_centroid(eptm)
         cls.update_normals(eptm)

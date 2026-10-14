@@ -17,8 +17,8 @@ logger = logging.getLogger(name=__name__)
 def _time_key(time):
     """The `dicts` key for a time point.
 
-    Keys are stringified floats, so `record(1)` and `retrieve(1.0)` agree. Accepts
-    either a number or a recorded frame, in which case the time is read from it.
+    Keys are stringified floats, so `record(1)` and `retrieve(1.0)` agree.
+    `time` is a number or a recorded frame.
     """
     if isinstance(time, pd.DataFrame):
         time = time["time"].iloc[0] if "time" in time.columns and len(time) else 0.0
@@ -130,12 +130,8 @@ class History:
 
     @property
     def datasets(self):
-        """The whole recorded history, one concatenated frame per element.
-
-        Rebuilt from `self.dicts` on every access. `dicts` is the store; this is a
-        convenience view for callers that want the full time series in one frame,
-        and is the only place a concatenation happens.
-        """
+        """The whole recorded history, one frame per element, built from
+        `self.dicts` on every access."""
         return {
             element: self._concat(element) for element in self.dicts
         }
@@ -208,11 +204,7 @@ class History:
         self.index += 1
 
     def update_datasets(self):
-        """Deprecated: `datasets` is now rebuilt from `dicts` on access.
-
-        Kept so existing code that called this after a simulation keeps working;
-        it is no longer necessary.
-        """
+        """Deprecated, not needed: returns `self.datasets`."""
         return self.datasets
 
     def retrieve(self, time):

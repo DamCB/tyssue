@@ -1,7 +1,6 @@
 """Tests for :mod:`tyssue.collisions.intersections`.
 
-The fast path is checked against a deliberately slow reference wherever a
-reference exists, and every synthetic case has an answer known by construction.
+Results are checked against slow reference implementations where they exist.
 """
 
 import numpy as np
@@ -31,8 +30,7 @@ def make_sheet(verts, faces):
     for fid, ring in enumerate(faces):
         for i, v in enumerate(ring):
             rows.append((int(v), int(ring[(i + 1) % len(ring)]), fid))
-    # shuffled deliberately: edge_df row order is NOT ring order, and the
-    # detector must chain srce -> trgt rather than trusting it
+    # shuffled: edge_df row order is not ring order
     rng = np.random.default_rng(0)
     rows = [rows[i] for i in rng.permutation(len(rows))]
     edge = pd.DataFrame(rows, columns=["srce", "trgt", "face"])
@@ -55,9 +53,7 @@ def test_regular_hexagon_is_clean():
 
 
 def test_bowtie_quad_is_flagged():
-    # swapping two vertices of a square makes the classic bow-tie. Its Newell
-    # area vector is exactly zero, which is why the frame must come from the
-    # best-fit plane and not from Newell.
+    # swapping two vertices of a square makes a bow-tie, with a zero Newell vector
     s = make_sheet([[0, 0], [1, 0], [0, 1], [1, 1]], [[0, 1, 2, 3]])
     assert list(s.find_intersections().folded) == [0]
 
@@ -193,10 +189,7 @@ def test_periodic_seam_needs_no_special_handling():
 
 
 def test_wide_face_on_a_tube_is_not_a_false_positive():
-    """A face spanning a wide arc is fitted by a CHORD plane through the surface,
-    which reports a crossing the surface does not have. Measured case: a crypt
-    face spanning 61.4 degrees. A residual test cannot catch it -- a chord fits a
-    chord well -- so the span of the surface normal is used instead."""
+    """A face spanning a wide arc is reported as undecidable, not folded."""
     wide = _tube_patch(0.0, 1.07, 0.0, 0.35)
     wide[[1, 2]] = wide[[2, 1]]
     nbr = _tube_patch(0.18, 1.25, 0.05, 0.40)
@@ -219,7 +212,7 @@ def test_small_faces_are_unaffected_by_the_curvature_guard():
 
 
 # ---------------------------------------------------------------------------
-# The signed/unsigned area gap the energy is blind to
+# Signed area screen
 # ---------------------------------------------------------------------------
 def test_signed_area_collapses_while_the_area_the_energy_sees_does_not():
     s = make_sheet(hexagon(), [[0, 1, 2, 3, 4, 5]])
@@ -235,7 +228,7 @@ def test_signed_area_collapses_while_the_area_the_energy_sees_does_not():
 
 
 # ---------------------------------------------------------------------------
-# Running it during a simulation, the way `reconnect` is run
+# check_intersections event
 # ---------------------------------------------------------------------------
 def test_behaviour_reappends_itself_and_reports():
     s = make_sheet([[0, 0], [1, 0], [0, 1], [1, 1]], [[0, 1, 2, 3]])
