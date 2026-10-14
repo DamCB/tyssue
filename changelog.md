@@ -38,6 +38,13 @@
 - `EulerSolver` skips the geometry update after events when the events are only
   `reconnect`, `t3` or `wait` and changed neither positions nor topology.
 
+## Active migration
+
+- `ActiveMigration` reads its direction from the face columns `mx`, `my`
+  (and `mz`), which are now also its spec defaults; the defaults were named
+  `migration_dir_*` and never used. Each cell's force, `migration_strength`,
+  is split between its vertices: it was applied in full to every vertex.
+
 ## Cylinder geometry
 
 - `CylinderGeometryInit.update_vert_deviation` uses all the neighbours of each

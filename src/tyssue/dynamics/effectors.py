@@ -688,6 +688,8 @@ class ActiveMigration(AbstractEffector):
 
     This is a non-conservative force that drives cells to migrate
     along a specified vector direction with constant magnitude.
+    The direction is read from the face columns ``m`` + coordinate
+    (``mx``, ``my``, and ``mz`` in 3D); it need not be normalized.
     """
 
     dimensions = units.force
@@ -698,9 +700,9 @@ class ActiveMigration(AbstractEffector):
         "face": {
             "is_alive": 1,
             "migration_strength": 0.1,  # magnitude of migration force
-            "migration_dir_x": 1.0,  # x-component of migration direction
-            "migration_dir_y": 0.0,  # y-component of migration direction
-            "migration_dir_z": 0.0,  # z-component (if 3D)
+            "mx": 1.0,  # migration direction
+            "my": 0.0,
+            "mz": 0.0,
         }
     }
 
@@ -713,11 +715,11 @@ class ActiveMigration(AbstractEffector):
 
     @staticmethod
     def gradient(eptm):
-        """Each cell exerts a constant force along its migration direction,
-        applied to its source vertices."""
+        """Each cell exerts a force of magnitude `migration_strength` along its
+        migration direction, split equally between its vertices."""
         df = eptm.face_df
 
-        force_magnitude = df["migration_strength"] * df["is_alive"]
+        force_magnitude = df["migration_strength"] * df["is_alive"] / df["num_sides"]
 
         migration_dirs = df[[f"m{c}" for c in eptm.coords]].to_numpy()
 
