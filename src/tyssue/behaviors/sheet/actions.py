@@ -244,7 +244,8 @@ def _t3_topology(sheet, bnd):
     nv, nf     element counts the keys are built with
     border     positional indices of every vertex on a free edge
     face_keys  sorted `vert * Nf + face` keys, a border vertex in a face
-    link_keys  sorted `min * Nv + max` keys, a border vertex linked by an edge
+    link_keys  sorted `srce * Nv + trgt` keys, a half-edge from or to a border
+               vertex
     """
     edge_df = sheet.edge_df
     nv, nf = len(sheet.vert_df), len(sheet.face_df)
@@ -259,9 +260,7 @@ def _t3_topology(sheet, bnd):
     in_face = on_border[e_srce]
     face_keys = np.unique(e_srce[in_face] * nf + e_face[in_face])
     linked = on_border[e_srce] | on_border[e_trgt]
-    lo = np.minimum(e_srce[linked], e_trgt[linked])
-    hi = np.maximum(e_srce[linked], e_trgt[linked])
-    link_keys = np.unique(lo * nv + hi)
+    link_keys = np.unique(e_srce[linked] * nv + e_trgt[linked])
     return {
         "nv": nv,
         "nf": nf,
@@ -283,8 +282,11 @@ def _t3_neighbor_list(bnd, cache, pos, radius):
     """(border vertex, free edge) pairs possibly closer than `radius`.
 
     Returns positional vertex indices and indices into the boundary index
-    free-edge arrays. Pairs where the vertex belongs to the edge's face or is
-    linked to one of its ends can never merge and are dropped here.
+    free-edge arrays. Pairs that can never merge are dropped here: the vertex
+    belongs to the edge's face, is one of its ends, or the merge would duplicate
+    a half-edge (a -> v or v -> b already exists, for the edge a -> b). A vertex
+    linked by v -> a or b -> v is kept: that transition zips two free edges (see
+    :func:`tyssue.topology.sheet_topology.t3_transition`).
     """
     empty = np.array([], dtype=np.int64)
     pa = pos[bnd.free_srce]
@@ -309,11 +311,14 @@ def _t3_neighbor_list(bnd, cache, pos, radius):
 
     nv, nf = cache["nv"], cache["nf"]
     in_face = _in_sorted(verts * nf + bnd.free_face[free_k], cache["face_keys"])
-    linked = np.zeros(len(verts), dtype=bool)
-    for end in (bnd.free_srce[free_k], bnd.free_trgt[free_k]):
-        key = np.minimum(verts, end) * nv + np.maximum(verts, end)
-        linked |= (verts == end) | _in_sorted(key, cache["link_keys"])
-    keep = ~(in_face | linked)
+    srce, trgt = bnd.free_srce[free_k], bnd.free_trgt[free_k]
+    duplicated = (
+        (verts == srce)
+        | (verts == trgt)
+        | _in_sorted(srce * nv + verts, cache["link_keys"])  # a -> v
+        | _in_sorted(verts * nv + trgt, cache["link_keys"])  # v -> b
+    )
+    keep = ~(in_face | duplicated)
     return verts[keep], free_k[keep]
 
 

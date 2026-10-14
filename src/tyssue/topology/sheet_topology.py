@@ -130,6 +130,13 @@ def t3_transition(sheet, vert, edge, snap=True, reindex=True):
     is added to F, so that v is shared by its own cell(s) and F. Nothing is
     removed; the free border now passes through v twice.
 
+    `v` may already be linked to an end of the edge by a free half-edge of
+    another face G, when the two free borders meet at that end: v -> a, or
+    b -> v. The new half-edge a -> v (or v -> b) of F is then the opposite of
+    G's, so the transition zips the two free edges into one edge shared by F
+    and G and closes the gap between them at that end. A link the other way round (a -> v or v -> b) would duplicate a half-edge
+    and is refused.
+
     See Fletcher et al., Implementing vertex dynamics models of cell populations
     in biology within a consistent computational framework, Progress in
     Biophysics and Molecular Biology 113 (2013)
@@ -148,7 +155,8 @@ def t3_transition(sheet, vert, edge, snap=True, reindex=True):
     Returns
     -------
     0 on success, -1 if the transition is not possible (`edge` is not free,
-    `vert` already belongs to its face or is linked to one of its ends)
+    `vert` already belongs to its face, or is linked to one of its ends other
+    than by v -> a or b -> v)
     """
     edge_df = sheet.edge_df
     srce, trgt, face = edge_df.loc[edge, ["srce", "trgt", "face"]].astype(int)
@@ -157,10 +165,11 @@ def t3_transition(sheet, vert, edge, snap=True, reindex=True):
 
     is_opposite = (edge_df["srce"] == trgt) & (edge_df["trgt"] == srce)
     in_face = (edge_df["face"] == face) & (edge_df["srce"] == vert)
-    linked = ((edge_df["srce"] == vert) & edge_df["trgt"].isin((srce, trgt))) | (
-        (edge_df["trgt"] == vert) & edge_df["srce"].isin((srce, trgt))
+    # a -> v or v -> b would be created twice; v -> a and b -> v are zipped
+    duplicated = ((edge_df["srce"] == srce) & (edge_df["trgt"] == vert)) | (
+        (edge_df["srce"] == vert) & (edge_df["trgt"] == trgt)
     )
-    if is_opposite.any() or in_face.any() or linked.any():
+    if is_opposite.any() or in_face.any() or duplicated.any():
         return -1
 
     if snap:

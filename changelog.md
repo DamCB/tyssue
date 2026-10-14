@@ -31,6 +31,12 @@
   (`settings["t3_skin"]`, default `10 * t3_threshold`); without contacts it
   costs ~1% of a step and leaves the trajectory bitwise unchanged.
   `Sheet` only.
+- A vertex linked to an end of the free edge by a free half-edge of its own
+  face (v -> a, or b -> v, for the edge a -> b) is merged too: that transition
+  zips the two free edges into one shared edge and closes the gap between the
+  two borders. Without it, the neighbours of a T3 junction slid through the
+  adjacent edges into the other cell. Links the other way round (a -> v,
+  v -> b) would duplicate a half-edge and are still refused.
 - **The removal of small triangular faces is now called a type 2 transition**,
   as in the vertex model literature: `QSSolver(with_t2=...)`,
   `single_rearangement(..., with_t2=...)`, `all_rearangements(..., with_t2=...)`,

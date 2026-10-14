@@ -428,7 +428,8 @@ def _brute_force_t3(sheet, d_min):
         for v in border:
             if v in (a, b) or v in face_verts[face]:
                 continue
-            if {(v, a), (a, v), (v, b), (b, v)} & linked:
+            # a -> v or v -> b would be created twice (v -> a, b -> v zip)
+            if {(a, v), (v, b)} & linked:
                 continue
             pv = pos.loc[v].to_numpy()
             t = np.dot(pv - pa, pb - pa) / np.dot(pb - pa, pb - pa)
@@ -492,6 +493,37 @@ def test_t3_transitions():
     far = _square_triangle(gap=0.05)
     far.settings["t3_threshold"] = 0.01
     assert t3_transitions(far) == 0
+
+
+def test_t3_transitions_zip_linked_free_edges():
+    """A vertex linked to the end of a nearby free edge by a free edge of its
+    own face is merged too: the two free edges become one shared edge."""
+    import pandas as pd
+
+    from tyssue.behaviors.sheet.actions import t3_transitions
+    from tyssue.config.geometry import planar_spec
+    from tyssue.geometry.planar_geometry import PlanarGeometry
+
+    # a square and a triangle sharing the corner 2; the triangle's 2 -> 4 runs
+    # down along the square's 1 -> 2, 4 is 0.005 away from it
+    vert = pd.DataFrame({"x": [0.0, 1, 1, 0, 1.005, 1.8], "y": [0.0, 0, 1, 1, 0.4, 0.5]})
+    edge = pd.DataFrame(
+        {"srce": [0, 1, 2, 3, 2, 4, 5], "trgt": [1, 2, 3, 0, 4, 5, 2],
+         "face": [0, 0, 0, 0, 1, 1, 1]}
+    )
+    face = pd.DataFrame({"x": [0.5, 1.3], "y": [0.5, 0.6]})
+    for df, name in ((vert, "vert"), (edge, "edge"), (face, "face")):
+        df.index.name = name
+    sheet = Sheet("sq_wedge", {"vert": vert, "edge": edge, "face": face},
+                  specs=planar_spec(), coords=["x", "y"])
+    PlanarGeometry.update_all(sheet)
+    sheet.settings["t3_threshold"] = 0.01
+
+    assert t3_transitions(sheet) == 1
+    PlanarGeometry.update_all(sheet)
+    assert sheet.validate()
+    assert (sheet.edge_df["opposite"] >= 0).sum() == 2
+    assert t3_transitions(sheet) == 0
 
 
 def test_t3_transitions_closed_sheet():
