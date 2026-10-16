@@ -10,6 +10,8 @@ import random
 from collections import deque
 from datetime import datetime
 
+import numpy as np
+
 logger = logging.getLogger(__name__)
 
 
@@ -72,29 +74,61 @@ class EventManager:
         behavior : function
         kwargs : dict defaults to {}
             keywords arguments to the behavior function
-            if `"face_id"` is in the kwargs dictionnary,
-            the face with this id is used.
+            if `"unique"` is True (the default), the event is skipped
+            when the same behavior with the same kwargs is already queued.
         """
-        if "face_id" in kwargs:
-            elem_id = kwargs["face_id"]
-        elif "elem_id" in kwargs:
-            elem_id = kwargs["elem_id"]
-        else:
-            elem_id = -1
+        self._append_unique(self.next, behavior, kwargs)
 
-        for tup in self.next:
-            unique = kwargs.get("unique", True)
-            if "face_id" in tup[1]:
-                if (elem_id == tup[1]["face_id"]) and (
-                    behavior.__name__ == tup[0].__name__ and (unique)
-                ):
-                    return
-            elif "elem_id" in tup[1]:
-                if (elem_id == tup[1]["elem_id"]) and (
-                    behavior.__name__ == tup[0].__name__(unique)
-                ):
-                    return
-        self.next.append((behavior, kwargs))
+    def extend_current(self, events, front=False):
+        """
+        Add a list of events to the current deque
+
+        Parameters
+        ----------
+        events : list of tuples (behavior, [elem_id, args, kwargs])
+            the three last elements don't need to be passed
+        front : bool, default False
+            if True, the events are put ahead of those already in the
+            current deque (keeping their own order), so they are executed
+            first by the next `execute`.
+
+        """
+        if not front:
+            for event in events:
+                self.append_current(event[0], **event[1])
+            return
+        added = deque()
+        for event in events:
+            behavior, kwargs = event[0], event[1]
+            if kwargs.get("unique", True) and (
+                _is_queued(self.current, behavior, kwargs)
+                or _is_queued(added, behavior, kwargs)
+            ):
+                continue
+            added.append((behavior, kwargs))
+        self.current.extendleft(reversed(added))
+
+    def append_current(self, behavior, **kwargs):
+        """Add an event to the manager's current deque
+
+        Events added while `execute` is running are executed in the
+        same step, after the events already in the current deque.
+
+        Parameters
+        ----------
+        behavior : function
+        kwargs : dict defaults to {}
+            keywords arguments to the behavior function
+            if `"unique"` is True (the default), the event is skipped
+            when the same behavior with the same kwargs is already queued.
+        """
+        self._append_unique(self.current, behavior, kwargs)
+
+    def _append_unique(self, queue, behavior, kwargs):
+        """Append (behavior, kwargs) to queue unless an identical event is there."""
+        if kwargs.get("unique", True) and _is_queued(queue, behavior, kwargs):
+            return
+        queue.append((behavior, kwargs))
 
     def execute(self, eptm):
         """
@@ -120,6 +154,31 @@ class EventManager:
         random.shuffle(self.next)
         self.current = self.next.copy()
         self.next.clear()
+
+
+def _is_queued(queue, behavior, kwargs):
+    """True if the same behavior with the same kwargs is already in queue."""
+    return any(
+        behavior.__name__ == tup[0].__name__ and _same_kwargs(kwargs, tup[1])
+        for tup in queue
+    )
+
+
+def _same_kwargs(kwargs, other):
+    """True if both kwargs dicts have the same keys and equal values."""
+    if kwargs.keys() != other.keys():
+        return False
+    return all(_same_value(kwargs[key], other[key]) for key in kwargs)
+
+
+def _same_value(value, other):
+    """Equality that also handles arrays; uncomparable values count as different."""
+    if value is other:
+        return True
+    try:
+        return bool(np.array_equal(value, other))
+    except (ValueError, TypeError):
+        return False
 
 
 # Default dictionary for wait function

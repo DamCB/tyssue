@@ -47,6 +47,19 @@ def test_add_only_once():
     initial_cell_event = [
         (division, {"face_id": 1, "geom": geom}),
         (apoptosis, {"face_id": 3, "shrink_rate": 4}),
+        (apoptosis, {"face_id": 3, "shrink_rate": 4}),
+    ]
+
+    manager.extend(initial_cell_event)
+    manager.execute(None)
+    manager.update()
+    assert len(manager.current) == 2
+
+
+def test_same_behavior_different_args():
+    manager = EventManager("face")
+    initial_cell_event = [
+        (apoptosis, {"face_id": 3, "shrink_rate": 4}),
         (apoptosis, {"face_id": 3}),
     ]
 
@@ -54,6 +67,36 @@ def test_add_only_once():
     manager.execute(None)
     manager.update()
     assert len(manager.current) == 2
+
+
+def test_add_only_once_current():
+    manager = EventManager("face")
+    manager.extend_current(
+        [
+            (apoptosis, {"face_id": 3, "shrink_rate": 4}),
+            (apoptosis, {"face_id": 3, "shrink_rate": 4}),
+            (apoptosis, {"face_id": 3, "shrink_rate": 4, "unique": False}),
+        ]
+    )
+    # the initial wait event plus two apoptosis events
+    assert len(manager.current) == 3
+
+
+def test_extend_current_front():
+    manager = EventManager("face")
+    manager.append_current(apoptosis, face_id=1)
+    manager.extend_current(
+        [
+            (apoptosis, {"face_id": 2}),
+            (apoptosis, {"face_id": 3}),
+            (apoptosis, {"face_id": 3}),  # duplicate within the batch
+            (apoptosis, {"face_id": 1}),  # already queued
+        ],
+        front=True,
+    )
+    ids = [kwargs["face_id"] for _, kwargs in manager.current]
+    # front events first, in their own order, ahead of wait and face 1
+    assert ids == [2, 3, -1, 1]
 
 
 def test_add_several_time_same_events():
