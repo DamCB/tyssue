@@ -8,7 +8,10 @@ created by Guillaume Gay, Sophie Theis, Magali Suzanne and the tyssue contributo
 With the agreement of the original authors, tyssue is developed here by the
 [vivarium-collective](https://github.com/vivarium-collective).
 
-Releases are published on PyPI under the name `tyssue`.
+**A release is upcoming.** This fork will become the source code for future
+`tyssue` releases on PyPI. The current PyPI release (1.1.0) was published from
+the upstream repository and does not include the changes listed under
+[Upcoming release](#upcoming-release).
 
 ![A nice banner](doc/illus/banner.png)
 
@@ -23,7 +26,9 @@ Releases are published on PyPI under the name `tyssue`.
 | [![Tests](https://github.com/vivarium-collective/vivatyssue/actions/workflows/tests.yml/badge.svg)](https://github.com/vivarium-collective/vivatyssue/actions/workflows/tests.yml) | [![Doc Status](https://readthedocs.org/projects/tyssue/badge/?version=latest)](http://tyssue.readthedocs.io/en/latest/) |  [![Join the chat at https://gitter.im/DamCB/tyssue](https://badges.gitter.im/DamCB/tyssue.svg)](https://gitter.im/DamCB/tyssue?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
 
 
-# tyssue is now published in the Journal of Open Source Software!
+## Publication
+
+`tyssue` is published in the Journal of Open Source Software.
 
 | ZENODO DOI | JOSS DOI |
 | --- | --- |
@@ -31,7 +36,7 @@ Releases are published on PyPI under the name `tyssue`.
 
 The `tyssue` library seeks to provide a unified interface to implement
 biomechanical models of living tissues.
-It's main focus is on **vertex based epithelium models**.
+Its main focus is on **vertex based epithelium models**.
 
 ## Overview
 
@@ -40,7 +45,7 @@ It's main focus is on **vertex based epithelium models**.
 The first model implemented is the one described in
 Monier et al.<sup id="a1">[1](#f1)</sup>. It is an example of a vertex model,
 where the interactions are only evaluated on the apical surface sheet
-of the epithelium. The second class of models is still at a
+of the epithelium. The second class of models is still at an early
 stage. They implement a description of the tissue's rheology, within a
 dissipation function formalism.
 
@@ -51,6 +56,32 @@ dissipation function formalism.
 <p align="center">
  <img src="doc/illus/geometry.png" width="500">
 </p>
+
+### What can you simulate?
+
+* **Tissues**: 2D sheets (`Sheet`, also with holes or periodic boundaries),
+  2D lateral sheets (`LateralSheet`), 3D apical sheets (flat, closed, ellipsoid,
+  cylinder and vessel shaped), and 3D monolayers and bulk tissues (`Monolayer`).
+* **Mechanics**: build a model from effectors (area, volume, perimeter and
+  length elasticity, line tension, contractility, surface tension, radial
+  tension, chiral torque, active migration and more) with `model_factory`.
+* **Solvers**: `QSSolver` finds the quasi-static (minimum energy) state;
+  `EulerSolver` runs overdamped dynamics in time and records a `History`.
+* **Topology changes**: type 1 transitions (neighbour exchange), type 2
+  transitions (removal of small triangular cells), type 3 transitions (a border
+  vertex joining the free edge of a neighbouring cell, `EulerSolver(..., with_t3=True)`),
+  cell division, apoptosis and delamination.
+* **Behaviours**: schedule events with an `EventManager`. `append` queues an
+  event for the next step and `append_current` for the current one. An event
+  that is already queued with the same arguments is not added twice, unless
+  you pass `unique=False`.
+* **Tissue closure**: fuse the facing lateral walls of two monolayer fronts
+  into one continuous epithelium (`lumen_closure` and `fuse` behaviours). See the
+  [tissue closure notebook](notebooks/tissue_closure_demo.ipynb).
+* **Folding and overlap checks**: `check_intersections` reports cells that
+  fold over themselves or overlap during a simulation.
+* **Input and output**: HDF5 histories, Zarr (with the `zarr` extra), and mesh
+  export through `meshio`.
 
 
 ### General Structure of the modeling API
@@ -115,6 +146,9 @@ fig, ax = sheet_view(sheet)
 
 * The old documentation is still browsable online [here](http://tyssue.readthedocs.io/en/latest/)
 * Introduction notebooks are available [here](https://github.com/DamCB/tyssue-demo).
+* The [tissue closure notebook](notebooks/tissue_closure_demo.ipynb) shows
+  lateral-face fusion and apical-constriction lift on monolayers.
+* Changes between versions are listed in the [changelog](changelog.md).
 
 ### Quick view with Colab
 
@@ -128,18 +162,38 @@ Thanks to @kephale, there is a napari plugin to visualise tyssue simulation outp
 You can find it [here](https://github.com/kephale/napari-tyssue).
 
 
-### What's new in 1.0 ?
-* Add new geometry : 2D lateral geometry
-* Add mean calculation in `Epithelium`
-* Add `sheet` conversion to `mesh` from `Meshio`
-* Allow hole in 2D sheet
-* Fix some visualisation
+### Upcoming release
+The next PyPI release will be the first one built from this fork. Changes since
+`tyssue` 1.1.0:
+
+* **No more CGAL**: tyssue is a pure python package, installed with `pip`.
+* **Type 3 transitions** for 2D and apical sheets. The removal of small
+  triangular cells is now called a type 2 transition (`with_t2=`). The old
+  `with_t3=` name on `QSSolver` and the rearrangement functions still works,
+  but gives a `FutureWarning`.
+* **Simulation results differ from earlier versions**: unit edge vectors used
+  outdated edge lengths, which changed line tension and contractility forces,
+  most of all on short edges.
+* **`EventManager`**: new `append_current` and `extend_current` add events to
+  the current step. Duplicate events are now found by comparing all of their
+  arguments, not only `face_id`.
+* **`ActiveMigration`** reads its direction from the face columns `mx`, `my`
+  (and `mz`), and each cell's force is split between its vertices.
+* **Folding and overlap detection** (`check_intersections`) replaces the
+  previous collision solvers.
+* **Tissue closure** behaviours for monolayers.
+* **Cylinder and vessel geometries**, with their own model factories.
+* **Faster** sheet simulations (`reconnect` and boundary updates).
+
+See the [changelog](changelog.md) for the full list.
 
 ### Roadmap
 You are welcome to participate in the development of `Tyssue`.
 What is planned for the future of `Tyssue`?
-* Solve collision in 2.5D & 3D
-* Use ZARR instead of HDF5 as base file format
+* Resolve collisions in 2.5D & 3D (detection is already available through
+  `check_intersections`)
+* Use ZARR instead of HDF5 as the default file format (reading and writing
+  Zarr already works with the `zarr` extra)
 * Upgrade geometry creation
   * Compound geometry to form complex shape
   * Use biological image as blueprint
@@ -166,9 +220,7 @@ Unsubscribe ➙ https://framalistes.org/sympa/sigrequest/tyssue
 
 ## Dependencies
 
-As all the dependencies are already completely supported in
-python 3.x, **we won't be maintaining a python 2.x version**, because
-it's time to move on...
+tyssue is tested on Linux, macOS and Windows with Python 3.10 to 3.13.
 <details>
   <summary>Show dependencies</summary>
 
@@ -211,7 +263,7 @@ it's time to move on...
 
 ## Install
 
-tyssue no longer depends on CGAL and is a pure python package, installed from PyPI:
+tyssue is a pure python package, installed from PyPI:
 
 ```bash
 python -m pip install --upgrade tyssue
@@ -240,6 +292,8 @@ which is not a python package and has to be installed separately:
 
 ### From source
 
+Until the [upcoming release](#upcoming-release) is published, install from source
+to get the features described in this README.
 See [INSTALL.md](INSTALL.md) for a step by step install.
 
 ## How to cite
@@ -279,17 +333,6 @@ Since version 0.3, this project is distributed under the terms of the [General P
 Versions 2.4 and earlier were distributed under the [Mozilla Public Licence](https://www.mozilla.org/en-US/MPL/2.0/).
 
 If GPL licencing is too restrictive for your intended usage, please contact the maintainer.
-
-## Research notice
-Please note that this repository is participating in a study into sustainability
- of open source projects. Data will be gathered about this repository for
- approximately the next 12 months, starting from June 2021.
-
-Data collected will include number of contributors, number of PRs, time taken to
- close/merge these PRs, and issues closed.
-
-For more information, please visit
-[our informational page](https://sustainable-open-science-and-software.github.io/) or download our [participant information sheet](https://sustainable-open-science-and-software.github.io/assets/PIS_sustainable_software.pdf).
 
 <hr/>
 
