@@ -5,15 +5,13 @@
 > The vivarium team in Conecticut considerably augmented and improved [tyssue](https://github.com/vivarium-collective/vivatyssue)
 > within their larger modeling framework. Go look it's great work.
 > I (@glyg) proposed to make **their fork the default tyssue** implementation
-> and cede them access to the pipy repository. This is still in discussion.
+> and cede them access to the pipy repository, which was done as of november 12th 2026
+>
+> I am **very** grateful to them for taking over and let this piece of code live on 🙂
+>
 > 
-> Please open an issue here if this impacts your work.
-
-
 > [!IMPORTANT]
-> You have until **March 3rd 2026** to contact me if you have concerns.
-> After that, independent of @sniffo et al to  take up the codebase, I will
-> archive this repository, as I can't find time to properly maintain it, as the one-year-old unticked boxes bellow can attest.
+> As a consequence, this repository is now archived
 
 
 ## [ANN] Working on a 1.0 release
